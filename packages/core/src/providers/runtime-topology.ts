@@ -242,9 +242,12 @@ function lockedProviderPresetProtocols(
     ...capabilities.map((capability) => capability.baseUrl)
   ].filter((value): value is string => Boolean(value?.trim()));
 
+  const hasGeminiOpenAiEndpoint = baseUrls.some((url) =>
+    /^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/openai(?:\/|$)/i.test(url.trim())
+  );
   for (const baseUrl of baseUrls) {
     const presetId = findProviderPresetByBaseUrl(baseUrl)?.id;
-    if (presetId === "gemini") {
+    if (presetId === "gemini" && !hasGeminiOpenAiEndpoint) {
       return ["gemini_generate_content", "gemini_interactions"];
     }
     if (presetId === "nvidia") {
@@ -429,6 +432,9 @@ export function normalizeProviderCapabilityProtocol(value: unknown): GatewayProv
 export function inferProtocol(provider: GatewayProviderConfig): GatewayProviderProtocol {
   const url = readBaseUrl(provider)?.toLowerCase() ?? "";
   const transformerNames = JSON.stringify(provider.transformer ?? "").toLowerCase();
+  if (/^https:\/\/generativelanguage\.googleapis\.com\/v1beta\/openai(?:\/|$)/.test(url)) {
+    return "openai_chat_completions";
+  }
   if (url.includes("/interactions") || transformerNames.includes("gemini_interactions")) {
     return "gemini_interactions";
   }

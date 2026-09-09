@@ -19,6 +19,7 @@ type ProviderPluginRequestInput = {
     headers?: Record<string, string | string[] | undefined>;
   };
   targetProviderConfig?: {
+    apikey?: string;
     baseurl?: string;
     type?: string;
   };
@@ -192,13 +193,28 @@ export function createGatewayPlugin() {
     providerHooks: [{
       key: "ccr-upstream-header-sanitizer",
       transformRequest(input: ProviderPluginRequestInput) {
+        const upstreamRequest = {
+          ...input.upstreamRequest,
+          headers: mergeUpstreamProviderHeaders(input.request?.headers, input.upstreamRequest.headers),
+          url: rewriteUpstreamProviderUrl(input.upstreamRequest.url, input.targetProviderConfig, input.config)
+        };
+        const apiKey = input.targetProviderConfig?.apikey?.trim();
+        if (apiKey?.startsWith("AIza") && /^gemini(?:_|$)/.test(input.targetProviderConfig?.type ?? "")) {
+          try {
+            const url = new URL(upstreamRequest.url);
+            if (url.hostname === "generativelanguage.googleapis.com") {
+              if (upstreamRequest.headers.authorization === `Bearer ${apiKey}`) delete upstreamRequest.headers.authorization;
+              upstreamRequest.headers["x-goog-api-key"] = apiKey;
+              url.searchParams.set("key", apiKey);
+              upstreamRequest.url = url.toString();
+            }
+          } catch {
+            // Invalid URLs are reported by the upstream transport.
+          }
+        }
         return {
           ok: true as const,
-          value: {
-            ...input.upstreamRequest,
-            headers: mergeUpstreamProviderHeaders(input.request?.headers, input.upstreamRequest.headers),
-            url: rewriteUpstreamProviderUrl(input.upstreamRequest.url, input.targetProviderConfig, input.config)
-          }
+          value: upstreamRequest
         };
       }
     }, {

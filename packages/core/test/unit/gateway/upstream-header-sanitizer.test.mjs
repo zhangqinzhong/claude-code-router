@@ -6,6 +6,21 @@ import {
   sanitizeUpstreamProviderHeaders
 } from "@ccr/core/gateway/core-runtime/upstream-header-sanitizer.ts";
 
+test("#1778 native Gemini sends AI Studio keys as API keys while OpenAI compatibility keeps bearer auth", () => {
+  const [hook] = createGatewayPlugin().providerHooks;
+  for (const type of ["gemini_generate_content", "gemini_interactions", "openai_chat_completions"]) {
+    const key = "AIza-test-provider-key";
+    const native = type !== "openai_chat_completions";
+    const result = hook.transformRequest({
+      targetProviderConfig: { type, apikey: key },
+      upstreamRequest: { body: {}, headers: { authorization: `Bearer ${key}` }, url: "https://generativelanguage.googleapis.com/v1beta/models/model:generateContent" }
+    }).value;
+    assert.equal(result.headers.authorization, native ? undefined : `Bearer ${key}`);
+    assert.equal(result.headers["x-goog-api-key"], native ? key : undefined);
+    assert.equal(new URL(result.url).searchParams.get("key"), native ? key : null);
+  }
+});
+
 test("provider boundary removes CCR-owned headers and preserves provider headers", () => {
   assert.deepEqual(sanitizeUpstreamProviderHeaders({
     authorization: "Bearer provider-token",

@@ -16,6 +16,22 @@ import {
   probeGatewayProviderCandidates
 } from "@ccr/core/providers/probe.ts";
 
+test("#1778 Gemini probe does not present an AI Studio API key as an OAuth bearer token", async (t) => {
+  const previousFetch = globalThis.fetch;
+  const requests = [];
+  globalThis.fetch = async (url, init) => {
+    requests.push({ url: String(url), headers: new Headers(init.headers) });
+    return new Response(JSON.stringify({ error: { message: "Missing contents" } }), { status: 400 });
+  };
+  t.after(() => { globalThis.fetch = previousFetch; });
+  await probeGatewayProvider({ baseUrl: "https://generativelanguage.googleapis.com", apiKey: "AIza-test-key", forceRefresh: true, mode: "protocols", protocols: ["gemini_generate_content"] });
+  assert.ok(requests.length > 0);
+  for (const request of requests) {
+    assert.equal(request.headers.get("authorization"), null);
+    assert.equal(request.headers.get("x-goog-api-key"), "AIza-test-key");
+  }
+});
+
 test("protocol support probe does not treat Gemini auth errors as every protocol", () => {
   const message = "HTTP 403: API key not valid. Please pass a valid API key.";
   const hints = ["gemini_generate_content"];

@@ -1512,7 +1512,7 @@ function anthropicHeaders(apiKey: string | undefined): Record<string, string> {
 function geminiHeaders(apiKey: string | undefined): Record<string, string> {
   const key = apiKeyCredentialValue(apiKey);
   return {
-    ...authorizationHeaders(apiKey),
+    ...(key?.startsWith("AIza") ? {} : authorizationHeaders(apiKey)),
     ...(key ? { "x-goog-api-key": key } : {})
   };
 }
