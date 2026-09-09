@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { createHash, randomBytes, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID } from "node:crypto";
 import { resolveRuntimeAppPath } from "@ccr/core/runtime/app-paths";
 import { saveAppConfig } from "@ccr/core/config/config";
 import { CONFIGDIR } from "@ccr/core/config/constants";
@@ -28,20 +28,14 @@ export const NO_CLAUDE_APP_ENTRY_PROFILE_MESSAGE =
   "No enabled claude-code profile can open the Claude App. Set a profile's Entry mode to App or Auto to configure the Claude App for CCR.";
 
 type ClaudeAppGatewayConfig = {
-  authentication: {
-    disableClaudeAiSignIn: true;
-  };
   bootstrapEnabled: false;
   inferenceCredentialKind: "static";
   inferenceGatewayApiKey: string;
   inferenceGatewayAuthScheme: "x-api-key";
   inferenceGatewayBaseUrl: string;
   inferenceModels: ClaudeAppGatewayInferenceModel[];
-  inferenceModelsUpdatedAt: string;
-  inferenceModelsVersion: string;
   inferenceProvider: "gateway";
   modelDiscoveryEnabled: true;
-  unstableDisableModelVerification: true;
 };
 
 type ClaudeAppApplyState = {
@@ -152,22 +146,15 @@ export function applyClaudeAppGatewayConfig(config: AppConfig, options: ClaudeAp
     defaultTargetModel: options.defaultModel
   });
   const model = models[0]?.name ?? "";
-  const modelsVersion = claudeAppGatewayModelsVersion(endpoint, models);
   const gatewayConfig: ClaudeAppGatewayConfig = {
-    authentication: {
-      disableClaudeAiSignIn: true
-    },
     bootstrapEnabled: false,
     inferenceCredentialKind: "static",
     inferenceGatewayApiKey: state.apiKey,
     inferenceGatewayAuthScheme: "x-api-key",
     inferenceGatewayBaseUrl: endpoint,
     inferenceModels: models,
-    inferenceModelsUpdatedAt: new Date().toISOString(),
-    inferenceModelsVersion: modelsVersion,
     inferenceProvider: "gateway",
-    modelDiscoveryEnabled: true,
-    unstableDisableModelVerification: true
+    modelDiscoveryEnabled: true
   };
 
   if (options.backup !== false) {
@@ -196,13 +183,6 @@ export function applyClaudeAppGatewayConfig(config: AppConfig, options: ClaudeAp
       requiresRestart: true
     }
   };
-}
-
-function claudeAppGatewayModelsVersion(endpoint: string, models: ClaudeAppGatewayInferenceModel[]): string {
-  return createHash("sha256")
-    .update(JSON.stringify({ endpoint, models }))
-    .digest("hex")
-    .slice(0, 16);
 }
 
 export function refreshClaudeAppModelDiscoveryCache(dataDir: string): void {
@@ -480,6 +460,9 @@ function restoreClaudeAppOwnedKey(
 
 function applyClaudeAppGatewayLibraryConfig(file: string, gatewayConfig: ClaudeAppGatewayConfig): void {
   const current = readJsonRecord(file);
+  for (const key of ["authentication", "inferenceModelsUpdatedAt", "inferenceModelsVersion", "unstableDisableModelVerification"]) {
+    if (current) delete current[key];
+  }
   writeJsonFile(file, {
     ...(current ?? {}),
     ...gatewayConfig

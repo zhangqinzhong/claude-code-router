@@ -6,7 +6,7 @@ import test from "node:test";
 import { applyClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service.ts";
 import { resolveClaudeAppGatewayRouteModel } from "@ccr/core/agents/claude-app/gateway-routes.ts";
 
-test("Claude App gateway config keeps 3P mode signed out of Claude.ai", () => {
+test("Claude App gateway config uses static gateway credentials with current schema", () => {
   const dataDir = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-gateway-config-"));
   const activeDataDir = `${dataDir}-3p`;
 
@@ -27,9 +27,9 @@ test("Claude App gateway config keeps 3P mode signed out of Claude.ai", () => {
     assert.equal(launchRootConfig.deploymentMode, "3p");
     assert.equal(activeRootConfig.deploymentMode, "3p");
     assert.deepEqual(launchGatewayConfig, activeGatewayConfig);
-    assert.deepEqual(activeGatewayConfig.authentication, {
-      disableClaudeAiSignIn: true
-    });
+    for (const key of ["authentication", "inferenceModelsUpdatedAt", "inferenceModelsVersion", "unstableDisableModelVerification"]) {
+      assert.equal(Object.hasOwn(activeGatewayConfig, key), false, key);
+    }
     assert.equal(activeGatewayConfig.bootstrapEnabled, false);
 
     assert.equal(activeGatewayConfig.inferenceProvider, "gateway");
@@ -38,7 +38,6 @@ test("Claude App gateway config keeps 3P mode signed out of Claude.ai", () => {
     assert.equal(activeGatewayConfig.inferenceGatewayApiKey, "existing-test-key");
     assert.equal(activeGatewayConfig.inferenceGatewayBaseUrl, "http://127.0.0.1:3456");
     assert.equal(activeGatewayConfig.modelDiscoveryEnabled, true);
-    assert.equal(activeGatewayConfig.unstableDisableModelVerification, true);
     assert.ok(activeGatewayConfig.inferenceModels.length > 0);
   } finally {
     rmSync(dataDir, { force: true, recursive: true });
@@ -89,6 +88,10 @@ test("Claude App gateway config preserves unknown keys when rewriting config lib
     for (const file of [launchLibraryFile, activeLibraryFile]) {
       writeJson(file, {
         ...readJson(file),
+        authentication: { disableClaudeAiSignIn: true },
+        inferenceModelsUpdatedAt: "2026-01-01",
+        inferenceModelsVersion: "old",
+        unstableDisableModelVerification: true,
         coworkEgressAllowedHosts: ["*"],
         extraUnknownKey: "keep-me"
       });
@@ -107,6 +110,9 @@ test("Claude App gateway config preserves unknown keys when rewriting config lib
       const rewritten = readJson(file);
       assert.deepEqual(rewritten.coworkEgressAllowedHosts, ["*"]);
       assert.equal(rewritten.extraUnknownKey, "keep-me");
+      for (const key of ["authentication", "inferenceModelsUpdatedAt", "inferenceModelsVersion", "unstableDisableModelVerification"]) {
+        assert.equal(Object.hasOwn(rewritten, key), false, key);
+      }
       assert.equal(rewritten.inferenceGatewayBaseUrl, "http://127.0.0.1:3457");
       assert.equal(rewritten.inferenceProvider, "gateway");
       assert.equal(rewritten.inferenceGatewayApiKey, "existing-test-key");
