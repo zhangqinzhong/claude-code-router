@@ -196,12 +196,32 @@ function configuredProviderModel(provider: GatewayProviderConfig, model: string)
   return provider.models.find((candidate) => candidate.trim().toLowerCase() === normalized)?.trim();
 }
 
-function providerAliases(provider: GatewayProviderConfig): Set<string> {
-  return new Set(
+type ProviderAliasCacheEntry = {
+  name: string;
+  id?: string;
+  provider?: string;
+  baseUrl?: string;
+  aliases: ReadonlySet<string>;
+};
+
+const providerAliasCache = new WeakMap<GatewayProviderConfig, ProviderAliasCacheEntry>();
+
+function providerAliases(provider: GatewayProviderConfig): ReadonlySet<string> {
+  const cached = providerAliasCache.get(provider);
+  const baseUrl = providerBaseUrl(provider);
+  if (cached && cached.name === provider.name && cached.id === provider.id &&
+    cached.provider === provider.provider && cached.baseUrl === baseUrl) {
+    return cached.aliases;
+  }
+  const aliases = new Set(
     [provider.name, provider.id, provider.provider, providerRuntimeId(provider)]
       .map((value) => value?.trim().toLowerCase())
       .filter((value): value is string => Boolean(value))
   );
+  providerAliasCache.set(provider, {
+    name: provider.name, id: provider.id, provider: provider.provider, baseUrl, aliases
+  });
+  return aliases;
 }
 
 function providerSelectorBase(value: string | undefined): string {
