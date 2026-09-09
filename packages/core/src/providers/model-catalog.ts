@@ -71,9 +71,25 @@ const presetCatalogModelOverrides: Record<string, CatalogProviderModelOverride> 
 };
 
 let catalogIndex: CatalogIndex | undefined;
+const catalogResultCache = new Map<string, ProviderCatalogModelsResult>();
+const CATALOG_RESULT_CACHE_LIMIT = 512;
 
 export function getProviderCatalogModels(request: ProviderCatalogModelsRequest): ProviderCatalogModelsResult {
   const index = loadCatalogIndex();
+  const key = JSON.stringify([request.providerPresetId, request.baseUrl, request.name, request.providerIds]);
+  const cached = catalogResultCache.get(key);
+  if (cached) {
+    return { ...cached };
+  }
+  const result = resolveProviderCatalogModels(index, request);
+  if (catalogResultCache.size >= CATALOG_RESULT_CACHE_LIMIT) {
+    catalogResultCache.delete(catalogResultCache.keys().next().value!);
+  }
+  catalogResultCache.set(key, result);
+  return { ...result };
+}
+
+function resolveProviderCatalogModels(index: CatalogIndex, request: ProviderCatalogModelsRequest): ProviderCatalogModelsResult {
   const modelOverride = providerCatalogModelOverride(request);
   if (modelOverride) {
     const { metadataModelAliases, ...result } = modelOverride;
