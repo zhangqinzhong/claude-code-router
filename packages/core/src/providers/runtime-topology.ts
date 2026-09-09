@@ -13,6 +13,13 @@ export function providerCapabilityForClientProtocol(
   clientProtocol: GatewayProviderProtocol
 ): (GatewayProviderCapability & { type: GatewayProviderProtocol }) | undefined {
   const capabilities = normalizedProviderCapabilities(provider);
+  if (clientProtocol === "anthropic_messages") {
+    const openRouterChat = capabilities.find((item) => item.type === "openai_chat_completions" &&
+      /^https:\/\/openrouter\.ai\/api\/v1(?:\/|$)/i.test(item.baseUrl || readBaseUrl(provider) || ""));
+    if (openRouterChat) {
+      return { ...openRouterChat, type: "openai_chat_completions" };
+    }
+  }
   for (const protocol of providerProtocolPreferenceForClient(clientProtocol)) {
     const capability = capabilities.find(
       (item): item is GatewayProviderCapability & { type: GatewayProviderProtocol } => item.type === protocol

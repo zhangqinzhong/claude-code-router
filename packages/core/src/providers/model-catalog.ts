@@ -198,7 +198,10 @@ function buildCatalogIndex(payload: unknown, loadedFrom: string): CatalogIndex {
       continue;
     }
 
-    const sourceRecords = Array.isArray(item.sourceRecords) ? item.sourceRecords : [];
+    // Direct provider records precede aggregators for the same exact model ID.
+    const sourceRecords = Array.isArray(item.sourceRecords) ? [...item.sourceRecords].sort((a, b) =>
+      Number(isRecord(b) && b.source === b.provider) - Number(isRecord(a) && a.source === a.provider)
+    ) : [];
     for (const sourceRecord of sourceRecords) {
       if (!isRecord(sourceRecord)) {
         continue;
@@ -271,8 +274,13 @@ function providerModelMetadataFromCatalog(
   model: string
 ): ProviderModelMetadata | undefined {
   const limits = isRecord(modelEntry.limits) ? modelEntry.limits : {};
-  const contextWindow = maxPositiveInteger(limits.contextTokens, limits.inputTokens, limits.maxTokens);
-  const maxOutputTokens = maxPositiveInteger(limits.outputTokens, limits.maxTokens);
+  const sourceMetadata = isRecord(sourceRecord.metadata) ? sourceRecord.metadata : {};
+  const topProvider = provider === "openrouter" && sourceRecord.source === "openrouter" && isRecord(sourceMetadata.topProvider)
+    ? sourceMetadata.topProvider : {};
+  const contextWindow = maxPositiveInteger(topProvider.context_length) ??
+    maxPositiveInteger(limits.contextTokens, limits.inputTokens, limits.maxTokens);
+  const maxOutputTokens = maxPositiveInteger(topProvider.max_completion_tokens) ??
+    maxPositiveInteger(limits.outputTokens, limits.maxTokens);
   const capabilities = isRecord(modelEntry.capabilities) ? modelEntry.capabilities : {};
   const imageInput = booleanValue(capabilities.imageInput);
   const webSearch = booleanValue(capabilities.webSearch);

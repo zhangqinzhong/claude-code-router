@@ -17,6 +17,7 @@ import { uniqueStrings } from "@ccr/core/gateway/internal/collections";
 import { contextArchiveConfigForApiKey, contextArchiveMcpEnabled } from "@ccr/core/gateway/context-archive";
 import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
 import { filterModelIdsForProfile, isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
+import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
 
 
 export function shouldServeGatewayModelsResponse(method: string, path: string): boolean {
@@ -452,7 +453,11 @@ function providerModelMetadataForResolvedModel(
     return direct;
   }
   const normalizedModel = resolved.model.toLowerCase();
-  return Object.entries(metadata).find(([model]) => model.trim().toLowerCase() === normalizedModel)?.[1];
+  return Object.entries(metadata).find(([model]) => model.trim().toLowerCase() === normalizedModel)?.[1] ??
+    getProviderCatalogModels({
+      baseUrl: resolved.provider.api_base_url,
+      name: resolved.provider.name
+    }).modelMetadata?.[resolved.model];
 }
 
 
@@ -477,10 +482,9 @@ function providerModelResolutionForSelector(config: AppConfig, selector: string)
 function gatewayModelSupportsOneMillionContext(config: AppConfig, selector: string): boolean {
   const discovery = providerModelDiscoveryForSelector(config, selector);
   const metadataContextWindow = effectiveProviderContextWindow(discovery.metadata);
-  return Boolean(
-    (metadataContextWindow && metadataContextWindow >= 1_000_000) ||
-    discovery.catalogEntry?.limits?.supports1MContext
-  );
+  return metadataContextWindow !== undefined
+    ? metadataContextWindow >= 1_000_000
+    : Boolean(discovery.catalogEntry?.limits?.supports1MContext);
 }
 
 
