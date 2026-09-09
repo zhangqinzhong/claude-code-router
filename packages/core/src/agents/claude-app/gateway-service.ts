@@ -227,9 +227,9 @@ export function restoreClaudeAppGatewayConfig(): void {
   }
 
   const paths = getClaudeAppGatewayPaths();
-  restoreFileSnapshot(paths.rootConfigFile, backup.rootConfigFile);
-  restoreFileSnapshot(paths.metaFile, backup.metaFile);
-  restoreFileSnapshot(paths.configLibraryFile, backup.configLibraryFile);
+  restoreClaudeAppOwnedKey(paths.rootConfigFile, backup.rootConfigFile, "deploymentMode", "3p");
+  restoreClaudeAppOwnedKey(paths.metaFile, backup.metaFile, "appliedId", CLAUDE_APP_CONFIG_ID);
+  // The inactive library entry contains preferences Claude writes during takeover.
   rmSync(CLAUDE_APP_GATEWAY_BACKUP_FILE, { force: true });
 }
 
@@ -445,6 +445,37 @@ function gatewayEndpoint(config: AppConfig): string {
   const formattedHost = host.includes(":") && !host.startsWith("[") ? `[${host}]` : host;
   const port = Number.isInteger(config.gateway.port) && config.gateway.port > 0 ? config.gateway.port : config.PORT;
   return `http://${formattedHost}:${port}`;
+}
+
+function restoreClaudeAppOwnedKey(
+  file: string,
+  snapshot: ClaudeAppGatewayFileSnapshot,
+  key: string,
+  appliedValue: string
+): void {
+  const current = readJsonRecord(file);
+  if (!current) {
+    restoreFileSnapshot(file, snapshot);
+    return;
+  }
+  if (current[key] !== appliedValue) {
+    return;
+  }
+  let previous: Record<string, unknown> = {};
+  if (snapshot.exists && snapshot.content) {
+    try {
+      const parsed: unknown = JSON.parse(snapshot.content);
+      if (isPlainRecord(parsed)) previous = parsed;
+    } catch {
+      // An invalid original file has no configuration key to restore.
+    }
+  }
+  if (Object.hasOwn(previous, key)) {
+    current[key] = previous[key];
+  } else {
+    delete current[key];
+  }
+  writeJsonFile(file, current);
 }
 
 function applyClaudeAppGatewayLibraryConfig(file: string, gatewayConfig: ClaudeAppGatewayConfig): void {
