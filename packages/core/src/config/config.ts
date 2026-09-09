@@ -1470,7 +1470,7 @@ function parseProviders(value: unknown): GatewayProviderConfig[] | undefined {
           ?? parseProviderProtocolCapability(item),
         credentials: parseProviderCredentials(item.credentials ?? item.keys ?? item.apiKeys),
         extraBody: item.extraBody,
-        extraHeaders: item.extraHeaders,
+        extraHeaders: item.extraHeaders ?? item.extra_headers ?? item.headers,
         icon: readString(item.icon),
         id: readString(item.id),
         enabled: item.enabled === false ? false : undefined,

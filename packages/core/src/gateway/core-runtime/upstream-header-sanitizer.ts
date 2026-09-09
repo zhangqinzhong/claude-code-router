@@ -1,3 +1,4 @@
+import { randomUUID } from "node:crypto";
 import { applyResponsesSessionAffinity } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
 import type { ResponsesSessionAffinityInput } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
 import { applyResponsesToolStrictness } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
@@ -16,6 +17,7 @@ type ProviderPluginRequestInput = {
     anthropicBaseUrl?: string;
   };
   request?: {
+    id?: string;
     headers?: Record<string, string | string[] | undefined>;
   };
   targetProviderConfig?: {
@@ -199,6 +201,16 @@ export function createGatewayPlugin() {
           url: rewriteUpstreamProviderUrl(input.upstreamRequest.url, input.targetProviderConfig, input.config)
         };
         const apiKey = input.targetProviderConfig?.apikey?.trim();
+        if (!upstreamRequest.headers["x-opencode-session"]?.trim()) {
+          try {
+            const url = new URL(upstreamRequest.url);
+            if (url.protocol === "https:" && url.hostname === "opencode.ai" && /^\/zen\/go\/v1(?:\/|$)/.test(url.pathname)) {
+              upstreamRequest.headers["x-opencode-session"] = `ccr-${input.request?.id || randomUUID()}`;
+            }
+          } catch {
+            // Invalid URLs are reported by the upstream transport.
+          }
+        }
         if (apiKey?.startsWith("AIza") && /^gemini(?:_|$)/.test(input.targetProviderConfig?.type ?? "")) {
           try {
             const url = new URL(upstreamRequest.url);
