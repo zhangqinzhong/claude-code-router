@@ -75,7 +75,8 @@ export function isAnthropicHostedWebSearchTool(tool: unknown): boolean {
   if (!isRecord(tool)) {
     return false;
   }
-  return anthropicHostedWebSearchType(stringValue(tool.type));
+  return anthropicHostedWebSearchType(stringValue(tool.type)) ||
+    (tool.type === undefined && tool.name === "WebSearch");
 }
 
 export function isOpenAiHostedWebSearchTool(tool: unknown): boolean {

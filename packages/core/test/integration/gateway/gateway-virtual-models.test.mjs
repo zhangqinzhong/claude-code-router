@@ -587,21 +587,26 @@ test("gateway resolves Claude discovery aliases before hosted web search matchin
       }
     ]
   };
-  const context = createHostedWebSearchProtocolContext({
-    body: Buffer.from(JSON.stringify({
-      messages: [{ content: "weather", role: "user" }],
-      model: "claude-Fusion/kimisearch",
-      tools: [{ name: "web_search", type: "web_search_20250305" }]
-    })),
-    config,
-    method: "POST",
-    path: "/v1/messages",
-    requestId: "request-1",
-    routedModel: "claude-Fusion/kimisearch",
-    sinceMs: 0
-  });
+  for (const tool of [
+    { name: "web_search", type: "web_search_20250305" },
+    { name: "WebSearch", input_schema: { type: "object" } }
+  ]) {
+    const context = createHostedWebSearchProtocolContext({
+      body: Buffer.from(JSON.stringify({
+        messages: [{ content: "weather", role: "user" }],
+        model: "claude-Fusion/kimisearch",
+        tools: [tool]
+      })),
+      config,
+      method: "POST",
+      path: "/v1/messages",
+      requestId: "request-1",
+      routedModel: "claude-Fusion/kimisearch",
+      sinceMs: 0
+    });
 
-  assert.equal(context?.toolName, "fusion_2_web_search");
+    assert.equal(context?.toolName, "fusion_2_web_search");
+  }
 });
 
 test("gateway does not route hosted web search through an unrelated Fusion search profile", () => {
@@ -1243,6 +1248,22 @@ test("gateway includes browser extraction diagnostics in hosted web search evide
   const parsed = JSON.parse(transformed.toString("utf8"));
 
   assert.match(parsed.messages[0].content, /Diagnostics: Page extraction failed/);
+});
+
+test("Cowork WebSearch is removed with its forced choice while custom tools survive", () => {
+  const customTools = ["web_search", "web_search_docs", "my_websearch"].map((name) => ({
+    name, input_schema: { type: "object" }
+  }));
+  const body = Buffer.from(JSON.stringify({
+    messages: [{ role: "user", content: "search docs" }],
+    tools: [{ name: "WebSearch", input_schema: { type: "object" } }, ...customTools],
+    tool_choice: { type: "tool", name: "WebSearch" }
+  }));
+  const parsed = JSON.parse(prepareAnthropicWebSearchProtocolRequestBody(
+    body, [sampleSearchRecord()], { queryHint: "search docs" }
+  ).toString("utf8"));
+  assert.deepEqual(parsed.tools, customTools);
+  assert.equal(parsed.tool_choice, undefined);
 });
 
 test("gateway hosted web search rewrites preserve custom web_search-named tools", () => {

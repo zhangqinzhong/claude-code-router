@@ -208,7 +208,10 @@ function stripAnthropicHostedWebSearchTools(body: Record<string, unknown>): Reco
   }
   const toolChoice = isRecord(next.tool_choice) ? next.tool_choice : undefined;
   const toolChoiceName = stringValue(toolChoice?.name);
-  if (tools.length === 0 || toolChoiceName === "web_search") {
+  const choiceWasRemoved = body.tools.some((tool) =>
+    isAnthropicHostedWebSearchTool(tool) && isRecord(tool) && tool.name === toolChoiceName
+  );
+  if (tools.length === 0 || choiceWasRemoved) {
     delete next.tool_choice;
   }
   return next;
