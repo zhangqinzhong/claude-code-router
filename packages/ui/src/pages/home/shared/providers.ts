@@ -1993,9 +1993,14 @@ export function providerCapabilitiesForSave(
   const normalizedNextBaseUrl = normalizeProviderBaseUrl(nextBaseUrl) || nextBaseUrl.trim();
   const preserveExisting = normalizedExistingBaseUrl === undefined ||
     normalizedExistingBaseUrl === normalizedNextBaseUrl;
+  const selectedTypes = new Set(currentCapabilities.map((capability) => capability.type));
+  const retainedCapabilities = preservedCapabilities.filter((capability) =>
+    selectedTypes.has(capability.type) ||
+    !providerProtocolOptions.some((option) => option.value === capability.type)
+  );
   return mergeProviderCapabilities(
     currentCapabilities,
-    ...(preserveExisting ? [preservedCapabilities] : [])
+    ...(preserveExisting ? [retainedCapabilities] : [])
   );
 }
 

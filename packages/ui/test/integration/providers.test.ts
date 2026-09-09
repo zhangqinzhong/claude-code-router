@@ -147,6 +147,25 @@ test("provider save keeps explicit secondary media origins when the base URL is 
   );
 });
 
+test("#1765 saving and reopening a manual provider does not resurrect unchecked protocols", () => {
+  const baseUrl = "https://llmgw.company.test/Minimax";
+  const selected = [{ baseUrl, source: "preset" as const, type: "openai_chat_completions" as const }];
+  const previous = [
+    ...selected,
+    { baseUrl, source: "detected" as const, type: "anthropic_messages" as const }
+  ];
+  for (const mode of ["manual", "auto"] as const) {
+    const capabilities = providerCapabilitiesForSave(selected, previous, baseUrl, baseUrl);
+    assert.deepEqual(capabilities, selected);
+    const draft = createProviderDraftFromProvider({
+      api_base_url: baseUrl, capabilities, models: ["DeepSeek-V4-Flash"], name: "company",
+      protocolDetectionMode: mode, type: "openai_chat_completions"
+    });
+    assert.deepEqual(draft.selectedProtocols, ["openai_chat_completions"]);
+    assert.equal(draft.protocolDetectionMode, mode);
+  }
+});
+
 test("provider save keeps hand-written fields the dialog cannot edit", () => {
   const existing = {
     api_base_url: "https://example.test/v1",
