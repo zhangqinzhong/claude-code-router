@@ -1,4 +1,5 @@
 import { randomUUID } from "node:crypto";
+import { applyMetaTokenFloor } from "@ccr/core/gateway/core-runtime/meta-token-floor";
 import { applyResponsesSessionAffinity } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
 import type { ResponsesSessionAffinityInput } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
 import { applyResponsesToolStrictness } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
@@ -226,7 +227,7 @@ export function createGatewayPlugin() {
         }
         return {
           ok: true as const,
-          value: upstreamRequest
+          value: applyMetaTokenFloor(upstreamRequest)
         };
       }
     }, {
