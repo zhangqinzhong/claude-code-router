@@ -9,8 +9,7 @@ import { scanBotHandoffBluetoothTargets, scanBotHandoffWifiTargets } from "@ccr/
 import { cancelBotGatewayQrLogin, startBotGatewayQrLogin, waitBotGatewayQrLogin } from "@ccr/core/agents/bot-gateway/qr-login-service";
 import { closeBotGatewayQrWindow, openBotGatewayQrWindow } from "./bot-gateway-qr-window-service";
 import { syncClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service";
-import { findInstalledCodexAppExecutable, findInstalledWorkbuddyAppExecutable } from "@ccr/core/agents/codex/app-launch";
-import { findInstalledOpenCodeAppExecutable } from "@ccr/core/agents/opencode/app-launch";
+import { getAppInfoPaths } from "@ccr/core/agents/app-info-paths";
 import { loadAppConfig, saveApiKeysConfig, saveAppConfig, saveAppThemePreference, withClaudeDesignRuntimePluginConfig } from "@ccr/core/config/config";
 import {
   APP_CONFIG_DB_FILE,
@@ -68,9 +67,7 @@ function applyAppThemePreference(theme: AppConfig["theme"]): void {
 }
 
 ipcMain.handle(IPC_CHANNELS.appGetInfo, () => {
-  const chatgptAppPath = findInstalledCodexAppExecutable().executable;
-  const opencodeAppPath = findInstalledOpenCodeAppExecutable().executable;
-  const workbuddyAppPath = findInstalledWorkbuddyAppExecutable().executable;
+  const { chatgptAppPath, opencodeAppPath, workbuddyAppPath } = getAppInfoPaths();
   return {
     ...(chatgptAppPath ? { chatgptAppPath } : {}),
     configDbFile: APP_CONFIG_DB_FILE,

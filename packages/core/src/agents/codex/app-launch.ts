@@ -1038,7 +1038,7 @@ function findInstalledCodexCompatibleAppExecutable(spec: CodexCompatibleAppSpec,
   return { checked, executable: findFirstExecutable(linuxCodexAppCandidates(spec), checked, spec) };
 }
 
-function findFirstExecutable(candidates: string[], checked: string[], spec: CodexCompatibleAppSpec): string | undefined {
+function findFirstExecutable(candidates: Iterable<string>, checked: string[], spec: CodexCompatibleAppSpec): string | undefined {
   for (const candidate of candidates) {
     if (!candidate || checked.includes(candidate)) {
       continue;
@@ -1072,7 +1072,7 @@ function macCodexAppCandidates(spec: CodexCompatibleAppSpec): string[] {
   return roots.flatMap((root) => spec.macAppNames.map((name) => path.join(root, name)));
 }
 
-function windowsCodexAppCandidates(spec: CodexCompatibleAppSpec): string[] {
+function windowsCodexAppCandidates(spec: CodexCompatibleAppSpec): Iterable<string> {
   return windowsDesktopAppCandidates({
     appDirs: spec.windowsAppDirs,
     exeNames: spec.windowsExeNames,

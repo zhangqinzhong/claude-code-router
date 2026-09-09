@@ -17,9 +17,9 @@ export type WindowsDesktopAppNormalizeOptions = {
   packageKeywords: string[];
 };
 
-export function windowsDesktopAppCandidates(options: WindowsDesktopAppDiscoveryOptions): string[] {
+export function* windowsDesktopAppCandidates(options: WindowsDesktopAppDiscoveryOptions): Generator<string> {
   if (process.platform !== "win32") {
-    return [];
+    return;
   }
 
   const candidates: string[] = [];
@@ -48,19 +48,12 @@ export function windowsDesktopAppCandidates(options: WindowsDesktopAppDiscoveryO
     }
   }
 
-  for (const candidate of windowsAppExecutionAliasCandidates(options)) {
-    pushUnique(candidates, candidate);
-  }
-  for (const candidate of windowsShortcutTargetCandidates(options)) {
-    pushUnique(candidates, candidate);
-  }
-  for (const candidate of windowsMsixPackageCandidates(options)) {
-    pushUnique(candidates, candidate);
-  }
-  for (const candidate of windowsWhereCandidates(options.whereNames)) {
-    pushUnique(candidates, candidate);
-  }
-  return candidates;
+  // Let callers stop at an installed app before starting discovery subprocesses.
+  yield* candidates;
+  yield* windowsAppExecutionAliasCandidates(options);
+  yield* windowsShortcutTargetCandidates(options);
+  yield* windowsMsixPackageCandidates(options);
+  yield* windowsWhereCandidates(options.whereNames);
 }
 
 function windowsShortcutTargetCandidates(options: WindowsDesktopAppDiscoveryOptions): string[] {

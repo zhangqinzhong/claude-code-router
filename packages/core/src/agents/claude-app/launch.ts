@@ -217,7 +217,7 @@ export function findInstalledClaudeAppExecutable(profileAppPath?: string): Claud
   return { checked, executable: findFirstExecutable(linuxClaudeAppCandidates(), checked) };
 }
 
-function findFirstExecutable(candidates: string[], checked: string[], options: ClaudeAppCandidateOptions = {}): string | undefined {
+function findFirstExecutable(candidates: Iterable<string>, checked: string[], options: ClaudeAppCandidateOptions = {}): string | undefined {
   for (const candidate of candidates) {
     if (!candidate || checked.includes(candidate)) {
       continue;
@@ -251,7 +251,7 @@ function macClaudeAppCandidates(): string[] {
   return roots.flatMap((root) => macClaudeAppNames.map((name) => path.join(root, name)));
 }
 
-function windowsClaudeAppCandidates(): string[] {
+function windowsClaudeAppCandidates(): Iterable<string> {
   return windowsDesktopAppCandidates({
     appDirs: windowsClaudeAppDirs,
     exeNames: windowsClaudeExeNames,

@@ -24,12 +24,11 @@ const windowsPackageKeywords = ["opencode", "opencode-desktop"];
 
 export function findInstalledOpenCodeAppExecutable(profileAppPath?: string): OpenCodeAppLookupResult {
   const checked: string[] = [];
-  const candidates = [
+  const explicitCandidates = [
     ...(profileAppPath?.trim() ? [resolveUserPath(profileAppPath)] : []),
-    ...["AR_OPENCODE_APP_PATH", "OPENCODE_APP_PATH"].map((key) => process.env[key]?.trim() || "").filter(Boolean).map(resolveUserPath),
-    ...platformCandidates()
+    ...["AR_OPENCODE_APP_PATH", "OPENCODE_APP_PATH"].map((key) => process.env[key]?.trim() || "").filter(Boolean).map(resolveUserPath)
   ];
-  for (const candidate of candidates) {
+  for (const candidate of appCandidates(explicitCandidates)) {
     if (!candidate || checked.includes(candidate)) {
       continue;
     }
@@ -40,6 +39,11 @@ export function findInstalledOpenCodeAppExecutable(profileAppPath?: string): Ope
     }
   }
   return { checked };
+}
+
+function* appCandidates(explicitCandidates: string[]): Generator<string> {
+  yield* explicitCandidates;
+  yield* platformCandidates();
 }
 
 export function findRunningOpenCodeAppPid(profileAppPath?: string): number | undefined {
@@ -139,7 +143,7 @@ export function openCodeDesktopCommandNames(platform: NodeJS.Platform = process.
     : ["opencode-desktop", "OpenCode"];
 }
 
-function platformCandidates(): string[] {
+function platformCandidates(): Iterable<string> {
   if (process.platform === "darwin") {
     return [
       "/Applications/OpenCode.app",
