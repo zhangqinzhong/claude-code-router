@@ -789,7 +789,7 @@ function grokStorageRoot(): string {
   if (explicitRoot) {
     return explicitRoot;
   }
-  const homeDir = process.env.CCR_INTERNAL_HOME_DIR?.trim() || process.env.HOME?.trim() || process.env.USERPROFILE?.trim() || os.homedir();
+  const homeDir = process.env.AR_INTERNAL_HOME_DIR?.trim() || process.env.HOME?.trim() || process.env.USERPROFILE?.trim() || os.homedir();
   return path.join(homeDir, ".grok");
 }
 

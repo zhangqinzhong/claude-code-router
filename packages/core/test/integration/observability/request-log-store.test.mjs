@@ -13,7 +13,7 @@ import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.t
 import { createBetterSqliteDatabase } from "@ccr/core/storage/sqlite-native.ts";
 
 const execFileAsync = promisify(execFile);
-const isBoundedHeapWorker = process.env.CCR_REQUEST_LOG_BOUNDED_HEAP_WORKER === "1";
+const isBoundedHeapWorker = process.env.AR_REQUEST_LOG_BOUNDED_HEAP_WORKER === "1";
 
 test("request log model summaries support routed paths and streamed responses", () => {
   assert.equal(
@@ -116,7 +116,7 @@ test("RequestLogStore resumes interrupted gateway migrations across bounded batc
           insert.run(
             createdAt,
             `legacy-event-${index}`,
-            JSON.stringify({ "x-ccr-fallback-attempts": String((index % 4) + 1) })
+            JSON.stringify({ "x-ar-fallback-attempts": String((index % 4) + 1) })
           );
         }
       })();
@@ -592,8 +592,8 @@ test("RequestLogStore redacts secrets and records CCR metadata", async () => {
         "ocp-apim-subscription-key": "bing-request-secret",
         "x-amz-security-token": "aws-request-secret",
         "x-auth-token": "custom-request-secret",
-        "x-ccr-provider-credential-chain": "cred-a, cred-b",
-        "x-ccr-provider-credential-id": "cred-a",
+        "x-ar-provider-credential-chain": "cred-a, cred-b",
+        "x-ar-provider-credential-id": "cred-a",
         "x-goog-api-key": "google-request-secret"
       },
       requestId: "request-log-metadata-test",
@@ -602,7 +602,7 @@ test("RequestLogStore redacts secrets and records CCR metadata", async () => {
         "content-type": "text/event-stream",
         "x-api-key": "response-secret",
         "x-company-client-secret": "custom-response-secret",
-        "x-ccr-provider-credential-saturated": "true",
+        "x-ar-provider-credential-saturated": "true",
         "x-gateway-billing-cache-read-tokens": "10",
         "x-gateway-billing-input-tokens": "100",
         "x-gateway-billing-output-tokens": "20",
@@ -781,7 +781,7 @@ test("RequestLogStore consumes fallback bundles by unique bundle id and only fin
         responseBodyText: "gateway-body",
         responseHeaders: {
           "content-type": "application/json",
-          "x-ccr-fallback-attempts": "2"
+          "x-ar-fallback-attempts": "2"
         },
         startedAt,
         statusCode: 200,
@@ -1056,7 +1056,7 @@ test("RequestLogStore applies raw trace updates to existing request logs", async
       requestHeaders: {
         "api-key": "raw-azure-secret",
         "ocp-apim-subscription-key": "raw-bing-secret",
-        "x-ccr-provider-credential-id": "raw-credential-id",
+        "x-ar-provider-credential-id": "raw-credential-id",
         "x-client-name": "codex-cli",
         "x-goog-api-key": "raw-google-secret"
       },
@@ -1082,7 +1082,7 @@ test("RequestLogStore applies raw trace updates to existing request logs", async
     assert.match(detail.responseBody?.text ?? "", /quota exceeded/);
     assert.equal(detail.requestHeaders["api-key"], "[redacted]");
     assert.equal(detail.requestHeaders["ocp-apim-subscription-key"], "[redacted]");
-    assert.equal(detail.requestHeaders["x-ccr-provider-credential-id"], "[redacted]");
+    assert.equal(detail.requestHeaders["x-ar-provider-credential-id"], "[redacted]");
     assert.equal(detail.requestHeaders["x-client-name"], "codex-cli");
     assert.equal(detail.requestHeaders["x-goog-api-key"], "[redacted]");
   } finally {
@@ -1150,7 +1150,7 @@ test("RequestLogStore analyzes agent sessions and exposes trace payloads", async
       requestHeaders: {
         "content-type": "application/json",
         "user-agent": "openai-codex test",
-        "x-ccr-route-reason": "default",
+        "x-ar-route-reason": "default",
         "x-codex-session-id": "session-1"
       },
       requestId: "agent-request-1",
@@ -1456,8 +1456,8 @@ test("RequestLogStore ignores subagent markers in tool definitions and placehold
         requestHeaders: {
           "content-type": "application/json",
           "user-agent": "claude-cli test",
-          "x-ccr-route-reason": "default",
-          "x-ccr-routed-model": "test-provider/claude-test",
+          "x-ar-route-reason": "default",
+          "x-ar-routed-model": "test-provider/claude-test",
           "x-claude-code-session-id": sessionId
         },
         requestId: `${sessionId}-request`,
@@ -1644,7 +1644,7 @@ test("RequestLogStore agent analysis cache ratio denominator includes cache toke
       requestHeaders: {
         "content-type": "application/json",
         "user-agent": "openai-codex test",
-        "x-ccr-route-reason": "default",
+        "x-ar-route-reason": "default",
         "x-codex-session-id": "cache-session"
       },
       requestId: "request-log-cache-ratio",
@@ -1796,7 +1796,7 @@ test("RequestLogStore bounded heap regression", {
 }, async () => {
   const workerEnv = {
     ...process.env,
-    CCR_REQUEST_LOG_BOUNDED_HEAP_WORKER: "1",
+    AR_REQUEST_LOG_BOUNDED_HEAP_WORKER: "1",
     ELECTRON_RUN_AS_NODE: "1"
   };
   delete workerEnv.NODE_TEST_CONTEXT;
@@ -1944,7 +1944,7 @@ test("RequestLogStore identifies OpenCode from its explicit client header", asyn
       requestHeaders: {
         "content-type": "application/json",
         "user-agent": "generic-openai-client/1.0",
-        "x-ccr-client": "opencode"
+        "x-ar-client": "opencode"
       },
       requestId: "opencode-agent-request",
       responseBodyText: JSON.stringify({ choices: [], model: "Provider/model" }),
@@ -1981,7 +1981,7 @@ test("RequestLogStore identifies Kilo CLI from its explicit client header", asyn
       requestHeaders: {
         "content-type": "application/json",
         "user-agent": "generic-openai-client/1.0",
-        "x-ccr-client": "kilo"
+        "x-ar-client": "kilo"
       },
       requestId: "kilo-agent-request",
       responseBodyText: JSON.stringify({ choices: [], model: "Provider/model" }),

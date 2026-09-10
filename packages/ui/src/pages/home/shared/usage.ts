@@ -146,6 +146,18 @@ export function formatCompactNumber(value: number, locale?: Intl.LocalesArgument
   }).format(value);
 }
 
+// Token rates are frequently below 10/s, and formatCompactNumber rounds those to
+// "0", which is indistinguishable from a stalled stream.
+export function formatTokenRate(value: number, locale?: Intl.LocalesArgument): string {
+  if (!Number.isFinite(value) || value <= 0) {
+    return "0";
+  }
+  if (value < 10) {
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 1 }).format(value);
+  }
+  return formatCompactNumber(value, locale);
+}
+
 export function formatUsdCost(value: number | undefined): string {
   const normalized = Number.isFinite(value) && value && value > 0 ? value : 0;
   if (normalized === 0) {

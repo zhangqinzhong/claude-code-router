@@ -21,7 +21,7 @@ test("claudeAppLaunchCommand opens macOS app bundles through LaunchServices", (t
     {
       "BAD-NAME": "ignored",
       CLAUDE_CONFIG_DIR: path.join(tempDir, "config"),
-      CCR_PROFILE_SURFACE: "app"
+      AR_PROFILE_SURFACE: "app"
     }
   );
 
@@ -36,7 +36,7 @@ test("claudeAppLaunchCommand opens macOS app bundles through LaunchServices", (t
   assert.deepEqual(launch.args.slice(0, 2), ["-W", "-n"]);
   assert.ok(launch.args.includes("--env"));
   assert.ok(launch.args.includes(`CLAUDE_CONFIG_DIR=${path.join(tempDir, "config")}`));
-  assert.ok(launch.args.includes("CCR_PROFILE_SURFACE=app"));
+  assert.ok(launch.args.includes("AR_PROFILE_SURFACE=app"));
   assert.equal(launch.args.some((arg) => arg.startsWith("BAD-NAME=")), false);
 
   const appIndex = launch.args.indexOf(appBundle);

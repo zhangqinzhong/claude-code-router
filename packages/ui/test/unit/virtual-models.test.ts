@@ -136,7 +136,7 @@ test("image and video generation are generic Fusion tools with independent model
 test("an imported Grok Agent supplies default API media models", () => {
   const config = appConfigFixture();
   config.Providers = [{
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     baseUrl: "https://cli-chat-proxy.grok.com/v1",
     models: ["grok-4.5"],
     name: "Imported Grok"

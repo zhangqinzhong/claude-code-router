@@ -1,3 +1,4 @@
+import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -13,8 +14,8 @@ export type KiloProfileConfigWriteResult = {
   inlineConfig: string;
 };
 
-const originalBackupSuffix = ".ccr-original";
-const originalMissingSuffix = ".ccr-original-missing";
+const originalBackupSuffix = ".ar-original";
+const originalMissingSuffix = ".ar-original-missing";
 
 export function resolveKiloConfigFile(configDir: string, profile: ProfileConfig): string {
   if (profile.scope === "ccr" || profile.scope === "custom") {
@@ -82,7 +83,7 @@ export function isManagedKiloConfigContent(content: string, providerId: string):
     return false;
   }
   const headers = isRecord(provider.options.headers) ? provider.options.headers : {};
-  return headers["x-ccr-client"] === "kilo" || headers["X-CCR-Client"] === "kilo";
+  return headers["x-ar-client"] === "kilo" || headers["X-AR-Client"] === "kilo";
 }
 
 export function kiloProviderId(profile: Pick<ProfileConfig, "providerId">): string {
@@ -91,7 +92,7 @@ export function kiloProviderId(profile: Pick<ProfileConfig, "providerId">): stri
 
 function kiloGatewayOverrides(config: AppConfig, profile: ProfileConfig, token: string): Record<string, unknown> {
   const providerId = kiloProviderId(profile);
-  const providerName = profile.providerName?.trim() || "Claude Code Router";
+  const providerName = profile.providerName?.trim() || "AgentRouter";
   const model = normalizeClientModel(profile.model) || defaultClientModel(config);
   const modelRef = `${providerId}/${model}`;
   const models = buildCodexModelCatalogIds(config, model, { allowedModels: profileAllowedModels({ ...profile, model }) });
@@ -107,8 +108,8 @@ function kiloGatewayOverrides(config: AppConfig, profile: ProfileConfig, token: 
           apiKey: token,
           baseURL: `${gatewayEndpoint(config).replace(/\/+$/g, "")}/v1`,
           headers: {
-            "x-ccr-client": "kilo",
-            "x-ccr-profile": profile.id || profile.name || "kilo"
+            "x-ar-client": "kilo",
+            "x-ar-profile": profile.id || profile.name || "kilo"
           }
         }
       }
@@ -153,6 +154,7 @@ function writeJsonFile(
 }
 
 function ensureOriginalSnapshot(file: string, previous: string | undefined): void {
+  adoptLegacyArtifacts(file);
   const originalBackup = `${file}${originalBackupSuffix}`;
   const originalMissing = `${file}${originalMissingSuffix}`;
   if (existsSync(originalBackup) || existsSync(originalMissing)) {
@@ -180,6 +182,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
     return;
   }
   const basename = path.basename(file);
+  adoptLegacyArtifacts(file);
   let entries: string[];
   try {
     entries = readdirSync(path.dirname(file));
@@ -190,7 +193,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
     if (
       entry === `${basename}${originalBackupSuffix}` ||
       entry === `${basename}${originalMissingSuffix}` ||
-      entry.startsWith(`${basename}.ccr-backup-`)
+      entry.startsWith(`${basename}.ar-backup-`)
     ) {
       chmodPrivateFile(path.join(path.dirname(file), entry));
     }
@@ -199,7 +202,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
 
 function backupFilePath(file: string): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  return `${file}.ccr-backup-${timestamp}`;
+  return `${file}.ar-backup-${timestamp}`;
 }
 
 function gatewayEndpoint(config: AppConfig): string {
@@ -230,7 +233,7 @@ function normalizeClientModel(value: string | undefined): string {
 }
 
 function kiloXdgRoot(environmentName: "XDG_CONFIG_HOME", fallback: string): string {
-  const internalHome = process.env.CCR_INTERNAL_HOME_DIR?.trim();
+  const internalHome = process.env.AR_INTERNAL_HOME_DIR?.trim();
   if (internalHome) {
     return path.join(internalHome, fallback);
   }

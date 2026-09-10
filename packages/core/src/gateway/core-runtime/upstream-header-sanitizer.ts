@@ -74,7 +74,7 @@ export function sanitizeUpstreamProviderHeaders(headers: Record<string, string>)
   const sanitized: Record<string, string> = {};
   for (const [name, value] of Object.entries(headers)) {
     const normalized = name.trim().toLowerCase();
-    if (normalized.startsWith("x-ccr-") || ccrAuthHeaderNames.has(normalized)) continue;
+    if (normalized.startsWith("x-ar-") || ccrAuthHeaderNames.has(normalized)) continue;
     sanitized[name] = value;
   }
   return sanitized;
@@ -104,7 +104,7 @@ export function mergeUpstreamProviderHeaders(
     if (
       !normalized ||
       value === undefined ||
-      normalized.startsWith("x-ccr-") ||
+      normalized.startsWith("x-ar-") ||
       ccrAuthHeaderNames.has(normalized) ||
       ccrRoutingHeaderNames.has(normalized) ||
       clientAuthHeaderNames.has(normalized) ||

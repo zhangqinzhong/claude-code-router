@@ -280,8 +280,8 @@ function createGatewayProcessEnv(
     AUTH_STATIC_API_KEY_ENV: coreGatewayAuthTokenEnv,
     AUTH_STATIC_API_KEY_HEADER: coreGatewayAuthHeader,
     CCR_GATEWAY_RUNTIME_ID: runtimeId,
-    CCR_UNDICI_MODULE: resolveUndiciProxyAgentModule(),
-    CCR_UPSTREAM_TIMEOUT_MS: String(gatewayUpstreamTimeoutMs(config)),
+    AR_UNDICI_MODULE: resolveUndiciProxyAgentModule(),
+    AR_UPSTREAM_TIMEOUT_MS: String(gatewayUpstreamTimeoutMs(config)),
     [coreGatewayAuthTokenEnv]: coreAuthToken,
     HOST: config.gateway.coreHost,
     PORT: String(config.gateway.corePort)
@@ -343,7 +343,7 @@ function resolveGatewayNodeRuntime(): GatewayNodeRuntime {
 }
 
 function configuredGatewayNodeRuntimeCandidates(): GatewayNodeRuntime[] {
-  const configured = process.env.CCR_NODE_BIN?.trim();
+  const configured = process.env.AR_NODE_BIN?.trim();
   return configured ? [{ command: configured, electronRunAsNode: false }] : [];
 }
 
@@ -469,8 +469,8 @@ function gatewayFetchPreloadScript(): string {
   return [
     "\"use strict\";",
     "const up = process.env.CCR_UPSTREAM_PROXY_URL;",
-    "const um = process.env.CCR_UNDICI_MODULE;",
-    "const rawTimeout = process.env.CCR_UPSTREAM_TIMEOUT_MS;",
+    "const um = process.env.AR_UNDICI_MODULE;",
+    "const rawTimeout = process.env.AR_UPSTREAM_TIMEOUT_MS;",
     "const parsedTimeout = rawTimeout === undefined || rawTimeout === '' ? NaN : Number(rawTimeout);",
     "const hasTimeout = Number.isFinite(parsedTimeout) && parsedTimeout >= 0;",
     "if ((up || hasTimeout) && um) {",
@@ -859,7 +859,7 @@ export function shouldServeGatewayRequest(config: AppConfig, request: IncomingMe
   if (config.gateway.enabled) {
     return true;
   }
-  return config.proxy.enabled && config.proxy.mode === "gateway" && readHeader(request.headers["x-ccr-proxy-mode"]) === "gateway";
+  return config.proxy.enabled && config.proxy.mode === "gateway" && readHeader(request.headers["x-ar-proxy-mode"]) === "gateway";
 }
 
 export function applyCors(response: ServerResponse, config?: AppConfig): void {

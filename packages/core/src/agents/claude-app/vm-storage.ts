@@ -6,8 +6,8 @@ import { resolveRuntimeAppPath } from "@ccr/core/runtime/app-paths";
 
 const claudeAppVmBundlesDir = "vm_bundles";
 const claudeAppVmBundleName = "claudevm.bundle";
-const claudeAppVmSeedEnv = "CCR_CLAUDE_APP_VM_SEED_DIR";
-const claudeAppVmSeedDisabledEnv = "CCR_CLAUDE_APP_VM_SEED_DISABLED";
+const claudeAppVmSeedEnv = "AR_CLAUDE_APP_VM_SEED_DIR";
+const claudeAppVmSeedDisabledEnv = "AR_CLAUDE_APP_VM_SEED_DISABLED";
 const maxSmallFileCopyBytes = 64 * 1024 * 1024;
 const lockRetryIntervalMs = 100;
 const lockTimeoutMs = 15_000;

@@ -257,13 +257,13 @@ curl http://127.0.0.1:3456/plugins/hello
 If the route uses the default `auth: "gateway"` and CCR has API keys configured:
 
 ```bash
-curl -H "Authorization: Bearer <CCR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "Authorization: Bearer <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 ```
 
 You can also use:
 
 ```bash
-curl -H "x-api-key: <CCR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 ```
 
 ### 4. Verify the HTTP backend and proxy route

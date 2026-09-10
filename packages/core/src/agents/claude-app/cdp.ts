@@ -33,7 +33,7 @@ const claudeAppDesignCdpKeepAliveMs = 45_000;
 const claudeAppDesignCdpPollIntervalMs = 250;
 
 export function shouldEnableClaudeAppDesignCdp(_enabledByConfig = false): boolean {
-  const configured = process.env.CCR_CLAUDE_APP_DESIGN_CDP?.trim().toLowerCase();
+  const configured = process.env.AR_CLAUDE_APP_DESIGN_CDP?.trim().toLowerCase();
   return configured === "true" || configured === "1" || configured === "on";
 }
 
@@ -41,7 +41,7 @@ export async function reserveClaudeAppCdpPort(logger: ClaudeAppCdpLogger = conso
   if (!shouldEnableClaudeAppDesignCdp(enabledByConfig)) {
     return undefined;
   }
-  const configured = Number(process.env.CCR_CLAUDE_APP_CDP_PORT);
+  const configured = Number(process.env.AR_CLAUDE_APP_CDP_PORT);
   if (Number.isInteger(configured) && configured > 0 && configured <= 65535) {
     return configured;
   }

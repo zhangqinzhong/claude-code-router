@@ -110,7 +110,7 @@ ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 - 启动桌面 App 时，本机必须已安装对应应用，并且当前环境必须有图形会话。
 - 大多数配置需要先启动 CCR 服务。Grok CLI、Kimi CLI 和 Pi 配置可以自动启动一个临时共享服务，并在最后一个受管会话退出后停止。
 
-桌面应用会安装一个相关命令 `ccr-app`。桌面 Agent 配置档案卡片复制出来的命令使用 `ccr-app`；本文介绍的 npm 包安装的是 `ccr`。
+桌面应用会安装一个相关命令 `agentrouter`。桌面 Agent 配置档案卡片复制出来的命令使用 `agentrouter`；本文介绍的 npm 包安装的是 `ccr`。
 
 ## 配置与运行文件
 
@@ -133,9 +133,9 @@ CCR 写入 SQLite 时不要直接编辑或复制活跃数据库。优先使用 U
 
 | 变量 | 说明 |
 | --- | --- |
-| `CCR_WEB_HOST` | 省略 `--host` 时使用的管理服务监听地址。 |
-| `CCR_WEB_PORT` | 省略 `--port` 时使用的管理服务端口。 |
-| `CCR_WEB_AUTH_TOKEN` | 固定管理 UI / RPC 的认证 Token；不设置时每个进程会生成随机 Token。 |
+| `AR_WEB_HOST` | 省略 `--host` 时使用的管理服务监听地址。 |
+| `AR_WEB_PORT` | 省略 `--port` 时使用的管理服务端口。 |
+| `AR_WEB_AUTH_TOKEN` | 固定管理 UI / RPC 的认证 Token；不设置时每个进程会生成随机 Token。 |
 
 认证后的管理 URL 会在查询参数中包含 `ccr_web_token`。请把这个 URL 当作密码，不要复制到日志、工单或公开的 Shell 历史中。除非确实需要远程访问，否则监听地址应保持 `127.0.0.1`。远程访问时，应同时使用防火墙或私网，并在可信反向代理上启用 TLS。
 

@@ -12,7 +12,7 @@ CCR 有两个相关命令：
 | 命令 | 来源 | 主要用途 |
 | --- | --- | --- |
 | `ccr` | npm 包 `@musistudio/claude-code-router` | 不依赖 Electron，提供浏览器管理界面和模型网关，并按配置启动 Agent。 |
-| `ccr-app` | CCR 桌面应用 | 桌面版生成的配置启动器；Agent 配置卡片复制的命令使用这个名称。 |
+| `agentrouter` | CCR 桌面应用 | 桌面版生成的配置启动器；Agent 配置卡片复制的命令使用这个名称。 |
 
 两个发行版会读取同一套本机配置目录，但不要把命令名混用。需要托盘、桌面通知、自动更新和桌面专属浏览器集成时，使用桌面版；需要无桌面部署或由进程管理器托管时，使用 npm CLI。
 
@@ -178,9 +178,9 @@ ccr profile-id -- --help
 
 | 变量 | 说明 |
 | --- | --- |
-| `CCR_WEB_HOST` | 省略 `--host` 时使用的管理服务监听地址。 |
-| `CCR_WEB_PORT` | 省略 `--port` 时使用的管理服务端口。 |
-| `CCR_WEB_AUTH_TOKEN` | 固定管理 UI / RPC Token；不设置时进程会生成随机 Token。 |
+| `AR_WEB_HOST` | 省略 `--host` 时使用的管理服务监听地址。 |
+| `AR_WEB_PORT` | 省略 `--port` 时使用的管理服务端口。 |
+| `AR_WEB_AUTH_TOKEN` | 固定管理 UI / RPC Token；不设置时进程会生成随机 Token。 |
 
 监听到 `0.0.0.0` 会让管理界面进入局域网或外部网络。只有在确实需要时才这样配置，并同时使用固定强 Token、主机防火墙或私网，以及可信反向代理提供的 TLS。
 
@@ -188,7 +188,7 @@ ccr profile-id -- --help
 
 ## 进程管理器示例
 
-生产环境应使用 `ccr serve --no-open`，让外部管理器负责重启和日志。启动命令至少应固定工作用户、`HOME`、监听地址和 `CCR_WEB_AUTH_TOKEN`。不要同时运行由 `ccr start` 创建的后台服务，否则可能得到两个管理端口或竞争同一套配置。
+生产环境应使用 `ccr serve --no-open`，让外部管理器负责重启和日志。启动命令至少应固定工作用户、`HOME`、监听地址和 `AR_WEB_AUTH_TOKEN`。不要同时运行由 `ccr start` 创建的后台服务，否则可能得到两个管理端口或竞争同一套配置。
 
 ## 常见问题
 

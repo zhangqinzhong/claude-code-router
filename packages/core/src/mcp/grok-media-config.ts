@@ -23,10 +23,10 @@ export function mediaToolsMcpServer(
     command: process.execPath,
     env: {
       ELECTRON_RUN_AS_NODE: "1",
-      ...(apiKey ? { CCR_MEDIA_MCP_API_KEY: apiKey } : {}),
-      CCR_MEDIA_MCP_TOOLS_JSON: JSON.stringify(mediaToolBindingsForConfig(config).map(mediaMcpToolDefinition)),
-      CCR_MEDIA_MCP_URL: `${mediaToolsGatewayEndpoint(config)}${MEDIA_TOOLS_MCP_PATH}`,
-      CCR_MEDIA_MCP_REQUEST_TIMEOUT_MS: String(Math.min(3600000, Math.max(60000, config.mediaTools.jobTimeoutMs + 30000)))
+      ...(apiKey ? { AR_MEDIA_MCP_API_KEY: apiKey } : {}),
+      AR_MEDIA_MCP_TOOLS_JSON: JSON.stringify(mediaToolBindingsForConfig(config).map(mediaMcpToolDefinition)),
+      AR_MEDIA_MCP_URL: `${mediaToolsGatewayEndpoint(config)}${MEDIA_TOOLS_MCP_PATH}`,
+      AR_MEDIA_MCP_REQUEST_TIMEOUT_MS: String(Math.min(3600000, Math.max(60000, config.mediaTools.jobTimeoutMs + 30000)))
     },
     name: MEDIA_TOOLS_MCP_SERVER_NAME,
     protocolVersion: "2024-11-05",

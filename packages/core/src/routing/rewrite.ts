@@ -134,7 +134,7 @@ function parseRewritePath(key: string, protectHeaders: boolean): { error?: strin
   }
   if (section === "header" || section === "headers") {
     const name = rest.join(".").toLowerCase();
-    if (protectHeaders && (protectedHeaderNames.has(name) || name.startsWith("x-auth-") || name.startsWith("x-ccr-"))) {
+    if (protectHeaders && (protectedHeaderNames.has(name) || name.startsWith("x-auth-") || name.startsWith("x-ar-"))) {
       return { error: `Route rewrite cannot modify protected header "${name}".` };
     }
     return { path: [name], scope: "headers" };

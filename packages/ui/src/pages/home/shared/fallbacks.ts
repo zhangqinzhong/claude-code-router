@@ -15,7 +15,7 @@ export const fallbackInfo: AppInfo = {
   dataDir: "Browser preview",
   desktop: false,
   launchAtLoginSupported: /^Mac|^Win/i.test(navigator.platform),
-  name: "Claude Code Router",
+  name: "AgentRouter",
   platform: navigator.platform,
   requestLogsDbFile: "Browser preview",
   usageDbFile: "Browser preview",

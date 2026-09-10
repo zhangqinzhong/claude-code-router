@@ -50,8 +50,8 @@ export function resolvePiSessionDir(configDir: string, profile: ProfileConfig): 
 export function piWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "pi";
   return process.platform === "win32"
-    ? `ccr-pi-wrapper-${slug}.cmd`
-    : `ccr-pi-wrapper-${slug}`;
+    ? `ar-pi-wrapper-${slug}.cmd`
+    : `ar-pi-wrapper-${slug}`;
 }
 
 export function writePiGatewayConfig(
@@ -101,8 +101,8 @@ function piModelsJson(
         authHeader: true,
         baseUrl: `${gatewayEndpoint(config).replace(/\/+$/g, "")}/v1`,
         headers: {
-          "x-ccr-client": "pi",
-          "x-ccr-profile": profile.id || profile.name || "pi"
+          "x-ar-client": "pi",
+          "x-ar-profile": profile.id || profile.name || "pi"
         },
         models: models.map((model) => piModelConfig(model, resolutionConfig))
       }

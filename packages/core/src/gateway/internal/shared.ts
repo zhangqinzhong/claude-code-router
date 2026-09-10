@@ -229,9 +229,9 @@ export const claudeCodeOauthBetaHeader = "anthropic-beta";
 
 export const claudeCodeOauthRequiredBeta = "oauth-2025-04-20";
 
-export const coreGatewayAuthHeader = "x-ccr-core-auth";
+export const coreGatewayAuthHeader = "x-ar-core-auth";
 
-export const coreGatewayAuthTokenEnv = "CCR_CORE_GATEWAY_AUTH_TOKEN";
+export const coreGatewayAuthTokenEnv = "AR_CORE_GATEWAY_AUTH_TOKEN";
 
 export const clientClosedRequestStatusCode = 499;
 
@@ -260,15 +260,15 @@ export function resolveStreamRequestLogOutcome(input: {
 }
 
 export const localObservabilityHeaderNames = new Set([
-  "x-ccr-claude-app-model-rewrite",
-  "x-ccr-codex-patch-bridge",
-  "x-ccr-claude-model-discovery",
-  "x-ccr-openrouter-discount-model",
-  "x-ccr-openrouter-discount-provider-id",
-  "x-ccr-cursor-openai-compat",
-  "x-ccr-logical-provider",
-  "x-ccr-provider-credential-chain",
-  "x-ccr-provider-credential-saturated"
+  "x-ar-claude-app-model-rewrite",
+  "x-ar-codex-patch-bridge",
+  "x-ar-claude-model-discovery",
+  "x-ar-openrouter-discount-model",
+  "x-ar-openrouter-discount-provider-id",
+  "x-ar-cursor-openai-compat",
+  "x-ar-logical-provider",
+  "x-ar-provider-credential-chain",
+  "x-ar-provider-credential-saturated"
 ]);
 
 export const proxyHeaderDenyList = new Set(["connection", coreGatewayAuthHeader, "host", "upgrade"]);
@@ -281,9 +281,9 @@ export const apiKeyLimitCounterRetentionWindows = 2;
 
 export const gatewayRuntimeMarkerFile = "gateway-runtime.json";
 
-export const rawTraceSyncHeader = "x-ccr-raw-trace-token";
+export const rawTraceSyncHeader = "x-ar-raw-trace-token";
 
-export const billingUsageSyncHeader = "x-ccr-billing-usage-token";
+export const billingUsageSyncHeader = "x-ar-billing-usage-token";
 
 export const virtualApplyPatchToolName = "virtual_apply_patch";
 
@@ -292,7 +292,7 @@ export const rawTraceSyncPath = "/__ccr/raw-trace-sync";
 
 export const billingUsageSyncPath = "/__ccr/billing-usage-sync";
 
-export const gatewayEntryOverrideEnv = "CCR_GATEWAY_ENTRY";
+export const gatewayEntryOverrideEnv = "AR_GATEWAY_ENTRY";
 
 export const gatewayPackageCandidates = ["@the-next-ai/ai-gateway", "gateway"];
 

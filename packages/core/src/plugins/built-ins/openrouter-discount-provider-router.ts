@@ -22,8 +22,8 @@ const DEFAULT_SETTINGS = {
 const endpointCacheMaxEntries = 500;
 const endpointFailureCooldownMs = 60_000;
 const endpointFetchTimeoutMs = 5_000;
-const openRouterDiscountModelHeader = "x-ccr-openrouter-discount-model";
-const openRouterDiscountProviderHeader = "x-ccr-openrouter-discount-provider-id";
+const openRouterDiscountModelHeader = "x-ar-openrouter-discount-model";
+const openRouterDiscountProviderHeader = "x-ar-openrouter-discount-provider-id";
 
 type OpenRouterDiscountRoutingSettings = typeof DEFAULT_SETTINGS;
 
@@ -148,10 +148,10 @@ async function routeOpenRouterRequestByEndpointDiscount(
         [openRouterDiscountProviderHeader]: providerStableKey(target.provider)
       }),
       responseHeaders: cleanHeaders({
-        "x-ccr-openrouter-discount-ignored-providers": providerIgnore.join(","),
-        "x-ccr-openrouter-discount-model": target.model,
-        "x-ccr-openrouter-discount-reason": "no-priced-endpoints-after-provider-filters",
-        "x-ccr-openrouter-discount-switched": "false"
+        "x-ar-openrouter-discount-ignored-providers": providerIgnore.join(","),
+        "x-ar-openrouter-discount-model": target.model,
+        "x-ar-openrouter-discount-reason": "no-priced-endpoints-after-provider-filters",
+        "x-ar-openrouter-discount-switched": "false"
       })
     };
   }
@@ -645,27 +645,27 @@ function buildResponseHeaders(input: {
     ? discountPercent(input.decision.selected.uncachedCostUsd, input.baseline.uncachedCostUsd)
     : 0;
   return cleanHeaders({
-    "x-ccr-openrouter-discount-baseline-cost-usd": input.baseline ? money(input.baseline.uncachedCostUsd) : "",
-    "x-ccr-openrouter-discount-baseline-provider": input.baseline?.tag ?? "",
-    "x-ccr-openrouter-discount-cache-loss-usd": money(input.decision.cacheLossUsd),
-    "x-ccr-openrouter-discount-cache-write-tokens": String(input.cacheWriteTokens),
-    "x-ccr-openrouter-discount-cheapest-cost-usd": money(input.cheapest.uncachedCostUsd),
-    "x-ccr-openrouter-discount-cheapest-off-pct": percent(cheapestOffPct),
-    "x-ccr-openrouter-discount-completion-tokens": String(input.completionTokens),
-    "x-ccr-openrouter-discount-gross-savings-usd": money(input.decision.grossSavingsUsd),
-    "x-ccr-openrouter-discount-image-count": String(input.imageCount),
-    "x-ccr-openrouter-discount-ignored-providers": input.providerIgnore.join(","),
-    "x-ccr-openrouter-discount-model": input.model,
-    "x-ccr-openrouter-discount-potential-net-savings-usd": money(input.decision.potentialNetSavingsUsd),
-    "x-ccr-openrouter-discount-prompt-tokens": String(input.promptTokens),
-    "x-ccr-openrouter-discount-reason": input.decision.reason,
-    "x-ccr-openrouter-discount-search-count": String(input.searchCount),
-    "x-ccr-openrouter-discount-selected-cost-usd": money(input.decision.selected.uncachedCostUsd),
-    "x-ccr-openrouter-discount-selected-off-pct": percent(input.decision.switched ? selectedOffPct : 0),
-    "x-ccr-openrouter-discount-selected-provider": input.decision.selected.tag,
-    "x-ccr-openrouter-discount-selected-provider-name": input.decision.selected.providerName,
-    "x-ccr-openrouter-discount-savings-usd": input.decision.switched ? money(input.decision.netSavingsUsd) : "0",
-    "x-ccr-openrouter-discount-switched": input.decision.switched ? "true" : "false"
+    "x-ar-openrouter-discount-baseline-cost-usd": input.baseline ? money(input.baseline.uncachedCostUsd) : "",
+    "x-ar-openrouter-discount-baseline-provider": input.baseline?.tag ?? "",
+    "x-ar-openrouter-discount-cache-loss-usd": money(input.decision.cacheLossUsd),
+    "x-ar-openrouter-discount-cache-write-tokens": String(input.cacheWriteTokens),
+    "x-ar-openrouter-discount-cheapest-cost-usd": money(input.cheapest.uncachedCostUsd),
+    "x-ar-openrouter-discount-cheapest-off-pct": percent(cheapestOffPct),
+    "x-ar-openrouter-discount-completion-tokens": String(input.completionTokens),
+    "x-ar-openrouter-discount-gross-savings-usd": money(input.decision.grossSavingsUsd),
+    "x-ar-openrouter-discount-image-count": String(input.imageCount),
+    "x-ar-openrouter-discount-ignored-providers": input.providerIgnore.join(","),
+    "x-ar-openrouter-discount-model": input.model,
+    "x-ar-openrouter-discount-potential-net-savings-usd": money(input.decision.potentialNetSavingsUsd),
+    "x-ar-openrouter-discount-prompt-tokens": String(input.promptTokens),
+    "x-ar-openrouter-discount-reason": input.decision.reason,
+    "x-ar-openrouter-discount-search-count": String(input.searchCount),
+    "x-ar-openrouter-discount-selected-cost-usd": money(input.decision.selected.uncachedCostUsd),
+    "x-ar-openrouter-discount-selected-off-pct": percent(input.decision.switched ? selectedOffPct : 0),
+    "x-ar-openrouter-discount-selected-provider": input.decision.selected.tag,
+    "x-ar-openrouter-discount-selected-provider-name": input.decision.selected.providerName,
+    "x-ar-openrouter-discount-savings-usd": input.decision.switched ? money(input.decision.netSavingsUsd) : "0",
+    "x-ar-openrouter-discount-switched": input.decision.switched ? "true" : "false"
   });
 }
 

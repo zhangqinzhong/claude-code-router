@@ -542,7 +542,7 @@ function confirmationPageHtml(job: StoredChromeLoginImportJob): string {
 }
 
 function setCorsHeaders(response: ServerResponse): void {
-  response.setHeader("access-control-allow-headers", "content-type, x-ccr-login-import");
+  response.setHeader("access-control-allow-headers", "content-type, x-ar-login-import");
   response.setHeader("access-control-allow-methods", "GET, POST, OPTIONS");
   response.setHeader("access-control-allow-origin", "*");
 }

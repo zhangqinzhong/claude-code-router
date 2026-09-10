@@ -1,8 +1,8 @@
 {
-  "name": "@claude-code-router/electron",
+  "name": "@agentrouter/electron",
   "version": "3.0.22",
   "private": true,
-  "description": "Claude Code Router Electron desktop shell.",
+  "description": "AgentRouter Electron desktop shell.",
   "author": "musistudio",
   "main": "dist/main/main.js",
   "scripts": {

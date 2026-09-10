@@ -7,7 +7,7 @@ import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
 import { mergeAnthropicBetaValues } from "@ccr/core/providers/oauth-plugin";
 
 const configProviderPluginKeyPrefix = "config:";
-const localAgentProviderPluginKeyPrefix = "ccr-local-agent-";
+const localAgentProviderPluginKeyPrefix = "ar-local-agent-";
 
 type HeaderRecord = Record<string, string>;
 

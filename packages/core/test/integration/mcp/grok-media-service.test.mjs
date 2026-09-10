@@ -260,7 +260,7 @@ test("an imported Grok Agent supplies OAuth-backed Grok API media models without
   const config = createDefaultAppConfig();
   config.mediaTools.enabled = true;
   config.Providers = [normalizeGrokProviderMediaCapabilities({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     baseUrl: "https://cli-chat-proxy.grok.com/v1",
     models: ["grok-4.5"],
     name: "Imported Grok"
@@ -306,7 +306,7 @@ test("provider image jobs use the internal media gateway, persist artifacts, and
   let service;
   const server = createServer(async (request, response) => {
     requests.push({
-      coreAuth: request.headers["x-ccr-core-auth"],
+      coreAuth: request.headers["x-ar-core-auth"],
       method: request.method,
       targetProvider: request.headers["x-target-provider"],
       url: request.url
@@ -349,7 +349,7 @@ test("provider image jobs use the internal media gateway, persist artifacts, and
   });
   const config = mediaConfig(baseUrl(server));
   service.start(config, baseUrl(server), {
-    authHeader: "x-ccr-core-auth",
+    authHeader: "x-ar-core-auth",
     authToken: "core-test-token",
     baseUrl: baseUrl(server)
   });

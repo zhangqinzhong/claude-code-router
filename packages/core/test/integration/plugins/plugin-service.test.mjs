@@ -335,10 +335,10 @@ test("built-in OpenRouter discount routing only runs for enabled provider models
     });
     assert.deepEqual(transformed.applied.map((item) => item.id), ["openrouter-discount-provider-router"]);
     assert.equal(transformed.applied[0].pluginId, "openrouter");
-    assert.equal(transformed.responseHeaders["x-ccr-openrouter-discount-ignored-providers"], "cheap");
-    assert.equal(transformed.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "mid");
-    assert.equal(transformed.responseHeaders["x-ccr-openrouter-discount-cheapest-off-pct"], "50.00");
-    assert.equal(transformed.responseHeaders["x-ccr-openrouter-discount-savings-usd"], "0.00325");
+    assert.equal(transformed.responseHeaders["x-ar-openrouter-discount-ignored-providers"], "cheap");
+    assert.equal(transformed.responseHeaders["x-ar-openrouter-discount-selected-provider"], "mid");
+    assert.equal(transformed.responseHeaders["x-ar-openrouter-discount-cheapest-off-pct"], "50.00");
+    assert.equal(transformed.responseHeaders["x-ar-openrouter-discount-savings-usd"], "0.00325");
   } finally {
     globalThis.fetch = originalFetch;
     await pluginService.stop();

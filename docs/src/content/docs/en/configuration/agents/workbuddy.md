@@ -28,7 +28,7 @@ WorkBuddy is fixed to **App only**, so the entry mode is not editable. The field
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **WorkBuddy** | Creates a WorkBuddy App launch entry in CCR. |
-| Config name | Free text, e.g. `WorkBuddy - Work` | Identifies the profile. Desktop commands use `ccr-app "<name>" app`; CLI commands use `ccr "<name>" app`. |
+| Config name | Free text, e.g. `WorkBuddy - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>" app`; CLI commands use `ccr "<name>" app`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Effect scope | `Only opened from CCR` / `System default` | Keeps the profile limited to CCR launches, or makes it the system-default WorkBuddy profile. Only one enabled system-default WorkBuddy profile is allowed. |
 | Provider ID | Default `claude-code-router` | Provider reference for this WorkBuddy profile. |
@@ -57,7 +57,7 @@ Click the play button on the profile card to open WorkBuddy with this profile's 
 Desktop App command copied from the profile card:
 
 ```text
-ccr-app "WorkBuddy - Work" app
+agentrouter "WorkBuddy - Work" app
 ```
 
 For CLI, run:

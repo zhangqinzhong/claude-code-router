@@ -744,7 +744,7 @@ function replaySafeHeaders(
     "openai-organization",
     "openai-project",
     "user-agent",
-    "x-ccr-client",
+    "x-ar-client",
     "x-client-name"
   ]);
   const output: Record<string, string> = {};

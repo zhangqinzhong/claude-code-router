@@ -289,7 +289,7 @@ async function loadBotGatewaySdk(): Promise<BotGatewaySdkModule> {
 
 async function importBotGatewaySdk(): Promise<BotGatewaySdkModule> {
   const candidates = [
-    process.env.CCR_BOT_GATEWAY_SDK_MODULE,
+    process.env.AR_BOT_GATEWAY_SDK_MODULE,
     resolveBundledBotGatewaySdkModule(),
     "@the-next-ai/bot-gateway-sdk"
   ].filter((value): value is string => Boolean(value?.trim()));

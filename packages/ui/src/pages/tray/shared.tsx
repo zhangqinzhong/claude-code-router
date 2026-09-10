@@ -528,9 +528,9 @@ export function isObjectRecord(value: unknown): value is Record<string, unknown>
 }
 
 export function normalizeTrayIconPreference(value: AppConfig["trayIcon"] | undefined): AppConfig["trayIcon"] {
-  return value === "violet" || value === "orange" || value === "cyan" || value === "progress" || value === "random"
+  return value === "layered" || value === "violet" || value === "orange" || value === "cyan" || value === "progress" || value === "random"
     ? value
-    : "random";
+    : "layered";
 }
 
 export function isTrayMascotIconPreference(value: AppConfig["trayIcon"]): value is "cyan" | "orange" | "violet" {

@@ -281,7 +281,7 @@ test("auto model refresh does not save stale results after the switch is disable
 });
 
 test("auto model refresh uses Codex local model catalog during hot apply", async (t) => {
-  const previousCcrHome = process.env.CCR_INTERNAL_HOME_DIR;
+  const previousCcrHome = process.env.AR_INTERNAL_HOME_DIR;
   const previousHome = process.env.HOME;
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-local-catalog-"));
   mkdirSync(path.join(home, ".codex"), { recursive: true });
@@ -297,13 +297,13 @@ test("auto model refresh uses Codex local model catalog during hot apply", async
       }
     ]
   }), "utf8");
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   process.env.HOME = home;
   t.after(() => {
     if (previousCcrHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousCcrHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousCcrHome;
     }
     if (previousHome === undefined) {
       delete process.env.HOME;
@@ -317,7 +317,7 @@ test("auto model refresh uses Codex local model catalog during hot apply", async
     Providers: [
       {
         api_base_url: codexDefaultBaseUrl,
-        api_key: "ccr-local-agent-login",
+        api_key: "ar-local-agent-login",
         autoFetchModels: true,
         autoFetchKnownModels: ["gpt-5-codex"],
         id: "codex-api",
@@ -425,7 +425,7 @@ test("auto model refresh uses enabled local provider plugins including protocol-
     Providers: [
       {
         api_base_url: "https://api.provider.test/v1",
-        api_key: "ccr-local-agent-login",
+        api_key: "ar-local-agent-login",
         autoFetchModels: true,
         autoFetchKnownModels: ["alpha"],
         id: "provider",
@@ -437,11 +437,11 @@ test("auto model refresh uses enabled local provider plugins including protocol-
     providerPlugins: [
       {
         enabled: false,
-        key: "ccr-local-agent-provider-disabled",
+        key: "ar-local-agent-provider-disabled",
         providerName: "Provider"
       },
       {
-        key: "ccr-local-agent-provider-internal",
+        key: "ar-local-agent-provider-internal",
         providerName: "provider::openai_chat_completions"
       },
       {
@@ -464,7 +464,7 @@ test("auto model refresh uses enabled local provider plugins including protocol-
     }
   });
 
-  assert.deepEqual(pluginKeys, ["ccr-local-agent-provider-internal"]);
+  assert.deepEqual(pluginKeys, ["ar-local-agent-provider-internal"]);
 });
 
 test("auto model refresh enabled check ignores disabled providers", () => {

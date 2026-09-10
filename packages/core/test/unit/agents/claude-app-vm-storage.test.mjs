@@ -94,22 +94,22 @@ function readRootfs(bundleDir) {
 function withRuntimeEnv(run) {
   const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-vm-storage-"));
   const previous = {
-    appData: process.env.CCR_INTERNAL_APP_DATA_DIR,
-    home: process.env.CCR_INTERNAL_HOME_DIR,
-    seed: process.env.CCR_CLAUDE_APP_VM_SEED_DIR,
-    seedDisabled: process.env.CCR_CLAUDE_APP_VM_SEED_DISABLED
+    appData: process.env.AR_INTERNAL_APP_DATA_DIR,
+    home: process.env.AR_INTERNAL_HOME_DIR,
+    seed: process.env.AR_CLAUDE_APP_VM_SEED_DIR,
+    seedDisabled: process.env.AR_CLAUDE_APP_VM_SEED_DISABLED
   };
   try {
-    process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(root, "app-data");
-    process.env.CCR_INTERNAL_HOME_DIR = path.join(root, "home");
-    delete process.env.CCR_CLAUDE_APP_VM_SEED_DIR;
-    delete process.env.CCR_CLAUDE_APP_VM_SEED_DISABLED;
+    process.env.AR_INTERNAL_APP_DATA_DIR = path.join(root, "app-data");
+    process.env.AR_INTERNAL_HOME_DIR = path.join(root, "home");
+    delete process.env.AR_CLAUDE_APP_VM_SEED_DIR;
+    delete process.env.AR_CLAUDE_APP_VM_SEED_DISABLED;
     run(root);
   } finally {
-    setOptionalEnv("CCR_INTERNAL_APP_DATA_DIR", previous.appData);
-    setOptionalEnv("CCR_INTERNAL_HOME_DIR", previous.home);
-    setOptionalEnv("CCR_CLAUDE_APP_VM_SEED_DIR", previous.seed);
-    setOptionalEnv("CCR_CLAUDE_APP_VM_SEED_DISABLED", previous.seedDisabled);
+    setOptionalEnv("AR_INTERNAL_APP_DATA_DIR", previous.appData);
+    setOptionalEnv("AR_INTERNAL_HOME_DIR", previous.home);
+    setOptionalEnv("AR_CLAUDE_APP_VM_SEED_DIR", previous.seed);
+    setOptionalEnv("AR_CLAUDE_APP_VM_SEED_DISABLED", previous.seedDisabled);
     rmSync(root, { force: true, recursive: true });
   }
 }

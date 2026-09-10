@@ -11,7 +11,7 @@ CCR 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 D
 
 | 方式 | 启动入口 | 默认管理地址 | 默认模型网关 |
 | --- | --- | --- | --- |
-| 桌面应用 | 应用界面 / `ccr-app` | 应用内窗口 | `http://127.0.0.1:3456` |
+| 桌面应用 | 应用界面 / `agentrouter` | 应用内窗口 | `http://127.0.0.1:3456` |
 | npm CLI | `ccr ui` / `ccr serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | `docker compose up -d --build` | 与网关共用 `http://127.0.0.1:3458` | 与管理界面共用 Nginx 入口 |
 
@@ -77,7 +77,7 @@ Agent 配置让 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 等
 
 ### Grok CLI
 
-选择 Grok CLI 并设置默认模型，然后运行复制出的 `ccr-app <配置名称>` 命令。即使 CCR Desktop 网关尚未运行，该命令也会启动一个可共享的临时网关服务；并发 Grok 会话会共同保持服务运行，直到最后一个会话退出。CCR 会把 Grok 的模型发现和推理请求指向本地网关；进入 Grok 后可以用 `/model` 切换 CCR 模型。
+选择 Grok CLI 并设置默认模型，然后运行复制出的 `agentrouter <配置名称>` 命令。即使 CCR Desktop 网关尚未运行，该命令也会启动一个可共享的临时网关服务；并发 Grok 会话会共同保持服务运行，直到最后一个会话退出。CCR 会把 Grok 的模型发现和推理请求指向本地网关；进入 Grok 后可以用 `/model` 切换 CCR 模型。
 
 ### ZCode
 

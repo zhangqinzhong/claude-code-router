@@ -73,7 +73,7 @@ test("route trace omits body values when request body capture is disabled", () =
       {
         after: "diagnostic-value",
         operation: "add",
-        path: "/headers/x-ccr-route-source",
+        path: "/headers/x-ar-route-source",
         scope: "headers"
       }
     ],

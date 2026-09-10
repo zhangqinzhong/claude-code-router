@@ -16,7 +16,7 @@ type MutableFs = {
 };
 
 const requireFromHere = createRequire(__filename);
-const virtualConfigPath = path.resolve(process.cwd(), `.ccr-gateway-config-${process.pid}`);
+const virtualConfigPath = path.resolve(process.cwd(), `.ar-gateway-config-${process.pid}`);
 let started = false;
 
 process.once("disconnect", () => {
@@ -57,13 +57,13 @@ function installVirtualConfigFile(config: Record<string, unknown>): void {
   };
   fs.writeFileSync = (file, data, options) => {
     if (isManagedConfigPath(file)) {
-      throw new Error("Gateway configuration is managed by Claude Code Router.");
+      throw new Error("Gateway configuration is managed by AgentRouter.");
     }
     originalWriteFileSync(file, data, options);
   };
   fs.renameSync = (oldPath, newPath) => {
     if (isManagedConfigPath(oldPath) || isManagedConfigPath(newPath)) {
-      throw new Error("Gateway configuration is managed by Claude Code Router.");
+      throw new Error("Gateway configuration is managed by AgentRouter.");
     }
     originalRenameSync(oldPath, newPath);
   };

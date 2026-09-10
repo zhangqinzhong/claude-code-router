@@ -118,7 +118,19 @@ export function modelFromPayload(payload: unknown): string | undefined {
 
 export type FormattedLogBody = {
   json?: unknown;
+  rawText?: string;
+  streamEvents?: LogStreamEvent[];
   text: string;
+};
+
+export type LogStreamEvent = {
+  dataText: string;
+  done?: boolean;
+  event?: string;
+  id?: string;
+  index: number;
+  json?: unknown;
+  raw: string;
 };
 
 export function logBodyKey(body: RequestLogBody | undefined): string {
@@ -149,10 +161,25 @@ export function formatLogBodyView(body: RequestLogBody | undefined): FormattedLo
     return { json: normalizedJson, text: JSON.stringify(normalizedJson, null, 2) };
   }
 
-  const streamPayloads = parseLogStreamPayloads(text);
-  if (streamPayloads.length > 0) {
+  const streamEvents = parseLogStreamEvents(text);
+  const streamPayloads = streamEvents
+    .map((event) => event.json)
+    .filter((payload): payload is unknown => payload !== undefined);
+  if (streamEvents.length > 0 && streamPayloads.length > 0) {
     const streamedJson = aggregateLogStreamPayloads(streamPayloads);
-    return { json: streamedJson, text: JSON.stringify(streamedJson, null, 2) };
+    return {
+      json: streamedJson,
+      rawText: text,
+      streamEvents,
+      text: JSON.stringify(streamedJson, null, 2)
+    };
+  }
+  if (streamEvents.length > 0) {
+    return {
+      rawText: text,
+      streamEvents,
+      text
+    };
   }
 
   return { text: text || "No body" };
@@ -177,23 +204,65 @@ export function parseLogJson(value: string): unknown | undefined {
 }
 
 export function parseLogStreamPayloads(value: string): unknown[] {
+  return parseLogStreamEvents(value)
+    .map((event) => event.json)
+    .filter((payload): payload is unknown => payload !== undefined);
+}
+
+export function parseLogStreamEvents(value: string): LogStreamEvent[] {
+  const hasSseData = /(?:^|\r?\n)\s*data\s*:/.test(value);
+  const blocks = value.split(/\r?\n(?:[ \t]*\r?\n)+/);
+  const events: LogStreamEvent[] = [];
+
+  if (hasSseData) {
+    for (const block of blocks) {
+      const lines = block.split(/\r?\n/);
+      const dataLines: string[] = [];
+      let event: string | undefined;
+      let id: string | undefined;
+      for (const rawLine of lines) {
+        const line = rawLine.trim();
+        if (line.startsWith("event:")) {
+          event = line.slice(6).trim() || undefined;
+        } else if (line.startsWith("id:")) {
+          id = line.slice(3).trim() || undefined;
+        } else if (line.startsWith("data:")) {
+          dataLines.push(line.slice(5).trim());
+        }
+      }
+      if (dataLines.length === 0) {
+        continue;
+      }
+      const dataText = dataLines.join("\n");
+      const done = dataText === "[DONE]";
+      events.push({
+        dataText,
+        ...(done ? { done: true } : {}),
+        ...(event ? { event } : {}),
+        ...(id ? { id } : {}),
+        index: events.length,
+        ...(done ? {} : parseLogJson(dataText) !== undefined ? { json: parseLogJson(dataText) } : {}),
+        raw: block
+      });
+    }
+    return events;
+  }
+
+  // Some gateways emit newline-delimited JSON without the SSE `data:` prefix.
   const payloads: unknown[] = [];
   for (const rawLine of value.split(/\r?\n/)) {
     const line = rawLine.trim();
-    const payload = line.startsWith("data:")
-      ? line.slice(5).trim()
-      : line.startsWith("{") || line.startsWith("[")
-        ? line
-        : "";
-    if (!payload || payload === "[DONE]") {
+    if (!line || (!line.startsWith("{") && !line.startsWith("["))) {
       continue;
     }
-    const parsed = parseLogJson(payload);
-    if (parsed !== undefined) {
-      payloads.push(parsed);
+    const parsed = parseLogJson(line);
+    if (parsed === undefined) {
+      continue;
     }
+    payloads.push(parsed);
+    events.push({ dataText: line, index: events.length, json: parsed, raw: rawLine });
   }
-  return payloads;
+  return payloads.length > 1 ? events : [];
 }
 
 export function aggregateLogStreamPayloads(payloads: unknown[]): Record<string, unknown> {

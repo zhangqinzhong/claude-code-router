@@ -68,9 +68,9 @@ test("legacy tray modules migrate into widgets with current variant preferences"
 });
 
 test("tray icon preference accepts supported values and safely defaults", () => {
-  for (const value of ["violet", "orange", "cyan", "progress", "random"] as const) {
+  for (const value of ["layered", "violet", "orange", "cyan", "progress", "random"] as const) {
     assert.equal(normalizeTrayIconPreference(value), value);
   }
-  assert.equal(normalizeTrayIconPreference(undefined), "random");
-  assert.equal(normalizeTrayIconPreference("unsupported" as never), "random");
+  assert.equal(normalizeTrayIconPreference(undefined), "layered");
+  assert.equal(normalizeTrayIconPreference("unsupported" as never), "layered");
 });

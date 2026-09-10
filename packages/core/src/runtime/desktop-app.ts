@@ -1,9 +1,9 @@
-export const CCR_DESKTOP_APP_ENV = "CCR_DESKTOP_APP";
+export const AR_DESKTOP_APP_ENV = "AR_DESKTOP_APP";
 
 export function markDesktopAppRuntime(): void {
-  process.env[CCR_DESKTOP_APP_ENV] = "1";
+  process.env[AR_DESKTOP_APP_ENV] = "1";
 }
 
 export function isDesktopAppRuntime(): boolean {
-  return process.env[CCR_DESKTOP_APP_ENV] === "1" && Boolean((process.versions as NodeJS.ProcessVersions & { electron?: string }).electron);
+  return process.env[AR_DESKTOP_APP_ENV] === "1" && Boolean((process.versions as NodeJS.ProcessVersions & { electron?: string }).electron);
 }

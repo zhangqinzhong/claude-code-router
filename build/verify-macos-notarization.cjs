@@ -10,8 +10,8 @@ module.exports = async function verifyMacosNotarization(context) {
     return;
   }
 
-  if (process.env.CCR_SKIP_MAC_NOTARIZATION_VERIFY === "1") {
-    console.warn("Skipping macOS notarization verification because CCR_SKIP_MAC_NOTARIZATION_VERIFY=1.");
+  if (process.env.AR_SKIP_MAC_NOTARIZATION_VERIFY === "1") {
+    console.warn("Skipping macOS notarization verification because AR_SKIP_MAC_NOTARIZATION_VERIFY=1.");
     return;
   }
 

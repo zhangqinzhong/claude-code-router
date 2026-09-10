@@ -442,7 +442,7 @@ export function inferProtocol(provider: GatewayProviderConfig): GatewayProviderP
 }
 
 export function resolveResponseProviderProtocol(headers: Headers, config: AppConfig | undefined): GatewayProviderProtocol | undefined {
-  const ccrProtocol = normalizeProviderProtocol(headers.get("x-ccr-provider-protocol"));
+  const ccrProtocol = normalizeProviderProtocol(headers.get("x-ar-provider-protocol"));
   if (ccrProtocol) {
     return ccrProtocol;
   }

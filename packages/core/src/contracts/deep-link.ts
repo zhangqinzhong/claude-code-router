@@ -12,7 +12,7 @@ import type {
 } from "@ccr/core/contracts/app";
 import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
 
-export const appDeepLinkProtocol = "ccr";
+export const appDeepLinkProtocol = "agentrouter";
 export const providerDeepLinkHost = "provider";
 
 const maxDeepLinkLength = 32_000;

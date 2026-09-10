@@ -7,7 +7,7 @@ import vm from "node:vm";
 import { gatewayFetchPreloadScriptForTest, writeGatewayFetchPreloadFile } from "@ccr/core/gateway/core-runtime/supervisor.ts";
 
 test("gateway fetch preload file is stored with private permissions", { skip: process.platform === "win32" }, () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-gateway-preload-permissions-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-gateway-preload-permissions-"));
   const configDir = path.join(root, ".claude-code-router");
   const preloadFile = path.join(configDir, "gateway-proxy-preload.cjs");
 
@@ -29,8 +29,8 @@ test("gateway fetch preload file is stored with private permissions", { skip: pr
 
 test("gateway fetch preload applies API_TIMEOUT_MS to direct upstream fetches", async () => {
   const harness = executePreload({
-    CCR_UNDICI_MODULE: "mock-undici",
-    CCR_UPSTREAM_TIMEOUT_MS: "600000"
+    AR_UNDICI_MODULE: "mock-undici",
+    AR_UPSTREAM_TIMEOUT_MS: "600000"
   });
 
   assert.equal(harness.agentOptions.length, 1);
@@ -47,9 +47,9 @@ test("gateway fetch preload applies API_TIMEOUT_MS to direct upstream fetches", 
 
 test("gateway fetch preload combines proxy routing with timeout dispatcher options", async () => {
   const harness = executePreload({
-    CCR_UNDICI_MODULE: "mock-undici",
+    AR_UNDICI_MODULE: "mock-undici",
     CCR_UPSTREAM_PROXY_URL: "http://127.0.0.1:8888",
-    CCR_UPSTREAM_TIMEOUT_MS: "600000",
+    AR_UPSTREAM_TIMEOUT_MS: "600000",
     NO_PROXY: "api.internal.test,.bypass.test"
   });
 
@@ -74,8 +74,8 @@ test("gateway fetch preload combines proxy routing with timeout dispatcher optio
 
 test("gateway fetch preload preserves explicit fetch dispatchers", async () => {
   const harness = executePreload({
-    CCR_UNDICI_MODULE: "mock-undici",
-    CCR_UPSTREAM_TIMEOUT_MS: "600000"
+    AR_UNDICI_MODULE: "mock-undici",
+    AR_UPSTREAM_TIMEOUT_MS: "600000"
   });
   const dispatcher = { kind: "caller" };
 

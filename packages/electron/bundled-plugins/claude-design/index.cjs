@@ -29,22 +29,22 @@ const DEFAULT_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS = 1500;
 const GATEWAY_MODEL_DISCOVERY_PATHS = ["/models", "/v1/models"];
 const CLAUDE_APP_ONE_MILLION_CONTEXT_SUFFIX = "[1m]";
 const CLAUDE_APP_ENCODED_ROUTE_ID_REGEX = /^anthropic\/claude-ccr(?:\d+)?-h([0-9a-f]+)$/i;
-const DESIGN_FRONTEND_ASSETS_ORIGIN_ENV_KEYS = ["CCR_CLAUDE_DESIGN_FRONTEND_ORIGIN", "CCR_CLAUDE_DESIGN_ASSETS_ORIGIN"];
-const DESIGN_FRONTEND_URL_ENV_KEYS = ["CCR_CLAUDE_DESIGN_FRONTEND_URL", "CCR_CLAUDE_DESIGN_WEB_URL"];
-const SHIP_FRONTEND_ASSETS_ORIGIN_ENV_KEYS = ["CCR_CLAUDE_SHIP_FRONTEND_ORIGIN", "CCR_CLAUDE_SHIP_ASSETS_ORIGIN", "CCR_CLAUDE_DESIGN_ASSETS_ORIGIN"];
-const SHIP_FRONTEND_URL_ENV_KEYS = ["CCR_CLAUDE_SHIP_FRONTEND_URL", "CCR_CLAUDE_SHIP_WEB_URL"];
-const UPSTREAM_PROXY_ENV_KEYS = ["CCR_CLAUDE_DESIGN_PROXY", "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy"];
+const DESIGN_FRONTEND_ASSETS_ORIGIN_ENV_KEYS = ["AR_CLAUDE_DESIGN_FRONTEND_ORIGIN", "AR_CLAUDE_DESIGN_ASSETS_ORIGIN"];
+const DESIGN_FRONTEND_URL_ENV_KEYS = ["AR_CLAUDE_DESIGN_FRONTEND_URL", "AR_CLAUDE_DESIGN_WEB_URL"];
+const SHIP_FRONTEND_ASSETS_ORIGIN_ENV_KEYS = ["AR_CLAUDE_SHIP_FRONTEND_ORIGIN", "AR_CLAUDE_SHIP_ASSETS_ORIGIN", "AR_CLAUDE_DESIGN_ASSETS_ORIGIN"];
+const SHIP_FRONTEND_URL_ENV_KEYS = ["AR_CLAUDE_SHIP_FRONTEND_URL", "AR_CLAUDE_SHIP_WEB_URL"];
+const UPSTREAM_PROXY_ENV_KEYS = ["AR_CLAUDE_DESIGN_PROXY", "HTTPS_PROXY", "https_proxy", "ALL_PROXY", "all_proxy"];
 const CLOUDFLARE_ACCOUNT_ID_ENV_KEYS = ["CLOUDFLARE_ACCOUNT_ID", "CF_ACCOUNT_ID"];
 const CLOUDFLARE_API_TOKEN_ENV_KEYS = ["CLOUDFLARE_API_TOKEN", "CF_API_TOKEN"];
-const CLOUDFLARE_PAGES_PROJECT_ENV_KEYS = ["CCR_CLAUDE_SHIP_CLOUDFLARE_PROJECT", "CLOUDFLARE_PAGES_PROJECT_NAME"];
-const CLOUDFLARE_PAGES_PROJECT_TEMPLATE_ENV_KEYS = ["CCR_CLAUDE_SHIP_CLOUDFLARE_PROJECT_TEMPLATE", "CLOUDFLARE_PAGES_PROJECT_NAME_TEMPLATE"];
-const CLOUDFLARE_PAGES_BRANCH_ENV_KEYS = ["CCR_CLAUDE_SHIP_CLOUDFLARE_BRANCH", "CLOUDFLARE_PAGES_BRANCH"];
-const CLOUDFLARE_PAGES_ENABLED_ENV_KEYS = ["CCR_CLAUDE_SHIP_CLOUDFLARE_ENABLED", "CLOUDFLARE_PAGES_ENABLED"];
+const CLOUDFLARE_PAGES_PROJECT_ENV_KEYS = ["AR_CLAUDE_SHIP_CLOUDFLARE_PROJECT", "CLOUDFLARE_PAGES_PROJECT_NAME"];
+const CLOUDFLARE_PAGES_PROJECT_TEMPLATE_ENV_KEYS = ["AR_CLAUDE_SHIP_CLOUDFLARE_PROJECT_TEMPLATE", "CLOUDFLARE_PAGES_PROJECT_NAME_TEMPLATE"];
+const CLOUDFLARE_PAGES_BRANCH_ENV_KEYS = ["AR_CLAUDE_SHIP_CLOUDFLARE_BRANCH", "CLOUDFLARE_PAGES_BRANCH"];
+const CLOUDFLARE_PAGES_ENABLED_ENV_KEYS = ["AR_CLAUDE_SHIP_CLOUDFLARE_ENABLED", "CLOUDFLARE_PAGES_ENABLED"];
 const DEFAULT_CLOUDFLARE_API_BASE_URL = "https://api.cloudflare.com/client/v4";
 const CLAUDE_APP_DESIGN_SHELL_PATH = "/desktop-design";
 const CLAUDE_APP_LEGACY_DESIGN_PATH = "/discover/design";
 const CLAUDE_SHIP_APP_PATH = "/claude-ship";
-const CCR_RESOURCE_RUNTIME_PATH = "/ccr-resource-runtime.js";
+const AR_RESOURCE_RUNTIME_PATH = "/ccr-resource-runtime.js";
 const CLAUDE_SHIP_ENVIRONMENT_ID = "local-claude-ship-011111111111111111111112";
 const CLAUDE_APP_SPA_ROUTE_PATHS = [
   CLAUDE_APP_DESIGN_SHELL_PATH,
@@ -71,7 +71,7 @@ const CLAUDE_SHIP_ROUTE_PATHS = [
 ];
 const CLAUDE_SHIP_FRONTEND_STATIC_ROUTE_PATHS = [
   CLAUDE_SHIP_APP_PATH,
-  CCR_RESOURCE_RUNTIME_PATH,
+  AR_RESOURCE_RUNTIME_PATH,
   "/ship",
   "/_frame-rt",
   "/assets",
@@ -102,13 +102,13 @@ const AUTH_ESCAPE_ROUTE_PATHS = ["/login", "/logout", "/auth", "/oauth"];
 const AUTH_API_ROUTE_PATHS = ["/api/auth", "/api/session", "/api/me", "/api/user", "/api/account", "/api/account_profile"];
 const BOOTSTRAP_ROUTE_PATHS = ["/_bootstrap", "/api/bootstrap", "/edge-api/bootstrap"];
 const TOKENIZED_PREVIEW_ROUTE_PATHS = ["/_t", "/design/_t"];
-const DESIGN_ONLINE_REQUIRED_ROUTE_PATHS = [CCR_RESOURCE_RUNTIME_PATH, "/design", CLAUDE_APP_LEGACY_DESIGN_PATH, OMELETTE_RPC_PATH_PREFIX, "/design/v1/design", "/v1/design", ...PRIVACY_CONSENT_ROUTE_PATHS, ...TOKENIZED_PREVIEW_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS];
-const DESIGN_LOCAL_REQUIRED_ROUTE_PATHS = [CCR_RESOURCE_RUNTIME_PATH, OMELETTE_RPC_PATH_PREFIX, "/design/v1/design", "/v1/design", ...PRIVACY_CONSENT_ROUTE_PATHS, ...TOKENIZED_PREVIEW_ROUTE_PATHS, ...CLAUDE_APP_SPA_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
+const DESIGN_ONLINE_REQUIRED_ROUTE_PATHS = [AR_RESOURCE_RUNTIME_PATH, "/design", CLAUDE_APP_LEGACY_DESIGN_PATH, OMELETTE_RPC_PATH_PREFIX, "/design/v1/design", "/v1/design", ...PRIVACY_CONSENT_ROUTE_PATHS, ...TOKENIZED_PREVIEW_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS];
+const DESIGN_LOCAL_REQUIRED_ROUTE_PATHS = [AR_RESOURCE_RUNTIME_PATH, OMELETTE_RPC_PATH_PREFIX, "/design/v1/design", "/v1/design", ...PRIVACY_CONSENT_ROUTE_PATHS, ...TOKENIZED_PREVIEW_ROUTE_PATHS, ...CLAUDE_APP_SPA_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
 const PARKED_MESSAGE_STATE_NOT_FOUND = 1;
 const ORGANIZATION_ROUTE_PATHS = ["/api/organizations", "/organizations"];
 const SHIP_API_ROUTE_PATHS = ["/api/billing/promotion/claude-ship", ...ORGANIZATION_ROUTE_PATHS];
-const SHIP_ONLINE_REQUIRED_ROUTE_PATHS = [CCR_RESOURCE_RUNTIME_PATH, "/v1/code", "/v1/sessions", ...SHIP_API_ROUTE_PATHS, ...PRIVACY_CONSENT_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
-const SHIP_LOCAL_REQUIRED_ROUTE_PATHS = [CCR_RESOURCE_RUNTIME_PATH, "/v1/code", "/v1/sessions", ...SHIP_API_ROUTE_PATHS, "/cdn-cgi", ...PRIVACY_CONSENT_ROUTE_PATHS, ...CLAUDE_SHIP_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
+const SHIP_ONLINE_REQUIRED_ROUTE_PATHS = [AR_RESOURCE_RUNTIME_PATH, "/v1/code", "/v1/sessions", ...SHIP_API_ROUTE_PATHS, ...PRIVACY_CONSENT_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
+const SHIP_LOCAL_REQUIRED_ROUTE_PATHS = [AR_RESOURCE_RUNTIME_PATH, "/v1/code", "/v1/sessions", ...SHIP_API_ROUTE_PATHS, "/cdn-cgi", ...PRIVACY_CONSENT_ROUTE_PATHS, ...CLAUDE_SHIP_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
 const DEFAULT_DESIGN_ROUTE_PATHS = ["/v1/design", ...ORGANIZATION_ROUTE_PATHS, ...PRIVACY_CONSENT_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS];
 const LOCAL_DESIGN_ROUTE_PATHS = ["/design", "/v1/design", ...ORGANIZATION_ROUTE_PATHS, "/cdn-cgi", ...PRIVACY_CONSENT_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS, ...AUTH_ESCAPE_ROUTE_PATHS, ...AUTH_API_ROUTE_PATHS];
 const DEFAULT_SHIP_ROUTE_PATHS = ["/v1/code", ...SHIP_API_ROUTE_PATHS, ...PRIVACY_CONSENT_ROUTE_PATHS, ...BOOTSTRAP_ROUTE_PATHS];
@@ -354,8 +354,8 @@ const OMELETTE_PREVIEW_LIVE_RELOAD_SCRIPT = `(function(){
   try {
     if (window.__ccrOmelettePreviewLiveReloadInstalled) return;
     window.__ccrOmelettePreviewLiveReloadInstalled = true;
-    var currentVersion = "__CCR_PREVIEW_VERSION__";
-    var pollUrl = "__CCR_PREVIEW_POLL_URL__";
+    var currentVersion = "__AR_PREVIEW_VERSION__";
+    var pollUrl = "__AR_PREVIEW_POLL_URL__";
     var timer = 0;
     var checking = false;
     var stopped = false;
@@ -378,7 +378,7 @@ const OMELETTE_PREVIEW_LIVE_RELOAD_SCRIPT = `(function(){
           method: "HEAD"
         });
         if (!response.ok) return;
-        var nextVersion = response.headers.get("x-ccr-preview-version") || response.headers.get("etag") || "";
+        var nextVersion = response.headers.get("x-ar-preview-version") || response.headers.get("etag") || "";
         if (nextVersion && currentVersion && nextVersion !== currentVersion) {
           stopped = true;
           window.location.reload();
@@ -466,8 +466,8 @@ const DEFAULT_ME = {
   accountUuid: "00000000-0000-4000-8000-000000000001",
   organizationUuid: "00000000-0000-4000-8000-000000000002",
   email: "claude-code-router@example.local",
-  displayName: "Claude Code Router",
-  orgName: "Claude Code Router Organization",
+  displayName: "AgentRouter",
+  orgName: "AgentRouter Organization",
   growthbookPayload: "{}",
   modelPresets: [
     {
@@ -507,14 +507,14 @@ const DEFAULT_ME = {
   memberships: [
     {
       uuid: "00000000-0000-4000-8000-000000000002",
-      name: "Claude Code Router Organization"
+      name: "AgentRouter Organization"
     }
   ]
 };
 
 module.exports = createClaudeProductPlugin("design");
 module.exports.createClaudeProductPlugin = createClaudeProductPlugin;
-if (process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS === "1") {
+if (process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS === "1") {
   module.exports.__test = {
     discoverLocalDesignIndexAssets,
     injectDesignMeIntoHtml,
@@ -934,7 +934,7 @@ async function routeMockRequest(runtime, method, url, request, requestBody) {
     return htmlResponse("<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"></head><body></body></html>\n");
   }
 
-  if (method === "GET" && path === CCR_RESOURCE_RUNTIME_PATH) {
+  if (method === "GET" && path === AR_RESOURCE_RUNTIME_PATH) {
     return serveClaudeResourceRuntime();
   }
 
@@ -5033,7 +5033,7 @@ function itemFromRow(row, organizationUuid) {
 }
 
 async function handleClaudeShipCodeApi(runtime, method, path, requestBody, url, requestHeaders = {}) {
-  if (process.env.CCR_CLAUDE_SHIP_DEBUG === "1") {
+  if (process.env.AR_CLAUDE_SHIP_DEBUG === "1") {
     runtime.logger?.info?.(`Claude Ship runtime request ${method} ${url.pathname}${url.search}`);
   }
 
@@ -7007,7 +7007,7 @@ function claudeShipTransportInitPayload(runtime, bridge) {
 }
 
 function claudeShipCliCommand(bridge) {
-  const command = firstEnvValue(["CCR_CLAUDE_SHIP_CLAUDE_BIN", "CCR_CLAUDE_CODE_BIN", "CODEXL_CLAUDE_CODE_BIN"]) || "claude";
+  const command = firstEnvValue(["AR_CLAUDE_SHIP_CLAUDE_BIN", "AR_CLAUDE_CODE_BIN", "CODEXL_CLAUDE_CODE_BIN"]) || "claude";
   const args = [
     "--print",
     "--output-format", "stream-json",
@@ -7026,7 +7026,7 @@ function claudeShipCliCommand(bridge) {
   if (bridge.cliSessionId) {
     args.push("--resume", bridge.cliSessionId);
   }
-  args.push(...splitShellLike(firstEnvValue(["CCR_CLAUDE_SHIP_CLAUDE_ARGS", "CCR_CLAUDE_CODE_EXTRA_ARGS", "CODEXL_CLAUDE_CODE_EXTRA_ARGS"]) || ""));
+  args.push(...splitShellLike(firstEnvValue(["AR_CLAUDE_SHIP_CLAUDE_ARGS", "AR_CLAUDE_CODE_EXTRA_ARGS", "CODEXL_CLAUDE_CODE_EXTRA_ARGS"]) || ""));
   const env = { ...process.env };
   delete env.ELECTRON_RUN_AS_NODE;
   env.CODEX_SESSION_ID = bridge.sessionId;
@@ -7036,7 +7036,7 @@ function claudeShipCliCommand(bridge) {
 }
 
 function claudeShipCliPermissionMode() {
-  return firstEnvValue(["CCR_CLAUDE_SHIP_PERMISSION_MODE", "CCR_CLAUDE_CODE_PERMISSION_MODE"]) || "bypassPermissions";
+  return firstEnvValue(["AR_CLAUDE_SHIP_PERMISSION_MODE", "AR_CLAUDE_CODE_PERMISSION_MODE"]) || "bypassPermissions";
 }
 
 function claudeShipCliUserPayload(bridge, payload) {
@@ -7181,7 +7181,7 @@ function shouldIgnoreClaudeShipWorkspaceEntry(name) {
 }
 
 function claudeShipWorkspacePath(runtime, sessionId) {
-  const root = firstEnvValue(["CCR_CLAUDE_SHIP_WORKSPACE_DIR", "CLAUDE_SHIP_WORKSPACE_DIR"]) ||
+  const root = firstEnvValue(["AR_CLAUDE_SHIP_WORKSPACE_DIR", "CLAUDE_SHIP_WORKSPACE_DIR"]) ||
     pathModule.join(pathModule.dirname(runtime.store?.dbFile || pathModule.join(os.tmpdir(), "claude-ship.sqlite")), "claude-ship-workspaces");
   return pathModule.join(root, sanitizePathSegment(sessionId) || "session");
 }
@@ -10152,7 +10152,7 @@ function servePendingDesignPreviewResponse(runtime, projectId, filePath) {
     "cache-control": "no-store",
     "content-type": "text/html; charset=utf-8",
     etag: `"ccr-preview-${previewVersion}"`,
-    "x-ccr-preview-version": previewVersion
+    "x-ar-preview-version": previewVersion
   });
 }
 
@@ -10228,7 +10228,7 @@ function serveProjectFileResponse(runtime, projectId, row, filePath) {
     const normalizedHtml = normalizeBabelJsxScriptTags(html);
     const inlinedHtml = inlineLocalBabelJsxScriptTags(runtime, projectId, filePath, normalizedHtml);
     const dependencySafeHtml = stripRemotePreviewDependencyIntegrity(inlinedHtml);
-    const previewHtml = injectOmelettePreviewScripts(dependencySafeHtml, headers["x-ccr-preview-version"], previewPollUrl(projectId, filePath));
+    const previewHtml = injectOmelettePreviewScripts(dependencySafeHtml, headers["x-ar-preview-version"], previewPollUrl(projectId, filePath));
     return textResponse(200, previewHtml, headers);
   }
   return binaryResponse(200, patchClaudeDesignProjectFileBody(body, filePath, contentType), headers);
@@ -10273,8 +10273,8 @@ function previewProjectFileHeaders(runtime, projectId, row, filePath, contentTyp
     "cache-control": "no-store",
     "content-type": contentType || guessContentType(filePath),
     etag: `"ccr-preview-${previewVersion}"`,
-    "x-ccr-file-version": fileVersion,
-    "x-ccr-preview-version": previewVersion
+    "x-ar-file-version": fileVersion,
+    "x-ar-preview-version": previewVersion
   };
 }
 
@@ -10326,8 +10326,8 @@ function injectOmelettePreviewLiveReloadBridge(html, previewVersion, pollUrl) {
     return source;
   }
   const script = OMELETTE_PREVIEW_LIVE_RELOAD_SCRIPT
-    .replace("\"__CCR_PREVIEW_VERSION__\"", JSON.stringify(String(previewVersion || "")))
-    .replace("\"__CCR_PREVIEW_POLL_URL__\"", JSON.stringify(String(pollUrl || "")));
+    .replace("\"__AR_PREVIEW_VERSION__\"", JSON.stringify(String(previewVersion || "")))
+    .replace("\"__AR_PREVIEW_POLL_URL__\"", JSON.stringify(String(pollUrl || "")));
   const scriptTag = `<script>${script}</script>`;
   if (/<head\b[^>]*>/i.test(source)) {
     return source.replace(/<head\b([^>]*)>/i, (tag) => `${tag}\n${scriptTag}`);
@@ -11987,7 +11987,7 @@ function gatewayModelDiscoveryHeaders(runtime) {
     accept: "application/json",
     "cache-control": "no-cache",
     "user-agent": "Claude Design/CCR",
-    "x-ccr-client": runtime.pluginId === "claude-ship" ? "Claude Ship" : "Claude Design"
+    "x-ar-client": runtime.pluginId === "claude-ship" ? "Claude Ship" : "Claude Design"
   };
   if (runtime.gatewayApiKey) {
     headers.authorization = `Bearer ${runtime.gatewayApiKey}`;
@@ -12472,7 +12472,7 @@ function fetchGateway(runtime, path, body, routingDecision, sessionContext, opti
     "anthropic-version": "2023-06-01",
     ...(options.stream ? { accept: "text/event-stream" } : {}),
     "content-type": "application/json",
-    "x-ccr-client": runtime.pluginId === "claude-ship" ? "Claude Ship" : "Claude Design",
+    "x-ar-client": runtime.pluginId === "claude-ship" ? "Claude Ship" : "Claude Design",
     "x-claude-design-proxy": "1"
   };
   if (runtime.gatewayApiKey) {

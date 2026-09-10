@@ -37,7 +37,7 @@ Use this page when you want to route Claude Code to a non-Anthropic provider, pi
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Claude Code** | Creates Claude Code launch entries in CCR. |
-| Config name | Free text, e.g. `Claude Code - Work` | Identifies the profile in CCR. Desktop commands use `ccr-app "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Claude Code - Work` | Identifies the profile in CCR. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and are not offered as launch entries. |
 | Effect scope | `Only opened from CCR` / `System default` | Keeps changes limited to CCR launches, or makes this the system-default Claude Code profile. Only one enabled system-default Claude Code profile is allowed. |
 | Entry mode | `CLI & APP` / `CLI only` / `App only` | `CLI & APP` exposes both the terminal command and the App button; `CLI only` only generates a CLI command; `App only` only exposes the App. |
@@ -66,7 +66,7 @@ Claude Code picks a model per tier. The **Model** field sets the default. The op
 
 - **CLI:** click the terminal button on the desktop profile card and run the copied command:
   ```text
-  ccr-app "Claude Code - Work"
+  agentrouter "Claude Code - Work"
   ```
   For CLI, run:
   ```text

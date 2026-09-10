@@ -26,7 +26,7 @@ export function findInstalledOpenCodeAppExecutable(profileAppPath?: string): Ope
   const checked: string[] = [];
   const candidates = [
     ...(profileAppPath?.trim() ? [resolveUserPath(profileAppPath)] : []),
-    ...["CCR_OPENCODE_APP_PATH", "OPENCODE_APP_PATH"].map((key) => process.env[key]?.trim() || "").filter(Boolean).map(resolveUserPath),
+    ...["AR_OPENCODE_APP_PATH", "OPENCODE_APP_PATH"].map((key) => process.env[key]?.trim() || "").filter(Boolean).map(resolveUserPath),
     ...platformCandidates()
   ];
   for (const candidate of candidates) {
@@ -71,7 +71,7 @@ export function launchOpenCodeAppProfile(
     ...process.env,
     ...profile.env,
     ...extraEnv,
-    CCR_PROFILE_SURFACE: "app",
+    AR_PROFILE_SURFACE: "app",
     OPENCODE_CLIENT: "desktop",
     OPENCODE_CONFIG: configFile,
     OPENCODE_CONFIG_CONTENT: inlineConfig
@@ -100,7 +100,7 @@ export function openCodeAppLaunchSignature(
   const env = Object.fromEntries(Object.entries({
     ...profile.env,
     ...extraEnv,
-    CCR_PROFILE_SURFACE: "app",
+    AR_PROFILE_SURFACE: "app",
     OPENCODE_CLIENT: "desktop",
     OPENCODE_CONFIG: configFile,
     OPENCODE_CONFIG_CONTENT: inlineConfig

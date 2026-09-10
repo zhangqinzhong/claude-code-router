@@ -9,7 +9,7 @@ lead: Choose among the desktop app, npm CLI, and Docker distributions, complete 
 
 | Distribution | Best for | Entry | Default management address | Default gateway address |
 | --- | --- | --- | --- | --- |
-| Desktop app | Daily local use, tray, multi-instance Agent Apps, desktop integrations | App UI, `ccr-app` | In-app window | `http://127.0.0.1:3456` |
+| Desktop app | Daily local use, tray, multi-instance Agent Apps, desktop integrations | App UI, `agentrouter` | In-app window | `http://127.0.0.1:3456` |
 | npm CLI | Terminal, SSH, no Electron, external process supervisors | `ccr` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | Persistent servers and container operations | Nginx | Shared public endpoint | `http://127.0.0.1:3458` with the default mapping |
 

@@ -14,12 +14,12 @@ const scenarios = [
   { base64Image: true, bodyBytes: 8 * 1024 * 1024, hops: 0, name: "base64-image-8mb", records: 10 }
 ];
 const webOptions = {
-  bodyBytes: positiveInteger(process.env.CCR_REQUEST_LOG_BENCHMARK_WEB_BODY_BYTES, 1_024),
-  concurrency: positiveInteger(process.env.CCR_REQUEST_LOG_BENCHMARK_WEB_CONCURRENCY, 64),
-  requests: positiveInteger(process.env.CCR_REQUEST_LOG_BENCHMARK_WEB_REQUESTS, 10_000),
-  skip: process.env.CCR_REQUEST_LOG_BENCHMARK_SKIP_WEB === "1"
+  bodyBytes: positiveInteger(process.env.AR_REQUEST_LOG_BENCHMARK_WEB_BODY_BYTES, 1_024),
+  concurrency: positiveInteger(process.env.AR_REQUEST_LOG_BENCHMARK_WEB_CONCURRENCY, 64),
+  requests: positiveInteger(process.env.AR_REQUEST_LOG_BENCHMARK_WEB_REQUESTS, 10_000),
+  skip: process.env.AR_REQUEST_LOG_BENCHMARK_SKIP_WEB === "1"
 };
-const skipStorage = process.env.CCR_REQUEST_LOG_BENCHMARK_SKIP_STORAGE === "1";
+const skipStorage = process.env.AR_REQUEST_LOG_BENCHMARK_SKIP_STORAGE === "1";
 
 void main();
 
@@ -44,7 +44,7 @@ async function main() {
   process.stdout.write(JSON.stringify({
     architecture: typeof requestLogs.createRequestLogRuntime === "function" ? "worker-runtime" : "main-thread-store",
     cpu: process.arch,
-    label: process.env.CCR_REQUEST_LOG_BENCHMARK_LABEL || "benchmark",
+    label: process.env.AR_REQUEST_LOG_BENCHMARK_LABEL || "benchmark",
     node: process.version,
     platform: process.platform,
     results,

@@ -37,7 +37,7 @@ Claude Code 是 Anthropic 的编码 Agent。CCR 同时支持它的两种形态�
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
 | Agent | 选择 **Claude Code** | 在 CCR 中创建 Claude Code 启动入口。 |
-| 配置名称 | 自由文本，例如 `Claude Code - Work` | 在 CCR 中标识该配置。桌面端命令使用 `ccr-app "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
+| 配置名称 | 自由文本，例如 `Claude Code - Work` | 在 CCR 中标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | 生效范围 | `仅从 CCR 打开时生效` / `系统默认` | 仅影响从 CCR 打开的 Claude Code，或作为系统默认 Claude Code 配置。同一 Agent 只允许一个启用的系统默认配置。 |
 | 入口模式 | `CLI 与 APP` / `仅 CLI` / `仅 App` | “CLI 与 APP”同时提供终端命令和 App 按钮；“仅 CLI”只生成命令；“仅 App”只提供 App 入口。 |
@@ -66,7 +66,7 @@ Claude Code 会为不同档位选择模型。**模型** 字段设置默认值，
 
 - **CLI**：点击桌面端配置卡片上的终端按钮，运行复制出的命令：
   ```text
-  ccr-app "Claude Code - Work"
+  agentrouter "Claude Code - Work"
   ```
   CLI请执行：
   ```text

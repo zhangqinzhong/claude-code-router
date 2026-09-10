@@ -17,27 +17,27 @@ test("ChatGPT app launch shares explicit or default Codex login when available",
   const defaultAuthDir = path.join(root, ".codex");
   const defaultAuthFile = path.join(defaultAuthDir, "auth.json");
   const authFile = path.join(root, "auth.json");
-  const previousCcr = process.env.CCR_CODEX_CHATGPT_AUTH_FILE;
+  const previousCcr = process.env.AR_CODEX_CHATGPT_AUTH_FILE;
   const previousCodexl = process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE;
   try {
     writeFileSync(authFile, JSON.stringify({ auth_mode: "chatgpt", tokens: { access_token: "token" } }));
     mkdirSync(defaultAuthDir, { recursive: true });
     writeFileSync(defaultAuthFile, JSON.stringify({ auth_mode: "chatgpt", tokens: { access_token: "default-token" } }));
-    delete process.env.CCR_CODEX_CHATGPT_AUTH_FILE;
+    delete process.env.AR_CODEX_CHATGPT_AUTH_FILE;
     delete process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE;
     assert.deepEqual(codexSharedChatGptAuthEnvForTest(root), {
-      CCR_CODEX_CHATGPT_AUTH_FILE: defaultAuthFile,
+      AR_CODEX_CHATGPT_AUTH_FILE: defaultAuthFile,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: defaultAuthFile
     });
 
-    process.env.CCR_CODEX_CHATGPT_AUTH_FILE = authFile;
+    process.env.AR_CODEX_CHATGPT_AUTH_FILE = authFile;
     assert.deepEqual(codexSharedChatGptAuthEnvForTest(root), {
-      CCR_CODEX_CHATGPT_AUTH_FILE: authFile,
+      AR_CODEX_CHATGPT_AUTH_FILE: authFile,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: authFile
     });
   } finally {
-    if (previousCcr === undefined) delete process.env.CCR_CODEX_CHATGPT_AUTH_FILE;
-    else process.env.CCR_CODEX_CHATGPT_AUTH_FILE = previousCcr;
+    if (previousCcr === undefined) delete process.env.AR_CODEX_CHATGPT_AUTH_FILE;
+    else process.env.AR_CODEX_CHATGPT_AUTH_FILE = previousCcr;
     if (previousCodexl === undefined) delete process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE;
     else process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE = previousCodexl;
     rmSync(root, { force: true, recursive: true });
@@ -375,7 +375,7 @@ test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
     assert.equal(modelsConfig.models[0].id, "Codex API/gpt-5-codex");
     assert.equal(modelsConfig.models[0].vendor, "Codex API");
     assert.equal(modelsConfig.models[0].url, "http://127.0.0.1:48765/v1");
-    assert.equal(modelsConfig.models[0].apiKey, "${CCR_PROFILE_API_KEY}");
+    assert.equal(modelsConfig.models[0].apiKey, "${AR_PROFILE_API_KEY}");
     assert.equal(modelsConfig.models[0].supportsToolCall, true);
     assert.equal(modelsConfig.models[0].supportsReasoning, true);
     assert.equal(modelsConfig.models[0].maxInputTokens, 272_000);
@@ -387,11 +387,11 @@ test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
     assert.equal(existsSync(result.workbuddyVirtualAuth.authFile), true);
 
     const session = JSON.parse(readFileSync(result.workbuddyVirtualAuth.authFile, "utf8"));
-    assert.equal(session.auth.accessToken, "ccr-local-profile");
+    assert.equal(session.auth.accessToken, "ar-local-profile");
     assert.equal(session.auth.domain, "www.workbuddy.ai");
     assert.equal(session.auth.refreshToken, "");
     assert.ok(Date.now() - session.auth.lastRefreshTime < 5_000);
-    assert.equal(session.account.uid, "ccr-local-profile");
+    assert.equal(session.account.uid, "ar-local-profile");
     assert.equal(session.account.nickname, "WorkBuddy Main");
     assert.equal(session.account.type, "personal");
     assert.deepEqual(session.accounts, [session.account]);
@@ -486,7 +486,7 @@ test("ChatGPT migration removes only the exact legacy CCR auth marker", () => {
   try {
     writeFileSync(authFile, JSON.stringify({
       auth_mode: "apikey",
-      OPENAI_API_KEY: "ccr-local-profile"
+      OPENAI_API_KEY: "ar-local-profile"
     }));
     assert.equal(removeLegacyCodexVirtualAuthMarker(root), true);
     assert.equal(existsSync(authFile), false);

@@ -39,6 +39,7 @@ import { createGatewayModelsResponse, prepareClaudeAppDiscoveredModelRequest, pr
 import { resolveProviderLogName, resolveResponseProviderProtocol, sanitizeHeaderValue } from "@ccr/core/providers/runtime-topology";
 import { createBodySampler, requestLogSampled, shouldRecordRequestLogs } from "@ccr/core/observability/raw-trace-sync";
 import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace";
+import { createStreamMetricsTracker } from "@ccr/core/observability/stream-metrics";
 import { coreGatewayUsageAttributionConfig } from "@ccr/core/gateway/core-runtime/config-compiler";
 import { providerModelPricingForUsage } from "@ccr/core/models/pricing-service";
 import { clientClosedRequestStatusCode, clientDisconnectMessage, resolveStreamRequestLogOutcome, UpstreamRequestError } from "@ccr/core/gateway/internal/shared";
@@ -142,14 +143,14 @@ export class GatewayRequestPipeline {
       const cursorCompatStartedAt = Date.now();
       const cursorCompatPreparation = prepareCursorOpenAICompatChatBody(this.config, client, method, path, requestBody);
       if (cursorCompatPreparation) {
-        headers["x-ccr-cursor-openai-compat"] = sanitizeHeaderValue(cursorCompatPreparation.diagnostic);
+        headers["x-ar-cursor-openai-compat"] = sanitizeHeaderValue(cursorCompatPreparation.diagnostic);
       }
       let bodyToForward: Buffer | undefined = cursorCompatPreparation?.body ?? requestBody;
       if (cursorCompatPreparation) {
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
-            { after: headers["x-ccr-cursor-openai-compat"], operation: "add", path: "/headers/x-ccr-cursor-openai-compat", scope: "headers" }
+            { after: headers["x-ar-cursor-openai-compat"], operation: "add", path: "/headers/x-ar-cursor-openai-compat", scope: "headers" }
           ],
           durationMs: Date.now() - cursorCompatStartedAt,
           kind: "mutation",
@@ -182,12 +183,12 @@ export class GatewayRequestPipeline {
       const claudeModelRewriteStartedAt = Date.now();
       const claudeModelRewrite = prepareClaudeCodeDiscoveredModelRequest(this.config, request.headers, method, path, bodyToForward);
       if (claudeModelRewrite) {
-        headers["x-ccr-claude-model-discovery"] = sanitizeHeaderValue(claudeModelRewrite.diagnostic);
+        headers["x-ar-claude-model-discovery"] = sanitizeHeaderValue(claudeModelRewrite.diagnostic);
         bodyToForward = claudeModelRewrite.body;
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body/model", scope: "body" },
-            { after: headers["x-ccr-claude-model-discovery"], operation: "add", path: "/headers/x-ccr-claude-model-discovery", scope: "headers" }
+            { after: headers["x-ar-claude-model-discovery"], operation: "add", path: "/headers/x-ar-claude-model-discovery", scope: "headers" }
           ],
           durationMs: Date.now() - claudeModelRewriteStartedAt,
           kind: "mutation",
@@ -201,13 +202,13 @@ export class GatewayRequestPipeline {
         profile: authenticatedProfile
       });
       if (claudeAppModelRewrite) {
-        headers["x-ccr-claude-app-model-rewrite"] = sanitizeHeaderValue(claudeAppModelRewrite.diagnostic);
+        headers["x-ar-claude-app-model-rewrite"] = sanitizeHeaderValue(claudeAppModelRewrite.diagnostic);
         bodyToForward = claudeAppModelRewrite.body;
         routedModel = claudeAppModelRewrite.routedModel;
         routeTrace?.capture({
           changes: [
             { after: routedModel, operation: "replace", path: "/body/model", scope: "body" },
-            { after: headers["x-ccr-claude-app-model-rewrite"], operation: "add", path: "/headers/x-ccr-claude-app-model-rewrite", scope: "headers" }
+            { after: headers["x-ar-claude-app-model-rewrite"], operation: "add", path: "/headers/x-ar-claude-app-model-rewrite", scope: "headers" }
           ],
           durationMs: Date.now() - claudeAppModelRewriteStartedAt,
           kind: "mutation",
@@ -257,7 +258,8 @@ export class GatewayRequestPipeline {
         responseBodyText = "",
         responseBodyTruncated = false,
         error?: string,
-        responseBodySizeBytes = Buffer.byteLength(responseBodyText)
+        responseBodySizeBytes = Buffer.byteLength(responseBodyText),
+        streamMetrics?: { firstTokenAtMs?: number; lastTokenAtMs?: number }
       ) => {
         const config = this.config;
         if (!config || !shouldRecordRequestLogs(config)) {
@@ -303,6 +305,12 @@ export class GatewayRequestPipeline {
           responseModel: requestLogResponseModel(responseBodyText),
           startedAt: startedAtIso,
           statusCode,
+          ...(streamMetrics?.firstTokenAtMs === undefined ? {} : {
+            timeToFirstTokenMs: streamMetrics.firstTokenAtMs
+          }),
+          ...(streamMetrics?.firstTokenAtMs === undefined || streamMetrics.lastTokenAtMs === undefined ? {} : {
+            streamOutputDurationMs: Math.max(0, streamMetrics.lastTokenAtMs - streamMetrics.firstTokenAtMs)
+          }),
           url: requestUrl
         });
       };
@@ -348,16 +356,16 @@ export class GatewayRequestPipeline {
         });
         const serialized = serializeJsonBody(restoreRouteRequestBody(routed.body, adaptation));
         headers["content-type"] = "application/json";
-        headers["x-ccr-route-reason"] = sanitizeHeaderValue(routed.decision.reason);
-        headers["x-ccr-route-source"] = routed.decision.source;
+        headers["x-ar-route-reason"] = sanitizeHeaderValue(routed.decision.reason);
+        headers["x-ar-route-source"] = routed.decision.source;
         if (routed.decision.diagnostics.length > 0) {
-          headers["x-ccr-route-diagnostics"] = String(routed.decision.diagnostics.length);
+          headers["x-ar-route-diagnostics"] = String(routed.decision.diagnostics.length);
         }
         routeFallback = routed.decision.fallback ?? routeFallback;
         routedSessionId = routed.decision.sessionId;
         routedTokenCount = routed.decision.tokenCount;
         if (routed.decision.model) {
-          headers["x-ccr-routed-model"] = sanitizeHeaderValue(routed.decision.model);
+          headers["x-ar-routed-model"] = sanitizeHeaderValue(routed.decision.model);
           routedModel = routed.decision.model;
         }
         bodyToForward = serialized;
@@ -365,9 +373,9 @@ export class GatewayRequestPipeline {
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" },
-            { after: headers["x-ccr-route-reason"], operation: "add", path: "/headers/x-ccr-route-reason", scope: "headers" },
-            { after: headers["x-ccr-route-source"], operation: "add", path: "/headers/x-ccr-route-source", scope: "headers" },
-            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: "/headers/x-ccr-routed-model", scope: "headers" as const }] : [])
+            { after: headers["x-ar-route-reason"], operation: "add", path: "/headers/x-ar-route-reason", scope: "headers" },
+            { after: headers["x-ar-route-source"], operation: "add", path: "/headers/x-ar-route-source", scope: "headers" },
+            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: "/headers/x-ar-routed-model", scope: "headers" as const }] : [])
           ],
           decision: {
             diagnostics: routed.decision.diagnostics,
@@ -409,12 +417,12 @@ export class GatewayRequestPipeline {
       if (codexApplyPatchBridgeRequest) {
         bodyToForward = codexApplyPatchBridgeRequest.body;
         codexApplyPatchBridgeActive = true;
-        headers["x-ccr-codex-patch-bridge"] = sanitizeHeaderValue(codexApplyPatchBridgeRequest.diagnostic);
+        headers["x-ar-codex-patch-bridge"] = sanitizeHeaderValue(codexApplyPatchBridgeRequest.diagnostic);
         headers["content-type"] = "application/json";
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
-            { after: headers["x-ccr-codex-patch-bridge"], operation: "add", path: "/headers/x-ccr-codex-patch-bridge", scope: "headers" },
+            { after: headers["x-ar-codex-patch-bridge"], operation: "add", path: "/headers/x-ar-codex-patch-bridge", scope: "headers" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" }
           ],
           durationMs: Date.now() - codexBridgeStartedAt,
@@ -437,12 +445,12 @@ export class GatewayRequestPipeline {
       if (codexMultiAgentBridgeRequest) {
         bodyToForward = codexMultiAgentBridgeRequest.body;
         codexMultiAgentBridgeActive = true;
-        headers["x-ccr-codex-multi-agent-bridge"] = sanitizeHeaderValue(codexMultiAgentBridgeRequest.diagnostic);
+        headers["x-ar-codex-multi-agent-bridge"] = sanitizeHeaderValue(codexMultiAgentBridgeRequest.diagnostic);
         headers["content-type"] = "application/json";
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
-            { after: headers["x-ccr-codex-multi-agent-bridge"], operation: "add", path: "/headers/x-ccr-codex-multi-agent-bridge", scope: "headers" },
+            { after: headers["x-ar-codex-multi-agent-bridge"], operation: "add", path: "/headers/x-ar-codex-multi-agent-bridge", scope: "headers" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" }
           ],
           durationMs: Date.now() - codexMultiAgentBridgeStartedAt,
@@ -483,11 +491,11 @@ export class GatewayRequestPipeline {
           if (webSearchContextBody) {
             bodyToForward = webSearchContextBody;
             headers["content-type"] = "application/json";
-            headers["x-ccr-hosted-web-search-context"] = hostedWebSearchProtocolContext.protocol;
+            headers["x-ar-hosted-web-search-context"] = hostedWebSearchProtocolContext.protocol;
             routeTrace?.capture({
               changes: [
                 { operation: "replace", path: "/body/tools", scope: "body" },
-                { after: headers["x-ccr-hosted-web-search-context"], operation: "add", path: "/headers/x-ccr-hosted-web-search-context", scope: "headers" }
+                { after: headers["x-ar-hosted-web-search-context"], operation: "add", path: "/headers/x-ar-hosted-web-search-context", scope: "headers" }
               ],
               durationMs: Date.now() - webSearchEnrichmentStartedAt,
               kind: "mutation",
@@ -532,11 +540,11 @@ export class GatewayRequestPipeline {
         if (webSearchContinuationBody) {
           bodyToForward = webSearchContinuationBody;
           headers["content-type"] = "application/json";
-          headers["x-ccr-claude-code-web-search-continuation"] = records.length > 0 ? "in-app-browser-evidence" : "tool-result-evidence";
+          headers["x-ar-claude-code-web-search-continuation"] = records.length > 0 ? "in-app-browser-evidence" : "tool-result-evidence";
           routeTrace?.capture({
             changes: [
               { operation: "replace", path: "/body/messages", scope: "body" },
-              { after: headers["x-ccr-claude-code-web-search-continuation"], operation: "add", path: "/headers/x-ccr-claude-code-web-search-continuation", scope: "headers" }
+              { after: headers["x-ar-claude-code-web-search-continuation"], operation: "add", path: "/headers/x-ar-claude-code-web-search-continuation", scope: "headers" }
             ],
             durationMs: Date.now() - webSearchContinuationStartedAt,
             kind: "mutation",
@@ -560,11 +568,11 @@ export class GatewayRequestPipeline {
       if (contextArchiveToolContinuation) {
         bodyToForward = contextArchiveToolContinuation.body;
         headers["content-type"] = "application/json";
-        headers["x-ccr-context-archive-tool"] = "available";
+        headers["x-ar-context-archive-tool"] = "available";
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
-            { after: headers["x-ccr-context-archive-tool"], operation: "add", path: "/headers/x-ccr-context-archive-tool", scope: "headers" },
+            { after: headers["x-ar-context-archive-tool"], operation: "add", path: "/headers/x-ar-context-archive-tool", scope: "headers" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" }
           ],
           kind: "mutation",
@@ -597,12 +605,12 @@ export class GatewayRequestPipeline {
         contextArchiveResponseMode = contextArchivePreparation.responseMode;
         upstreamPath = contextArchivePreparation.upstreamPath ?? upstreamPath;
         headers["content-type"] = "application/json";
-        headers["x-ccr-context-archive"] = sanitizeHeaderValue(contextArchivePreparation.diagnostic);
+        headers["x-ar-context-archive"] = sanitizeHeaderValue(contextArchivePreparation.diagnostic);
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
             ...(contextArchivePreparation.upstreamPath ? [{ before: path, after: upstreamPath, operation: "replace" as const, path: "/url/path", scope: "url" as const }] : []),
-            { after: headers["x-ccr-context-archive"], operation: "add", path: "/headers/x-ccr-context-archive", scope: "headers" },
+            { after: headers["x-ar-context-archive"], operation: "add", path: "/headers/x-ar-context-archive", scope: "headers" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" }
           ],
           durationMs: Date.now() - contextArchiveStartedAt,
@@ -629,12 +637,12 @@ export class GatewayRequestPipeline {
         codexCompactCompatResponseMode = codexCompactCompatPreparation.responseMode;
         upstreamPath = codexCompactCompatPreparation.upstreamPath ?? upstreamPath;
         headers["content-type"] = "application/json";
-        headers["x-ccr-codex-compact"] = sanitizeHeaderValue(codexCompactCompatPreparation.diagnostic);
+        headers["x-ar-codex-compact"] = sanitizeHeaderValue(codexCompactCompatPreparation.diagnostic);
         routeTrace?.capture({
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
             ...(codexCompactCompatPreparation.upstreamPath ? [{ before: path, after: upstreamPath, operation: "replace" as const, path: "/url/path", scope: "url" as const }] : []),
-            { after: headers["x-ccr-codex-compact"], operation: "add", path: "/headers/x-ccr-codex-compact", scope: "headers" },
+            { after: headers["x-ar-codex-compact"], operation: "add", path: "/headers/x-ar-codex-compact", scope: "headers" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" }
           ],
           durationMs: Date.now() - codexCompactCompatStartedAt,
@@ -823,7 +831,7 @@ export class GatewayRequestPipeline {
         responseHeaders.set("content-type", contextArchiveResponseContentType);
       }
       if (contextArchiveToolContinuation?.executedCalls) {
-        responseHeaders.set("x-ccr-context-archive-tool-calls", String(contextArchiveToolContinuation.executedCalls));
+        responseHeaders.set("x-ar-context-archive-tool-calls", String(contextArchiveToolContinuation.executedCalls));
       }
       const hostedWebSearchResponseContentType = responseHeaders.get("content-type")?.toLowerCase() ?? "";
       if (
@@ -914,11 +922,14 @@ export class GatewayRequestPipeline {
       let streamDetectedError: string | undefined;
       let upstreamStreamEnded = false;
       let logRecorded = false;
+      const streamMetrics = createStreamMetricsTracker(startedAt);
+      let measuredStreamMetrics: { firstTokenAtMs?: number; lastTokenAtMs?: number } = {};
       const writeStreamLog = (error?: string) => {
         if (logRecorded) {
           return;
         }
         logRecorded = true;
+        measuredStreamMetrics = streamMetrics.finish();
         const outcome = resolveStreamRequestLogOutcome({
           clientDisconnected,
           detectedError: streamDetectedError,
@@ -933,7 +944,8 @@ export class GatewayRequestPipeline {
           sampler.read(),
           sampler.isTruncated(),
           outcome.error,
-          sampler.sizeBytes()
+          sampler.sizeBytes(),
+          measuredStreamMetrics
         );
       };
       onClientDisconnect = () => {
@@ -966,10 +978,12 @@ export class GatewayRequestPipeline {
         stream.on("error", onResponseStreamError);
       }
       clientResponseBody.on("data", (chunk) => {
+        streamMetrics.append(chunk);
         sampler.append(chunk);
         streamDetectedError ??= sseErrorDetector.append(chunk);
       });
       clientResponseBody.once("end", () => {
+        measuredStreamMetrics = streamMetrics.finish();
         upstreamStreamEnded = true;
         streamDetectedError ??= sseErrorDetector.finish();
         if (responseCompleted || response.writableEnded) {
@@ -1013,7 +1027,7 @@ export class GatewayRequestPipeline {
     const headers: Record<string, string> = {
       ...input.snapshot.replayHeaders,
       "content-type": "application/json",
-      "x-ccr-context-archive-replay": input.snapshot.archiveId,
+      "x-ar-context-archive-replay": input.snapshot.archiveId,
       "x-client-request-id": randomUUID()
     };
     if (route.credentialChain?.length) {

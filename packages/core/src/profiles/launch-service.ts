@@ -21,15 +21,43 @@ import { mediaToolsGatewayEndpoint } from "@ccr/core/mcp/grok-media-config";
 import { buildProfileLaunchPlan, findProfileForOpen, profileLaunchSpawnCommand, profileOpenCommand, profileOpenSurfaces, resolveClaudeCodeSettingsFile, resolveProfileOpenSurface } from "@ccr/core/profiles/launch-core";
 import { profileApiKeyId } from "@ccr/core/profiles/api-key";
 import { applyProfileConfig, cleanupGeneratedBinBackups } from "@ccr/core/profiles/service";
+import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
 import { isDesktopAppRuntime } from "@ccr/core/runtime/desktop-app";
 import { windowsEnvironmentChangedPowerShellLines, windowsSystemCommand } from "@ccr/core/platform/windows-system";
 
-const ccrPathBlockStart = "# >>> Claude Code Router CLI >>>";
-const ccrPathBlockEnd = "# <<< Claude Code Router CLI <<<";
-export const desktopCliCommandName = "ccr-app";
-const desktopCliRuntimeFileName = "ccr-cli.js";
-const desktopCliCommandNameEnv = "CCR_CLI_COMMAND_NAME";
-export const CCR_CLI_COMPANION_RUNTIME_FILE_NAMES = [
+const ccrPathBlockStart = "# >>> AgentRouter CLI >>>";
+const ccrPathBlockEnd = "# <<< AgentRouter CLI <<<";
+// Blocks written before the AgentRouter rename must still be matched, otherwise
+// the managed PATH block would be appended a second time on upgrade.
+const legacyCcrPathBlockStart = "# >>> Claude Code Router CLI >>>";
+const legacyCcrPathBlockEnd = "# <<< Claude Code Router CLI <<<";
+export const desktopCliCommandName = "agentrouter";
+const desktopCliRuntimeFileName = "ar-cli.js";
+const desktopCliCommandNameEnv = "AR_CLI_COMMAND_NAME";
+const CODEX_API_ENV_KEYS = ["OPENAI_API_KEY", "OPENAI_BASE_URL", "OPENAI_ORG_ID", "OPENAI_PROJECT_ID"] as const;
+const CODEX_SHARED_AUTH_ENV_KEYS = [
+  "AR_CODEX_CHATGPT_AUTH_FILE",
+  "CODEXL_CODEX_CHATGPT_AUTH_FILE"
+] as const;
+
+function sanitizeCodexAuthEnvironment(
+  env: NodeJS.ProcessEnv,
+  profile: ProfileConfig
+): NodeJS.ProcessEnv {
+  const next = { ...env };
+  const isCodexProfile = profile.agent === "codex" || profile.agent === "workbuddy" || profile.agent === "zcode";
+  if (!isCodexProfile) {
+    return next;
+  }
+  const keys = profile.scope === "global"
+    ? CODEX_API_ENV_KEYS
+    : [...CODEX_API_ENV_KEYS, ...CODEX_SHARED_AUTH_ENV_KEYS];
+  for (const key of keys) {
+    delete next[key];
+  }
+  return next;
+}
+export const AR_CLI_COMPANION_RUNTIME_FILE_NAMES = [
   "browser-web-search-proxy-mcp.js",
   "fusion-tool-fallback-mcp.js",
   "fusion-vision-mcp.js",
@@ -143,12 +171,12 @@ export async function openProfileFromCcr(config: AppConfig, request: ProfileOpen
   const launch = profileLaunchSpawnCommand(plan);
   const child = spawn(launch.command, launch.args, {
     detached: true,
-    env: {
+    env: sanitizeCodexAuthEnvironment({
       ...process.env,
       ...plan.env,
       ...botGatewayProfileEnv(config, profile, surface),
       ...(profile.agent === "claude-code" ? claudeCodeUtcTimezoneEnvOverride() : {})
-    },
+    }, profile),
     stdio: "ignore"
   });
   const spawnError = await waitForImmediateSpawnError(child, 500);
@@ -630,8 +658,8 @@ function readClaudeCodeWifTokenCandidates(profile: ReturnType<typeof findProfile
 function claudeCodeWifIdentityTokenFilename(profile: ReturnType<typeof findProfileForOpen>): string {
   const slug = sanitizeProfilePathSegment(profile.id || profile.name || profile.agent) || "claude-code";
   return process.platform === "win32"
-    ? `ccr-claude-code-wif-token-${slug}.txt`
-    : `ccr-claude-code-wif-token-${slug}`;
+    ? `ar-claude-code-wif-token-${slug}.txt`
+    : `ar-claude-code-wif-token-${slug}`;
 }
 
 function readClaudeCodeLegacyApiKeyHelperCandidates(profile: ReturnType<typeof findProfileForOpen>): string[] {
@@ -646,16 +674,17 @@ function readClaudeCodeLegacyApiKeyHelperCandidates(profile: ReturnType<typeof f
 function claudeCodeLegacyApiKeyHelperFilename(profile: ReturnType<typeof findProfileForOpen>): string {
   const slug = sanitizeProfilePathSegment(profile.id || profile.name || profile.agent) || "claude-code";
   return process.platform === "win32"
-    ? `ccr-claude-code-api-key-${slug}.cmd`
-    : `ccr-claude-code-api-key-${slug}`;
+    ? `ar-claude-code-api-key-${slug}.cmd`
+    : `ar-claude-code-api-key-${slug}`;
 }
 
 function readBackupFiles(file: string): string[] {
   const dir = path.dirname(file);
-  const prefix = `${path.basename(file)}.ccr-backup-`;
+  adoptLegacyArtifacts(file);
+  const basename = path.basename(file);
   try {
     return readdirSync(dir)
-      .filter((entry) => entry.startsWith(prefix))
+      .filter((entry) => entry.startsWith(`${basename}.ar-backup-`))
       .sort()
       .reverse()
       .map((entry) => path.join(dir, entry));
@@ -1306,11 +1335,11 @@ function nodeErrorCode(error: unknown): string | undefined {
 function startClaudeAppBotWorker(config: AppConfig, profile: ReturnType<typeof findProfileForOpen>): void {
   const botEnv = botGatewayProfileEnv(config, profile, "app");
   stopClaudeAppBotWorker();
-  if (botEnv.CCR_BOT_GATEWAY_ENABLED !== "true") {
+  if (botEnv.AR_BOT_GATEWAY_ENABLED !== "true") {
     return;
   }
 
-  const runtimeFile = path.join(CONFIGDIR, "bin", "ccr-codex-cli-middleware.js");
+  const runtimeFile = path.join(CONFIGDIR, "bin", "ar-codex-cli-middleware.js");
   ensureBotWorkerRuntime(runtimeFile);
 
   const settingsFile = resolveClaudeCodeSettingsFile(CONFIGDIR, profile);
@@ -1323,15 +1352,15 @@ function startClaudeAppBotWorker(config: AppConfig, profile: ReturnType<typeof f
     ...settingsEnv,
     ...botEnv,
     ...(nodeLaunch.electronRunAsNode ? { ELECTRON_RUN_AS_NODE: "1" } : {}),
-    CCR_CLAUDE_BASE_CONFIG_DIR: path.dirname(settingsFile),
+    AR_CLAUDE_BASE_CONFIG_DIR: path.dirname(settingsFile),
     CLAUDE_CONFIG_DIR: path.dirname(settingsFile),
     CLAUDE_USER_DATA_DIR: claudeAppUserDataDir,
-    CCR_CLAUDE_APP_USER_DATA_PATH: claudeAppUserDataDir,
-    CCR_CLAUDE_CODE_BOT_WORKER: "1",
-    CCR_CLAUDE_CODE_MODEL: profile.model.trim(),
-    CCR_CODEX_MODEL: profile.model.trim(),
-    CCR_CODEX_WORKSPACE_NAME: profile.name || profile.id,
-    CCR_PROFILE_SURFACE: "app",
+    AR_CLAUDE_APP_USER_DATA_PATH: claudeAppUserDataDir,
+    AR_CLAUDE_CODE_BOT_WORKER: "1",
+    AR_CLAUDE_CODE_MODEL: profile.model.trim(),
+    AR_CODEX_MODEL: profile.model.trim(),
+    AR_CODEX_WORKSPACE_NAME: profile.name || profile.id,
+    AR_PROFILE_SURFACE: "app",
     CODEXL_CODEX_WORKSPACE_NAME: profile.name || profile.id,
     CODEXL_PROFILE_SURFACE: "app",
     ...claudeCodeUtcTimezoneEnvOverride()
@@ -1346,7 +1375,7 @@ function startClaudeAppBotWorker(config: AppConfig, profile: ReturnType<typeof f
   });
   claudeAppBotWorker = child;
   claudeAppBotWorkerProfileId = profile.id;
-  claudeAppBotWorkerStateDir = botEnv.CCR_BOT_GATEWAY_STATE_DIR;
+  claudeAppBotWorkerStateDir = botEnv.AR_BOT_GATEWAY_STATE_DIR;
   child.stderr?.on("data", (chunk) => {
     console.warn(`[profile] Claude App bot worker stderr: ${chunk.toString("utf8").trim()}`);
   });
@@ -1378,7 +1407,7 @@ function startOpenCodeAppBotWorker(
   launchSignature: string
 ): void {
   const botEnv = botGatewayProfileEnv(config, profile, "app");
-  if (botEnv.CCR_BOT_GATEWAY_ENABLED !== "true") {
+  if (botEnv.AR_BOT_GATEWAY_ENABLED !== "true") {
     stopOpenCodeAppBotWorker(profile.id);
     return;
   }
@@ -1393,7 +1422,7 @@ function startOpenCodeAppBotWorker(
   }
 
   stopOpenCodeAppBotWorker();
-  const runtimeFile = path.join(CONFIGDIR, "bin", "ccr-codex-cli-middleware.js");
+  const runtimeFile = path.join(CONFIGDIR, "bin", "ar-codex-cli-middleware.js");
   ensureBotWorkerRuntime(runtimeFile);
   const nodeLaunch = nodeRuntimeLaunch();
   const env: NodeJS.ProcessEnv = {
@@ -1401,9 +1430,9 @@ function startOpenCodeAppBotWorker(
     ...stringRecord(profile.env),
     ...botEnv,
     ...(nodeLaunch.electronRunAsNode ? { ELECTRON_RUN_AS_NODE: "1" } : {}),
-    CCR_OPENCODE_BOT_WORKER: "1",
-    CCR_OPENCODE_WORKSPACE_NAME: profile.name || profile.id,
-    CCR_PROFILE_SURFACE: "app",
+    AR_OPENCODE_BOT_WORKER: "1",
+    AR_OPENCODE_WORKSPACE_NAME: profile.name || profile.id,
+    AR_PROFILE_SURFACE: "app",
     OPENCODE_CLIENT: "cli",
     OPENCODE_CONFIG: configFile,
     OPENCODE_CONFIG_CONTENT: inlineConfig
@@ -1419,7 +1448,7 @@ function startOpenCodeAppBotWorker(
   openCodeAppBotWorker = child;
   openCodeAppBotWorkerProfileId = profile.id;
   openCodeAppBotWorkerSignature = launchSignature;
-  openCodeAppBotWorkerStateDir = botEnv.CCR_BOT_GATEWAY_STATE_DIR;
+  openCodeAppBotWorkerStateDir = botEnv.AR_BOT_GATEWAY_STATE_DIR;
   child.stderr?.on("data", (chunk) => {
     console.warn(`[profile] OpenCode App bot worker stderr: ${chunk.toString("utf8").trim()}`);
   });
@@ -1447,7 +1476,7 @@ function startOpenCodeAppBotWorker(
 
 function startCodexAppBotWorker(config: AppConfig, profile: ReturnType<typeof findProfileForOpen>): void {
   const botEnv = botGatewayProfileEnv(config, profile, "app");
-  if (botEnv.CCR_BOT_GATEWAY_ENABLED !== "true") {
+  if (botEnv.AR_BOT_GATEWAY_ENABLED !== "true") {
     stopCodexAppBotWorker(profile.id);
     return;
   }
@@ -1458,14 +1487,14 @@ function startCodexAppBotWorker(config: AppConfig, profile: ReturnType<typeof fi
   stopCodexAppBotWorker(profile.id);
   const plan = buildProfileLaunchPlan(CONFIGDIR, profile, "app", ["codex-bot-worker", "--workspace-name", profile.name || profile.id]);
   const launch = profileLaunchSpawnCommand(plan);
-  const env: NodeJS.ProcessEnv = {
+  const env: NodeJS.ProcessEnv = sanitizeCodexAuthEnvironment({
     ...process.env,
     ...plan.env,
     ...botEnv,
-    CCR_CODEX_BOT_WORKER: "1",
-    CCR_PROFILE_SURFACE: "app",
+    AR_CODEX_BOT_WORKER: "1",
+    AR_PROFILE_SURFACE: "app",
     CODEXL_PROFILE_SURFACE: "app"
-  };
+  }, profile);
   delete env.ELECTRON_NO_ATTACH_CONSOLE;
   const child = spawn(launch.command, launch.args, {
     detached: false,
@@ -1474,7 +1503,7 @@ function startCodexAppBotWorker(config: AppConfig, profile: ReturnType<typeof fi
     windowsHide: true,
     windowsVerbatimArguments: launch.windowsVerbatimArguments
   });
-  codexAppBotWorkers.set(profile.id, { agent: profile.agent, child, stateDir: botEnv.CCR_BOT_GATEWAY_STATE_DIR });
+  codexAppBotWorkers.set(profile.id, { agent: profile.agent, child, stateDir: botEnv.AR_BOT_GATEWAY_STATE_DIR });
   child.stderr?.on("data", (chunk) => {
     console.warn(`[profile] ${profile.agent === "zcode" ? "ZCode" : "Codex"} App bot worker stderr: ${chunk.toString("utf8").trim()}`);
   });
@@ -1551,11 +1580,11 @@ function ensureBotWorkerRuntime(runtimeFile: string): void {
     }
   }
   if (
-    !content.includes("CCR_CLAUDE_CODE_BOT_WORKER") ||
+    !content.includes("AR_CLAUDE_CODE_BOT_WORKER") ||
     !content.includes("claude-bot-worker") ||
-    !content.includes("CCR_OPENCODE_BOT_WORKER") ||
+    !content.includes("AR_OPENCODE_BOT_WORKER") ||
     !content.includes("opencode-bot-worker") ||
-    !content.includes("CCR_CODEX_BOT_WORKER") ||
+    !content.includes("AR_CODEX_BOT_WORKER") ||
     !content.includes("codex-bot-worker")
   ) {
     throw new Error("Bot worker runtime does not contain all required entrypoints.");
@@ -1627,7 +1656,7 @@ function stopCodexAppMediaPreviewBridge(profileId?: string): void {
 }
 
 function nodeRuntimeLaunch(): { command: string; electronRunAsNode: boolean } {
-  const configured = process.env.CCR_NODE_BIN?.trim();
+  const configured = process.env.AR_NODE_BIN?.trim();
   if (configured) {
     return { command: configured, electronRunAsNode: false };
   }
@@ -1673,7 +1702,7 @@ export function prepareCcrCliLauncherRuntime(): CcrCliLauncherPreparation {
 export function syncCcrCliCompanionRuntimes(runtimeSource: string, binDir: string): string[] {
   const sourceDir = path.dirname(runtimeSource);
   const synced: string[] = [];
-  for (const fileName of CCR_CLI_COMPANION_RUNTIME_FILE_NAMES) {
+  for (const fileName of AR_CLI_COMPANION_RUNTIME_FILE_NAMES) {
     const source = path.join(sourceDir, fileName);
     if (!existsSync(source)) continue;
     const destination = path.join(binDir, fileName);
@@ -1740,10 +1769,10 @@ function cleanupLegacyCcrCliLauncher(binDir: string): void {
 }
 
 function isLegacyManagedCcrCliLauncher(source: string): boolean {
-  return source.includes("CCR_CLI_NODE_PATH") &&
+  return source.includes("AR_CLI_NODE_PATH") &&
     source.includes(desktopCliRuntimeFileName) &&
     source.includes("ELECTRON_RUN_AS_NODE=1") &&
-    source.includes("CCR_NODE_BIN");
+    source.includes("AR_NODE_BIN");
 }
 
 function findBundledCcrCliSource(): string {
@@ -1780,14 +1809,14 @@ function posixCcrLauncher(runtimeFile: string): string {
     "#!/bin/sh",
     `${desktopCliCommandNameEnv}=${shQuote(desktopCliCommandName)}`,
     `export ${desktopCliCommandNameEnv}`,
-    `CCR_CLI_NODE_PATH=${shQuote(nodePath)}`,
+    `AR_CLI_NODE_PATH=${shQuote(nodePath)}`,
     'if [ -n "$NODE_PATH" ]; then',
-    '  export NODE_PATH="$CCR_CLI_NODE_PATH:$NODE_PATH"',
+    '  export NODE_PATH="$AR_CLI_NODE_PATH:$NODE_PATH"',
     "else",
-    '  export NODE_PATH="$CCR_CLI_NODE_PATH"',
+    '  export NODE_PATH="$AR_CLI_NODE_PATH"',
     "fi",
-    'if [ -n "$CCR_NODE_BIN" ]; then',
-    `  exec "$CCR_NODE_BIN" ${shQuote(runtimeFile)} "$@"`,
+    'if [ -n "$AR_NODE_BIN" ]; then',
+    `  exec "$AR_NODE_BIN" ${shQuote(runtimeFile)} "$@"`,
     "fi",
     `ELECTRON_RUN_AS_NODE=1 exec ${shQuote(process.execPath)} ${shQuote(runtimeFile)} "$@"`
   ].join("\n") + "\n";
@@ -1800,12 +1829,12 @@ export function windowsCcrLauncher(runtimeFile: string, config?: AppConfig): str
     "@echo off",
     "setlocal",
     `set "${desktopCliCommandNameEnv}=${desktopCliCommandName}"`,
-    `set "CCR_CLI_RUNTIME=${cmdEnvValue(runtimeFile)}"`,
-    `set "CCR_CLI_NODE_PATH=${cmdEnvValue(nodePath)}"`,
+    `set "AR_CLI_RUNTIME=${cmdEnvValue(runtimeFile)}"`,
+    `set "AR_CLI_NODE_PATH=${cmdEnvValue(nodePath)}"`,
     "if defined NODE_PATH (",
-    "  set \"NODE_PATH=%CCR_CLI_NODE_PATH%;%NODE_PATH%\"",
+    "  set \"NODE_PATH=%AR_CLI_NODE_PATH%;%NODE_PATH%\"",
     ") else (",
-    "  set \"NODE_PATH=%CCR_CLI_NODE_PATH%\"",
+    "  set \"NODE_PATH=%AR_CLI_NODE_PATH%\"",
     ")",
     ...(dispatches.length > 0
       ? [
@@ -1815,22 +1844,22 @@ export function windowsCcrLauncher(runtimeFile: string, config?: AppConfig): str
           ":ccr_run_cli"
         ]
       : []),
-    "if defined CCR_NODE_BIN (",
-    '  "%CCR_NODE_BIN%" "%CCR_CLI_RUNTIME%" %*',
+    "if defined AR_NODE_BIN (",
+    '  "%AR_NODE_BIN%" "%AR_CLI_RUNTIME%" %*',
     "  exit /b %ERRORLEVEL%",
     ")",
     "set \"ELECTRON_RUN_AS_NODE=1\"",
-    `${cmdQuote(process.execPath)} "%CCR_CLI_RUNTIME%" %*`,
+    `${cmdQuote(process.execPath)} "%AR_CLI_RUNTIME%" %*`,
     "exit /b %ERRORLEVEL%",
     ...dispatches.flatMap((dispatch, index) => [
       `:ccr_profile_${index}`,
-      "set \"CCR_CLI_PREPARE_PROFILE_ONLY=1\"",
+      "set \"AR_CLI_PREPARE_PROFILE_ONLY=1\"",
       "set \"ELECTRON_RUN_AS_NODE=1\"",
-      `${cmdQuote(process.execPath)} "%CCR_CLI_RUNTIME%" %*`,
+      `${cmdQuote(process.execPath)} "%AR_CLI_RUNTIME%" %*`,
       "if errorlevel 1 exit /b %ERRORLEVEL%",
-      "set \"CCR_CLI_PREPARE_PROFILE_ONLY=\"",
+      "set \"AR_CLI_PREPARE_PROFILE_ONLY=\"",
       "set \"ELECTRON_RUN_AS_NODE=\"",
-      "set \"CCR_CLI_DIRECT_PROFILE_DISPATCH=1\"",
+      "set \"AR_CLI_DIRECT_PROFILE_DISPATCH=1\"",
       `call ${cmdQuote(dispatch.launcher)} %*`,
       "exit /b %ERRORLEVEL%"
     ])
@@ -2004,11 +2033,8 @@ function normalizeWindowsPathSegment(value: string): string {
 function ensureShellRcPathBlock(rcFile: string, binDir: string): void {
   mkdirSync(path.dirname(rcFile), { recursive: true });
   const source = existsSync(rcFile) ? readFileSync(rcFile, "utf8") : "";
-  const block = shellRcPathBlock();
-  const managedPattern = new RegExp(
-    `\\n?${escapeRegExp(ccrPathBlockStart)}[\\s\\S]*?${escapeRegExp(ccrPathBlockEnd)}\\n?`,
-    "m"
-  );
+  const block = shellRcPathBlock(binDir);
+  const managedPattern = managedShellRcPathBlockPattern();
   if (managedPattern.test(source)) {
     const next = ensureTrailingNewline(source.replace(managedPattern, `\n${block}\n`)).replace(/^\n+/, "");
     writeFileIfChanged(rcFile, next);
@@ -2022,14 +2048,14 @@ function ensureShellRcPathBlock(rcFile: string, binDir: string): void {
   writeFileIfChanged(rcFile, `${source}${separator}${block}\n`);
 }
 
-function shellRcPathBlock(): string {
-  const binDir = "$HOME/.claude-code-router/bin";
+function shellRcPathBlock(binDir: string): string {
+  const shellBinDir = shellBinPath(binDir);
   return [
     ccrPathBlockStart,
-    "# Added by Claude Code Router. Enables the ccr-app command in new shells.",
+    "# Added by AgentRouter. Enables the agentrouter command in new shells.",
     'case ":$PATH:" in',
-    `  *":${binDir}:"*) ;;`,
-    `  *) export PATH="${binDir}:$PATH" ;;`,
+    `  *":${shellBinDir}:"*) ;;`,
+    `  *) export PATH="${shellBinDir}:$PATH" ;;`,
     "esac",
     ccrPathBlockEnd
   ].join("\n");
@@ -2038,11 +2064,8 @@ function shellRcPathBlock(): string {
 function ensureFishPathBlock(file: string, binDir: string): void {
   mkdirSync(path.dirname(file), { recursive: true });
   const source = existsSync(file) ? readFileSync(file, "utf8") : "";
-  const block = fishPathBlock();
-  const managedPattern = new RegExp(
-    `\\n?${escapeRegExp(ccrPathBlockStart)}[\\s\\S]*?${escapeRegExp(ccrPathBlockEnd)}\\n?`,
-    "m"
-  );
+  const block = fishPathBlock(binDir);
+  const managedPattern = managedShellRcPathBlockPattern();
   if (managedPattern.test(source)) {
     const next = ensureTrailingNewline(source.replace(managedPattern, `\n${block}\n`)).replace(/^\n+/, "");
     writeFileIfChanged(file, next);
@@ -2056,11 +2079,12 @@ function ensureFishPathBlock(file: string, binDir: string): void {
   writeFileIfChanged(file, `${source}${separator}${block}\n`);
 }
 
-function fishPathBlock(): string {
+function fishPathBlock(binDir: string): string {
+  const shellBinDir = shellBinPath(binDir);
   return [
     ccrPathBlockStart,
-    "# Added by Claude Code Router. Enables the ccr-app command in new shells.",
-    'set -l ccr_bin "$HOME/.claude-code-router/bin"',
+    "# Added by AgentRouter. Enables the agentrouter command in new shells.",
+    `set -l ccr_bin "${shellBinDir}"`,
     "if not contains $ccr_bin $PATH",
     "    set -gx PATH $ccr_bin $PATH",
     "end",
@@ -2068,10 +2092,26 @@ function fishPathBlock(): string {
   ].join("\n");
 }
 
+function managedShellRcPathBlockPattern(): RegExp {
+  return new RegExp(
+    `\\n?(?:${escapeRegExp(ccrPathBlockStart)}|${escapeRegExp(legacyCcrPathBlockStart)})` +
+    `[\\s\\S]*?(?:${escapeRegExp(ccrPathBlockEnd)}|${escapeRegExp(legacyCcrPathBlockEnd)})\\n?`,
+    "m"
+  );
+}
+
 function shellRcAlreadyAddsCcrBin(source: string, binDir: string): boolean {
   return source.includes("$HOME/.claude-code-router/bin") ||
     source.includes("~/.claude-code-router/bin") ||
+    source.includes(shellBinPath(binDir)) ||
     source.includes(binDir);
+}
+
+function shellBinPath(binDir: string): string {
+  const relative = path.relative(os.homedir(), binDir);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative)
+    ? `$HOME/${relative.split(path.sep).join("/")}`
+    : binDir;
 }
 
 function ensureTrailingNewline(value: string): string {

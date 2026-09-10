@@ -1,3 +1,4 @@
+import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -16,8 +17,8 @@ export type OpenCodeProfileConfigWriteResult = {
   inlineConfig: string;
 };
 
-const originalBackupSuffix = ".ccr-original";
-const originalMissingSuffix = ".ccr-original-missing";
+const originalBackupSuffix = ".ar-original";
+const originalMissingSuffix = ".ar-original-missing";
 const defaultOpenCodeContextWindow = 128_000;
 const defaultOpenCodeMaxOutputTokens = 8_192;
 
@@ -86,7 +87,7 @@ export function isManagedOpenCodeConfigContent(content: string, providerId: stri
     return false;
   }
   const headers = isRecord(provider.options.headers) ? provider.options.headers : {};
-  return headers["x-ccr-client"] === "opencode" || headers["X-CCR-Client"] === "opencode";
+  return headers["x-ar-client"] === "opencode" || headers["X-AR-Client"] === "opencode";
 }
 
 export function openCodeProviderId(profile: Pick<ProfileConfig, "providerId">): string {
@@ -95,7 +96,7 @@ export function openCodeProviderId(profile: Pick<ProfileConfig, "providerId">): 
 
 function openCodeGatewayOverrides(config: AppConfig, profile: ProfileConfig, token: string): Record<string, unknown> {
   const providerId = openCodeProviderId(profile);
-  const providerName = profile.providerName?.trim() || "Claude Code Router";
+  const providerName = profile.providerName?.trim() || "AgentRouter";
   const model = normalizeClientModel(profile.model) || defaultClientModel(config);
   const modelRef = `${providerId}/${model}`;
   const models = openCodeModelConfigs(config, { ...profile, model }, model);
@@ -111,8 +112,8 @@ function openCodeGatewayOverrides(config: AppConfig, profile: ProfileConfig, tok
           apiKey: token,
           baseURL: `${gatewayEndpoint(config).replace(/\/+$/g, "")}/v1`,
           headers: {
-            "x-ccr-client": "opencode",
-            "x-ccr-profile": profile.id || profile.name || "opencode"
+            "x-ar-client": "opencode",
+            "x-ar-profile": profile.id || profile.name || "opencode"
           }
         }
       }
@@ -238,6 +239,7 @@ function writeJsonFile(
 }
 
 function ensureOriginalSnapshot(file: string, previous: string | undefined): void {
+  adoptLegacyArtifacts(file);
   const originalBackup = `${file}${originalBackupSuffix}`;
   const originalMissing = `${file}${originalMissingSuffix}`;
   if (existsSync(originalBackup) || existsSync(originalMissing)) {
@@ -265,6 +267,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
     return;
   }
   const basename = path.basename(file);
+  adoptLegacyArtifacts(file);
   let entries: string[];
   try {
     entries = readdirSync(path.dirname(file));
@@ -276,7 +279,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
     if (
       entry === `${basename}${originalBackupSuffix}` ||
       entry === `${basename}${originalMissingSuffix}` ||
-      entry.startsWith(`${basename}.ccr-backup-`)
+      entry.startsWith(`${basename}.ar-backup-`)
     ) {
       chmodPrivateFile(path.join(path.dirname(file), entry));
     }
@@ -285,7 +288,7 @@ function chmodPrivateConfigArtifacts(file: string): void {
 
 function backupFilePath(file: string): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  return `${file}.ccr-backup-${timestamp}`;
+  return `${file}.ar-backup-${timestamp}`;
 }
 
 function gatewayEndpoint(config: AppConfig): string {
@@ -322,7 +325,7 @@ function positiveNumber(value: number | undefined): number | undefined {
 }
 
 function openCodeXdgRoot(environmentName: "XDG_CONFIG_HOME", fallback: string): string {
-  const internalHome = process.env.CCR_INTERNAL_HOME_DIR?.trim();
+  const internalHome = process.env.AR_INTERNAL_HOME_DIR?.trim();
   if (internalHome) {
     return path.join(internalHome, fallback);
   }

@@ -95,7 +95,7 @@ class DeepLinkService {
     return this.openPluginRequest({
       ...(appId ? { appId } : {}),
       pluginId,
-      rawUrl: `ccr://plugin/${encodeURIComponent(pluginId)}/open`
+      rawUrl: `agentrouter://plugin/${encodeURIComponent(pluginId)}/open`
     });
   }
 

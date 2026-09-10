@@ -26,7 +26,7 @@ test("Media tools are a Fusion MCP backend independent from ToolHub", () => {
   config.gateway.host = "0.0.0.0";
   config.mediaTools.enabled = true;
   config.mediaTools.jobTimeoutMs = 600000;
-  config.Providers = [{ apiKey: "ccr-local-agent-login", baseUrl: "https://cli-chat-proxy.grok.com/v1", models: ["grok-4.5"], name: "Grok Agent" }];
+  config.Providers = [{ apiKey: "ar-local-agent-login", baseUrl: "https://cli-chat-proxy.grok.com/v1", models: ["grok-4.5"], name: "Grok Agent" }];
   config.virtualModelProfiles = [{
     enabled: true,
     metadata: {
@@ -48,9 +48,9 @@ test("Media tools are a Fusion MCP backend independent from ToolHub", () => {
   assert.equal(media.transport, "stdio");
   assert.equal(media.command, process.execPath);
   assert.ok(media.args[0].endsWith("media-tools-proxy-mcp.js"));
-  assert.equal(media.env.CCR_MEDIA_MCP_API_KEY, "ccr-profile-test");
-  assert.equal(media.env.CCR_MEDIA_MCP_URL, `http://127.0.0.1:${config.gateway.port}${MEDIA_TOOLS_MCP_PATH}`);
-  assert.deepEqual(JSON.parse(media.env.CCR_MEDIA_MCP_TOOLS_JSON).map((tool) => tool.name), [
+  assert.equal(media.env.AR_MEDIA_MCP_API_KEY, "ccr-profile-test");
+  assert.equal(media.env.AR_MEDIA_MCP_URL, `http://127.0.0.1:${config.gateway.port}${MEDIA_TOOLS_MCP_PATH}`);
+  assert.deepEqual(JSON.parse(media.env.AR_MEDIA_MCP_TOOLS_JSON).map((tool) => tool.name), [
     "image_generate_profile_one",
     "image_edit_profile_one",
     "video_generate_profile_one",
@@ -87,7 +87,7 @@ test("Core Gateway registers media tools directly for Fusion models", async () =
   assert.ok(media);
   assert.equal(media.transport, "stdio");
   assert.ok(media.args[0].endsWith("media-tools-proxy-mcp.js"));
-  assert.equal(servers.some((server) => server.name === "ccr-toolhub"), false);
+  assert.equal(servers.some((server) => server.name === "ar-toolhub"), false);
 });
 
 test("Core Gateway compiles one profile for each configured Fusion media model", async () => {
@@ -95,7 +95,7 @@ test("Core Gateway compiles one profile for each configured Fusion media model",
   config.mediaTools.enabled = true;
   config.Providers = [
     { models: ["base-model"], name: "Provider" },
-    { apiKey: "ccr-local-agent-login", baseUrl: "https://cli-chat-proxy.grok.com/v1", models: ["grok-4.5"], name: "Grok Agent" }
+    { apiKey: "ar-local-agent-login", baseUrl: "https://cli-chat-proxy.grok.com/v1", models: ["grok-4.5"], name: "Grok Agent" }
   ];
   config.virtualModelProfiles = [{
     baseModel: { fixedModel: "Provider/base-model", mode: "fixed" },

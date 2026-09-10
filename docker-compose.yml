@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: claude-code-router:local
+    image: agentrouter:local
     ports:
       # Publish only Nginx. Internal web/gateway listeners stay inside the container.
       - "3458:8080"

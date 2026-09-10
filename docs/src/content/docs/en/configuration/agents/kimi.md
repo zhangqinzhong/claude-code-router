@@ -34,7 +34,7 @@ Kimi CLI is fixed to **Only opened from CCR** and **CLI only**, so those two fie
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Kimi CLI** | Creates a Kimi CLI launch entry in CCR. |
-| Config name | Free text, e.g. `Kimi - Work` | Identifies the profile. Desktop commands use `ccr-app "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Kimi - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Kimi model | A provider model or Fusion model | The default model. At least one model is required. |
 | Available models | One or more provider/Fusion models | Models available from Kimi's `/model` menu. The default model is always included. |
@@ -45,7 +45,7 @@ Kimi CLI is fixed to **Only opened from CCR** and **CLI only**, so those two fie
 Desktop command copied from the profile card:
 
 ```text
-ccr-app "Kimi - Work"
+agentrouter "Kimi - Work"
 ```
 
 For CLI, run:
@@ -62,7 +62,7 @@ Create separate Kimi CLI profiles when you want different default models or mode
 
 ## Verify
 
-1. Run the desktop `ccr-app` command copied from the profile card, or the CLI `ccr` command.
+1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `ccr` command.
 2. Send one message in Kimi CLI and confirm it replies.
 3. Open **Request logs** in CCR and confirm the request passed through the gateway.
 4. Run `/model` and confirm the default plus available models appear.

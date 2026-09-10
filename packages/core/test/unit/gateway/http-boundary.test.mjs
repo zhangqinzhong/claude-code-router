@@ -25,12 +25,12 @@ import {
 } from "@ccr/core/gateway/http/body.ts";
 
 test("gateway client inference honors explicit, proxy, API-key, and user-agent identity", () => {
-  assert.equal(inferGatewayClient(undefined, { "x-ccr-client": "  Desktop App  " }), "Desktop App");
+  assert.equal(inferGatewayClient(undefined, { "x-ar-client": "  Desktop App  " }), "Desktop App");
   assert.equal(inferGatewayClient({ id: "key-id", name: "Team key" }, { "user-agent": "codex-cli/1.0" }), "Team key");
   assert.equal(
     inferGatewayClient(
       { id: "key-id", name: "Team key" },
-      { "user-agent": "codex-cli/1.0", "x-ccr-proxy-mode": "gateway" }
+      { "user-agent": "codex-cli/1.0", "x-ar-proxy-mode": "gateway" }
     ),
     "Codex"
   );
@@ -59,7 +59,7 @@ test("gateway header forwarding strips hop-by-hop, local auth, and observability
   const forwarded = forwardHeaders({
     connection: "keep-alive",
     host: "127.0.0.1:3456",
-    "x-ccr-core-auth": "internal-secret",
+    "x-ar-core-auth": "internal-secret",
     "x-extra": ["one", "two"],
     "x-keep": "yes"
   });
@@ -80,8 +80,8 @@ test("gateway header forwarding strips hop-by-hop, local auth, and observability
 
   assert.deepEqual(
     omitLocalObservabilityHeaders({
-      "x-ccr-logical-provider": "Provider",
-      "x-ccr-provider-credential-chain": "credential",
+      "x-ar-logical-provider": "Provider",
+      "x-ar-provider-credential-chain": "credential",
       "x-keep": "yes"
     }),
     { "x-keep": "yes" }
@@ -91,7 +91,7 @@ test("gateway header forwarding strips hop-by-hop, local auth, and observability
 test("core gateway auth and upstream response headers stay on their intended boundary", () => {
   assert.deepEqual(withCoreGatewayAuthHeader({ accept: "application/json" }, "core-token"), {
     accept: "application/json",
-    "x-ccr-core-auth": "core-token"
+    "x-ar-core-auth": "core-token"
   });
   assert.throws(() => withCoreGatewayAuthHeader({}, ""), /not initialized/);
 

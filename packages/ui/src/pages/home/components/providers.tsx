@@ -1527,7 +1527,7 @@ function LocalAgentProviderImportPanel({
   );
 }
 
-const localAgentProviderApiKey = "ccr-local-agent-login";
+const localAgentProviderApiKey = "ar-local-agent-login";
 const localAgentProviderPluginSuffixes: Record<Exclude<LocalAgentProviderCandidate["kind"], "opencode">, string[]> = {
   "claude-code": ["-claude-code-oauth", "-claude-code-oauth-internal"],
   codex: ["-codex-oauth", "-codex-oauth-internal"],
@@ -1574,7 +1574,7 @@ function localAgentProviderAlreadyImported(
     const key = isPlainRecord(plugin) && typeof plugin.key === "string" ? plugin.key : "";
     const providerName = isPlainRecord(plugin) && typeof plugin.providerName === "string" ? plugin.providerName : "";
     return (
-      key.startsWith("ccr-local-agent-") &&
+      key.startsWith("ar-local-agent-") &&
       suffixes.some((suffix) => key.endsWith(suffix)) &&
       localProviderNames.has(providerName.trim().toLowerCase())
     );

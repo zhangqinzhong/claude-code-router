@@ -71,7 +71,7 @@ export const localAgentProviderIconUrls: Record<LocalAgentProviderKind, string> 
   zcode: zcodeLogoUrl
 };
 
-const localAgentProviderApiKeyValue = "ccr-local-agent-login";
+const localAgentProviderApiKeyValue = "ar-local-agent-login";
 
 export function createModelCatalogItems(config: AppConfig): ModelCatalogItem[] {
   const rows: ModelCatalogItem[] = [];
@@ -878,7 +878,7 @@ function localAgentProviderPluginMatchesNames(plugin: unknown, names: Set<string
     return false;
   }
   const key = typeof plugin.key === "string" ? plugin.key.trim().toLowerCase() : "";
-  if (!key.startsWith("ccr-local-agent-")) {
+  if (!key.startsWith("ar-local-agent-")) {
     return false;
   }
   const pluginProviderName = typeof plugin.providerName === "string"
@@ -1603,7 +1603,7 @@ export function createProviderInstallLinkFromDraft(draft: AddProviderDraft, prob
     name: providerName,
     protocol
   };
-  return `ccr://provider?payload=${base64UrlEncodeText(JSON.stringify(payload))}`;
+  return `agentrouter://provider?payload=${base64UrlEncodeText(JSON.stringify(payload))}`;
 }
 
 export function base64UrlEncodeText(value: string): string {

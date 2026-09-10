@@ -22,8 +22,8 @@ export function resolveModelCatalogPath(): string | undefined {
 
 export function modelCatalogPathCandidates(): string[] {
   return uniqueStrings([
-    process.env.CCR_MODEL_CATALOG_PATH?.trim() || "",
-    process.env.CCR_MODELS_JSON_PATH?.trim() || "",
+    process.env.AR_MODEL_CATALOG_PATH?.trim() || "",
+    process.env.AR_MODELS_JSON_PATH?.trim() || "",
     pathResolve(process.cwd(), "models.json"),
     pathResolve(process.cwd(), "packages", "core", "models.json"),
     pathResolve(process.cwd(), "packages", "cli", "models.json"),

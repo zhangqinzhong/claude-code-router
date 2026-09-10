@@ -14,6 +14,7 @@ import {
   X
 } from "../shared/index";
 import { ModelSelector } from "./model-selector";
+import trayLayeredIconUrl from "@/assets/tray-layered.png";
 
 const settingsPageContentWidthClassName = "mx-auto w-full max-w-[900px]";
 
@@ -126,10 +127,16 @@ export function AppSettingsDialog({
               copy={copy}
               onChangeTrayBalanceProgress={onChangeTrayBalanceProgress}
               onChangeTrayIcon={onChangeTrayIcon}
+              onChangeTrayShowTokenUsage={(trayShowTokenUsage) => updateConfig((current) => ({
+                ...current,
+                trayShowTokenUsage
+              }))}
               onChangeTrayWidgets={onChangeTrayWidgets}
               providerAccountSnapshots={providerAccountSnapshots}
               trayBalanceProgress={trayBalanceProgress}
               trayIconPreference={trayIconPreference}
+              trayShowTokenUsage={config.trayShowTokenUsage === true}
+              trayTitleSupported={/^(darwin|mac)/i.test(appInfo.platform)}
               trayWidgets={trayWidgets}
             />
           );
@@ -1872,23 +1879,29 @@ function authMethodLabel(platform: string, authType: string): string {
   return botGatewayAuthSpecsForPlatform(platform).find((option) => option.value === normalized)?.label ?? normalized;
 }
 
-function TraySettingsPage({
+export function TraySettingsPage({
   copy,
   onChangeTrayBalanceProgress,
   onChangeTrayIcon,
+  onChangeTrayShowTokenUsage,
   onChangeTrayWidgets,
   providerAccountSnapshots,
   trayBalanceProgress,
   trayIconPreference,
+  trayShowTokenUsage,
+  trayTitleSupported,
   trayWidgets
 }: {
   copy: AppCopy;
   onChangeTrayBalanceProgress: (config: TrayBalanceProgressConfig) => void;
   onChangeTrayIcon: (value: string) => void;
+  onChangeTrayShowTokenUsage: (checked: boolean) => void;
   onChangeTrayWidgets: (widgets: TrayWidgetConfig[]) => void;
   providerAccountSnapshots: ProviderAccountSnapshot[];
   trayBalanceProgress?: TrayBalanceProgressConfig;
   trayIconPreference: AppConfig["trayIcon"];
+  trayShowTokenUsage: boolean;
+  trayTitleSupported: boolean;
   trayWidgets: TrayWidgetConfig[];
 }) {
   const pageRef = useRef<HTMLDivElement>(null);
@@ -1910,6 +1923,7 @@ function TraySettingsPage({
   const effectiveTrayIconPreference: AppConfig["trayIcon"] = progressSelectionActive ? "progress" : trayIconPreference;
   const progressEditorOpen = effectiveTrayIconPreference === "progress";
   const trayIconOptions: Array<{ label: string; value: AppConfig["trayIcon"] }> = [
+    { label: copy.settings.trayIconLayered, value: "layered" },
     { label: copy.settings.trayIconRandom, value: "random" },
     { label: copy.settings.trayIconViolet, value: "violet" },
     { label: copy.settings.trayIconOrange, value: "orange" },
@@ -2100,6 +2114,24 @@ function TraySettingsPage({
           )
         ) : null}
       </div>
+      {trayTitleSupported ? (
+        <label className="flex min-w-0 items-center justify-between gap-4 rounded-md border border-border bg-background p-3">
+          <span className="min-w-0">
+            <span className="block text-[13px] font-semibold text-foreground">
+              {copy.settings.trayShowTokenUsage}
+            </span>
+            <span className="mt-1 block text-[11px] leading-4 text-muted-foreground" id="tray-token-usage-hint">
+              {copy.settings.trayShowTokenUsageHint}
+            </span>
+          </span>
+          <Switch
+            aria-describedby="tray-token-usage-hint"
+            aria-label={copy.settings.trayShowTokenUsage}
+            checked={trayShowTokenUsage}
+            onCheckedChange={onChangeTrayShowTokenUsage}
+          />
+        </label>
+      ) : null}
       <div className="grid min-h-0 grid-cols-[220px_minmax(320px,1fr)_260px] gap-4 max-[1140px]:grid-cols-1">
         <div className="flex min-h-0 flex-col overflow-hidden rounded-md border border-border bg-background">
           <div className="shrink-0 border-b border-border/70 px-3 py-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
@@ -2394,6 +2426,18 @@ function TrayIconPreview({
         className
       )}
     >
+      {preference === "layered" ? (
+        <span
+          className="h-full w-full bg-foreground"
+          data-tray-icon="layered"
+          style={{
+            maskImage: `url(${trayLayeredIconUrl})`,
+            maskPosition: "center",
+            maskRepeat: "no-repeat",
+            maskSize: "contain"
+          }}
+        />
+      ) : null}
       {preference === "random" ? (
         randomIcons.map((iconId, index) => (
           <img

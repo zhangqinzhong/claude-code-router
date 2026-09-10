@@ -55,17 +55,17 @@ test("gateway stop preserves a runtime marker that this service instance does no
 });
 
 test("gateway start observes an exit that occurs while the runtime marker is being written", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-gateway-early-exit-test-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-gateway-early-exit-test-"));
   const gatewayEntry = path.join(dir, "gateway-entry.cjs");
   const gatewayEntryLoaded = path.join(dir, "gateway-entry-loaded");
-  const previousGatewayEntry = process.env.CCR_GATEWAY_ENTRY;
-  const previousGatewayEntryLoaded = process.env.CCR_GATEWAY_EARLY_EXIT_SENTINEL;
+  const previousGatewayEntry = process.env.AR_GATEWAY_ENTRY;
+  const previousGatewayEntryLoaded = process.env.AR_GATEWAY_EARLY_EXIT_SENTINEL;
   const replaceRuntimeState = configRepository.replaceRuntimeState;
   writeFileSync(
     gatewayEntry,
     [
       'const { writeFileSync } = require("node:fs");',
-      'writeFileSync(process.env.CCR_GATEWAY_EARLY_EXIT_SENTINEL, "loaded\\n");',
+      'writeFileSync(process.env.AR_GATEWAY_EARLY_EXIT_SENTINEL, "loaded\\n");',
       "process.exit(23);",
       ""
     ].join("\n"),
@@ -74,8 +74,8 @@ test("gateway start observes an exit that occurs while the runtime marker is bei
 
   try {
     await gatewayService.stop();
-    process.env.CCR_GATEWAY_ENTRY = gatewayEntry;
-    process.env.CCR_GATEWAY_EARLY_EXIT_SENTINEL = gatewayEntryLoaded;
+    process.env.AR_GATEWAY_ENTRY = gatewayEntry;
+    process.env.AR_GATEWAY_EARLY_EXIT_SENTINEL = gatewayEntryLoaded;
     configRepository.replaceRuntimeState = async function (...args) {
       await waitForFile(gatewayEntryLoaded);
       await delay(100);
@@ -103,14 +103,14 @@ test("gateway start observes an exit that occurs while the runtime marker is bei
   } finally {
     configRepository.replaceRuntimeState = replaceRuntimeState;
     if (previousGatewayEntry === undefined) {
-      delete process.env.CCR_GATEWAY_ENTRY;
+      delete process.env.AR_GATEWAY_ENTRY;
     } else {
-      process.env.CCR_GATEWAY_ENTRY = previousGatewayEntry;
+      process.env.AR_GATEWAY_ENTRY = previousGatewayEntry;
     }
     if (previousGatewayEntryLoaded === undefined) {
-      delete process.env.CCR_GATEWAY_EARLY_EXIT_SENTINEL;
+      delete process.env.AR_GATEWAY_EARLY_EXIT_SENTINEL;
     } else {
-      process.env.CCR_GATEWAY_EARLY_EXIT_SENTINEL = previousGatewayEntryLoaded;
+      process.env.AR_GATEWAY_EARLY_EXIT_SENTINEL = previousGatewayEntryLoaded;
     }
     await gatewayService.stop();
     await deletePersistedRuntimeState("gateway");
@@ -119,19 +119,19 @@ test("gateway start observes an exit that occurs while the runtime marker is bei
 });
 
 test("gateway start waits for matching runtime health before reporting running", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-gateway-readiness-test-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-gateway-readiness-test-"));
   const gatewayEntry = path.join(dir, "gateway-entry.cjs");
   const readySentinel = path.join(dir, "gateway-ready");
-  const previousGatewayEntry = process.env.CCR_GATEWAY_ENTRY;
-  const previousReadyDelay = process.env.CCR_GATEWAY_READY_DELAY_MS;
-  const previousReadySentinel = process.env.CCR_GATEWAY_READY_SENTINEL;
+  const previousGatewayEntry = process.env.AR_GATEWAY_ENTRY;
+  const previousReadyDelay = process.env.AR_GATEWAY_READY_DELAY_MS;
+  const previousReadySentinel = process.env.AR_GATEWAY_READY_SENTINEL;
   writeFileSync(gatewayEntry, delayedHealthyGatewayEntry(), "utf8");
 
   try {
     await gatewayService.stop();
-    process.env.CCR_GATEWAY_ENTRY = gatewayEntry;
-    process.env.CCR_GATEWAY_READY_DELAY_MS = "250";
-    process.env.CCR_GATEWAY_READY_SENTINEL = readySentinel;
+    process.env.AR_GATEWAY_ENTRY = gatewayEntry;
+    process.env.AR_GATEWAY_READY_DELAY_MS = "250";
+    process.env.AR_GATEWAY_READY_SENTINEL = readySentinel;
 
     const config = gatewayTestConfig(await findAvailablePort());
     const startedAt = Date.now();
@@ -143,9 +143,9 @@ test("gateway start waits for matching runtime health before reporting running",
     assert.ok(elapsedMs >= 200, `gateway start returned before delayed health was ready (${elapsedMs}ms)`);
     assert.match(String((await loadPersistedRuntimeState("gateway"))?.runtimeId), /.+/);
   } finally {
-    restoreEnv("CCR_GATEWAY_ENTRY", previousGatewayEntry);
-    restoreEnv("CCR_GATEWAY_READY_DELAY_MS", previousReadyDelay);
-    restoreEnv("CCR_GATEWAY_READY_SENTINEL", previousReadySentinel);
+    restoreEnv("AR_GATEWAY_ENTRY", previousGatewayEntry);
+    restoreEnv("AR_GATEWAY_READY_DELAY_MS", previousReadyDelay);
+    restoreEnv("AR_GATEWAY_READY_SENTINEL", previousReadySentinel);
     await gatewayService.stop();
     await deletePersistedRuntimeState("gateway");
     rmSync(dir, { force: true, recursive: true });
@@ -153,10 +153,10 @@ test("gateway start waits for matching runtime health before reporting running",
 });
 
 test("gateway start completes the IPC and health handshake with the bundled runtime", async () => {
-  const previousGatewayEntry = process.env.CCR_GATEWAY_ENTRY;
+  const previousGatewayEntry = process.env.AR_GATEWAY_ENTRY;
   try {
     await gatewayService.stop();
-    delete process.env.CCR_GATEWAY_ENTRY;
+    delete process.env.AR_GATEWAY_ENTRY;
     const status = await gatewayService.start(gatewayTestConfig(await findAvailablePort()));
     assert.equal(status.state, "running", status.lastError);
 
@@ -168,36 +168,36 @@ test("gateway start completes the IPC and health handshake with the bundled runt
     assert.equal(health.status, "ok");
     assert.equal(health.runtimeId, marker?.runtimeId);
   } finally {
-    restoreEnv("CCR_GATEWAY_ENTRY", previousGatewayEntry);
+    restoreEnv("AR_GATEWAY_ENTRY", previousGatewayEntry);
     await gatewayService.stop();
     await deletePersistedRuntimeState("gateway");
   }
 });
 
 test("gateway restart waits for the previous core runtime to stop", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-gateway-restart-stop-test-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-gateway-restart-stop-test-"));
   const slowGatewayEntry = path.join(dir, "slow-gateway-entry.cjs");
   const replacementGatewayEntry = path.join(dir, "replacement-gateway-entry.cjs");
   const readySentinel = path.join(dir, "replacement-ready");
-  const previousGatewayEntry = process.env.CCR_GATEWAY_ENTRY;
-  const previousTermDelay = process.env.CCR_GATEWAY_TERM_DELAY_MS;
-  const previousReadyDelay = process.env.CCR_GATEWAY_READY_DELAY_MS;
-  const previousReadySentinel = process.env.CCR_GATEWAY_READY_SENTINEL;
+  const previousGatewayEntry = process.env.AR_GATEWAY_ENTRY;
+  const previousTermDelay = process.env.AR_GATEWAY_TERM_DELAY_MS;
+  const previousReadyDelay = process.env.AR_GATEWAY_READY_DELAY_MS;
+  const previousReadySentinel = process.env.AR_GATEWAY_READY_SENTINEL;
   writeFileSync(slowGatewayEntry, slowTerminatingGatewayEntry(), "utf8");
   writeFileSync(replacementGatewayEntry, delayedHealthyGatewayEntry(), "utf8");
 
   try {
     await gatewayService.stop();
-    process.env.CCR_GATEWAY_ENTRY = slowGatewayEntry;
-    process.env.CCR_GATEWAY_TERM_DELAY_MS = "300";
+    process.env.AR_GATEWAY_ENTRY = slowGatewayEntry;
+    process.env.AR_GATEWAY_TERM_DELAY_MS = "300";
 
     const config = gatewayTestConfig(await findAvailablePort());
     const firstStatus = await gatewayService.start(config);
     assert.equal(firstStatus.state, "running", firstStatus.lastError);
 
-    process.env.CCR_GATEWAY_ENTRY = replacementGatewayEntry;
-    process.env.CCR_GATEWAY_READY_DELAY_MS = "0";
-    process.env.CCR_GATEWAY_READY_SENTINEL = readySentinel;
+    process.env.AR_GATEWAY_ENTRY = replacementGatewayEntry;
+    process.env.AR_GATEWAY_READY_DELAY_MS = "0";
+    process.env.AR_GATEWAY_READY_SENTINEL = readySentinel;
     const startedAt = Date.now();
     const secondStatus = await gatewayService.start(config);
     const elapsedMs = Date.now() - startedAt;
@@ -206,10 +206,10 @@ test("gateway restart waits for the previous core runtime to stop", async () => 
     assert.equal(existsSync(readySentinel), true);
     assert.ok(elapsedMs >= 200, `gateway restart returned before the old runtime stopped (${elapsedMs}ms)`);
   } finally {
-    restoreEnv("CCR_GATEWAY_ENTRY", previousGatewayEntry);
-    restoreEnv("CCR_GATEWAY_TERM_DELAY_MS", previousTermDelay);
-    restoreEnv("CCR_GATEWAY_READY_DELAY_MS", previousReadyDelay);
-    restoreEnv("CCR_GATEWAY_READY_SENTINEL", previousReadySentinel);
+    restoreEnv("AR_GATEWAY_ENTRY", previousGatewayEntry);
+    restoreEnv("AR_GATEWAY_TERM_DELAY_MS", previousTermDelay);
+    restoreEnv("AR_GATEWAY_READY_DELAY_MS", previousReadyDelay);
+    restoreEnv("AR_GATEWAY_READY_SENTINEL", previousReadySentinel);
     await gatewayService.stop();
     await deletePersistedRuntimeState("gateway");
     rmSync(dir, { force: true, recursive: true });
@@ -217,14 +217,14 @@ test("gateway restart waits for the previous core runtime to stop", async () => 
 });
 
 test("gateway start rejects healthy endpoints owned by a different runtime", async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-gateway-runtime-identity-test-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-gateway-runtime-identity-test-"));
   const gatewayEntry = path.join(dir, "gateway-entry.cjs");
-  const previousGatewayEntry = process.env.CCR_GATEWAY_ENTRY;
+  const previousGatewayEntry = process.env.AR_GATEWAY_ENTRY;
   writeFileSync(gatewayEntry, foreignRuntimeGatewayEntry(), "utf8");
 
   try {
     await gatewayService.stop();
-    process.env.CCR_GATEWAY_ENTRY = gatewayEntry;
+    process.env.AR_GATEWAY_ENTRY = gatewayEntry;
 
     const status = await gatewayService.start(gatewayTestConfig(await findAvailablePort()));
 
@@ -232,7 +232,7 @@ test("gateway start rejects healthy endpoints owned by a different runtime", asy
     assert.match(status.lastError ?? "", /owned by a different runtime/);
     assert.equal(await loadPersistedRuntimeState("gateway"), undefined);
   } finally {
-    restoreEnv("CCR_GATEWAY_ENTRY", previousGatewayEntry);
+    restoreEnv("AR_GATEWAY_ENTRY", previousGatewayEntry);
     await gatewayService.stop();
     await deletePersistedRuntimeState("gateway");
     rmSync(dir, { force: true, recursive: true });
@@ -259,7 +259,7 @@ function delayedHealthyGatewayEntry() {
   return [
     'const { writeFileSync } = require("node:fs");',
     'const { createServer } = require("node:http");',
-    "const delayMs = Number(process.env.CCR_GATEWAY_READY_DELAY_MS || 0);",
+    "const delayMs = Number(process.env.AR_GATEWAY_READY_DELAY_MS || 0);",
     "setTimeout(() => {",
     "  const server = createServer((request, response) => {",
     "    if (request.url === '/health') {",
@@ -274,7 +274,7 @@ function delayedHealthyGatewayEntry() {
     "    response.end();",
     "  });",
     "  server.listen(Number(process.env.PORT), process.env.HOST, () => {",
-    "    writeFileSync(process.env.CCR_GATEWAY_READY_SENTINEL, 'ready\\n');",
+    "    writeFileSync(process.env.AR_GATEWAY_READY_SENTINEL, 'ready\\n');",
     "  });",
     "}, delayMs);",
     ""
@@ -304,7 +304,7 @@ function slowTerminatingGatewayEntry() {
     "  setTimeout(() => {",
     "    server.close(() => process.exit(0));",
     "    server.closeAllConnections?.();",
-    "  }, Number(process.env.CCR_GATEWAY_TERM_DELAY_MS || 300));",
+    "  }, Number(process.env.AR_GATEWAY_TERM_DELAY_MS || 300));",
     "});",
     ""
   ].join("\n");

@@ -34,7 +34,7 @@ Grok CLI is fixed to **Only opened from CCR** and **CLI only**, so those two fie
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Grok CLI** | Creates a Grok CLI launch entry in CCR. |
-| Config name | Free text, e.g. `Grok - Work` | Identifies the profile. Desktop commands use `ccr-app "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Grok - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Model | A provider model or Fusion model | The model Grok CLI uses at startup. |
 | Environment variables | Key/value rows | Optional advanced overrides; leave empty for normal use. |
@@ -44,7 +44,7 @@ Grok CLI is fixed to **Only opened from CCR** and **CLI only**, so those two fie
 Desktop command copied from the profile card:
 
 ```text
-ccr-app "Grok - Work"
+agentrouter "Grok - Work"
 ```
 
 For CLI, run:
@@ -61,7 +61,7 @@ Create separate Grok CLI profiles when you want separate launch entries with dif
 
 ## Verify
 
-1. Run the desktop `ccr-app` command copied from the profile card, or the CLI `ccr` command.
+1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `ccr` command.
 2. Send one message in Grok CLI and confirm it replies.
 3. Open **Request logs** in CCR and confirm the request passed through the gateway.
 4. Run `/model` and confirm the CCR-exposed models appear.

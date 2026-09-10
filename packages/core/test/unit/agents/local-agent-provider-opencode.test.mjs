@@ -93,8 +93,8 @@ test("OpenCode local provider imports Zen models using each model's native proto
     assert.equal(result.provider.account, undefined);
     assert.equal(result.providerPlugins.length, 2);
     assert.equal(result.providerPlugins[0].auth.headers.authorization, "Bearer opencode-zen-key");
-    assert.equal(result.providerPlugins[0].key, "ccr-local-agent-__CCR_PROVIDER_NAME_SLUG__-opencode-openai-responses-api-key");
-    assert.equal(result.providerPlugins[1].providerName, "__CCR_PROVIDER_INTERNAL_NAME__");
+    assert.equal(result.providerPlugins[0].key, "ar-local-agent-__AR_PROVIDER_NAME_SLUG__-opencode-openai-responses-api-key");
+    assert.equal(result.providerPlugins[1].providerName, "__AR_PROVIDER_INTERNAL_NAME__");
 
     const anthropicResult = importOpenCodeProvider(anthropic, []);
     assert.equal(anthropicResult.providerPlugins[0].auth.headers["x-api-key"], "opencode-zen-key");
@@ -108,11 +108,11 @@ test("OpenCode local provider imports Zen models using each model's native proto
 
 test("OpenCode local provider resolves API keys from OpenCode JSONC config", async () => {
   await withOpenCodeHome(async (home) => {
-    process.env.CCR_OPENCODE_TEST_KEY = "configured-opencode-key";
+    process.env.AR_OPENCODE_TEST_KEY = "configured-opencode-key";
     writeOpenCodeConfig(home, `{
       "provider": {
         "opencode": {
-          "options": { "apiKey": "{env:CCR_OPENCODE_TEST_KEY}" },
+          "options": { "apiKey": "{env:AR_OPENCODE_TEST_KEY}" },
         },
       },
     }`);
@@ -280,8 +280,8 @@ function candidateForProtocol(candidates, protocol) {
 
 async function withOpenCodeHome(run) {
   const environmentNames = [
-    "CCR_INTERNAL_HOME_DIR",
-    "CCR_OPENCODE_TEST_KEY",
+    "AR_INTERNAL_HOME_DIR",
+    "AR_OPENCODE_TEST_KEY",
     "OPENCODE_API_KEY",
     "OPENCODE_AUTH_CONTENT",
     "OPENCODE_CONFIG",
@@ -289,7 +289,7 @@ async function withOpenCodeHome(run) {
   ];
   const previousEnvironment = Object.fromEntries(environmentNames.map((name) => [name, process.env[name]]));
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-test-"));
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   for (const name of environmentNames.slice(1)) {
     delete process.env[name];
   }

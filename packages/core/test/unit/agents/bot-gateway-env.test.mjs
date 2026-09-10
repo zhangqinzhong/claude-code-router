@@ -54,7 +54,7 @@ test("botGatewayProfileEnv disables bot gateway outside app surface", () => {
   const env = botGatewayProfileEnv({ botConfigs: [], botGateway: botGateway() }, profile, "cli");
 
   assert.deepEqual(env, {
-    CCR_BOT_GATEWAY_ENABLED: "false",
+    AR_BOT_GATEWAY_ENABLED: "false",
     CODEXL_BOT_GATEWAY_ENABLED: "false"
   });
 });
@@ -81,18 +81,18 @@ test("botGatewayProfileEnv merges saved config and normalizes websocket integrat
     "app"
   );
 
-  assert.equal(env.CCR_BOT_GATEWAY_ENABLED, "true");
-  assert.equal(env.CCR_BOT_GATEWAY_PLATFORM, "feishu");
-  assert.equal(env.CCR_BOT_GATEWAY_AUTH_TYPE, "app_secret");
-  assert.equal(env.CCR_BOT_GATEWAY_CREATE_INTEGRATION, "true");
-  assert.equal(env.CCR_BOT_GATEWAY_STATE_DIR, `${process.env.HOME}/bot-state`);
-  assert.equal(env.CCR_BOT_PROFILE_ID, "codex-main");
-  assert.equal(env.CCR_BOT_PROFILE_NAME, "Codex Main");
+  assert.equal(env.AR_BOT_GATEWAY_ENABLED, "true");
+  assert.equal(env.AR_BOT_GATEWAY_PLATFORM, "feishu");
+  assert.equal(env.AR_BOT_GATEWAY_AUTH_TYPE, "app_secret");
+  assert.equal(env.AR_BOT_GATEWAY_CREATE_INTEGRATION, "true");
+  assert.equal(env.AR_BOT_GATEWAY_STATE_DIR, `${process.env.HOME}/bot-state`);
+  assert.equal(env.AR_BOT_PROFILE_ID, "codex-main");
+  assert.equal(env.AR_BOT_PROFILE_NAME, "Codex Main");
 
-  const credentials = JSON.parse(env.CCR_BOT_GATEWAY_CREDENTIALS_JSON);
+  const credentials = JSON.parse(env.AR_BOT_GATEWAY_CREDENTIALS_JSON);
   assert.deepEqual(credentials, { appId: "app-1", token: "secret" });
 
-  const integrationConfig = JSON.parse(env.CCR_BOT_GATEWAY_CONFIG_JSON);
+  const integrationConfig = JSON.parse(env.AR_BOT_GATEWAY_CONFIG_JSON);
   assert.deepEqual(integrationConfig, { appId: "app-1", team: "T1", transport: "websocket" });
 });
 
@@ -109,10 +109,10 @@ test("botGatewayProfileEnv disables create integration for QR login platforms", 
     "app"
   );
 
-  assert.equal(env.CCR_BOT_GATEWAY_PLATFORM, "weixin-ilink");
-  assert.equal(env.CCR_BOT_GATEWAY_AUTH_TYPE, "qr_login");
-  assert.equal(env.CCR_BOT_GATEWAY_CREATE_INTEGRATION, "false");
-  assert.equal(JSON.parse(env.CCR_BOT_GATEWAY_CONFIG_JSON).transport, "websocket");
+  assert.equal(env.AR_BOT_GATEWAY_PLATFORM, "weixin-ilink");
+  assert.equal(env.AR_BOT_GATEWAY_AUTH_TYPE, "qr_login");
+  assert.equal(env.AR_BOT_GATEWAY_CREATE_INTEGRATION, "false");
+  assert.equal(JSON.parse(env.AR_BOT_GATEWAY_CONFIG_JSON).transport, "websocket");
 });
 
 test("botGatewayProfileEnv defaults iMessage to local auth", () => {
@@ -130,9 +130,9 @@ test("botGatewayProfileEnv defaults iMessage to local auth", () => {
     "app"
   );
 
-  assert.equal(env.CCR_BOT_GATEWAY_PLATFORM, "imessage");
-  assert.equal(env.CCR_BOT_GATEWAY_AUTH_TYPE, "local");
-  assert.equal(JSON.parse(env.CCR_BOT_GATEWAY_CONFIG_JSON).transport, "websocket");
+  assert.equal(env.AR_BOT_GATEWAY_PLATFORM, "imessage");
+  assert.equal(env.AR_BOT_GATEWAY_AUTH_TYPE, "local");
+  assert.equal(JSON.parse(env.AR_BOT_GATEWAY_CONFIG_JSON).transport, "websocket");
 });
 
 test("botGatewaySdkImportSpecifier converts Windows absolute paths before URL scheme detection", () => {

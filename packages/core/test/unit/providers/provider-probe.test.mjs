@@ -337,7 +337,7 @@ test("connectivity probe applies provider plugin auth for local agent imports", 
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "http://127.0.0.1:49123/v1",
       name: "Local Agent",
@@ -475,7 +475,7 @@ test("connectivity probe refreshes Codex OAuth plugin auth", async (t) => {
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "http://127.0.0.1:49122/codex",
       name: "Codex API",
@@ -489,7 +489,7 @@ test("connectivity probe refreshes Codex OAuth plugin auth", async (t) => {
         refreshToken: "refresh-current",
         tokenEndpoint: "http://127.0.0.1:49122/oauth/token"
       },
-      key: "ccr-local-agent-codex-api-codex-oauth",
+      key: "ar-local-agent-codex-api-codex-oauth",
       providerName: "Codex API"
     }],
     protocols: ["openai_responses"]
@@ -545,7 +545,7 @@ test("connectivity probe applies Codex request defaults for OAuth plugins", asyn
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "https://chatgpt.com/backend-api/codex",
       name: "Codex API",
@@ -558,7 +558,7 @@ test("connectivity probe applies Codex request defaults for OAuth plugins", asyn
       codexOauth: {
         accessToken
       },
-      key: "ccr-local-agent-codex-api-codex-oauth",
+      key: "ar-local-agent-codex-api-codex-oauth",
       providerName: "Codex API"
     }],
     protocols: ["openai_responses"]
@@ -589,8 +589,8 @@ test("connectivity probe prefers live Codex auth over saved OAuth plugin tokens"
   });
   const calls = [];
 
-  fs.mkdirSync(path.join(process.env.CCR_INTERNAL_HOME_DIR, ".codex"), { recursive: true });
-  fs.writeFileSync(path.join(process.env.CCR_INTERNAL_HOME_DIR, ".codex", "auth.json"), JSON.stringify({
+  fs.mkdirSync(path.join(process.env.AR_INTERNAL_HOME_DIR, ".codex"), { recursive: true });
+  fs.writeFileSync(path.join(process.env.AR_INTERNAL_HOME_DIR, ".codex", "auth.json"), JSON.stringify({
     tokens: {
       access_token: liveToken,
       account_id: "acct-live-file",
@@ -629,7 +629,7 @@ test("connectivity probe prefers live Codex auth over saved OAuth plugin tokens"
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "https://chatgpt.com/backend-api/codex",
       name: "Codex API",
@@ -643,7 +643,7 @@ test("connectivity probe prefers live Codex auth over saved OAuth plugin tokens"
         accessToken: savedToken,
         accountId: "acct-saved-plugin"
       },
-      key: "ccr-local-agent-codex-api-codex-oauth",
+      key: "ar-local-agent-codex-api-codex-oauth",
       providerName: "Codex API"
     }],
     protocols: ["openai_responses"]
@@ -706,7 +706,7 @@ test("connectivity probe shares concurrent Codex OAuth refreshes", async (t) => 
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "http://127.0.0.1:49125/codex",
       name: "Codex API",
@@ -720,7 +720,7 @@ test("connectivity probe shares concurrent Codex OAuth refreshes", async (t) => 
         refreshToken: "refresh-shared-current",
         tokenEndpoint: "http://127.0.0.1:49125/oauth/token"
       },
-      key: "ccr-local-agent-codex-api-codex-oauth",
+      key: "ar-local-agent-codex-api-codex-oauth",
       providerName: "Codex API"
     }],
     protocols: ["openai_responses"]
@@ -744,8 +744,8 @@ test("connectivity probe recovers Codex OAuth auth when saved plugin is missing"
   });
   const calls = [];
 
-  fs.mkdirSync(path.join(process.env.CCR_INTERNAL_HOME_DIR, ".codex"), { recursive: true });
-  fs.writeFileSync(path.join(process.env.CCR_INTERNAL_HOME_DIR, ".codex", "auth.json"), JSON.stringify({
+  fs.mkdirSync(path.join(process.env.AR_INTERNAL_HOME_DIR, ".codex"), { recursive: true });
+  fs.writeFileSync(path.join(process.env.AR_INTERNAL_HOME_DIR, ".codex", "auth.json"), JSON.stringify({
     tokens: {
       refresh_token: "refresh-live"
     }
@@ -791,7 +791,7 @@ test("connectivity probe recovers Codex OAuth auth when saved plugin is missing"
   });
 
   const report = await checkGatewayProviderConnectivity({
-    apiKey: "ccr-local-agent-login",
+    apiKey: "ar-local-agent-login",
     candidates: [{
       baseUrl: "https://chatgpt.com/backend-api/codex",
       name: "Codex API",
@@ -888,13 +888,13 @@ function base64url(value) {
 
 function useTemporaryCodexHome(t, prefix) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-  const previousHome = process.env.CCR_INTERNAL_HOME_DIR;
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  const previousHome = process.env.AR_INTERNAL_HOME_DIR;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   t.after(() => {
     if (previousHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousHome;
     }
   });
   return home;

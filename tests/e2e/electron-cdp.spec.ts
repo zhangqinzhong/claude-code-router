@@ -206,8 +206,8 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
     configDir,
     "bin",
     process.platform === "win32"
-      ? `ccr-codex-cli-stdio-${profileId}.cmd`
-      : `ccr-codex-cli-stdio-${profileId}`
+      ? `ar-codex-cli-stdio-${profileId}.cmd`
+      : `ar-codex-cli-stdio-${profileId}`
   );
   expect(workbuddyStatus?.path).toBe(configFile);
 
@@ -225,7 +225,7 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
   expect(workbuddyModels.availableModels).toEqual(["Workbuddy E2E Provider/gpt-5-codex"]);
   expect(workbuddyModels.models).toHaveLength(1);
   expect(workbuddyModels.models[0]).toMatchObject({
-    apiKey: "${CCR_PROFILE_API_KEY}",
+    apiKey: "${AR_PROFILE_API_KEY}",
     id: "Workbuddy E2E Provider/gpt-5-codex",
     supportsToolCall: true,
     tags: ["chat", "custom"],
@@ -238,15 +238,15 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
   expect(launcher).toContain("WORKBUDDY_HOME");
   expect(launcher).toContain("WORKBUDDY_CONFIG_DIR");
   expect(launcher).toContain("CODEBUDDY_CONFIG_DIR");
-  expect(launcher).toContain("CCR_REAL_CODEX_CLI_PATH");
+  expect(launcher).toContain("AR_REAL_CODEX_CLI_PATH");
   expect(launcher).toContain("codebuddy");
 
   const virtualAuthFile = workbuddyVirtualAuthFile(profileHome);
   expect(existsSync(virtualAuthFile)).toBe(true);
   const virtualSession = JSON.parse(readFileSync(virtualAuthFile, "utf8"));
-  expect(virtualSession.auth.accessToken).toBe("ccr-local-profile");
+  expect(virtualSession.auth.accessToken).toBe("ar-local-profile");
   expect(virtualSession.auth.domain).toBe("www.workbuddy.ai");
-  expect(virtualSession.account.uid).toBe("ccr-local-profile");
+  expect(virtualSession.account.uid).toBe("ar-local-profile");
   expect(virtualSession.accounts).toHaveLength(1);
   expect(virtualSession.allAccounts).toHaveLength(1);
 });
@@ -279,9 +279,9 @@ async function startElectronOverCdp(): Promise<ElectronCdpRuntime> {
       cwd: projectRoot,
       env: {
         ...process.env,
-        CCR_INTERNAL_APP_DATA_DIR: path.join(testHome, "app-data"),
-        CCR_INTERNAL_HOME_DIR: testHome,
-        CCR_INTERNAL_USER_DATA_DIR: path.join(testHome, "user-data"),
+        AR_INTERNAL_APP_DATA_DIR: path.join(testHome, "app-data"),
+        AR_INTERNAL_HOME_DIR: testHome,
+        AR_INTERNAL_USER_DATA_DIR: path.join(testHome, "user-data"),
         ELECTRON_DISABLE_SECURITY_WARNINGS: "1",
         HOME: testHome,
         NODE_ENV: "test"
@@ -367,7 +367,7 @@ function writeElectronE2eConfig(
 function createLegacyApiKeyDatabase(file: string): void {
   runElectronNode(`
     const Database = require("better-sqlite3");
-    const database = new Database(process.env.CCR_E2E_SQLITE_FILE);
+    const database = new Database(process.env.AR_E2E_SQLITE_FILE);
     database.exec(\`
       CREATE TABLE api_keys (
         id TEXT PRIMARY KEY,
@@ -407,8 +407,8 @@ function readGatewayRuntimeMarker(file: string): Record<string, unknown> | undef
 function readSqliteRows<Row>(file: string, query: string): Row[] {
   const output = runElectronNode(`
     const Database = require("better-sqlite3");
-    const database = new Database(process.env.CCR_E2E_SQLITE_FILE, { readonly: true });
-    const rows = database.prepare(process.env.CCR_E2E_SQLITE_QUERY).all();
+    const database = new Database(process.env.AR_E2E_SQLITE_FILE, { readonly: true });
+    const rows = database.prepare(process.env.AR_E2E_SQLITE_QUERY).all();
     database.close();
     process.stdout.write(JSON.stringify(rows));
   `, file, query);
@@ -431,8 +431,8 @@ function runElectronNode(script: string, file: string, query = ""): string {
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_E2E_SQLITE_FILE: file,
-      CCR_E2E_SQLITE_QUERY: query,
+      AR_E2E_SQLITE_FILE: file,
+      AR_E2E_SQLITE_QUERY: query,
       ELECTRON_RUN_AS_NODE: "1"
     }
   });

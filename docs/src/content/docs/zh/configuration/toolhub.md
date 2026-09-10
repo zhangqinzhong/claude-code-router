@@ -7,7 +7,7 @@ lead: 将多个 MCP server 收束成一个紧凑入口，让 Agent 按任务懒�
 
 ## 适用场景
 
-当你接入的 MCP server 越来越多时，直接把所有工具暴露给 Agent 会让工具列表变长，也更容易选错工具。ToolHub 会向 Agent 暴露一个 `ccr-toolhub` MCP server，里面只有两个元工具：
+当你接入的 MCP server 越来越多时，直接把所有工具暴露给 Agent 会让工具列表变长，也更容易选错工具。ToolHub 会向 Agent 暴露一个 `ar-toolhub` MCP server，里面只有两个元工具：
 
 - `tool_hub.resolve`：根据用户任务和上下文检索可用 MCP 工具。
 - `tool_hub.invoke`：调用已经被本轮任务选中的真实 MCP 工具。
@@ -19,10 +19,10 @@ lead: 将多个 MCP server 收束成一个紧凑入口，让 Agent 按任务懒�
 1. 在 **设置 → ToolHub** 中启用 ToolHub。
 2. 选择一个已配置模型作为 **检索模型**。它负责阅读 MCP 工具目录并挑选本轮任务需要的工具；建议使用 `deepseek-v4-flash`，或同等 Flash 价位、响应稳定的轻量模型。
 3. 添加或导入后端 MCP server。ToolHub 支持 `stdio`、`streamable-http` 和 `sse`。
-4. 从 CCR 打开 Claude Code 或 Codex。CCR 会在对应 Agent 配置中写入 `ccr-toolhub`。
+4. 从 CCR 打开 Claude Code 或 Codex。CCR 会在对应 Agent 配置中写入 `ar-toolhub`。
 5. Agent 遇到外部服务、已安装 MCP 能力或业务 API 相关请求时，先调用 `tool_hub.resolve`，再用 `tool_hub.invoke` 执行选中的工具。
 
-ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中的全局 Agent MCP servers，并自动排除 `ccr-toolhub` 自身，避免递归调用。
+ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中的全局 Agent MCP servers，并自动排除 `ar-toolhub` 自身，避免递归调用。
 
 ## 内置浏览器自动化
 
@@ -73,7 +73,7 @@ ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中�
 
 | 配置项 | 说明 |
 | --- | --- |
-| 启用 ToolHub | 开启后才会向 Agent 暴露 `ccr-toolhub`。如果没有可用后端 MCP server，CCR 不会生成 ToolHub MCP 配置。 |
+| 启用 ToolHub | 开启后才会向 Agent 暴露 `ar-toolhub`。如果没有可用后端 MCP server，CCR 不会生成 ToolHub MCP 配置。 |
 | 内置浏览器自动化 | 仅在启用 ToolHub 后显示。开启后让 Agent 可以使用 CCR Desktop 的内置浏览器完成网页操作。 |
 | 检索模型 | 从已配置供应商模型中选择。建议使用 `deepseek-v4-flash`，或同等 Flash 价位、响应稳定、工具理解能力足够的轻量模型。 |
 | 最大工具数 | 单次解析最多返回的工具数量，范围 `1` 到 `20`，默认 `10`。 |
@@ -152,7 +152,7 @@ ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中�
 
 | 能力 | ToolHub | Fusion 自定义 MCP 工具 |
 | --- | --- | --- |
-| 使用入口 | Agent 侧的 `ccr-toolhub` MCP server | 某个 Fusion 模型内部能力 |
+| 使用入口 | Agent 侧的 `ar-toolhub` MCP server | 某个 Fusion 模型内部能力 |
 | 工具选择 | 每个任务动态检索并返回工具包 | 模型配置中固定选择工具 |
 | 适合场景 | MCP server 很多、工具目录经常变化、希望 Agent 自主发现能力 | 给某个模型补一组明确工具 |
 | 可见范围 | 通过 CCR 打开的 Claude Code 或 Codex 配置 | 选择该 Fusion 模型的路由或 Agent |

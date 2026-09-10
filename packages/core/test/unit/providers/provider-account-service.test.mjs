@@ -16,7 +16,7 @@ import {
   grokProviderAccountConfig
 } from "@ccr/core/agents/local-providers/grok.ts";
 
-const localAgentProviderApiKey = "ccr-local-agent-login";
+const localAgentProviderApiKey = "ar-local-agent-login";
 const codexDefaultBaseUrl = "https://chatgpt.com/backend-api/codex";
 const zcodeDefaultBaseUrl = "https://zcode.z.ai/api/v1/zcode-plan/anthropic";
 
@@ -225,15 +225,15 @@ test("webcontent-json connector reports unsupported outside CCR Desktop", async 
 });
 
 test("Codex local account credential refreshes when only a refresh token is available", async (t) => {
-  const previousHome = process.env.CCR_INTERNAL_HOME_DIR;
+  const previousHome = process.env.AR_INTERNAL_HOME_DIR;
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-account-refresh-"));
   mkdirSync(path.join(home, ".codex"), { recursive: true });
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   t.after(() => {
     if (previousHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousHome;
     }
   });
 
@@ -268,7 +268,7 @@ test("Codex local account credential refreshes when only a refresh token is avai
       refreshToken: "refresh-only",
       tokenEndpoint: "http://127.0.0.1/oauth/token"
     },
-    key: "ccr-local-agent-codex-api-codex-oauth",
+    key: "ar-local-agent-codex-api-codex-oauth",
     providerName: "Codex API"
   });
 
@@ -299,7 +299,7 @@ test("Codex local account credential matches internal provider plugin names", as
         codexOauth: {
           accessToken
         },
-        key: "ccr-local-agent-codex-api-codex-oauth-internal",
+        key: "ar-local-agent-codex-api-codex-oauth-internal",
         providerName: "codex-api::openai_responses"
       }
     ]
@@ -350,7 +350,7 @@ test("Codex local account credential falls back to the live auth file when plugi
 });
 
 test("Claude Code local account credential prefers live macOS Keychain token", { skip: process.platform === "win32" }, async (t) => {
-  const home = useTemporaryHome(t, "ccr-claude-code-account-live-keychain-");
+  const home = useTemporaryHome(t, "ar-claude-code-account-live-keychain-");
   usePlatform(t, "darwin");
   useFakeSecurityOutput(t, {
     access_token: "keychain-account-token",
@@ -368,7 +368,7 @@ test("Claude Code local account credential prefers live macOS Keychain token", {
           },
           strict: true
         },
-        key: "ccr-local-agent-claude-code-api-claude-code-oauth-internal",
+        key: "ar-local-agent-claude-code-api-claude-code-oauth-internal",
         providerName: "claude-code-api::anthropic_messages"
       }
     ]
@@ -402,7 +402,7 @@ test("Kimi local account credential carries its API key and CLI identity", async
           headers: { authorization: "Bearer kimi-plugin-key" },
           strict: true
         },
-        key: "ccr-local-agent-kimi-api-kimi-cli-api-key-internal",
+        key: "ar-local-agent-kimi-api-kimi-cli-api-key-internal",
         providerName: "kimi-api::openai_chat_completions"
       }
     ]
@@ -433,7 +433,7 @@ test("ZCode local account credential matches internal provider plugin names", as
           removeHeaders: ["authorization"],
           strict: true
         },
-        key: "ccr-local-agent-zcode-api-zcode-api-key-internal",
+        key: "ar-local-agent-zcode-api-zcode-api-key-internal",
         providerName: "zcode-api::anthropic_messages"
       }
     ]
@@ -489,19 +489,19 @@ function useTemporaryCodexHome(t, prefix) {
 }
 
 function useTemporaryHome(t, prefix) {
-  const previousHome = process.env.CCR_INTERNAL_HOME_DIR;
+  const previousHome = process.env.AR_INTERNAL_HOME_DIR;
   const previousOsHome = process.env.HOME;
   const previousZcodeHome = process.env.ZCODE_HOME;
   const previousZcodeStorageDir = process.env.ZCODE_STORAGE_DIR;
   const home = mkdtempSync(path.join(os.tmpdir(), prefix));
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   delete process.env.ZCODE_HOME;
   delete process.env.ZCODE_STORAGE_DIR;
   t.after(() => {
     if (previousHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousHome;
     }
     if (previousOsHome === undefined) {
       delete process.env.HOME;
@@ -538,7 +538,7 @@ function useFakeSecurityOutput(t, output) {
   const binDir = mkdtempSync(path.join(os.tmpdir(), "ccr-security-bin-"));
   const securityPath = path.join(binDir, "security");
   const previousPath = process.env.PATH;
-  writeFileSync(securityPath, `#!/bin/sh\ncat <<'CCR_KEYCHAIN_JSON'\n${JSON.stringify(output)}\nCCR_KEYCHAIN_JSON\n`);
+  writeFileSync(securityPath, `#!/bin/sh\ncat <<'AR_KEYCHAIN_JSON'\n${JSON.stringify(output)}\nAR_KEYCHAIN_JSON\n`);
   chmodSync(securityPath, 0o755);
   process.env.PATH = `${binDir}${path.delimiter}${previousPath ?? ""}`;
   t.after(() => {

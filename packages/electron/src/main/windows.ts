@@ -528,11 +528,11 @@ function configurePluginAppDiagnostics(window: BrowserWindow, options: PluginApp
 }
 
 function schedulePluginAppScreenshot(window: BrowserWindow, prefix: string): void {
-  const targetPath = process.env.CCR_PLUGIN_APP_SCREENSHOT_PATH;
+  const targetPath = process.env.AR_PLUGIN_APP_SCREENSHOT_PATH;
   if (!targetPath || process.env.NODE_ENV !== "development") {
     return;
   }
-  const targetId = process.env.CCR_PLUGIN_APP_SCREENSHOT_ID;
+  const targetId = process.env.AR_PLUGIN_APP_SCREENSHOT_ID;
   if (targetId && !prefix.includes(targetId)) {
     return;
   }
@@ -541,7 +541,7 @@ function schedulePluginAppScreenshot(window: BrowserWindow, prefix: string): voi
   }
   pluginAppScreenshotCaptures.add(window.webContents);
 
-  const delayMs = clampNumber(Number(process.env.CCR_PLUGIN_APP_SCREENSHOT_DELAY_MS) || 3_000, 250, 30_000);
+  const delayMs = clampNumber(Number(process.env.AR_PLUGIN_APP_SCREENSHOT_DELAY_MS) || 3_000, 250, 30_000);
   setTimeout(() => {
     if (window.isDestroyed() || window.webContents.isDestroyed()) {
       return;
@@ -556,20 +556,20 @@ function schedulePluginAppScreenshot(window: BrowserWindow, prefix: string): voi
 }
 
 function schedulePluginAppScript(window: BrowserWindow, prefix: string): void {
-  const scriptPath = process.env.CCR_PLUGIN_APP_SCRIPT_PATH;
+  const scriptPath = process.env.AR_PLUGIN_APP_SCRIPT_PATH;
   if (!scriptPath || process.env.NODE_ENV !== "development") {
     return;
   }
-  const targetId = process.env.CCR_PLUGIN_APP_SCRIPT_ID;
+  const targetId = process.env.AR_PLUGIN_APP_SCRIPT_ID;
   if (targetId && !prefix.includes(targetId)) {
     return;
   }
-  if (process.env.CCR_PLUGIN_APP_SCRIPT_ON_EACH_LOAD !== "1" && pluginAppScriptRuns.has(window.webContents)) {
+  if (process.env.AR_PLUGIN_APP_SCRIPT_ON_EACH_LOAD !== "1" && pluginAppScriptRuns.has(window.webContents)) {
     return;
   }
   pluginAppScriptRuns.add(window.webContents);
 
-  const delayMs = clampNumber(Number(process.env.CCR_PLUGIN_APP_SCRIPT_DELAY_MS) || 1_000, 250, 30_000);
+  const delayMs = clampNumber(Number(process.env.AR_PLUGIN_APP_SCRIPT_DELAY_MS) || 1_000, 250, 30_000);
   setTimeout(() => {
     if (window.isDestroyed() || window.webContents.isDestroyed()) {
       return;

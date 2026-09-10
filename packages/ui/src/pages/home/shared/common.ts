@@ -133,9 +133,9 @@ export function normalizeThemePreference(value: unknown): AppConfig["theme"] {
 }
 
 export function normalizeTrayIconPreference(value: unknown): AppConfig["trayIcon"] {
-  return value === "random" || value === "violet" || value === "orange" || value === "cyan" || value === "progress"
+  return value === "layered" || value === "random" || value === "violet" || value === "orange" || value === "cyan" || value === "progress"
     ? value
-    : "random";
+    : "layered";
 }
 
 export function normalizeTrayBalanceProgressConfig(value: unknown): TrayBalanceProgressConfig | undefined {

@@ -843,7 +843,7 @@ function shouldUseClaudeCodeToolHubName(current: string | undefined, candidate: 
 
 function claudeCodeToolHubNameScore(name: string): number {
   const normalized = name.toLowerCase();
-  if (normalized.startsWith("mcp__ccr-toolhub__") || normalized.startsWith("mcp__ccr_toolhub__")) {
+  if (normalized.startsWith("mcp__ar-toolhub__") || normalized.startsWith("mcp__ccr_toolhub__")) {
     return 3;
   }
   if (normalized.startsWith("mcp__") && normalized.includes("toolhub")) {

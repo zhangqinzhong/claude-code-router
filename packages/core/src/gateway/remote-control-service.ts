@@ -155,7 +155,7 @@ class CcrRemoteControlService {
     this.appendEvent(session, {
       direction: "system",
       payload: { title },
-      source: "ccr-gateway",
+      source: "ar-gateway",
       type: "session.created"
     });
 
@@ -193,7 +193,7 @@ class CcrRemoteControlService {
       this.appendEvent(session, {
         direction: "system",
         payload: { metadata: metadata ?? {}, title: title ?? session.title },
-        source: "ccr-gateway",
+        source: "ar-gateway",
         type: "session.updated"
       });
       context.sendJson(context.response, 200, { session: this.sessionSnapshot(session, context.endpoint) });
@@ -206,7 +206,7 @@ class CcrRemoteControlService {
       this.appendEvent(session, {
         direction: "system",
         payload: { archivedAt: session.archivedAt },
-        source: "ccr-gateway",
+        source: "ar-gateway",
         type: "session.archived"
       });
       context.sendJson(context.response, 200, { archived: true, session: this.sessionSummary(session, context.endpoint) });
@@ -334,7 +334,7 @@ class CcrRemoteControlService {
     const event = this.appendEvent(session, {
       direction: "system",
       payload: { clientId, presence },
-      source: "ccr-gateway",
+      source: "ar-gateway",
       type: "presence.updated"
     });
     context.sendJson(context.response, 202, { event, presence: session.presence });

@@ -5,8 +5,8 @@ import {
   takeJsonObject
 } from "@ccr/core/gateway/http/body.ts";
 
-const iterations = positiveInteger(process.env.CCR_REQUEST_BODY_BENCHMARK_ITERATIONS, 200);
-const parsePasses = positiveInteger(process.env.CCR_REQUEST_BODY_BENCHMARK_PARSE_PASSES, 7);
+const iterations = positiveInteger(process.env.AR_REQUEST_BODY_BENCHMARK_ITERATIONS, 200);
+const parsePasses = positiveInteger(process.env.AR_REQUEST_BODY_BENCHMARK_PARSE_PASSES, 7);
 const payload = JSON.stringify(createPayload(400 * 1024));
 
 for (let index = 0; index < 10; index += 1) {

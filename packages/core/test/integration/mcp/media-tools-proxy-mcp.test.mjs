@@ -33,14 +33,14 @@ test("media tools stdio proxy exposes its compiled catalog and forwards calls wi
   const child = spawn(process.execPath, [runtime], {
     env: {
       ...process.env,
-      CCR_MEDIA_MCP_API_KEY: "ccr-profile-test",
-      CCR_MEDIA_MCP_REQUEST_TIMEOUT_MS: "5000",
-      CCR_MEDIA_MCP_TOOLS_JSON: JSON.stringify([{
+      AR_MEDIA_MCP_API_KEY: "ccr-profile-test",
+      AR_MEDIA_MCP_REQUEST_TIMEOUT_MS: "5000",
+      AR_MEDIA_MCP_TOOLS_JSON: JSON.stringify([{
         description: "Generate an image.",
         inputSchema: { properties: { prompt: { type: "string" } }, required: ["prompt"], type: "object" },
         name: "image_generate_glm_5_2v"
       }]),
-      CCR_MEDIA_MCP_URL: `http://127.0.0.1:${address.port}/mcp`,
+      AR_MEDIA_MCP_URL: `http://127.0.0.1:${address.port}/mcp`,
       ELECTRON_RUN_AS_NODE: "1"
     },
     stdio: ["pipe", "pipe", "pipe"]

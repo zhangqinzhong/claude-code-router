@@ -47,8 +47,8 @@ test("Pi profile config writes a CCR OpenAI Responses provider", () => {
     assert.equal(provider.apiKey, "ccr-profile-token");
     assert.equal(provider.authHeader, true);
     assert.deepEqual(provider.headers, {
-      "x-ccr-client": "pi",
-      "x-ccr-profile": "pi-main"
+      "x-ar-client": "pi",
+      "x-ar-profile": "pi-main"
     });
     assert.ok(provider.models.some((model) => model.id === "Example/alpha"));
     assert.ok(provider.models.some((model) => model.id === "Example/beta"));

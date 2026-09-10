@@ -8,15 +8,15 @@ type JsonRpcResponse =
 type McpTool = { description: string; inputSchema: Record<string, unknown>; name: string };
 
 const protocolVersion = "2024-11-05";
-const targetUrl = env("CCR_MEDIA_MCP_URL");
-const targetApiKey = env("CCR_MEDIA_MCP_API_KEY");
-const requestTimeoutMs = clampInteger(Number(env("CCR_MEDIA_MCP_REQUEST_TIMEOUT_MS")), 1_000, 3_600_000, 630_000);
+const targetUrl = env("AR_MEDIA_MCP_URL");
+const targetApiKey = env("AR_MEDIA_MCP_API_KEY");
+const requestTimeoutMs = clampInteger(Number(env("AR_MEDIA_MCP_REQUEST_TIMEOUT_MS")), 1_000, 3_600_000, 630_000);
 const tools = readTools();
 
 let inputBuffer = Buffer.alloc(0);
 
 if (!targetUrl) {
-  process.stderr.write("CCR_MEDIA_MCP_URL is required.\n");
+  process.stderr.write("AR_MEDIA_MCP_URL is required.\n");
   process.exit(1);
 }
 
@@ -118,7 +118,7 @@ async function forwardToolCall(request: JsonRpcRequest, id: JsonRpcId): Promise<
 }
 
 function readTools(): McpTool[] {
-  const raw = env("CCR_MEDIA_MCP_TOOLS_JSON");
+  const raw = env("AR_MEDIA_MCP_TOOLS_JSON");
   if (!raw) return [];
   let parsed: unknown;
   try {

@@ -7,7 +7,7 @@ lead: Collapse many MCP servers into one compact entry point so agents lazy-load
 
 ## When to use it
 
-As your MCP setup grows, exposing every tool directly to an agent makes the eager tool list large and easier to misuse. ToolHub exposes one `ccr-toolhub` MCP server with two meta tools:
+As your MCP setup grows, exposing every tool directly to an agent makes the eager tool list large and easier to misuse. ToolHub exposes one `ar-toolhub` MCP server with two meta tools:
 
 - `tool_hub.resolve`: searches the available MCP tool catalog for the current task.
 - `tool_hub.invoke`: calls a real MCP tool that was selected for this task.
@@ -19,10 +19,10 @@ Use ToolHub for tools that are useful occasionally but do not need to stay loade
 1. Enable ToolHub in **Settings → ToolHub**.
 2. Select a configured model as the **Resolver model**. It reads the MCP tool catalog and chooses the tools needed for the task. Prefer `deepseek-v4-flash`, or another stable lightweight model in a similar flash-price tier.
 3. Add or import backend MCP servers. ToolHub supports `stdio`, `streamable-http`, and `sse`.
-4. Open Claude Code or Codex from CCR. CCR writes the `ccr-toolhub` MCP server into that agent config.
+4. Open Claude Code or Codex from CCR. CCR writes the `ar-toolhub` MCP server into that agent config.
 5. When the agent receives a request about external services, installed MCP capabilities, or business APIs, it calls `tool_hub.resolve` first, then uses `tool_hub.invoke` to run the selected tools.
 
-ToolHub combines MCP servers configured on the ToolHub page with compatible global Agent MCP servers from older configs, and excludes `ccr-toolhub` itself to avoid recursive calls.
+ToolHub combines MCP servers configured on the ToolHub page with compatible global Agent MCP servers from older configs, and excludes `ar-toolhub` itself to avoid recursive calls.
 
 ## Built-in browser automation
 
@@ -73,7 +73,7 @@ The extension reads only the domains listed in the CCR import job. It does not e
 
 | Option | Description |
 | --- | --- |
-| Enable ToolHub | Exposes `ccr-toolhub` to agents. If no backend MCP server is available, CCR does not generate a ToolHub MCP config. |
+| Enable ToolHub | Exposes `ar-toolhub` to agents. If no backend MCP server is available, CCR does not generate a ToolHub MCP config. |
 | Built-in browser automation | Shown only after ToolHub is enabled. Lets agents use CCR Desktop's built-in browser for web tasks. |
 | Resolver model | Choose from configured provider models. Prefer `deepseek-v4-flash`, or another stable lightweight model in a similar flash-price tier with enough tool-description understanding. |
 | Max tools | Maximum tools returned by one resolve call. Range `1` to `20`, default `10`. |
@@ -152,7 +152,7 @@ The import dialog also accepts common MCP JSON:
 
 | Capability | ToolHub | Fusion Custom MCP Tool |
 | --- | --- | --- |
-| Entry point | Agent-side `ccr-toolhub` MCP server | Capability inside one Fusion model |
+| Entry point | Agent-side `ar-toolhub` MCP server | Capability inside one Fusion model |
 | Tool selection | Dynamically resolves a tool bundle for each task | Fixed tools selected in the model config |
 | Best for | Many MCP servers, changing tool catalogs, agent-led capability discovery | Adding a known tool set to one model |
 | Visibility | Claude Code or Codex configs opened through CCR | Routes or agents that select that Fusion model |

@@ -41,7 +41,7 @@ function testConfig(overrides = {}) {
 
 function compactHeaders(sessionId, extra = {}) {
   return {
-    "x-ccr-context-compact": "handoff",
+    "x-ar-context-compact": "handoff",
     "x-session-id": sessionId,
     ...extra
   };

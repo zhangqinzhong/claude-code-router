@@ -11,7 +11,7 @@ CCR is available as a desktop app, a Node.js 22+ npm CLI, and a single-entrypoin
 
 | Distribution | Start entry | Default management | Default model gateway |
 | --- | --- | --- | --- |
-| Desktop | App UI / `ccr-app` | In-app window | `http://127.0.0.1:3456` |
+| Desktop | App UI / `agentrouter` | In-app window | `http://127.0.0.1:3456` |
 | npm CLI | `ccr ui` / `ccr serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | `docker compose up -d --build` | Shared `http://127.0.0.1:3458` | Shared Nginx endpoint |
 
@@ -77,7 +77,7 @@ In **Agent Config**, choose Codex and confirm Provider ID, Provider Name, model,
 
 ### Grok CLI
 
-Choose Grok CLI and select a default model, then run the copied `ccr-app <profile-name>` command. The command starts a shared temporary gateway service when CCR Desktop is not already serving one; concurrent Grok sessions keep it alive until the last session exits. CCR points Grok model discovery and inference at the local gateway; use `/model` inside Grok to switch CCR models.
+Choose Grok CLI and select a default model, then run the copied `agentrouter <profile-name>` command. The command starts a shared temporary gateway service when CCR Desktop is not already serving one; concurrent Grok sessions keep it alive until the last session exits. CCR points Grok model discovery and inference at the local gateway; use `/model` inside Grok to switch CCR models.
 
 ### ZCode
 

@@ -8,12 +8,12 @@ import { copyMissingDirectoryContents, sameFilesystemPath } from "@ccr/core/stor
 installSocketTypeOfServiceCompat();
 markDesktopAppRuntime();
 
-const appDataPath = readConfiguredRuntimePath("CCR_INTERNAL_APP_DATA_DIR") ?? app.getPath("appData");
-const homePath = readConfiguredRuntimePath("CCR_INTERNAL_HOME_DIR") ?? app.getPath("home");
+const appDataPath = readConfiguredRuntimePath("AR_INTERNAL_APP_DATA_DIR") ?? app.getPath("appData");
+const homePath = readConfiguredRuntimePath("AR_INTERNAL_HOME_DIR") ?? app.getPath("home");
 setRuntimeAppPaths({
   appData: appDataPath,
   home: homePath,
-  userData: readConfiguredRuntimePath("CCR_INTERNAL_USER_DATA_DIR")
+  userData: readConfiguredRuntimePath("AR_INTERNAL_USER_DATA_DIR")
 });
 const userDataPath = configureRuntimeUserDataPath(app.getPath("userData"));
 setRuntimeAppPaths({
@@ -46,7 +46,7 @@ function reportFatalStartupError(error: unknown): void {
   console.error(detail);
 
   try {
-    dialog.showErrorBox("Claude Code Router failed to start", startupErrorMessage(detail));
+    dialog.showErrorBox("AgentRouter failed to start", startupErrorMessage(detail));
   } catch {
     // If the platform dialog is unavailable, the console output above still
     // preserves the actionable failure for command-line launches.

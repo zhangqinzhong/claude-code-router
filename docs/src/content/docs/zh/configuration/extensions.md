@@ -257,13 +257,13 @@ curl http://127.0.0.1:3456/plugins/hello
 如果路由使用默认的 `auth: "gateway"`，并且 CCR 已配置 API Key：
 
 ```bash
-curl -H "Authorization: Bearer <CCR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "Authorization: Bearer <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 ```
 
 也可以使用：
 
 ```bash
-curl -H "x-api-key: <CCR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 ```
 
 ### 4. 验证 HTTP 后端和代理规则

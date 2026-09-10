@@ -12,8 +12,8 @@ test("provider boundary removes CCR-owned headers and preserves provider headers
     "X-Auth-API-Key-ID": "profile:claude",
     "x-auth-sub": "profile:claude",
     "x-auth-token": "provider-specific-token",
-    "x-ccr-core-auth": "core-secret",
-    "X-CCR-Route-Reason": "rule:claude",
+    "x-ar-core-auth": "core-secret",
+    "X-AR-Route-Reason": "rule:claude",
     "x-client-request-id": "request-1"
   }), {
     authorization: "Bearer provider-token",
@@ -28,7 +28,7 @@ test("gateway sanitizer hook runs on the final upstream request shape", async ()
     body: { model: "provider-model" },
     headers: {
       "content-type": "application/json",
-      "x-ccr-provider-credential-id": "credential-id",
+      "x-ar-provider-credential-id": "credential-id",
       "x-auth-api-key-id": "profile:codex"
     },
     method: "POST",
@@ -42,7 +42,7 @@ test("gateway sanitizer hook runs on the final upstream request shape", async ()
     ...upstreamRequest,
     headers: { "content-type": "application/json" }
   });
-  assert.equal(upstreamRequest.headers["x-ccr-provider-credential-id"], "credential-id");
+  assert.equal(upstreamRequest.headers["x-ar-provider-credential-id"], "credential-id");
 });
 
 test("gateway sanitizer hook forwards client headers without overriding provider headers", async () => {
@@ -70,7 +70,7 @@ test("gateway sanitizer hook forwards client headers without overriding provider
         "user-agent": "Codex Desktop",
         "x-auth-api-key-id": "profile:codex",
         "x-auth-provider-extension": "provider-extension",
-        "x-ccr-core-auth": "core-secret",
+        "x-ar-core-auth": "core-secret",
         "x-custom-provider-header": "custom-value",
         "x-custom-list": ["one", "two"],
         "x-hop-only": "remove-me",

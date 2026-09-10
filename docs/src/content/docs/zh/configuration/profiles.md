@@ -27,7 +27,7 @@ lead: 为 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 和 WorkB
 | 选项 | 适用范围 | 说明 |
 | --- | --- | --- |
 | Agent | 全部 | 选择 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 或 WorkBuddy。Grok CLI 和 Kimi CLI 只支持 CLI，ZCode 和 WorkBuddy 只支持 App。 |
-| 配置名称 | 全部 | 用于在 CCR 中识别配置。桌面端命令使用 `ccr-app <配置名称>`，CLI 命令使用 `ccr <配置名称>`。名称可以有空格，复制命令时 CCR 会自动加引号。 |
+| 配置名称 | 全部 | 用于在 CCR 中识别配置。桌面端命令使用 `agentrouter <配置名称>`，CLI 命令使用 `ccr <配置名称>`。名称可以有空格，复制命令时 CCR 会自动加引号。 |
 | 启用开关 | 全部 | 关闭后该配置不会出现在打开入口中，也不会被应用为有效启动配置。 |
 | 作用范围 | 全部 | **仅从 CCR 打开时生效** 只影响从 CCR 打开的 Agent；**系统默认** 也会影响你直接打开的 Agent。同一个 Agent 同时只能有一个启用的系统默认配置。 |
 | 入口模式 | Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI | `CLI & APP` 同时显示 CLI 和 App 打开入口；`CLI only` 只生成 CLI 命令；`App only` 只显示 App 打开入口。Grok CLI 和 Kimi CLI 固定为 `CLI only`；ZCode 和 WorkBuddy 固定为 `App only`。 |
@@ -84,11 +84,11 @@ Claude App 和 Claude Code CLI 的模型列表适配方式不同：
 | 环境变量 | 可选高级设置；普通使用保持为空。 |
 | Bot | 只在 ChatGPT App 入口生效。 |
 
-保存后，Codex CLI 在桌面端可用配置卡片里的终端图标复制命令，例如 `ccr-app "Codex - Work"`；CLI请执行：`ccr "Codex - Work"`。ChatGPT 使用播放图标打开。
+保存后，Codex CLI 在桌面端可用配置卡片里的终端图标复制命令，例如 `agentrouter "Codex - Work"`；CLI请执行：`ccr "Codex - Work"`。ChatGPT 使用播放图标打开。
 
 ### Grok CLI
 
-Grok CLI 配置固定为 **仅从 CCR 打开时生效** 和 **CLI only**。保存后运行配置命令：桌面端是 `ccr-app "Grok - Work"`，CLI 是 `ccr "Grok - Work"`。进入 Grok CLI 后可以使用 `/model` 切换 CCR 返回的普通供应商模型或 Fusion 模型。
+Grok CLI 配置固定为 **仅从 CCR 打开时生效** 和 **CLI only**。保存后运行配置命令：桌面端是 `agentrouter "Grok - Work"`，CLI 是 `ccr "Grok - Work"`。进入 Grok CLI 后可以使用 `/model` 切换 CCR 返回的普通供应商模型或 Fusion 模型。
 
 ### Kimi CLI
 
@@ -126,7 +126,7 @@ WorkBuddy 只支持 App 打开，因此入口模式固定为 `App only`。
 
 | 模式 | 如何打开 | 适合场景 | 主要差异 |
 | --- | --- | --- | --- |
-| CLI | 桌面端：点击终端图标并运行 `ccr-app <配置名称>`；CLI：运行 `ccr <配置名称>` | 在项目目录中运行 Agent、需要 shell 工作流、需要把命令放进脚本 | 在终端打开当前配置；当前不转发 Bot 消息。 |
+| CLI | 桌面端：点击终端图标并运行 `agentrouter <配置名称>`；CLI：运行 `ccr <配置名称>` | 在项目目录中运行 Agent、需要 shell 工作流、需要把命令放进脚本 | 在终端打开当前配置；当前不转发 Bot 消息。 |
 | App | 点击播放图标从 CCR 桌面 App 启动 | 需要桌面窗口、Bot 消息转发或接力 | 同一配置重复打开会激活已有窗口。是否支持多开取决于 Agent；OpenCode Desktop 是单实例应用，切换 OpenCode 配置时 CCR 会先停止其管理的旧实例。 |
 | CLI & APP | 同一个配置同时提供 CLI 和 App 入口 | 同一套模型配置既用于终端，也用于桌面 App | 两个入口共用配置名称、模型、作用范围和环境变量，但启动方式不同。 |
 

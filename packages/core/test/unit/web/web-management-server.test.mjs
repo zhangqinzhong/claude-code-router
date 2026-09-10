@@ -7,19 +7,19 @@ import path from "node:path";
 import test, { after } from "node:test";
 
 const previousRuntimeEnv = {
-  appData: process.env.CCR_INTERNAL_APP_DATA_DIR,
-  home: process.env.CCR_INTERNAL_HOME_DIR,
-  userData: process.env.CCR_INTERNAL_USER_DATA_DIR
+  appData: process.env.AR_INTERNAL_APP_DATA_DIR,
+  home: process.env.AR_INTERNAL_HOME_DIR,
+  userData: process.env.AR_INTERNAL_USER_DATA_DIR
 };
 const runtimeRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-web-management-test-"));
-process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(runtimeRoot, "app-data");
-process.env.CCR_INTERNAL_HOME_DIR = path.join(runtimeRoot, "home");
-process.env.CCR_INTERNAL_USER_DATA_DIR = path.join(runtimeRoot, "user-data");
+process.env.AR_INTERNAL_APP_DATA_DIR = path.join(runtimeRoot, "app-data");
+process.env.AR_INTERNAL_HOME_DIR = path.join(runtimeRoot, "home");
+process.env.AR_INTERNAL_USER_DATA_DIR = path.join(runtimeRoot, "user-data");
 
 after(() => {
-  setOptionalEnv("CCR_INTERNAL_APP_DATA_DIR", previousRuntimeEnv.appData);
-  setOptionalEnv("CCR_INTERNAL_HOME_DIR", previousRuntimeEnv.home);
-  setOptionalEnv("CCR_INTERNAL_USER_DATA_DIR", previousRuntimeEnv.userData);
+  setOptionalEnv("AR_INTERNAL_APP_DATA_DIR", previousRuntimeEnv.appData);
+  setOptionalEnv("AR_INTERNAL_HOME_DIR", previousRuntimeEnv.home);
+  setOptionalEnv("AR_INTERNAL_USER_DATA_DIR", previousRuntimeEnv.userData);
   rmSync(runtimeRoot, { force: true, recursive: true });
 });
 
@@ -52,7 +52,7 @@ test("web RPC ignores Origin and Referer when the auth token is valid", async ()
         "content-type": "application/json",
         "origin": "http://127.0.0.1:8000",
         "referer": "http://127.0.0.1:8000/",
-        "x-ccr-web-auth": authToken
+        "x-ar-web-auth": authToken
       },
       method: "POST"
     });
@@ -60,7 +60,7 @@ test("web RPC ignores Origin and Referer when the auth token is valid", async ()
 
     assert.equal(response.status, 200);
     assert.equal(payload.ok, true);
-    assert.equal(payload.value.name, "Claude Code Router");
+    assert.equal(payload.value.name, "AgentRouter");
   } finally {
     await runtime.close();
   }
@@ -136,7 +136,7 @@ async function rpc(baseUrl, authToken, method, args = []) {
     body: JSON.stringify({ args, method }),
     headers: {
       "content-type": "application/json",
-      "x-ccr-web-auth": authToken
+      "x-ar-web-auth": authToken
     },
     method: "POST"
   });

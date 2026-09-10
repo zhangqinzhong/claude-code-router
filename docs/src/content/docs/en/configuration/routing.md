@@ -272,7 +272,7 @@ A string, number, or array is not a valid routing result. Unknown object fields 
 | `array-remove` | `value` | Remove array elements that match `value`. |
 | `array-replace` | `match`, `value` | Replace array elements that match `match` with `value`. |
 
-Rewrite `value` and `match` properties must be JSON values. Unsafe path segments such as `__proto__`, `constructor`, and `prototype` are rejected. Scripts cannot rewrite authentication, cookie, host, content-length, connection-control, `x-auth-*`, `x-ccr-*`, and other protected headers.
+Rewrite `value` and `match` properties must be JSON values. Unsafe path segments such as `__proto__`, `constructor`, and `prototype` are rejected. Scripts cannot rewrite authentication, cookie, host, content-length, connection-control, `x-auth-*`, `x-ar-*`, and other protected headers.
 
 ##### Fallback shape
 
@@ -306,7 +306,7 @@ if (!tenant) {
 }
 
 // Local file example: { "enterprise": { "model": "Provider/primary" } }
-const policyFile = api.env("CCR_ROUTING_POLICY_FILE")
+const policyFile = api.env("AR_ROUTING_POLICY_FILE")
   ?? "~/.config/ccr/routing-policy.json";
 let policy = {};
 if (await api.fs.exists(policyFile)) {
@@ -315,13 +315,13 @@ if (await api.fs.exists(policyFile)) {
 }
 
 // If a policy service is configured, its result overrides local policy.
-const policyUrl = api.env("CCR_ROUTING_POLICY_URL");
+const policyUrl = api.env("AR_ROUTING_POLICY_URL");
 if (policyUrl) {
   const response = await api.fetch(policyUrl, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${api.env("CCR_ROUTING_POLICY_TOKEN") ?? ""}`
+      authorization: `Bearer ${api.env("AR_ROUTING_POLICY_TOKEN") ?? ""}`
     },
     body: JSON.stringify({
       tenant,
@@ -523,4 +523,4 @@ After saving, send a request and inspect Logs:
 - `resolved model`: the final model.
 - status code and error details.
 
-When Fallback runs, response headers include `x-ccr-fallback-attempts`, `x-ccr-fallback-failures`, `x-ccr-fallback-delays-ms` for delayed attempts, and the final `x-ccr-fallback-model`. Request log details also show the related retry attempt list.
+When Fallback runs, response headers include `x-ar-fallback-attempts`, `x-ar-fallback-failures`, `x-ar-fallback-delays-ms` for delayed attempts, and the final `x-ar-fallback-model`. Request log details also show the related retry attempt list.

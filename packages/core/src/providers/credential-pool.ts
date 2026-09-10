@@ -47,7 +47,7 @@ export function recordProviderCredentialOutcome(
   const provider = findProviderByPublicOrInternalName(config, attempt.logicalProvider);
   if (!provider) return;
 
-  const responseCredentialId = responseHeaders.get("x-ccr-provider-credential-id")?.trim();
+  const responseCredentialId = responseHeaders.get("x-ar-provider-credential-id")?.trim();
   const responseCredential = responseCredentialId
     ? findProviderCredentialByRuntimeId(provider, responseCredentialId)
     : undefined;

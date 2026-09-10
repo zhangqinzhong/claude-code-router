@@ -25,18 +25,18 @@ const mp4 = Buffer.concat([
 ]);
 
 test("Codex inline media bridge is enabled only for configured Fusion media and honors the kill switch", () => {
-  const previous = process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW;
+  const previous = process.env.AR_CODEX_INLINE_VIDEO_PREVIEW;
   try {
-    delete process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW;
+    delete process.env.AR_CODEX_INLINE_VIDEO_PREVIEW;
     assert.equal(shouldEnableCodexMediaPreviewBridge(true), true);
     assert.equal(shouldEnableCodexMediaPreviewBridge(false), false);
-    process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW = "off";
+    process.env.AR_CODEX_INLINE_VIDEO_PREVIEW = "off";
     assert.equal(shouldEnableCodexMediaPreviewBridge(true), false);
-    process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW = "1";
+    process.env.AR_CODEX_INLINE_VIDEO_PREVIEW = "1";
     assert.equal(shouldEnableCodexMediaPreviewBridge(true), true);
   } finally {
-    if (previous === undefined) delete process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW;
-    else process.env.CCR_CODEX_INLINE_VIDEO_PREVIEW = previous;
+    if (previous === undefined) delete process.env.AR_CODEX_INLINE_VIDEO_PREVIEW;
+    else process.env.AR_CODEX_INLINE_VIDEO_PREVIEW = previous;
   }
 });
 

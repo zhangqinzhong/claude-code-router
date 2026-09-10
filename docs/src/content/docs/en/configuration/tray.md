@@ -9,12 +9,15 @@ lead: Configure the CCR system tray icon, balance progress, and tray window widg
 
 | Field | Capability |
 | --- | --- |
-| Tray mascot | Selects the tray icon style. Options include `Random`, `Auralis`, `Solara`, `Vesper`, and `Balance progress`. |
+| Tray icon | Defaults to `Layered knot`. Other options include `Random`, `Auralis`, `Solara`, `Vesper`, and `Balance progress`. Previously saved icon choices are preserved. |
+| Show Token usage in the menu bar | Available on macOS and off by default. When off, only the icon is shown; usage remains in the tooltip and context menu. When on, today's Token usage appears beside the icon. |
 | Balance progress | Uses provider account usage as tray icon progress. Requires `Fetch usage` on a provider first. |
 | Account | Selects the provider account used for balance progress. |
 | Data | Selects the balance, subscription, or quota meter used as the progress source. |
 
 If no account data is available, the page shows `No account data is available. Enable account monitoring on a provider first.` This usually means no provider has `Fetch usage` enabled, or usage fetching has not succeeded yet.
+
+Icon and usage-display preferences save automatically and update the menu bar after saving, without restarting. Menu bar usage is independent of the tray window's `Header component`.
 
 ## Tray window layout
 

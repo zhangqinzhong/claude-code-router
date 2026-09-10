@@ -661,7 +661,7 @@ function kimiStorageRoot(): string {
   if (explicit) {
     return resolveUserPath(explicit);
   }
-  const internalHome = process.env.CCR_INTERNAL_HOME_DIR?.trim();
+  const internalHome = process.env.AR_INTERNAL_HOME_DIR?.trim();
   return internalHome ? path.join(internalHome, ".kimi-code") : path.join(os.homedir(), ".kimi-code");
 }
 
@@ -684,7 +684,7 @@ function kimiCliVersion(): string {
 }
 
 function kimiCliCandidates(): string[] {
-  const explicit = process.env.CCR_KIMI_BIN?.trim() || process.env.KIMI_BIN?.trim();
+  const explicit = process.env.AR_KIMI_BIN?.trim() || process.env.KIMI_BIN?.trim();
   return uniqueStrings([
     explicit,
     path.join(kimiStorageRoot(), "bin", process.platform === "win32" ? "kimi.exe" : "kimi"),

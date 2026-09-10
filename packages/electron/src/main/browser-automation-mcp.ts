@@ -670,7 +670,7 @@ class BrowserAutomationMcpService implements BrowserAutomationMcpIntegration {
     if (request.method === "GET" && (path === BROWSER_AUTOMATION_MCP_PATH || path === `${BROWSER_AUTOMATION_MCP_PATH}/`)) {
       sendJson(response, 200, {
         endpoint: BROWSER_AUTOMATION_MCP_PATH,
-        name: "ccr-browser-automation",
+        name: "ar-browser-automation",
         protocol: "mcp",
         transport: "streamable-http"
       });
@@ -735,7 +735,7 @@ class BrowserAutomationMcpService implements BrowserAutomationMcpIntegration {
             },
             protocolVersion,
             serverInfo: {
-              name: "ccr-browser-automation",
+              name: "ar-browser-automation",
               title: "CCR Browser Automation",
               version: "1.0.0"
             }

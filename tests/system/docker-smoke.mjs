@@ -7,8 +7,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..", "..");
-const imageName = process.env.CCR_DOCKER_TEST_IMAGE || "claude-code-router:local";
-const token = process.env.CCR_DOCKER_TEST_WEB_AUTH_TOKEN || "token+/&=#?";
+const imageName = process.env.AR_DOCKER_TEST_IMAGE || "claude-code-router:local";
+const token = process.env.AR_DOCKER_TEST_WEB_AUTH_TOKEN || "token+/&=#?";
 const testId = randomUUID().slice(0, 8);
 const containerName = `ccr-docker-smoke-${testId}`;
 const volumeName = `ccr-docker-smoke-${testId}`;
@@ -18,7 +18,7 @@ let containerStarted = false;
 let volumeCreated = false;
 
 try {
-  if (process.env.CCR_DOCKER_TEST_SKIP_BUILD !== "1") {
+  if (process.env.AR_DOCKER_TEST_SKIP_BUILD !== "1") {
     run("docker", ["build", "-t", imageName, "."], { cwd: projectRoot });
   }
 
@@ -35,11 +35,11 @@ try {
     "-p",
     `${hostPort}:8080`,
     "-e",
-    `CCR_WEB_AUTH_TOKEN=${token}`,
+    `AR_WEB_AUTH_TOKEN=${token}`,
     "-e",
-    "CCR_PUBLIC_HOST=127.0.0.1",
+    "AR_PUBLIC_HOST=127.0.0.1",
     "-e",
-    `CCR_PUBLIC_PORT=${hostPort}`,
+    `AR_PUBLIC_PORT=${hostPort}`,
     "-v",
     `${volumeName}:/data`,
     imageName
@@ -203,7 +203,7 @@ async function rpc(baseUrl, method, authToken, args = []) {
     body: JSON.stringify({ args, method }),
     headers: {
       "content-type": "application/json",
-      ...(authToken ? { "x-ccr-web-auth": authToken } : {})
+      ...(authToken ? { "x-ar-web-auth": authToken } : {})
     },
     method: "POST"
   });

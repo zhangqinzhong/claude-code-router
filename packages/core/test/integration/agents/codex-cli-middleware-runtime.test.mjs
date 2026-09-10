@@ -9,7 +9,7 @@ import { codexCliMiddlewareRuntimeScript } from "@ccr/core/agents/codex/cli-midd
 
 test("generated Codex CLI middleware runtime is valid JavaScript", () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-check-"));
-  const file = path.join(dir, "ccr-codex-cli-middleware.js");
+  const file = path.join(dir, "ar-codex-cli-middleware.js");
   writeFileSync(file, codexCliMiddlewareRuntimeScript());
   execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });
 });
@@ -64,8 +64,8 @@ test("Codex app-server uses ChatGPT's bundled Node as a signed supervisor", { sk
   ].join("\n"));
   writeFileSync(bundledNode, [
     "#!/bin/sh",
-    "printf '%s\\n' \"$@\" > \"$CCR_FAKE_SUPERVISOR_ARGS\"",
-    "exec \"$CCR_TEST_NODE\" \"$@\"",
+    "printf '%s\\n' \"$@\" > \"$AR_FAKE_SUPERVISOR_ARGS\"",
+    "exec \"$AR_TEST_NODE\" \"$@\"",
     ""
   ].join("\n"));
   chmodSync(fakeCodex, 0o700);
@@ -75,11 +75,11 @@ test("Codex app-server uses ChatGPT's bundled Node as a signed supervisor", { sk
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_FAKE_SUPERVISOR_ARGS: observedFile,
-      CCR_PROFILE_SCOPE: "global",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
-      CCR_TEST_NODE: process.execPath
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_FAKE_SUPERVISOR_ARGS: observedFile,
+      AR_PROFILE_SCOPE: "global",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_TEST_NODE: process.execPath
     },
     input: JSON.stringify({ id: 1, method: "probe/supervisor", params: {} }) + "\n"
   });
@@ -103,11 +103,11 @@ test("Codex runtime ignores middleware recursion and uses the bundled real CLI f
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_BUNDLED_CODEX_CLI_PATH: fakeCodex,
-      CCR_CODEX_PROFILE: "claude-code-router",
-      CCR_REAL_CODEX_CLI_PATH: "",
+      AR_BUNDLED_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_PROFILE: "claude-code-router",
+      AR_REAL_CODEX_CLI_PATH: "",
       CODEXL_REAL_CODEX_CLI_PATH: "",
-      CODEX_CLI_PATH: path.join(dir, "ccr-codex-cli-stdio-profile")
+      CODEX_CLI_PATH: path.join(dir, "ar-codex-cli-stdio-profile")
     }
   });
 
@@ -132,9 +132,9 @@ test("Codex CLI middleware launches Windows cmd shims", { skip: process.platform
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_MODEL_PROVIDER: "claude-code-router",
-      CCR_CODEX_PROFILE: "claude-code-router",
-      CCR_REAL_CODEX_CLI_PATH: fakeCli
+      AR_CODEX_MODEL_PROVIDER: "claude-code-router",
+      AR_CODEX_PROFILE: "claude-code-router",
+      AR_REAL_CODEX_CLI_PATH: fakeCli
     }
   });
 
@@ -161,10 +161,10 @@ test("Windows direct profile dispatch strips the profile command arguments", { s
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CLAUDE_CODE_WRAPPER: "1",
-      CCR_CLI_DIRECT_PROFILE_DISPATCH: "1",
-      CCR_REAL_CLAUDE_CODE_BIN: fakeCli,
-      CCR_REMOTE_SYNC_ENABLED: "0"
+      AR_CLAUDE_CODE_WRAPPER: "1",
+      AR_CLI_DIRECT_PROFILE_DISPATCH: "1",
+      AR_REAL_CLAUDE_CODE_BIN: fakeCli,
+      AR_REMOTE_SYNC_ENABLED: "0"
     }
   });
 
@@ -202,10 +202,10 @@ test("Codex app-server uses a local non-OpenAI identity without credentials", { 
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_CODEX_CHATGPT_AUTH_FILE: "",
-      CCR_PROFILE_SCOPE: "ccr",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_CODEX_CHATGPT_AUTH_FILE: "",
+      AR_PROFILE_SCOPE: "ccr",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: "",
       CODEXL_CODEX_WORKSPACE_NAME: "CCR Workspace"
@@ -224,7 +224,7 @@ test("Codex app-server uses a local non-OpenAI identity without credentials", { 
   assert.deepEqual(responses[0].result, { sawBootstrap: true });
   assert.deepEqual(responses[1].result, {
     authMethod: "amazonBedrock",
-    authToken: "ccr-local-profile",
+    authToken: "ar-local-profile",
     requiresOpenaiAuth: false
   });
   assert.deepEqual(responses[2].result, {
@@ -271,9 +271,9 @@ test("Codex app-server reads but never overwrites an existing ChatGPT auth file"
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_PROFILE_SCOPE: "ccr",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_PROFILE_SCOPE: "ccr",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome
     },
     input: [
@@ -326,10 +326,10 @@ test("Codex app-server bridges shared ChatGPT auth into an isolated profile with
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_CHATGPT_AUTH_FILE: sharedAuthFile,
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_PROFILE_SCOPE: "ccr",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_CHATGPT_AUTH_FILE: sharedAuthFile,
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_PROFILE_SCOPE: "ccr",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: ""
     },
@@ -378,9 +378,9 @@ test("Codex app-server delegates public Git marketplaces and leaves account-priv
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_PROFILE_SCOPE: "ccr",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_PROFILE_SCOPE: "ccr",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome
     },
     input: [
@@ -426,15 +426,15 @@ test("Codex app-server merges CCR Fast Mode catalog metadata without spoofing au
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CODEX_CHATGPT_AUTH_FILE: "",
-      CCR_CODEX_MODEL_CATALOG: JSON.stringify({
+      AR_CODEX_CHATGPT_AUTH_FILE: "",
+      AR_CODEX_MODEL_CATALOG: JSON.stringify({
         models: [
           { display_name: "Native Fast", slug: "native-model", supports_fast_mode: true },
           { display_name: "Plain Model", slug: "plain-model" }
         ]
       }),
-      CCR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_CODEX_REMOTE_FRONTEND_MODE: "app",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: ""
     },
@@ -459,7 +459,7 @@ test("Codex app-server merges CCR Fast Mode catalog metadata without spoofing au
   assert.deepEqual(plainModel.serviceTiers, []);
   assert.deepEqual(responses.get(2).result, {
     authMethod: "amazonBedrock",
-    authToken: "ccr-local-profile",
+    authToken: "ar-local-profile",
     requiresOpenaiAuth: false
   });
   assert.deepEqual(responses.get(3).result, {
@@ -481,11 +481,11 @@ test("Claude Code wrapper leaves the scoped profile model as an environment defa
     env: {
       ...process.env,
       ANTHROPIC_MODEL: "Fusion/kimisearch",
-      CCR_CLAUDE_CODE_MODEL: "Fusion/kimisearch",
-      CCR_CLAUDE_CODE_WRAPPER: "1",
-      CCR_FAKE_CLAUDE_OUT: outputFile,
-      CCR_REAL_CLAUDE_CODE_BIN: fakeCli,
-      CCR_REMOTE_SYNC_ENABLED: "0"
+      AR_CLAUDE_CODE_MODEL: "Fusion/kimisearch",
+      AR_CLAUDE_CODE_WRAPPER: "1",
+      AR_FAKE_CLAUDE_OUT: outputFile,
+      AR_REAL_CLAUDE_CODE_BIN: fakeCli,
+      AR_REMOTE_SYNC_ENABLED: "0"
     },
     stdio: "pipe"
   });
@@ -493,7 +493,7 @@ test("Claude Code wrapper leaves the scoped profile model as an environment defa
   const observed = JSON.parse(readFileSync(outputFile, "utf8"));
   assert.deepEqual(observed.argv, ["-p", "hi"]);
   assert.equal(observed.env.ANTHROPIC_MODEL, "Fusion/kimisearch");
-  assert.equal(observed.env.CCR_CLAUDE_CODE_MODEL, "Fusion/kimisearch");
+  assert.equal(observed.env.AR_CLAUDE_CODE_MODEL, "Fusion/kimisearch");
 });
 
 test("Claude Code wrapper preserves an explicit model argument", { skip: process.platform === "win32" }, () => {
@@ -505,11 +505,11 @@ test("Claude Code wrapper preserves an explicit model argument", { skip: process
     env: {
       ...process.env,
       ANTHROPIC_MODEL: "Fusion/kimisearch",
-      CCR_CLAUDE_CODE_MODEL: "Fusion/kimisearch",
-      CCR_CLAUDE_CODE_WRAPPER: "1",
-      CCR_FAKE_CLAUDE_OUT: outputFile,
-      CCR_REAL_CLAUDE_CODE_BIN: fakeCli,
-      CCR_REMOTE_SYNC_ENABLED: "0"
+      AR_CLAUDE_CODE_MODEL: "Fusion/kimisearch",
+      AR_CLAUDE_CODE_WRAPPER: "1",
+      AR_FAKE_CLAUDE_OUT: outputFile,
+      AR_REAL_CLAUDE_CODE_BIN: fakeCli,
+      AR_REMOTE_SYNC_ENABLED: "0"
     },
     stdio: "pipe"
   });
@@ -527,18 +527,18 @@ test("Claude Code wrapper injects the ToolHub MCP config into real CLI args", { 
   execFileSync(process.execPath, [runtimeFile, "-p", "hi"], {
     env: {
       ...process.env,
-      CCR_CLAUDE_CODE_MCP_CONFIG: mcpConfigFile,
-      CCR_CLAUDE_CODE_WRAPPER: "1",
-      CCR_FAKE_CLAUDE_OUT: outputFile,
-      CCR_REAL_CLAUDE_CODE_BIN: fakeCli,
-      CCR_REMOTE_SYNC_ENABLED: "0"
+      AR_CLAUDE_CODE_MCP_CONFIG: mcpConfigFile,
+      AR_CLAUDE_CODE_WRAPPER: "1",
+      AR_FAKE_CLAUDE_OUT: outputFile,
+      AR_REAL_CLAUDE_CODE_BIN: fakeCli,
+      AR_REMOTE_SYNC_ENABLED: "0"
     },
     stdio: "pipe"
   });
 
   const observed = JSON.parse(readFileSync(outputFile, "utf8"));
   assert.deepEqual(observed.argv, ["--mcp-config", mcpConfigFile, "-p", "hi"]);
-  assert.equal(observed.env.CCR_CLAUDE_CODE_MCP_CONFIG, mcpConfigFile);
+  assert.equal(observed.env.AR_CLAUDE_CODE_MCP_CONFIG, mcpConfigFile);
 });
 
 test("Claude Code wrapper does not duplicate an explicit MCP config argument", { skip: process.platform === "win32" }, () => {
@@ -551,11 +551,11 @@ test("Claude Code wrapper does not duplicate an explicit MCP config argument", {
   execFileSync(process.execPath, [runtimeFile, "--mcp-config", explicitMcpConfigFile, "-p", "hi"], {
     env: {
       ...process.env,
-      CCR_CLAUDE_CODE_MCP_CONFIG: envMcpConfigFile,
-      CCR_CLAUDE_CODE_WRAPPER: "1",
-      CCR_FAKE_CLAUDE_OUT: outputFile,
-      CCR_REAL_CLAUDE_CODE_BIN: fakeCli,
-      CCR_REMOTE_SYNC_ENABLED: "0"
+      AR_CLAUDE_CODE_MCP_CONFIG: envMcpConfigFile,
+      AR_CLAUDE_CODE_WRAPPER: "1",
+      AR_FAKE_CLAUDE_OUT: outputFile,
+      AR_REAL_CLAUDE_CODE_BIN: fakeCli,
+      AR_REMOTE_SYNC_ENABLED: "0"
     },
     stdio: "pipe"
   });
@@ -591,19 +591,19 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
     "const argv = process.argv.slice(2);",
-    "fs.appendFileSync(process.env.CCR_FAKE_OPENCODE_CALLS, JSON.stringify({",
+    "fs.appendFileSync(process.env.AR_FAKE_OPENCODE_CALLS, JSON.stringify({",
     "  argv,",
     "  cwd: process.cwd(),",
     "  pwd: process.env.PWD || '',",
     "  config: process.env.OPENCODE_CONFIG || '',",
     "  configContent: process.env.OPENCODE_CONFIG_CONTENT || '',",
     "  client: process.env.OPENCODE_CLIENT || '',",
-    "  workerMarker: process.env.CCR_OPENCODE_BOT_WORKER || ''",
+    "  workerMarker: process.env.AR_OPENCODE_BOT_WORKER || ''",
     "}) + '\\n');",
     "if (argv[0] === 'session') {",
     "  process.stdout.write(JSON.stringify([",
     "    { id: 'ses_existing', title: 'Existing session', directory: process.cwd(), time: { updated: Date.now() } },",
-    "    { id: 'ses_other', title: 'Other session', directory: process.env.CCR_FAKE_OTHER_PROJECT, time: { updated: Date.now() - 1 } }",
+    "    { id: 'ses_other', title: 'Other session', directory: process.env.AR_FAKE_OTHER_PROJECT, time: { updated: Date.now() - 1 } }",
     "  ]) + '\\n');",
     "} else {",
     "  const prompt = argv[argv.length - 1];",
@@ -646,7 +646,7 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
     "        event('event-2', 'second')",
     "      ] };",
     "    },",
-    "    send: async (payload) => fs.appendFileSync(process.env.CCR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
+    "    send: async (payload) => fs.appendFileSync(process.env.AR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
     "    ackEvent: async () => ({}),",
     "    close: async () => ({})",
     "  };",
@@ -658,23 +658,23 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
   const child = spawn(process.execPath, [runtimeFile, "opencode-bot-worker", "--workspace-name", "OpenCode Test"], {
     env: {
       ...process.env,
-      CCR_OPENCODE_BOT_WORKER: "1",
-      CCR_OPENCODE_BOT_CWD: dir,
-      CCR_OPENCODE_BIN: fakeOpenCode,
-      CCR_BOT_GATEWAY_ENABLED: "true",
-      CCR_BOT_GATEWAY_PLATFORM: "slack",
-      CCR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
-      CCR_BOT_GATEWAY_TENANT_ID: "ccr",
-      CCR_BOT_GATEWAY_ACK_EVENTS: "true",
-      CCR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
-      CCR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_SHELL_ENABLED: "true",
-      CCR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
-      CCR_BOT_GATEWAY_STATE_DIR: stateDir,
-      CCR_FAKE_OPENCODE_CALLS: callsFile,
-      CCR_FAKE_OTHER_PROJECT: otherProject,
-      CCR_FAKE_BOT_REPLIES: repliesFile,
+      AR_OPENCODE_BOT_WORKER: "1",
+      AR_OPENCODE_BOT_CWD: dir,
+      AR_OPENCODE_BIN: fakeOpenCode,
+      AR_BOT_GATEWAY_ENABLED: "true",
+      AR_BOT_GATEWAY_PLATFORM: "slack",
+      AR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
+      AR_BOT_GATEWAY_TENANT_ID: "ccr",
+      AR_BOT_GATEWAY_ACK_EVENTS: "true",
+      AR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
+      AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_SHELL_ENABLED: "true",
+      AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
+      AR_BOT_GATEWAY_STATE_DIR: stateDir,
+      AR_FAKE_OPENCODE_CALLS: callsFile,
+      AR_FAKE_OTHER_PROJECT: otherProject,
+      AR_FAKE_BOT_REPLIES: repliesFile,
       OPENCODE_CONFIG: configFile,
       OPENCODE_CONFIG_CONTENT: "{\"provider\":{}}"
     },
@@ -732,7 +732,7 @@ test("OpenCode bot worker streams without duplicate final text replies or implic
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
     "const argv = process.argv.slice(2);",
-    "fs.appendFileSync(process.env.CCR_FAKE_OPENCODE_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
+    "fs.appendFileSync(process.env.AR_FAKE_OPENCODE_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
     "process.stdout.write(JSON.stringify({ type: 'text', sessionID: 'ses_stream', part: { id: 'part-1', type: 'text', text: 'reply:stream me' } }) + '\\n');",
     ""
   ].join("\n"));
@@ -751,7 +751,7 @@ test("OpenCode bot worker streams without duplicate final text replies or implic
     "        conversation: { id: 'conversation-1', type: 'dm' }, message: { id: 'message-stream', text: 'stream me' }",
     "      } }] };",
     "    },",
-    "    send: async (payload) => fs.appendFileSync(process.env.CCR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
+    "    send: async (payload) => fs.appendFileSync(process.env.AR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
     "    ackEvent: async () => ({}),",
     "    close: async () => ({})",
     "  };",
@@ -763,23 +763,23 @@ test("OpenCode bot worker streams without duplicate final text replies or implic
   const child = spawn(process.execPath, [runtimeFile, "opencode-bot-worker", "--workspace-name", "OpenCode Test"], {
     env: {
       ...process.env,
-      CCR_OPENCODE_BOT_WORKER: "1",
-      CCR_OPENCODE_BOT_CWD: dir,
-      CCR_OPENCODE_BIN: fakeOpenCode,
-      CCR_BOT_GATEWAY_ENABLED: "true",
-      CCR_BOT_GATEWAY_PLATFORM: "slack",
-      CCR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
-      CCR_BOT_GATEWAY_TENANT_ID: "ccr",
-      CCR_BOT_GATEWAY_ACK_EVENTS: "true",
-      CCR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
-      CCR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_SHELL_ENABLED: "true",
-      CCR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_STREAM_REPLIES: "true",
-      CCR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
-      CCR_BOT_GATEWAY_STATE_DIR: stateDir,
-      CCR_FAKE_OPENCODE_CALLS: callsFile,
-      CCR_FAKE_BOT_REPLIES: repliesFile
+      AR_OPENCODE_BOT_WORKER: "1",
+      AR_OPENCODE_BOT_CWD: dir,
+      AR_OPENCODE_BIN: fakeOpenCode,
+      AR_BOT_GATEWAY_ENABLED: "true",
+      AR_BOT_GATEWAY_PLATFORM: "slack",
+      AR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
+      AR_BOT_GATEWAY_TENANT_ID: "ccr",
+      AR_BOT_GATEWAY_ACK_EVENTS: "true",
+      AR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
+      AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_SHELL_ENABLED: "true",
+      AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_STREAM_REPLIES: "true",
+      AR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
+      AR_BOT_GATEWAY_STATE_DIR: stateDir,
+      AR_FAKE_OPENCODE_CALLS: callsFile,
+      AR_FAKE_BOT_REPLIES: repliesFile
     },
     stdio: ["ignore", "ignore", "pipe"]
   });
@@ -818,7 +818,7 @@ test("Codex App bot worker uses native projects and sessions without enabling sh
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
     "const argv = process.argv.slice(2);",
-    "fs.appendFileSync(process.env.CCR_FAKE_CODEX_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
+    "fs.appendFileSync(process.env.AR_FAKE_CODEX_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
     "const prompt = argv[argv.length - 1];",
     "const reply = () => {",
     "  process.stdout.write(JSON.stringify({ type: 'thread.started', thread_id: 'ses_codex' }) + '\\n');",
@@ -850,7 +850,7 @@ test("Codex App bot worker uses native projects and sessions without enabling sh
     "        event('second', 'second')",
     "      ] };",
     "    },",
-    "    send: async (payload) => fs.appendFileSync(process.env.CCR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
+    "    send: async (payload) => fs.appendFileSync(process.env.AR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
     "    ackEvent: async () => ({}),",
     "    close: async () => ({})",
     "  };",
@@ -863,22 +863,22 @@ test("Codex App bot worker uses native projects and sessions without enabling sh
     env: {
       ...process.env,
       CODEX_HOME: codexHome,
-      CCR_CODEX_BOT_WORKER: "1",
-      CCR_CODEX_PROFILE: "claude-code-router",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
-      CCR_BOT_GATEWAY_CWD: dir,
-      CCR_BOT_GATEWAY_ENABLED: "true",
-      CCR_BOT_GATEWAY_PLATFORM: "slack",
-      CCR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
-      CCR_BOT_GATEWAY_TENANT_ID: "ccr",
-      CCR_BOT_GATEWAY_ACK_EVENTS: "true",
-      CCR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
-      CCR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
-      CCR_BOT_GATEWAY_STATE_DIR: stateDir,
-      CCR_FAKE_CODEX_CALLS: callsFile,
-      CCR_FAKE_BOT_REPLIES: repliesFile
+      AR_CODEX_BOT_WORKER: "1",
+      AR_CODEX_PROFILE: "claude-code-router",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_BOT_GATEWAY_CWD: dir,
+      AR_BOT_GATEWAY_ENABLED: "true",
+      AR_BOT_GATEWAY_PLATFORM: "slack",
+      AR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
+      AR_BOT_GATEWAY_TENANT_ID: "ccr",
+      AR_BOT_GATEWAY_ACK_EVENTS: "true",
+      AR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
+      AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
+      AR_BOT_GATEWAY_STATE_DIR: stateDir,
+      AR_FAKE_CODEX_CALLS: callsFile,
+      AR_FAKE_BOT_REPLIES: repliesFile
     },
     stdio: ["ignore", "ignore", "pipe"]
   });
@@ -924,7 +924,7 @@ test("Codex App bot worker passes image attachments to exec and avoids duplicate
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
     "const argv = process.argv.slice(2);",
-    "fs.appendFileSync(process.env.CCR_FAKE_CODEX_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
+    "fs.appendFileSync(process.env.AR_FAKE_CODEX_CALLS, JSON.stringify({ argv, cwd: process.cwd() }) + '\\n');",
     "process.stdout.write(JSON.stringify({ type: 'thread.started', thread_id: 'ses_image' }) + '\\n');",
     "process.stdout.write(JSON.stringify({ type: 'item.completed', item: { id: 'answer-image', type: 'agent_message', text: 'reply:describe image' } }) + '\\n');",
     ""
@@ -946,7 +946,7 @@ test("Codex App bot worker passes image attachments to exec and avoids duplicate
     "        message: { id: 'message-image', text: 'describe image', attachments: [{ id: 'att-1', type: 'image', url: 'https://attachments.local/screenshot.png', name: 'screenshot.png', mimeType: 'image/png', sizeBytes: 3 }] }",
     "      } }] };",
     "    },",
-    "    send: async (payload) => fs.appendFileSync(process.env.CCR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
+    "    send: async (payload) => fs.appendFileSync(process.env.AR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
     "    ackEvent: async () => ({}),",
     "    close: async () => ({})",
     "  };",
@@ -959,24 +959,24 @@ test("Codex App bot worker passes image attachments to exec and avoids duplicate
     env: {
       ...process.env,
       CODEX_HOME: codexHome,
-      CCR_CODEX_BOT_WORKER: "1",
-      CCR_CODEX_PROFILE: "claude-code-router",
-      CCR_REAL_CODEX_CLI_PATH: fakeCodex,
-      CCR_BOT_GATEWAY_CWD: dir,
-      CCR_BOT_GATEWAY_ENABLED: "true",
-      CCR_BOT_GATEWAY_MEDIA_ENABLED: "true",
-      CCR_BOT_GATEWAY_PLATFORM: "slack",
-      CCR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
-      CCR_BOT_GATEWAY_TENANT_ID: "ccr",
-      CCR_BOT_GATEWAY_ACK_EVENTS: "true",
-      CCR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
-      CCR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_STREAM_REPLIES: "true",
-      CCR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
-      CCR_BOT_GATEWAY_STATE_DIR: stateDir,
-      CCR_FAKE_CODEX_CALLS: callsFile,
-      CCR_FAKE_BOT_REPLIES: repliesFile
+      AR_CODEX_BOT_WORKER: "1",
+      AR_CODEX_PROFILE: "claude-code-router",
+      AR_REAL_CODEX_CLI_PATH: fakeCodex,
+      AR_BOT_GATEWAY_CWD: dir,
+      AR_BOT_GATEWAY_ENABLED: "true",
+      AR_BOT_GATEWAY_MEDIA_ENABLED: "true",
+      AR_BOT_GATEWAY_PLATFORM: "slack",
+      AR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
+      AR_BOT_GATEWAY_TENANT_ID: "ccr",
+      AR_BOT_GATEWAY_ACK_EVENTS: "true",
+      AR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
+      AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_STREAM_REPLIES: "true",
+      AR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
+      AR_BOT_GATEWAY_STATE_DIR: stateDir,
+      AR_FAKE_CODEX_CALLS: callsFile,
+      AR_FAKE_BOT_REPLIES: repliesFile
     },
     stdio: ["ignore", "ignore", "pipe"]
   });
@@ -1052,7 +1052,7 @@ test("Claude App bot worker keeps project and session selection as separate leve
     "        event('old-task', '/task')",
     "      ] };",
     "    },",
-    "    send: async (payload) => fs.appendFileSync(process.env.CCR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
+    "    send: async (payload) => fs.appendFileSync(process.env.AR_FAKE_BOT_REPLIES, JSON.stringify(payload) + '\\n'),",
     "    ackEvent: async () => ({}),",
     "    close: async () => ({})",
     "  };",
@@ -1064,20 +1064,20 @@ test("Claude App bot worker keeps project and session selection as separate leve
   const child = spawn(process.execPath, [runtimeFile, "claude-bot-worker", "--workspace-name", "Claude Test"], {
     env: {
       ...process.env,
-      CCR_CLAUDE_CODE_BOT_WORKER: "1",
-      CCR_CLAUDE_APP_USER_DATA_PATH: userDataDir,
+      AR_CLAUDE_CODE_BOT_WORKER: "1",
+      AR_CLAUDE_APP_USER_DATA_PATH: userDataDir,
       CLAUDE_USER_DATA_DIR: userDataDir,
-      CCR_BOT_GATEWAY_ENABLED: "true",
-      CCR_BOT_GATEWAY_PLATFORM: "slack",
-      CCR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
-      CCR_BOT_GATEWAY_TENANT_ID: "ccr",
-      CCR_BOT_GATEWAY_ACK_EVENTS: "true",
-      CCR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
-      CCR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
-      CCR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
-      CCR_BOT_GATEWAY_STATE_DIR: stateDir,
-      CCR_FAKE_BOT_REPLIES: repliesFile
+      AR_BOT_GATEWAY_ENABLED: "true",
+      AR_BOT_GATEWAY_PLATFORM: "slack",
+      AR_BOT_GATEWAY_INTEGRATION_ID: "bot-test",
+      AR_BOT_GATEWAY_TENANT_ID: "ccr",
+      AR_BOT_GATEWAY_ACK_EVENTS: "true",
+      AR_BOT_GATEWAY_POLL_INTERVAL_MS: "50",
+      AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: "2000",
+      AR_BOT_GATEWAY_SDK_MODULE: fakeSdk,
+      AR_BOT_GATEWAY_STATE_DIR: stateDir,
+      AR_FAKE_BOT_REPLIES: repliesFile
     },
     stdio: ["ignore", "ignore", "pipe"]
   });
@@ -1105,7 +1105,7 @@ test("Claude App bot worker keeps project and session selection as separate leve
 });
 
 function writeRuntimeScript(dir) {
-  const file = path.join(dir, "ccr-codex-cli-middleware.js");
+  const file = path.join(dir, "ar-codex-cli-middleware.js");
   writeFileSync(file, codexCliMiddlewareRuntimeScript());
   chmodSync(file, 0o700);
   return file;
@@ -1154,12 +1154,12 @@ function writeFakeClaudeCli(dir) {
   writeFileSync(fakeCli, [
     "#!/usr/bin/env node",
     "const fs = require('node:fs');",
-    "fs.writeFileSync(process.env.CCR_FAKE_CLAUDE_OUT, JSON.stringify({",
+    "fs.writeFileSync(process.env.AR_FAKE_CLAUDE_OUT, JSON.stringify({",
     "  argv: process.argv.slice(2),",
     "  env: {",
     "    ANTHROPIC_MODEL: process.env.ANTHROPIC_MODEL || '',",
-    "    CCR_CLAUDE_CODE_MODEL: process.env.CCR_CLAUDE_CODE_MODEL || '',",
-    "    CCR_CLAUDE_CODE_MCP_CONFIG: process.env.CCR_CLAUDE_CODE_MCP_CONFIG || ''",
+    "    AR_CLAUDE_CODE_MODEL: process.env.AR_CLAUDE_CODE_MODEL || '',",
+    "    AR_CLAUDE_CODE_MCP_CONFIG: process.env.AR_CLAUDE_CODE_MCP_CONFIG || ''",
     "  }",
     "}));",
     ""

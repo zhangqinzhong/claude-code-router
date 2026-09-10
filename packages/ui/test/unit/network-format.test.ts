@@ -79,3 +79,58 @@ test("preview mode truncates an over-large JSON text body instead of parsing it"
   assert.ok(view.text.length < hugeText.length, "should be truncated");
   assert.match(view.text, /characters omitted from preview/);
 });
+
+test("full mode keeps large JSON bodies complete", () => {
+  const body: RequestLogBody = {
+    bodyRef: "full-json-body",
+    contentType: "application/json",
+    encoding: "utf8",
+    preview: true,
+    sizeBytes: 300 * 1024,
+    text: JSON.stringify({
+      messages: Array.from({ length: 4000 }, (_, i) => ({ role: "user", content: `message ${i}` }))
+    }),
+    truncated: false
+  };
+
+  const view = formatLogBodyForWorker(body, "full", 256 * 1024, 160 * 1024);
+  assert.ok(view.json);
+  assert.equal(view.text, JSON.stringify(view.json, null, 2));
+  assert.equal(view.text.includes("message 3999"), true);
+});
+
+test("SSE bodies expose complete event blocks for timeline rendering", () => {
+  const body: RequestLogBody = {
+    bodyRef: "sse-body",
+    contentType: "text/event-stream",
+    encoding: "utf8",
+    preview: false,
+    sizeBytes: 0,
+    text: [
+      "event: response.created",
+      "id: 1",
+      'data: {"type":"response.created","model":"gpt-6-astra"}',
+      "",
+      'data: {"type":"response.output_text.delta","delta":"hello"}',
+      "",
+      "data: [DONE]",
+      "",
+      ""
+    ].join("\n"),
+    truncated: false
+  };
+
+  const view = formatLogBodyForWorker(body, "full");
+  assert.equal(view.streamEvents?.length, 3);
+  assert.deepEqual(view.streamEvents?.[0], {
+    dataText: '{"type":"response.created","model":"gpt-6-astra"}',
+    event: "response.created",
+    id: "1",
+    index: 0,
+    json: { type: "response.created", model: "gpt-6-astra" },
+    raw: "event: response.created\nid: 1\ndata: {\"type\":\"response.created\",\"model\":\"gpt-6-astra\"}"
+  });
+  assert.equal(view.streamEvents?.[2]?.done, true);
+  assert.deepEqual(view.streamEvents?.[2]?.dataText, "[DONE]");
+  assert.match(view.text, /streamed_data/);
+});

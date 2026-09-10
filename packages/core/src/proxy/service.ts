@@ -1242,18 +1242,18 @@ function createForwardHeaders(
   const pluginRoute = route?.pluginRoute;
   if (pluginRoute) {
     forwarded.host = pluginRoute.preserveHost ? (route.targetUrl?.host ?? readHeader(headers.host) ?? upstreamUrl.host) : upstreamUrl.host;
-    forwarded["x-ccr-proxy-mode"] = "plugin";
-    forwarded["x-ccr-plugin-id"] = pluginRoute.pluginId;
-    forwarded["x-ccr-plugin-route-id"] = pluginRoute.id;
-    forwarded["x-ccr-original-host"] = readHeader(headers.host) ?? "";
-    forwarded["x-ccr-original-url"] = pluginRoute.targetUrl.toString();
+    forwarded["x-ar-proxy-mode"] = "plugin";
+    forwarded["x-ar-plugin-id"] = pluginRoute.pluginId;
+    forwarded["x-ar-plugin-route-id"] = pluginRoute.id;
+    forwarded["x-ar-original-host"] = readHeader(headers.host) ?? "";
+    forwarded["x-ar-original-url"] = pluginRoute.targetUrl.toString();
     for (const [key, value] of Object.entries(pluginRoute.headers ?? {})) {
       forwarded[key.toLowerCase()] = value;
     }
   } else if (routedToGateway) {
     forwarded.host = upstreamUrl.host;
-    forwarded["x-ccr-proxy-mode"] = "gateway";
-    forwarded["x-ccr-original-host"] = readHeader(headers.host) ?? "";
+    forwarded["x-ar-proxy-mode"] = "gateway";
+    forwarded["x-ar-original-host"] = readHeader(headers.host) ?? "";
     delete forwarded.authorization;
     delete forwarded["x-api-key"];
     const apiKey = primaryApiKey(config);
@@ -1263,7 +1263,7 @@ function createForwardHeaders(
     }
   } else {
     forwarded.host = upstreamUrl.host;
-    forwarded["x-ccr-proxy-mode"] = "transparent";
+    forwarded["x-ar-proxy-mode"] = "transparent";
   }
   return forwarded;
 }
@@ -1548,6 +1548,8 @@ function normalizeFingerprint(value: string): string {
 function macosSystemCertificateInstallScript(): string {
   return [
     "set -e",
+    "/usr/bin/security delete-certificate -c 'AgentRouter CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
+    // Also drop the pre-rename CA so upgrading does not leave an orphaned trusted root.
     "/usr/bin/security delete-certificate -c 'Claude Code Router CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
     `/usr/bin/security add-trusted-cert -d -r trustRoot -p ssl -k /Library/Keychains/System.keychain ${quoteShellArg(PROXY_CA_CERT_FILE)}`
   ].join("; ");
@@ -1555,6 +1557,7 @@ function macosSystemCertificateInstallScript(): string {
 
 function macosManualCertificateInstallCommand(): string {
   return [
+    "sudo /usr/bin/security delete-certificate -c 'AgentRouter CA' /Library/Keychains/System.keychain || true",
     "sudo /usr/bin/security delete-certificate -c 'Claude Code Router CA' /Library/Keychains/System.keychain || true",
     `sudo /usr/bin/security add-trusted-cert -d -r trustRoot -p ssl -k /Library/Keychains/System.keychain ${quoteShellArg(PROXY_CA_CERT_FILE)}`
   ].join("\n");
@@ -1606,6 +1609,7 @@ function macosTerminalCertificateInstallScript(): string {
     "echo 'Installing CCR Proxy CA into the macOS System keychain.'",
     "echo 'Terminal will ask for your macOS password if sudo is required.'",
     "echo ''",
+    "sudo /usr/bin/security delete-certificate -c 'AgentRouter CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
     "sudo /usr/bin/security delete-certificate -c 'Claude Code Router CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
     `sudo /usr/bin/security add-trusted-cert -d -r trustRoot -p ssl -k /Library/Keychains/System.keychain ${quoteShellArg(PROXY_CA_CERT_FILE)}`,
     "echo ''",
@@ -1694,7 +1698,7 @@ function toProxyNetworkExchange(record: ProxyNetworkCaptureRecord): ProxyNetwork
 
 function inferProxyClient(headers: IncomingHttpHeaders): string {
   const explicitClient =
-    readHeader(headers["x-ccr-client"]) ??
+    readHeader(headers["x-ar-client"]) ??
     readHeader(headers["x-client-name"]) ??
     readHeader(headers["x-forwarded-client-cert"]);
   if (explicitClient) {

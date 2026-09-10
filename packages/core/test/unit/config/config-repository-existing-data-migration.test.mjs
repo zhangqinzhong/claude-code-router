@@ -5,12 +5,12 @@ import test from "node:test";
 
 test("legacy API keys are merged without replacing existing target keys", async () => {
   const testRoot = path.join(
-    process.env.CCR_INTERNAL_HOME_DIR,
+    process.env.AR_INTERNAL_HOME_DIR,
     `config-repository-existing-data-${process.pid}`
   );
-  process.env.CCR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
-  process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
-  process.env.CCR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+  process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
+  process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
+  process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
   const {
     APP_CONFIG_DB_FILE,

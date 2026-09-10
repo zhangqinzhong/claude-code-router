@@ -14,7 +14,7 @@ import { NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, hasAvailableGatewayModels, type Ap
 import { findModelCatalogEntry } from "@ccr/core/gateway/model-catalog";
 
 const CLAUDE_APP_CONFIG_ID = "8f69f2f1-3275-4ad8-9317-4aa7e972f311";
-const CLAUDE_APP_CONFIG_NAME = "Claude Code Router";
+const CLAUDE_APP_CONFIG_NAME = "AgentRouter";
 const CLAUDE_APP_CONFIG_FILE = "claude_desktop_config.json";
 const CLAUDE_APP_CONFIG_LIBRARY_DIR = "configLibrary";
 const CLAUDE_APP_CONFIG_META_FILE = "_meta.json";

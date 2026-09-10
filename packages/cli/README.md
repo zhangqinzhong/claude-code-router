@@ -110,7 +110,7 @@ ccr <profile-name-or-id> [cli|app] [-- <agent arguments>]
 - Desktop App launches require that app to be installed and a graphical session to be available.
 - Start the CCR service before opening most profiles. Grok CLI, Kimi CLI, and Pi profiles can start a temporary shared service automatically and stop it after the last managed session exits.
 
-The desktop application installs a related command named `ccr-app`. Commands copied from desktop Agent Profiles cards use `ccr-app`; the npm package documented here installs `ccr`.
+The desktop application installs a related command named `agentrouter`. Commands copied from desktop Agent Profiles cards use `agentrouter`; the npm package documented here installs `ccr`.
 
 ## Configuration And Runtime Files
 
@@ -133,9 +133,9 @@ Do not edit or copy live SQLite files while CCR is writing to them. Use the UI e
 
 | Variable | Description |
 | --- | --- |
-| `CCR_WEB_HOST` | Default management listener when `--host` is omitted. |
-| `CCR_WEB_PORT` | Default management port when `--port` is omitted. |
-| `CCR_WEB_AUTH_TOKEN` | Fixes the management UI/RPC token instead of generating a random token for the process. |
+| `AR_WEB_HOST` | Default management listener when `--host` is omitted. |
+| `AR_WEB_PORT` | Default management port when `--port` is omitted. |
+| `AR_WEB_AUTH_TOKEN` | Fixes the management UI/RPC token instead of generating a random token for the process. |
 
 The authenticated management URL contains `ccr_web_token` in its query string. Treat that URL like a password and avoid copying it into logs, tickets, or shell history. Bind to `127.0.0.1` unless remote access is intentional. For remote access, use a firewall or private network plus TLS at a trusted reverse proxy.
 

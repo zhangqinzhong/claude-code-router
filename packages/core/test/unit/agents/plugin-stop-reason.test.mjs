@@ -7,13 +7,13 @@ import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
 import { gatewayService } from "@ccr/core/gateway/service.ts";
 import { pluginService } from "@ccr/core/plugins/service.ts";
 
-test("gateway restart reports disabled reason to removed plugin stop hooks", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("gateway restart reports disabled reason to removed plugin stop hooks", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-stop-reason-"));
-  const previousReasonFile = process.env.CCR_TEST_PLUGIN_STOP_REASON_FILE;
+  const previousReasonFile = process.env.AR_TEST_PLUGIN_STOP_REASON_FILE;
   try {
     const reasonFile = path.join(dir, "stop-reasons.log");
     const pluginFile = path.join(dir, "stop-reason-plugin.cjs");
-    process.env.CCR_TEST_PLUGIN_STOP_REASON_FILE = reasonFile;
+    process.env.AR_TEST_PLUGIN_STOP_REASON_FILE = reasonFile;
     writeFileSync(pluginFile, [
       "\"use strict\";",
       "const fs = require(\"node:fs\");",
@@ -21,7 +21,7 @@ test("gateway restart reports disabled reason to removed plugin stop hooks", { s
       "  setup() {",
       "    return {",
       "      stop(event) {",
-      "        fs.appendFileSync(process.env.CCR_TEST_PLUGIN_STOP_REASON_FILE, `${event?.reason || \"missing\"}\\n`);",
+      "        fs.appendFileSync(process.env.AR_TEST_PLUGIN_STOP_REASON_FILE, `${event?.reason || \"missing\"}\\n`);",
       "      }",
       "    };",
       "  }",
@@ -37,9 +37,9 @@ test("gateway restart reports disabled reason to removed plugin stop hooks", { s
     await gatewayService.stop();
     await pluginService.stop();
     if (previousReasonFile === undefined) {
-      delete process.env.CCR_TEST_PLUGIN_STOP_REASON_FILE;
+      delete process.env.AR_TEST_PLUGIN_STOP_REASON_FILE;
     } else {
-      process.env.CCR_TEST_PLUGIN_STOP_REASON_FILE = previousReasonFile;
+      process.env.AR_TEST_PLUGIN_STOP_REASON_FILE = previousReasonFile;
     }
     rmSync(dir, { force: true, recursive: true });
   }

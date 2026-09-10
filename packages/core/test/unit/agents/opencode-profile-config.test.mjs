@@ -72,7 +72,7 @@ test("OpenCode profile config routes primary and small models through CCR", () =
     assert.equal(config.provider["claude-code-router"].npm, "@ai-sdk/openai-compatible");
     assert.equal(config.provider["claude-code-router"].options.baseURL, "http://127.0.0.1:4567/v1");
     assert.equal(config.provider["claude-code-router"].options.apiKey, "ccr-profile-key");
-    assert.equal(config.provider["claude-code-router"].options.headers["x-ccr-client"], "opencode");
+    assert.equal(config.provider["claude-code-router"].options.headers["x-ar-client"], "opencode");
     assert.ok(config.provider["claude-code-router"].models["Provider/model-a"]);
     assert.deepEqual(config.provider["claude-code-router"].models["Provider/model-a"].modalities, {
       input: ["text", "image"],
@@ -177,16 +177,16 @@ test("OpenCode global config keeps user settings and snapshots the original JSON
     assert.equal(resolveOpenCodeConfigFile(root, profile), configFile);
     assert.equal(managed.autoupdate, false);
     assert.equal(managed.provider.existing.name, "Existing");
-    assert.equal(readFileSync(`${configFile}.ccr-original`, "utf8"), original);
+    assert.equal(readFileSync(`${configFile}.ar-original`, "utf8"), original);
     assert.ok(result.backupFile && existsSync(result.backupFile));
     if (process.platform !== "win32") {
       chmodSync(configFile, 0o644);
-      chmodSync(`${configFile}.ccr-original`, 0o644);
+      chmodSync(`${configFile}.ar-original`, 0o644);
       chmodSync(result.backupFile, 0o644);
       const unchanged = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ccr-profile-key");
       assert.equal(unchanged.changed, false);
       assert.equal(statSync(configFile).mode & 0o777, 0o600);
-      assert.equal(statSync(`${configFile}.ccr-original`).mode & 0o777, 0o600);
+      assert.equal(statSync(`${configFile}.ar-original`).mode & 0o777, 0o600);
       assert.equal(statSync(result.backupFile).mode & 0o777, 0o600);
     }
   } finally {
@@ -200,18 +200,18 @@ test("OpenCode App launch avoids the ignored Electron user-data switch", () => {
 
 test("OpenCode App launch signature changes with effective profile settings", () => {
   const profile = testProfile({ appPath: "/Applications/OpenCode.app", env: { USER_VALUE: "one" } });
-  const signature = openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"one"}', { CCR_BOT_GATEWAY_ENABLED: "false" });
+  const signature = openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"one"}', { AR_BOT_GATEWAY_ENABLED: "false" });
 
   assert.equal(
-    openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"one"}', { CCR_BOT_GATEWAY_ENABLED: "false" }),
+    openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"one"}', { AR_BOT_GATEWAY_ENABLED: "false" }),
     signature
   );
   assert.notEqual(
-    openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"two"}', { CCR_BOT_GATEWAY_ENABLED: "false" }),
+    openCodeAppLaunchSignature(profile, "/tmp/opencode.jsonc", '{"model":"two"}', { AR_BOT_GATEWAY_ENABLED: "false" }),
     signature
   );
   assert.notEqual(
-    openCodeAppLaunchSignature({ ...profile, env: { USER_VALUE: "two" } }, "/tmp/opencode.jsonc", '{"model":"one"}', { CCR_BOT_GATEWAY_ENABLED: "false" }),
+    openCodeAppLaunchSignature({ ...profile, env: { USER_VALUE: "two" } }, "/tmp/opencode.jsonc", '{"model":"one"}', { AR_BOT_GATEWAY_ENABLED: "false" }),
     signature
   );
 });

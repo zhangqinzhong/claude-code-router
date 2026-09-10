@@ -372,7 +372,7 @@ test("codex catalog preserves persisted local Codex GPT-5 context metadata", () 
       Providers: [
         {
           api_base_url: "https://chatgpt.com/backend-api/codex",
-          api_key: "ccr-local-agent-login",
+          api_key: "ar-local-agent-login",
           modelMetadata: {
             [modelName]: {
               contextWindow: 272000,
@@ -396,7 +396,7 @@ test("codex catalog reports pinned context windows in full", () => {
     Providers: [
       {
         api_base_url: "https://chatgpt.com/backend-api/codex",
-        api_key: "ccr-local-agent-login",
+        api_key: "ar-local-agent-login",
         modelMetadata: {
           "gpt-5.6-sol": {
             contextWindow: 1000000,
@@ -421,7 +421,7 @@ test("codex catalog preserves pinned context windows", () => {
     Providers: [
       {
         api_base_url: "https://chatgpt.com/backend-api/codex",
-        api_key: "ccr-local-agent-login",
+        api_key: "ar-local-agent-login",
         modelMetadata: {
           "gpt-5-codex": {
             contextWindow: 1000000,
@@ -441,11 +441,11 @@ test("codex catalog preserves pinned context windows", () => {
 });
 
 test("codex catalog falls back to local Codex model cache metadata", () => {
-  const previousCcrHome = process.env.CCR_INTERNAL_HOME_DIR;
+  const previousCcrHome = process.env.AR_INTERNAL_HOME_DIR;
   const previousHome = process.env.HOME;
   const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-model-catalog-"));
   try {
-    process.env.CCR_INTERNAL_HOME_DIR = home;
+    process.env.AR_INTERNAL_HOME_DIR = home;
     process.env.HOME = home;
     const codexHome = path.join(home, ".codex");
     mkdirSync(codexHome, { recursive: true });
@@ -472,7 +472,7 @@ test("codex catalog falls back to local Codex model cache metadata", () => {
       Providers: [
         {
           api_base_url: "https://chatgpt.com/backend-api/codex",
-          api_key: "ccr-local-agent-login",
+          api_key: "ar-local-agent-login",
           models: ["gpt-5-codex"],
           name: "Codex API",
           type: "openai_responses"
@@ -489,9 +489,9 @@ test("codex catalog falls back to local Codex model cache metadata", () => {
     assert.deepEqual(model.supported_reasoning_levels.map((level) => level.effort), ["low", "high"]);
   } finally {
     if (previousCcrHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousCcrHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousCcrHome;
     }
     if (previousHome === undefined) {
       delete process.env.HOME;

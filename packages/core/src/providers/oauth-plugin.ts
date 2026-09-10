@@ -3,7 +3,7 @@ import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
 export function isLocalClaudeCodeOauthProviderPlugin(value: unknown): value is Record<string, unknown> {
   if (!isRecord(value)) return false;
   const key = stringValue(value.key)?.toLowerCase() ?? "";
-  return key.startsWith("ccr-local-agent-") && key.includes("claude-code-oauth");
+  return key.startsWith("ar-local-agent-") && key.includes("claude-code-oauth");
 }
 
 export function mergeAnthropicBetaValues(...values: Array<string | undefined>): string {

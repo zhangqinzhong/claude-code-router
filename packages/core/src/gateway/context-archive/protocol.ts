@@ -179,7 +179,7 @@ export function hasExplicitCompactSignal(
   headers: Record<string, string | string[] | undefined>
 ): boolean {
   const explicitHeader = [
-    readHeader(headers, "x-ccr-context-compact"),
+    readHeader(headers, "x-ar-context-compact"),
     readHeader(headers, "x-context-compact")
   ].find(Boolean);
   if (explicitHeader && ["1", "true", "compact", "handoff"].includes(explicitHeader.trim().toLowerCase())) {

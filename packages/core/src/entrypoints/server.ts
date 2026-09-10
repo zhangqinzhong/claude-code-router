@@ -101,12 +101,12 @@ function printHelp(): void {
     "  ccr-core-server [--host <host>] [--port <port>] [--no-gateway]",
     "",
     "Options:",
-    "  --host <host>    Management server host. Defaults to CCR_WEB_HOST or 127.0.0.1.",
-    "  --port <port>    Management server port. Defaults to CCR_WEB_PORT or 3458.",
+    "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
+    "  --port <port>    Management server port. Defaults to AR_WEB_PORT or 3458.",
     "  --no-gateway     Start only the web management server.",
     "",
     "Environment:",
-    "  CCR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
+    "  AR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
   ].join("\n") + "\n");
 }
 

@@ -59,9 +59,9 @@ export async function fusionBuiltinToolArtifacts(
             ...(visionConfig.baseUrl && visionConfig.apiKey ? { VISION_API_KEY: visionConfig.apiKey } : {}),
             ...(visionConfig.timeoutMs ? { VISION_TIMEOUT_MS: String(visionConfig.timeoutMs) } : {}),
             ...(usageSync ? {
-              CCR_FUSION_USAGE_SYNC_ENDPOINT: usageSync.endpoint,
-              CCR_FUSION_USAGE_SYNC_HEADER: usageSync.header,
-              CCR_FUSION_USAGE_SYNC_TOKEN: usageSync.token
+              AR_FUSION_USAGE_SYNC_ENDPOINT: usageSync.endpoint,
+              AR_FUSION_USAGE_SYNC_HEADER: usageSync.header,
+              AR_FUSION_USAGE_SYNC_TOKEN: usageSync.token
             } : {})
           },
           name: `fusion-vision-${sanitizedProfileId}`,

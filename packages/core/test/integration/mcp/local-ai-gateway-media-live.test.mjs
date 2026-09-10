@@ -18,11 +18,11 @@ import {
 } from "@ccr/core/mcp/grok-media-mcp.ts";
 import { getSystemProxyUrlForProtocol } from "@ccr/core/proxy/system-proxy-fetch.ts";
 
-const localGatewayEntry = process.env.CCR_LIVE_AI_GATEWAY_ENTRY;
-const liveEnabled = process.env.CCR_LIVE_GROK_MEDIA === "1";
+const localGatewayEntry = process.env.AR_LIVE_AI_GATEWAY_ENTRY;
+const liveEnabled = process.env.AR_LIVE_GROK_MEDIA === "1";
 
 test("Fusion generates image and video through the local ai-gateway", { skip: !liveEnabled }, async () => {
-  assert.ok(localGatewayEntry, "CCR_LIVE_AI_GATEWAY_ENTRY is required");
+  assert.ok(localGatewayEntry, "AR_LIVE_AI_GATEWAY_ENTRY is required");
   assert.ok(existsSync(localGatewayEntry), `Local ai-gateway entry does not exist: ${localGatewayEntry}`);
 
   const candidate = grokCandidate();
@@ -130,8 +130,8 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
     );
     enableGatewayDiagnostics(coreGatewayConfig);
 
-    const previousEntry = process.env.CCR_GATEWAY_ENTRY;
-    process.env.CCR_GATEWAY_ENTRY = localGatewayEntry;
+    const previousEntry = process.env.AR_GATEWAY_ENTRY;
+    process.env.AR_GATEWAY_ENTRY = localGatewayEntry;
     try {
       const spawnedGateway = spawnGatewayProcess(
         config,
@@ -143,7 +143,7 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
       child = spawnedGateway.child;
       await spawnedGateway.configAccepted;
     } finally {
-      restoreEnv("CCR_GATEWAY_ENTRY", previousEntry);
+      restoreEnv("AR_GATEWAY_ENTRY", previousEntry);
     }
     capture(child.stdout, gatewayOutput);
     capture(child.stderr, gatewayOutput);
@@ -186,7 +186,7 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
     await assertArtifactUrl(videoJob.artifact.url, videoJob.artifact.sizeBytes);
     console.log(`LIVE_PHASE video_succeeded id=${videoJob.id} bytes=${videoJob.artifact.sizeBytes} mime=${videoJob.artifact.mimeType}`);
 
-    console.log(`CCR_FUSION_LIVE_RESULT=${JSON.stringify({
+    console.log(`AR_FUSION_LIVE_RESULT=${JSON.stringify({
       aiGatewayEntry: localGatewayEntry,
       artifactRoot,
       image: publicArtifactSummary(imageJob),
@@ -197,14 +197,14 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
   } catch (error) {
     const diagnostics = sanitizeGatewayOutput(gatewayOutput.join(""));
     if (diagnostics) console.error(`LOCAL_AI_GATEWAY_DIAGNOSTICS\n${diagnostics}`);
-    if (process.env.CCR_LIVE_KEEP_CONFIG === "1") console.error(`LIVE_CONFIG_ROOT=${configRoot}`);
+    if (process.env.AR_LIVE_KEEP_CONFIG === "1") console.error(`LIVE_CONFIG_ROOT=${configRoot}`);
     throw error;
   } finally {
     await service.stop();
     if (mcpServer) await close(mcpServer);
     if (child && child.exitCode === null && !child.killed) child.kill();
     if (child && child.exitCode === null) await waitForExit(child, 5000);
-    if (completed || process.env.CCR_LIVE_KEEP_CONFIG !== "1") {
+    if (completed || process.env.AR_LIVE_KEEP_CONFIG !== "1") {
       rmSync(configRoot, { force: true, recursive: true });
     }
   }
@@ -213,9 +213,9 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
 function materializeProviderPlugins(templates, providerName, providerId, protocol) {
   const slug = providerName.toLowerCase().replace(/[^a-z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "") || "provider";
   const replacements = {
-    __CCR_PROVIDER_INTERNAL_NAME__: `${providerId}::${protocol}`,
-    __CCR_PROVIDER_NAME__: providerName,
-    __CCR_PROVIDER_NAME_SLUG__: slug
+    __AR_PROVIDER_INTERNAL_NAME__: `${providerId}::${protocol}`,
+    __AR_PROVIDER_NAME__: providerName,
+    __AR_PROVIDER_NAME_SLUG__: slug
   };
   return templates.map((template) => replacePlaceholders(template, replacements));
 }

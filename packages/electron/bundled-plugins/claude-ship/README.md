@@ -14,10 +14,10 @@ By default the Claude Ship window opens `https://claude.ai/claude-ship` so relat
 
 Claude Ship no longer loads from Claude Desktop's local `ion-dist` assets. Keep the Cloudflare Pages frontend available, or use an explicit `assetDir` only for local development fixtures.
 
-When the packaged app owns the `ccr://` protocol handler, the window can also be opened with:
+When the packaged app owns the `agentrouter://` protocol handler, the window can also be opened with:
 
 ```sh
-open 'ccr://plugin/claude-ship/open'
+open 'agentrouter://plugin/claude-ship/open'
 ```
 
 The local test is considered healthy when Claude Ship opens, exposes a non-empty agent list, can create a session/project through `/v1/code/sessions`, lists it through `/v1/code/sessions` and `/v1/code/session_groupings`, previews locally, and can publish through `/v1/code/baku/sessions/:id/deploy`.
@@ -43,8 +43,8 @@ Supported environment variables:
 
 - `CLOUDFLARE_ACCOUNT_ID` or `CF_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN` or `CF_API_TOKEN`
-- `CLOUDFLARE_PAGES_PROJECT_NAME` or `CCR_CLAUDE_SHIP_CLOUDFLARE_PROJECT`
-- `CLOUDFLARE_PAGES_PROJECT_NAME_TEMPLATE` or `CCR_CLAUDE_SHIP_CLOUDFLARE_PROJECT_TEMPLATE`
-- `CLOUDFLARE_PAGES_BRANCH` or `CCR_CLAUDE_SHIP_CLOUDFLARE_BRANCH`
+- `CLOUDFLARE_PAGES_PROJECT_NAME` or `AR_CLAUDE_SHIP_CLOUDFLARE_PROJECT`
+- `CLOUDFLARE_PAGES_PROJECT_NAME_TEMPLATE` or `AR_CLAUDE_SHIP_CLOUDFLARE_PROJECT_TEMPLATE`
+- `CLOUDFLARE_PAGES_BRANCH` or `AR_CLAUDE_SHIP_CLOUDFLARE_BRANCH`
 
 If `projectName` is omitted, the plugin derives a Pages-safe project name from the session title and id. The published artifact is static HTML plus `_headers`; the local preview debug bridge is not uploaded.

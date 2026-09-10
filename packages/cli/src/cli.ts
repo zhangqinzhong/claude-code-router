@@ -59,16 +59,16 @@ type ServiceState = {
 const serviceStateFileName = "service.json";
 const serviceStartLockFileName = "service-start.lock";
 const profileGatewayLeaseDirName = "profile-gateway-leases";
-const serviceInstanceTokenEnv = "CCR_SERVICE_INSTANCE_TOKEN";
+const serviceInstanceTokenEnv = "AR_SERVICE_INSTANCE_TOKEN";
 const serviceRpcTimeoutMs = 2_000;
 const serviceStartTimeoutMs = 30_000;
 const serviceStopTimeoutMs = 10_000;
 const profileGatewayIdleGraceMs = 2_000;
 const profileGatewayLeasePollMs = 500;
-const webAuthHeader = "x-ccr-web-auth";
+const webAuthHeader = "x-ar-web-auth";
 const webAuthQueryParam = "ccr_web_token";
 const defaultCliCommandName = "ccr";
-const prepareProfileOnlyEnv = "CCR_CLI_PREPARE_PROFILE_ONLY";
+const prepareProfileOnlyEnv = "AR_CLI_PREPARE_PROFILE_ONLY";
 
 async function main(): Promise<void> {
   const options = parseArgs(process.argv.slice(2));
@@ -466,7 +466,7 @@ function serviceChildEnv(serviceToken: string): NodeJS.ProcessEnv {
   env[serviceInstanceTokenEnv] = serviceToken;
   const modelCatalogPath = resolveModelCatalogPath();
   if (modelCatalogPath) {
-    env.CCR_MODEL_CATALOG_PATH = modelCatalogPath;
+    env.AR_MODEL_CATALOG_PATH = modelCatalogPath;
   }
   if (process.versions.electron) {
     env.ELECTRON_RUN_AS_NODE = "1";
@@ -601,17 +601,17 @@ function printStartHelp(exitCode: number): void {
     `  ${command} start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]`,
     "",
     "Options:",
-    "  --host <host>    Management server host. Defaults to CCR_WEB_HOST or 127.0.0.1.",
-    "  --port <port>    Management server port. Defaults to CCR_WEB_PORT or 3458.",
+    "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
+    "  --port <port>    Management server port. Defaults to AR_WEB_PORT or 3458.",
     "  --open           Open the management page in the default browser.",
     "  --no-open        Do not open the management page.",
     "  --gateway        Start the configured model gateway (default).",
     "  --no-gateway     Start only the web management server.",
     "",
     "Environment:",
-    "  CCR_WEB_HOST        Default management server host.",
-    "  CCR_WEB_PORT        Default management server port.",
-    "  CCR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
+    "  AR_WEB_HOST        Default management server host.",
+    "  AR_WEB_PORT        Default management server port.",
+    "  AR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
   ].join("\n");
   const stream = exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${output}\n`);
@@ -627,17 +627,17 @@ function printUiHelp(exitCode: number): void {
     "Starts the background CCR service if needed and opens the management UI in the default browser.",
     "",
     "Options:",
-    "  --host <host>    Management server host. Defaults to CCR_WEB_HOST or 127.0.0.1.",
-    "  --port <port>    Management server port. Defaults to CCR_WEB_PORT or 3458.",
+    "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
+    "  --port <port>    Management server port. Defaults to AR_WEB_PORT or 3458.",
     "  --open           Open the management page (default).",
     "  --no-open        Start or find the service and print the management URL without opening a browser.",
     "  --gateway        Start the configured model gateway (default).",
     "  --no-gateway     Start only the web management server when the service is not already running.",
     "",
     "Environment:",
-    "  CCR_WEB_HOST        Default management server host.",
-    "  CCR_WEB_PORT        Default management server port.",
-    "  CCR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
+    "  AR_WEB_HOST        Default management server host.",
+    "  AR_WEB_PORT        Default management server port.",
+    "  AR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
   ].join("\n");
   const stream = exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${output}\n`);
@@ -666,17 +666,17 @@ function printWebHelp(exitCode: number): void {
     `Runs in the foreground. ${command} web is an alias.`,
     "",
     "Options:",
-    "  --host <host>    Management server host. Defaults to CCR_WEB_HOST or 127.0.0.1.",
-    "  --port <port>    Management server port. Defaults to CCR_WEB_PORT or 3458.",
+    "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
+    "  --port <port>    Management server port. Defaults to AR_WEB_PORT or 3458.",
     "  --open           Open the management page in the default browser.",
     "  --no-open        Do not open the management page (default).",
     "  --gateway        Start the configured model gateway (default).",
     "  --no-gateway     Start only the web management server.",
     "",
     "Environment:",
-    "  CCR_WEB_HOST        Default management server host.",
-    "  CCR_WEB_PORT        Default management server port.",
-    "  CCR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
+    "  AR_WEB_HOST        Default management server host.",
+    "  AR_WEB_PORT        Default management server port.",
+    "  AR_WEB_AUTH_TOKEN  Use this token for management UI and RPC authentication."
   ].join("\n");
   const stream = exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${output}\n`);
@@ -684,7 +684,7 @@ function printWebHelp(exitCode: number): void {
 }
 
 function cliCommandName(): string {
-  const configured = process.env.CCR_CLI_COMMAND_NAME?.trim();
+  const configured = process.env.AR_CLI_COMMAND_NAME?.trim();
   return configured && /^[A-Za-z0-9._-]+$/.test(configured)
     ? configured
     : defaultCliCommandName;
@@ -928,7 +928,7 @@ async function verifyServiceState(state: ServiceState): Promise<ServiceStateVeri
   }
 
   const appInfo = await callServiceRpc<{ name?: unknown }>(state, "getAppInfo").catch(() => undefined);
-  return appInfo?.name === "Claude Code Router"
+  return appInfo?.name === "AgentRouter"
     ? { ok: true, trustedPid: false }
     : { ok: false };
 }
@@ -937,13 +937,13 @@ async function waitForServiceUnavailable(state: ServiceState, timeoutMs: number)
   const startedAt = Date.now();
   while (Date.now() - startedAt < timeoutMs) {
     const appInfo = await callServiceRpc<{ name?: unknown }>(state, "getAppInfo").catch(() => undefined);
-    if (appInfo?.name !== "Claude Code Router") {
+    if (appInfo?.name !== "AgentRouter") {
       return true;
     }
     await delay(150);
   }
   const appInfo = await callServiceRpc<{ name?: unknown }>(state, "getAppInfo").catch(() => undefined);
-  return appInfo?.name !== "Claude Code Router";
+  return appInfo?.name !== "AgentRouter";
 }
 
 async function callServiceRpc<T>(state: ServiceState, method: string, args: unknown[] = [], timeoutMs = serviceRpcTimeoutMs): Promise<T> {

@@ -185,8 +185,8 @@ export async function resolveContextArchiveToolContinuation(input: {
     const headers: Record<string, string> = {
       ...input.headers,
       "content-type": "application/json",
-      "x-ccr-context-archive-tool": "continuation",
-      "x-ccr-context-archive-tool-calls": String(input.context.executedCalls)
+      "x-ar-context-archive-tool": "continuation",
+      "x-ar-context-archive-tool-calls": String(input.context.executedCalls)
     };
     delete headers["content-length"];
     result = await fetchUpstreamWithFallback({

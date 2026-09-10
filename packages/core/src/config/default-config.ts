@@ -30,7 +30,7 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
     API_TIMEOUT_MS: 600000,
     CUSTOM_ROUTER_PATH: "",
     HOST: "127.0.0.1",
-    PORT: 3456,
+    PORT: 3466,
     Providers: [],
     Router: {
       builtInRules: {
@@ -103,10 +103,10 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
     },
     gateway: {
       coreHost,
-      corePort: 3457,
+      corePort: 3467,
       enabled: true,
       host: "127.0.0.1",
-      port: 3456
+      port: 3466
     },
     mediaTools: {
       allowedInputRoots: [],
@@ -148,7 +148,7 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
         managedCompact: false,
         model: "",
         providerId: "claude-code-router",
-        providerName: "Claude Code Router",
+        providerName: "AgentRouter",
         showAllSessions: false
       },
       enabled: true,
@@ -184,7 +184,7 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
           model: "",
           name: "Codex",
           providerId: "claude-code-router",
-          providerName: "Claude Code Router",
+          providerName: "AgentRouter",
           showAllSessions: false,
           scope: "global",
           surface: "auto"
@@ -212,10 +212,11 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
     },
     providerPlugins: [],
     overviewWidgets: DEFAULT_OVERVIEW_WIDGETS,
-    routerEndpoint: "http://127.0.0.1:3456",
+    routerEndpoint: "http://127.0.0.1:3466",
     theme: "system",
     trayComponentVariants: DEFAULT_TRAY_COMPONENT_VARIANTS,
-    trayIcon: "random",
+    trayIcon: "layered",
+    trayShowTokenUsage: false,
     trayProgressTargetTokens: 100000,
     trayWidgets: DEFAULT_TRAY_WIDGETS,
     trayWindowModules: DEFAULT_TRAY_WINDOW_MODULES,

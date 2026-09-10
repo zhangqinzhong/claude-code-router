@@ -52,10 +52,10 @@ type ProfileActionBusy = {
   surface: ProfileOpenSurface;
 };
 
-const providerNamePlaceholder = "__CCR_PROVIDER_NAME__";
-const providerNameSlugPlaceholder = "__CCR_PROVIDER_NAME_SLUG__";
-const providerInternalNamePlaceholder = "__CCR_PROVIDER_INTERNAL_NAME__";
-const localAgentProviderApiKey = "ccr-local-agent-login";
+const providerNamePlaceholder = "__AR_PROVIDER_NAME__";
+const providerNameSlugPlaceholder = "__AR_PROVIDER_NAME_SLUG__";
+const providerInternalNamePlaceholder = "__AR_PROVIDER_INTERNAL_NAME__";
+const localAgentProviderApiKey = "ar-local-agent-login";
 const localCodexDefaultBaseUrl = "https://chatgpt.com/backend-api/codex";
 const localCodexProviderId = "codex-api";
 
@@ -3443,7 +3443,7 @@ function App() {
               toolHub: draftConfig.toolHub,
               providerAccountSnapshots,
               trayBalanceProgress: normalizeTrayBalanceProgressConfig(draftConfig.trayBalanceProgress),
-              trayIconPreference: draftConfig.trayIcon || "random",
+              trayIconPreference: normalizeTrayIconPreference(draftConfig.trayIcon),
               traySupported,
               trayWidgets: normalizeTrayWidgets(draftConfig.trayWidgets ?? DEFAULT_TRAY_WIDGETS, draftConfig.trayWindowModules, draftConfig.trayComponentVariants),
               updateConfig

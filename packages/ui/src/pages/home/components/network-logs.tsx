@@ -4,9 +4,9 @@ import type { RequestRouteTrace, RequestRouteTraceChange, RequestRouteTraceHop }
 import {
   AnimatedIconSwap, Check, ChevronDown, ChevronLeft,
   ChevronRight, clampNumber, clientInitial, cn, Copy, copyTextToClipboard,
-  createLogBodyPreviewText, Database, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, formatBytes, formatCompactNumber, formatDuration,
+  createLogBodyPreviewText, Database, Dialog, DialogBody, DialogContent, DialogHeader, DialogTitle, formatBytes, formatCompactNumber, formatDuration, formatTokenRate,
   formatLogDateTime, formatLogTokenSummary, formatNetworkRequestRaw, formatNetworkResponseRaw, formatRouteTracePath, formatUsdCost,
-  FormattedLogBody,
+  FormattedLogBody, LogStreamEvent,
   isJsonContainer, isLargeLogBody, jsonChildPath, logRequestModel,
   LogBodyFormatMode, logBodyLargeTextThreshold, logBodyPreviewTextLimit, LogBodyWorkerResponse,
   logResolvedRouteModel, logSelectOptions, motion, MoveRight, Network, networkCodeLabel,
@@ -24,7 +24,6 @@ type NetworkResponseTab = "body" | "header" | "raw";
 const logJsonAutoExpandEntryLimit = 60;
 const logJsonContainerPreviewLimit = 80;
 const logJsonAutoExpandTextLimit = 160 * 1024;
-const logBodyAutoLoadJsonBytes = 2 * 1024 * 1024;
 const logBodyWorkerFilterDebounceMs = 180;
 type LogTableColumnId = "time" | "status" | "stream" | "model" | "credential" | "tokens" | "duration";
 type LogTableColumn = {
@@ -952,6 +951,9 @@ export function LogExpandedDetails({
   const t = useAppText();
   const numberLocale = useAppNumberLocale();
   const hasCredentialInfo = logHasCredentialInfo(entry);
+  const outputRate = entry.outputTokens > 0 && entry.streamOutputDurationMs && entry.streamOutputDurationMs > 0
+    ? `${formatTokenRate(entry.outputTokens / (entry.streamOutputDurationMs / 1_000), numberLocale)} token/s`
+    : "-";
 
   return (
     <div className="network-detail border-b">
@@ -968,6 +970,8 @@ export function LogExpandedDetails({
       </div>
       <div className={cn("network-body-meta grid grid-cols-2 gap-y-2 border-b px-3 py-2 text-[12px] sm:grid-cols-4", hasCredentialInfo ? "lg:grid-cols-12" : "lg:grid-cols-9")}>
         <LogMetric label={t("持续时间")} value={formatDuration(entry.durationMs)} />
+        <LogMetric label={t("首 Token")} value={entry.timeToFirstTokenMs === undefined ? "-" : formatDuration(entry.timeToFirstTokenMs)} />
+        <LogMetric label={t("输出速率")} value={outputRate} />
         <LogMetric label={t("Stream")} value={entry.isStream ? t("Streaming") : t("Non-streaming")} />
         <LogMetric label={t("Request ID")} value={entry.requestId || "-"} />
         <LogMetric label={t("Client")} value={entry.client || "-"} />
@@ -1807,6 +1811,7 @@ function LogJsonPanel({
   const visible = bodyView.visible;
   const headerRows = useMemo(() => networkHeaderRows(headers ?? {}), [headers]);
   const [expandedJsonPaths, setExpandedJsonPaths] = useState<Set<string>>(() => createInitialVisibleJsonPaths(bodyView, side));
+  const showTimeline = Boolean(bodyView.streamEvents?.length) && query.trim() === "" && !preferTextBody;
   const showJsonTree = bodyView.json !== undefined && query.trim() === "" && !preferTextBody;
 
   useEffect(() => {
@@ -1960,21 +1965,19 @@ function LogJsonPanel({
     ) {
       return;
     }
-    if (effectiveBody.sizeBytes <= logBodyAutoLoadJsonBytes && isJsonLikeLogBody(effectiveBody)) {
-      void loadInlineFullBody();
-      return;
-    }
-    if (!chunkViewActive && !chunkView?.loading) {
-      void loadBodyChunk(0);
-    }
+    void loadInlineFullBody();
   }, [bodyMode, chunkView, chunkViewActive, effectiveBody, fullBodyError, fullBodyLoading, loadedBody]);
 
   const displayedCopyText = chunkViewActive
     ? chunkView.chunk?.text ?? ""
-    : formatted;
+    : preferTextBody
+      ? bodyView.rawText ?? formatted
+      : formatted;
   const displayedVisible = chunkViewActive
     ? filterStaticLogBodyText(chunkView.chunk?.text ?? "", query)
-    : visible;
+    : preferTextBody
+      ? filterStaticLogBodyText(bodyView.rawText ?? formatted, query)
+      : visible;
 
   return (
     <div className={cn("network-pane-split flex min-h-0 min-w-0 flex-col", className)}>
@@ -2022,7 +2025,9 @@ function LogJsonPanel({
                 <LogJsonBodyContent
                   expandedJsonPaths={expandedJsonPaths}
                   onToggleJsonPath={toggleJsonPath}
+                  showTimeline={showTimeline}
                   showJsonTree={showJsonTree}
+                  streamEvents={bodyView.streamEvents}
                   value={bodyView.json}
                   visible={visible}
                 />
@@ -2043,7 +2048,9 @@ function LogJsonPanel({
                 onToggleTextBody={() => setPreferTextBody((current) => !current)}
                 preferTextBody={preferTextBody}
                 query={query}
+                showTimeline={showTimeline}
                 showJsonTree={showJsonTree}
+                streamEvents={bodyView.streamEvents}
                 subtitle={subtitle}
                 title={title}
                 visible={displayedVisible}
@@ -2079,7 +2086,7 @@ function LogJsonBodyToolbar({
   title: string;
 }) {
   const t = useAppText();
-  const canToggleJsonText = bodyView.json !== undefined && query.trim() === "";
+  const canToggleJsonText = (bodyView.json !== undefined || Boolean(bodyView.streamEvents?.length)) && query.trim() === "";
   const toggleLabel = preferTextBody ? "JSON" : t("Text");
 
   return (
@@ -2115,20 +2122,51 @@ function LogJsonBodyToolbar({
 function LogJsonBodyContent({
   expandedJsonPaths,
   onToggleJsonPath,
+  showTimeline,
   showJsonTree,
+  streamEvents,
   value,
   visible
 }: {
   expandedJsonPaths: Set<string>;
   onToggleJsonPath: (path: string) => void;
+  showTimeline: boolean;
   showJsonTree: boolean;
+  streamEvents?: import("../shared/logs").LogStreamEvent[];
   value: unknown;
   visible: string;
 }) {
+  if (showTimeline && streamEvents?.length) {
+    return <LogStreamTimeline events={streamEvents} />;
+  }
   return showJsonTree ? (
     <LogJsonTree expandedPaths={expandedJsonPaths} onToggle={onToggleJsonPath} value={value} />
   ) : (
     <pre className="network-code min-h-0 flex-1 overflow-auto whitespace-pre-wrap break-words p-3 pr-20 font-mono text-[11px] leading-5">{visible}</pre>
+  );
+}
+
+function LogStreamTimeline({ events }: { events: LogStreamEvent[] }) {
+  return (
+    <div className="min-h-0 flex-1 space-y-2 overflow-auto p-3">
+      {events.map((event) => (
+        <section
+          className="overflow-hidden rounded-md border border-[color:var(--network-border)] bg-[color:var(--network-surface)]"
+          key={`${event.index}-${event.raw}`}
+        >
+          <div className="network-body-meta flex min-h-8 items-center gap-2 border-b px-3 py-1.5 text-[11px]">
+            <span className="font-bold">#{event.index + 1}</span>
+            <span className="network-muted">SSE</span>
+            {event.event ? <span className="rounded bg-[color:var(--network-border)] px-1.5 py-0.5 font-mono">{event.event}</span> : null}
+            {event.id ? <span className="network-muted font-mono">id={event.id}</span> : null}
+            {event.done ? <span className="ml-auto rounded bg-[color:var(--network-border)] px-1.5 py-0.5 font-semibold">DONE</span> : null}
+          </div>
+          <pre className="network-code overflow-auto whitespace-pre-wrap break-words p-3 font-mono text-[11px] leading-5">
+            {event.json !== undefined ? JSON.stringify(event.json, null, 2) : event.dataText}
+          </pre>
+        </section>
+      ))}
+    </div>
   );
 }
 
@@ -2203,7 +2241,9 @@ function LogJsonFullscreenViewer({
   onToggleTextBody,
   preferTextBody,
   query,
+  showTimeline,
   showJsonTree,
+  streamEvents,
   subtitle,
   title,
   value,
@@ -2222,7 +2262,9 @@ function LogJsonFullscreenViewer({
   onToggleTextBody: () => void;
   preferTextBody: boolean;
   query: string;
+  showTimeline: boolean;
   showJsonTree: boolean;
+  streamEvents?: import("../shared/logs").LogStreamEvent[];
   subtitle?: string;
   title: string;
   value: unknown;
@@ -2268,7 +2310,9 @@ function LogJsonFullscreenViewer({
               <LogJsonBodyContent
                 expandedJsonPaths={expandedJsonPaths}
                 onToggleJsonPath={onToggleJsonPath}
+                showTimeline={showTimeline}
                 showJsonTree={showJsonTree}
+                streamEvents={streamEvents}
                 value={value}
                 visible={visible}
               />
@@ -2296,18 +2340,6 @@ function logBodyCacheKey(body: RequestLogBody | undefined): string {
     text.slice(0, 96),
     text.slice(-96)
   ].join("\u001f");
-}
-
-function isJsonLikeLogBody(body: RequestLogBody | undefined): boolean {
-  if (!body || body.encoding === "base64") {
-    return false;
-  }
-  const contentType = body.contentType?.split(";", 1)[0]?.trim().toLowerCase() ?? "";
-  if (contentType === "application/json" || contentType.endsWith("+json")) {
-    return true;
-  }
-  const first = body.text.trimStart().charAt(0);
-  return first === "{" || first === "[";
 }
 
 function nextChunkPreviousOffsets(

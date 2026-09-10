@@ -2,9 +2,9 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
 import { createHash, randomUUID } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import os from "node:os";
 import path from "node:path";
 import OpenAI from "openai";
+import { resolveRuntimeConfigDir } from "@ccr/core/runtime/app-paths";
 
 type JsonPrimitive = boolean | null | number | string;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -181,7 +181,7 @@ type ResolveOutput = {
 };
 
 const protocolVersion = "2024-11-05";
-const toolHubServerName = "ccr-toolhub";
+const toolHubServerName = "ar-toolhub";
 const resolveToolName = "tool_hub.resolve";
 const invokeToolName = "tool_hub.invoke";
 const defaultRequestTimeoutMs = 60_000;
@@ -379,7 +379,7 @@ class ToolHubRuntime {
       catalog = await this.registry.listTools();
     }
     if (taskWantsChromeLoginImport(task) && !catalogHasChromeLoginImportTool(catalog)) {
-      await this.registry.refreshServers(["ccr-browser-automation"], true);
+      await this.registry.refreshServers(["ar-browser-automation"], true);
       catalog = await this.registry.listTools();
     }
     if (catalog.length === 0) {
@@ -2485,8 +2485,8 @@ function expandToolBundleWithCompanionTools(selectedTools: CatalogEntry[], catal
 }
 
 function isBrowserAutomationTool(tool: CatalogEntry): boolean {
-  return tool.serverName === "ccr-browser-automation" ||
-    tool.serverId === "ccr-browser-automation" ||
+  return tool.serverName === "ar-browser-automation" ||
+    tool.serverId === "ar-browser-automation" ||
     tool.serverNamespace === "ccr_browser_automation" ||
     tool.toolName.startsWith("mcp.ccr_browser_automation.");
 }
@@ -2805,7 +2805,7 @@ function normalizeToolDefinitionForCache(value: unknown): ToolDefinition | null 
 }
 
 function toolHubCacheFile(): string {
-  return env("TOOLHUB_CACHE_FILE") || path.join(os.homedir(), ".claude-code-router", "toolhub-cache.json");
+  return env("TOOLHUB_CACHE_FILE") || path.join(resolveRuntimeConfigDir(), "toolhub-cache.json");
 }
 
 function hashToolHubMcpServerConfig(config: GatewayMcpServerConfig): string {

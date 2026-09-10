@@ -1160,7 +1160,7 @@ function readHeader(headers: Headers, name: string): string | undefined {
 }
 
 function readCredentialId(headers: Headers): string | undefined {
-  return readHeader(headers, "x-ccr-provider-credential-id") ?? parseCredentialChain(readHeader(headers, "x-ccr-provider-credential-chain"))[0];
+  return readHeader(headers, "x-ar-provider-credential-id") ?? parseCredentialChain(readHeader(headers, "x-ar-provider-credential-chain"))[0];
 }
 
 function parseCredentialChain(value: string | undefined): string[] {

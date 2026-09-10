@@ -19,18 +19,18 @@ test("Windows CCR launcher prepares CLI profiles before direct TTY dispatch", { 
       ]
     }
   };
-  const runtimeFile = path.join("C:\\CCR", "ccr-cli.js");
+  const runtimeFile = path.join("C:\\CCR", "ar-cli.js");
   const launcher = windowsCcrLauncher(runtimeFile, config);
 
   assert.match(launcher, /if \/I "%~1"=="Claude Main" goto ccr_profile_0/);
-  assert.match(launcher, /set "CCR_CLI_PREPARE_PROFILE_ONLY=1"/);
+  assert.match(launcher, /set "AR_CLI_PREPARE_PROFILE_ONLY=1"/);
   assert.match(launcher, /set "ELECTRON_RUN_AS_NODE=1"/);
-  assert.match(launcher, /set "CCR_CLI_DIRECT_PROFILE_DISPATCH=1"/);
-  assert.match(launcher, /call ".*ccr-claude-code-wrapper-claude-main\.cmd" %\*/);
+  assert.match(launcher, /set "AR_CLI_DIRECT_PROFILE_DISPATCH=1"/);
+  assert.match(launcher, /call ".*ar-claude-code-wrapper-claude-main\.cmd" %\*/);
 
-  const prepareIndex = launcher.indexOf('set "CCR_CLI_PREPARE_PROFILE_ONLY=1"');
-  const directDispatchIndex = launcher.indexOf('set "CCR_CLI_DIRECT_PROFILE_DISPATCH=1"');
-  const wrapperIndex = launcher.indexOf("ccr-claude-code-wrapper-claude-main.cmd");
+  const prepareIndex = launcher.indexOf('set "AR_CLI_PREPARE_PROFILE_ONLY=1"');
+  const directDispatchIndex = launcher.indexOf('set "AR_CLI_DIRECT_PROFILE_DISPATCH=1"');
+  const wrapperIndex = launcher.indexOf("ar-claude-code-wrapper-claude-main.cmd");
   assert.equal(prepareIndex >= 0, true);
   assert.equal(directDispatchIndex > prepareIndex, true);
   assert.equal(wrapperIndex > directDispatchIndex, true);

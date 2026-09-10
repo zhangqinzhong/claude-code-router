@@ -71,7 +71,7 @@ test("Codex OAuth plugins retain the default base URL after runtime identity nor
   config.providerPlugins = [
     {
       codexOauth: {},
-      key: "ccr-local-agent-codex-api-codex-oauth",
+      key: "ar-local-agent-codex-api-codex-oauth",
       providerName: "Codex API"
     }
   ];
@@ -114,12 +114,12 @@ test("Codex OAuth plugins prefer live login credentials over imported snapshots"
       accountId: "acct-imported",
       refreshToken: "refresh-imported"
     },
-    key: "ccr-local-agent-codex-api-codex-oauth",
+    key: "ar-local-agent-codex-api-codex-oauth",
     providerName: "Codex API"
   }];
   config.Providers = [{
     api_base_url: codexDefaultBaseUrl,
-    api_key: "ccr-local-agent-login",
+    api_key: "ar-local-agent-login",
     id: "codex-api",
     models: ["gpt-5.5"],
     name: "Codex API",
@@ -132,7 +132,7 @@ test("Codex OAuth plugins prefer live login credentials over imported snapshots"
     "billing-usage-token",
     "core-auth-token"
   );
-  const codexPlugin = compiled.providerPlugins.find((item) => item.key === "ccr-local-agent-codex-api-codex-oauth");
+  const codexPlugin = compiled.providerPlugins.find((item) => item.key === "ar-local-agent-codex-api-codex-oauth");
 
   assert.equal(codexPlugin.codexOauth.accessToken, "access-live");
   assert.equal(codexPlugin.codexOauth.refreshToken, "refresh-live");
@@ -155,7 +155,7 @@ test("Codex local providers synthesize OAuth plugins when persisted plugins are 
   config.Providers = [
     {
       api_base_url: codexDefaultBaseUrl,
-      api_key: "ccr-local-agent-login",
+      api_key: "ar-local-agent-login",
       id: "codex-api",
       models: ["gpt-5.5"],
       name: "Codex API",
@@ -193,13 +193,13 @@ test("Codex local provider fallback respects disabled OAuth plugins", async (t) 
       refreshToken: "refresh-disabled"
     },
     enabled: false,
-    key: "ccr-local-agent-codex-api-codex-oauth",
+    key: "ar-local-agent-codex-api-codex-oauth",
     providerName: "Codex API"
   }];
   config.Providers = [
     {
       api_base_url: codexDefaultBaseUrl,
-      api_key: "ccr-local-agent-login",
+      api_key: "ar-local-agent-login",
       id: "codex-api",
       models: ["gpt-5.5"],
       name: "Codex API",
@@ -248,13 +248,13 @@ test("credential-free fallback headers use the provider runtime identity", () =>
 
 function useTemporaryCodexHome(t, prefix) {
   const home = fs.mkdtempSync(path.join(os.tmpdir(), prefix));
-  const previousHome = process.env.CCR_INTERNAL_HOME_DIR;
-  process.env.CCR_INTERNAL_HOME_DIR = home;
+  const previousHome = process.env.AR_INTERNAL_HOME_DIR;
+  process.env.AR_INTERNAL_HOME_DIR = home;
   t.after(() => {
     if (previousHome === undefined) {
-      delete process.env.CCR_INTERNAL_HOME_DIR;
+      delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.CCR_INTERNAL_HOME_DIR = previousHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousHome;
     }
   });
   return home;

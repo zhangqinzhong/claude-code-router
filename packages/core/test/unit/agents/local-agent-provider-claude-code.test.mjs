@@ -74,7 +74,7 @@ test("Core gateway config replaces imported Claude Code OAuth token with live ma
               removeHeaders: ["x-api-key"],
               strict: true
             },
-            key: "ccr-local-agent-claude-code-api-claude-code-oauth",
+            key: "ar-local-agent-claude-code-api-claude-code-oauth",
             providerName: "Claude Code API"
           }
         ];
@@ -89,7 +89,7 @@ test("Core gateway config replaces imported Claude Code OAuth token with live ma
         ];
 
         const compiled = await compileCoreGatewayConfig(config, "raw-trace-token", "billing-usage-token", "core-auth-token");
-        const plugin = compiled.providerPlugins.find((item) => item.key === "ccr-local-agent-claude-code-api-claude-code-oauth");
+        const plugin = compiled.providerPlugins.find((item) => item.key === "ar-local-agent-claude-code-api-claude-code-oauth");
 
         assert.equal(plugin.auth.headers.authorization, "Bearer keychain-runtime-token");
         assert.deepEqual(plugin.auth.headers["anthropic-beta"], {
@@ -319,7 +319,7 @@ test("Claude Code local provider reports a missing candidate when no keychain it
 });
 
 async function withClaudeCodeHome(run) {
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-code-provider-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-claude-code-provider-"));
   const previousHome = process.env.HOME;
   process.env.HOME = home;
   try {
@@ -344,7 +344,7 @@ async function withPlatform(platform, run) {
 }
 
 async function withFakeSecurityOutput(output, run) {
-  await withFakeSecurityScript(`cat <<'CCR_KEYCHAIN_JSON'\n${JSON.stringify(output)}\nCCR_KEYCHAIN_JSON\n`, run);
+  await withFakeSecurityScript(`cat <<'AR_KEYCHAIN_JSON'\n${JSON.stringify(output)}\nAR_KEYCHAIN_JSON\n`, run);
 }
 
 async function withFakeSecurityFailure(run) {
@@ -409,15 +409,15 @@ function fakeSecurityBody(items) {
     }
   }
   const branches = [
-    ...items.map((item, index) => ({ key: `${item.service}|${item.account}`, record: item.record, tag: `CCR_J${index}` })),
-    ...[...firstForService.values()].map((item, index) => ({ key: `${item.service}|`, record: item.record, tag: `CCR_A${index}` }))
+    ...items.map((item, index) => ({ key: `${item.service}|${item.account}`, record: item.record, tag: `AR_J${index}` })),
+    ...[...firstForService.values()].map((item, index) => ({ key: `${item.service}|`, record: item.record, tag: `AR_A${index}` }))
   ];
 
   return [
     `if [ "$1" = "dump-keychain" ]; then`,
-    `cat <<'CCR_DUMP'`,
+    `cat <<'AR_DUMP'`,
     dump,
-    "CCR_DUMP",
+    "AR_DUMP",
     "exit 0",
     "fi",
     "shift",

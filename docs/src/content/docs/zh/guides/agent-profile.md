@@ -11,7 +11,7 @@ lead: "页面顶部的交互式面板可直接连到你正在运行的 CCR，为
 - 试用阶段优先选择 **仅从 CCR 打开时生效**（默认），只影响从 CCR 打开的 Agent；确认稳定后再考虑 **系统默认**。
 - Claude Code、Codex 可选择 **入口模式**（CLI 与 APP / 仅 CLI / 仅 App）；Grok CLI、Kimi CLI 固定为仅 CLI，ZCode 和 WorkBuddy 固定为仅 App。
 - 保存后尽量用配置卡片上的按钮启动 Agent（终端按钮打开 CLI，播放按钮打开 App），再发一条请求到 **请求日志** 验证。
-- 命令名按发行版区分：桌面端卡片复制的是 `ccr-app ...`；CLI 使用 `ccr ...`，配置名称和可选的 `cli` / `app` 后缀保持一致。
+- 命令名按发行版区分：桌面端卡片复制的是 `agentrouter ...`；CLI 使用 `ccr ...`，配置名称和可选的 `cli` / `app` 后缀保持一致。
 
 ## Claude Code
 
@@ -41,7 +41,7 @@ Codex 专属字段见 [Codex 接入与配置](../../configuration/agents/codex/)
 
 1. **添加配置** → 选择 **Grok CLI**，填写 **配置名称**。
 2. 选择 **模型**。
-3. **保存**，然后运行配置命令：桌面端卡片是 `ccr-app "<配置名称>"`，CLI 是 `ccr "<配置名称>"`。
+3. **保存**，然后运行配置命令：桌面端卡片是 `agentrouter "<配置名称>"`，CLI 是 `ccr "<配置名称>"`。
 4. 在 Grok 中发一条消息确认能正常回复，到 **请求日志** 核对请求是否经过网关；用 `/model` 切换 CCR 暴露的模型。
 
 完整字段见 [Grok CLI 接入与配置](../../configuration/agents/grok/)。
@@ -52,7 +52,7 @@ Codex 专属字段见 [Codex 接入与配置](../../configuration/agents/codex/)
 
 1. **添加配置** → 选择 **Kimi CLI**，填写 **配置名称**。
 2. 选择 **Kimi 模型**（默认模型）以及一个或多个 **可用模型**。
-3. **保存**，然后运行配置命令：桌面端卡片是 `ccr-app "<配置名称>"`，CLI 是 `ccr "<配置名称>"`。
+3. **保存**，然后运行配置命令：桌面端卡片是 `agentrouter "<配置名称>"`，CLI 是 `ccr "<配置名称>"`。
 4. 在 Kimi 中发一条消息确认能正常回复，到 **请求日志** 核对请求是否经过网关；用 `/model` 在默认模型与可用模型之间切换。
 
 完整字段见 [Kimi CLI 接入与配置](../../configuration/agents/kimi/)。

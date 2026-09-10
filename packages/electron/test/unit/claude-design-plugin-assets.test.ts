@@ -4,8 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-const previousTestExports = process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
-process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = "1";
+const previousTestExports = process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
+process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = "1";
 const claudeDesignPlugin = require(path.resolve(
   process.cwd(),
   "packages",
@@ -15,9 +15,9 @@ const claudeDesignPlugin = require(path.resolve(
   "index.cjs"
 ));
 if (previousTestExports === undefined) {
-  delete process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
+  delete process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
 } else {
-  process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = previousTestExports;
+  process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = previousTestExports;
 }
 
 test("Claude Design local asset discovery supports public, design, and assets roots", () => {

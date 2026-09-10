@@ -22,7 +22,7 @@ import { isLocalAgentOauthProviderPlugin } from "@ccr/core/gateway/core-runtime/
 import { resolveConfiguredProviderModelSelector, resolveUniqueConfiguredProviderModelSelector } from "@ccr/core/routing/model-resolution";
 
 const upstreamHeaderSanitizerPluginKey = "ccr-upstream-header-sanitizer";
-const localAgentAuthProviderHookPluginKey = "ccr-local-agent-auth-provider-hooks";
+const localAgentAuthProviderHookPluginKey = "ar-local-agent-auth-provider-hooks";
 export const unlimitedVirtualModelToolCalls = Number.MAX_SAFE_INTEGER;
 export const unlimitedVirtualModelToolTurns = Number.MAX_SAFE_INTEGER;
 
@@ -64,7 +64,7 @@ export async function compileCoreGatewayConfig(
   const coreEndpoint = endpoint(config.gateway.coreHost, config.gateway.corePort);
   const proxyPreloadFile = upstreamProxyUrl ? writeGatewayProxyPreloadFile() : undefined;
   const proxyEnv = upstreamProxyUrl
-    ? { CCR_UPSTREAM_PROXY_URL: upstreamProxyUrl, CCR_UNDICI_MODULE: resolveUndiciProxyAgentModule() }
+    ? { CCR_UPSTREAM_PROXY_URL: upstreamProxyUrl, AR_UNDICI_MODULE: resolveUndiciProxyAgentModule() }
     : undefined;
   const builtinToolArtifacts = await fusionBuiltinToolArtifacts(
     virtualModelProfiles,
@@ -245,7 +245,7 @@ function withMissingCodexOauthProviderPlugins(
       continue;
     }
 
-    const keyPrefix = `ccr-local-agent-${providerNameSlug(runtimeName)}`;
+    const keyPrefix = `ar-local-agent-${providerNameSlug(runtimeName)}`;
     additions.push({
       codexOauth: {
         accessToken: codexAuth.accessToken,
@@ -687,7 +687,7 @@ function isLocalCodexOauthProviderPlugin(value: unknown): value is Record<string
     return false;
   }
   const key = stringValue(value.key)?.toLowerCase() ?? "";
-  return key.startsWith("ccr-local-agent-") && key.includes("codex-oauth");
+  return key.startsWith("ar-local-agent-") && key.includes("codex-oauth");
 }
 
 
@@ -793,7 +793,7 @@ function isLocalGrokOauthProviderPlugin(value: unknown): value is Record<string,
     return false;
   }
   const key = stringValue(value.key)?.toLowerCase() ?? "";
-  return key.startsWith("ccr-local-agent-") && key.includes("grok-cli-oauth");
+  return key.startsWith("ar-local-agent-") && key.includes("grok-cli-oauth");
 }
 
 
@@ -802,7 +802,7 @@ function isLocalKimiOauthProviderPlugin(value: unknown): value is Record<string,
     return false;
   }
   const key = stringValue(value.key)?.toLowerCase() ?? "";
-  return key.startsWith("ccr-local-agent-") && key.includes("kimi-cli-oauth");
+  return key.startsWith("ar-local-agent-") && key.includes("kimi-cli-oauth");
 }
 
 

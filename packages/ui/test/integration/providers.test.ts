@@ -932,7 +932,7 @@ test("provider connectivity API key follows selected credential mode", () => {
 test("provider connectivity includes saved Codex OAuth plugins while editing", () => {
   const provider = {
     api_base_url: "https://chatgpt.com/backend-api/codex",
-    api_key: "ccr-local-agent-login",
+    api_key: "ar-local-agent-login",
     id: "codex-api",
     models: ["gpt-5.5"],
     name: "Codex API",
@@ -944,23 +944,23 @@ test("provider connectivity includes saved Codex OAuth plugins while editing", (
   };
   const displayPlugin = {
     codexOauth: { refreshToken: "refresh-display" },
-    key: "ccr-local-agent-codex-api-codex-oauth",
+    key: "ar-local-agent-codex-api-codex-oauth",
     providerName: "Codex API"
   };
   const runtimePlugin = {
     codexOauth: { refreshToken: "refresh-runtime" },
-    key: "ccr-local-agent-codex-api-codex-oauth-internal",
+    key: "ar-local-agent-codex-api-codex-oauth-internal",
     providerName: "codex-api::openai_responses"
   };
   const disabledRuntimePlugin = {
     codexOauth: { refreshToken: "refresh-disabled" },
     enabled: false,
-    key: "ccr-local-agent-codex-api-codex-oauth-disabled",
+    key: "ar-local-agent-codex-api-codex-oauth-disabled",
     providerName: "codex-api::openai_responses"
   };
   const otherPlugin = {
     codexOauth: { refreshToken: "refresh-other" },
-    key: "ccr-local-agent-other-codex-oauth",
+    key: "ar-local-agent-other-codex-oauth",
     providerName: "Other Codex API"
   };
 
@@ -981,7 +981,7 @@ test("provider connectivity includes saved Codex OAuth plugins while editing", (
     ...provider,
     api_key: "",
     credentials: [{
-      api_key: "ccr-local-agent-login",
+      api_key: "ar-local-agent-login",
       enabled: true,
       id: "login",
       name: "Login"
@@ -1466,7 +1466,7 @@ test("provider display icon prefers custom icons and falls back to preset icons"
   assert.equal(
     providerDisplayIcon({
       api_base_url: "https://cli-chat-proxy.grok.com/v1",
-      api_key: "ccr-local-agent-login",
+      api_key: "ar-local-agent-login",
       icon: "/assets/grok-old.svg",
       models: [],
       name: "Grok CLI API",

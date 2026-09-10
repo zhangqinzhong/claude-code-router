@@ -5,9 +5,9 @@ import path from "node:path";
 import test from "node:test";
 import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
 import { pluginService } from "@ccr/core/plugins/service.ts";
-import { CCR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
+import { AR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
 
-test("plugin permissions gate dynamic gateway route registration", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("plugin permissions gate dynamic gateway route registration", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-permissions-"));
   try {
     const pluginFile = path.join(dir, "route-plugin.cjs");
@@ -44,7 +44,7 @@ test("plugin permissions gate dynamic gateway route registration", { skip: !proc
   }
 });
 
-test("plugins without permissions declarations are rejected", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("plugins without permissions declarations are rejected", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-missing-permissions-"));
   try {
     const pluginFile = path.join(dir, "missing-permissions-plugin.cjs");
@@ -77,7 +77,7 @@ test("plugins without permissions declarations are rejected", { skip: !process.e
   }
 });
 
-test("plugin permissions gate configured browser apps", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("plugin permissions gate configured browser apps", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-static-permissions-"));
   try {
     const warnings = await startWithWarnings({
@@ -100,7 +100,7 @@ test("plugin permissions gate configured browser apps", { skip: !process.env.CCR
   }
 });
 
-test("known bundled plugins without persisted permissions receive scoped defaults", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("known bundled plugins without persisted permissions receive scoped defaults", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-known-defaults-"));
   try {
     const pluginFile = path.join(dir, "claude-design-plugin.cjs");
@@ -141,11 +141,11 @@ test("known bundled plugins without persisted permissions receive scoped default
   }
 });
 
-test("Claude browser plugins are skipped outside CCR Desktop", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("Claude browser plugins are skipped outside CCR Desktop", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-desktop-only-"));
-  const previousDesktopApp = process.env[CCR_DESKTOP_APP_ENV];
+  const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
-    delete process.env[CCR_DESKTOP_APP_ENV];
+    delete process.env[AR_DESKTOP_APP_ENV];
     const pluginFile = path.join(dir, "claude-design-plugin.cjs");
     writeFileSync(pluginFile, [
       "\"use strict\";",
@@ -178,13 +178,13 @@ test("Claude browser plugins are skipped outside CCR Desktop", { skip: !process.
     assert.deepEqual(pluginService.getApps(), []);
     assert.equal(pluginService.hasGatewayRoutes(), false);
   } finally {
-    restoreEnv(CCR_DESKTOP_APP_ENV, previousDesktopApp);
+    restoreEnv(AR_DESKTOP_APP_ENV, previousDesktopApp);
     await pluginService.stop();
     rmSync(dir, { force: true, recursive: true });
   }
 });
 
-test("app-only plugin surface can execute trusted JavaScript and register apps", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("app-only plugin surface can execute trusted JavaScript and register apps", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-app-surface-"));
   try {
     const pluginFile = path.join(dir, "app-only-plugin.cjs");
@@ -234,7 +234,7 @@ test("app-only plugin surface can execute trusted JavaScript and register apps",
   }
 });
 
-test("plugin surfaces gate dynamic gateway registration", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("plugin surfaces gate dynamic gateway registration", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-surface-gate-"));
   try {
     const pluginFile = path.join(dir, "gateway-surface-plugin.cjs");
@@ -267,7 +267,7 @@ test("plugin surfaces gate dynamic gateway registration", { skip: !process.env.C
   }
 });
 
-test("plugin modules are reloaded from the same path after gateway restart", { skip: !process.env.CCR_INTERNAL_HOME_DIR }, async () => {
+test("plugin modules are reloaded from the same path after gateway restart", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-plugin-reload-"));
   try {
     const pluginFile = path.join(dir, "reload-plugin.cjs");
@@ -321,12 +321,12 @@ function baseConfig(dir) {
 }
 
 async function withDesktopRuntime(run) {
-  const previousDesktopApp = process.env[CCR_DESKTOP_APP_ENV];
+  const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
-    process.env[CCR_DESKTOP_APP_ENV] = "1";
+    process.env[AR_DESKTOP_APP_ENV] = "1";
     return await run();
   } finally {
-    restoreEnv(CCR_DESKTOP_APP_ENV, previousDesktopApp);
+    restoreEnv(AR_DESKTOP_APP_ENV, previousDesktopApp);
   }
 }
 

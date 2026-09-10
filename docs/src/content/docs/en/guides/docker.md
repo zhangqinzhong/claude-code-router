@@ -88,7 +88,7 @@ docker run -d \
   --name claude-code-router \
   --restart unless-stopped \
   -p 127.0.0.1:3458:8080 \
-  -e CCR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
+  -e AR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
   -v ccr-data:/data \
   claude-code-router:local
 ```
@@ -99,24 +99,24 @@ The repository also provides `npm run docker:build` and `npm run docker:run`. Th
 
 | Credential | Purpose | Where configured |
 | --- | --- | --- |
-| `CCR_WEB_AUTH_TOKEN` | Management UI / RPC authentication | Container environment variable |
+| `AR_WEB_AUTH_TOKEN` | Management UI / RPC authentication | Container environment variable |
 | CCR client API key | Model gateway request authentication | **API Keys** page in the UI |
 | Upstream provider credential | CCR calling model providers | **Providers** page in the UI |
 
-Without `CCR_WEB_AUTH_TOKEN`, the entrypoint generates a new random token on every container start. Opening the root address still works because Nginx redirects to a URL containing the current token; but persistent and remote deployments should pin a sufficiently long, strong token.
+Without `AR_WEB_AUTH_TOKEN`, the entrypoint generates a new random token on every container start. Opening the root address still works because Nginx redirects to a URL containing the current token; but persistent and remote deployments should pin a sufficiently long, strong token.
 
 Do not write the token directly into shell history. Create an environment file that stays out of version control:
 
 ```dotenv
-CCR_WEB_AUTH_TOKEN=replace-with-a-long-random-value
-CCR_PUBLIC_BASE_URL=http://127.0.0.1:3458
+AR_WEB_AUTH_TOKEN=replace-with-a-long-random-value
+AR_PUBLIC_BASE_URL=http://127.0.0.1:3458
 ```
 
 Use it via `docker run --env-file`, or map the same variables into the Compose service `environment`. The complete management URL containing `ccr_web_token` should also be protected like a password, because it can appear in browser history, reverse proxy logs, screenshots, and tickets.
 
 ## Change the external port or address
 
-The host-facing address and the container-internal port are two layers of configuration. When changing the host port, also set `CCR_PUBLIC_BASE_URL` to the full address clients actually use:
+The host-facing address and the container-internal port are two layers of configuration. When changing the host port, also set `AR_PUBLIC_BASE_URL` to the full address clients actually use:
 
 ```yaml
 services:
@@ -124,11 +124,11 @@ services:
     ports:
       - "127.0.0.1:8088:8080"
     environment:
-      CCR_PUBLIC_BASE_URL: http://127.0.0.1:8088
-      CCR_WEB_AUTH_TOKEN: ${CCR_WEB_AUTH_TOKEN:?set CCR_WEB_AUTH_TOKEN}
+      AR_PUBLIC_BASE_URL: http://127.0.0.1:8088
+      AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
-`CCR_PUBLIC_BASE_URL` is synchronized into CCR's public router endpoint. It does not publish a Docker port by itself, nor does it change the Nginx listen address.
+`AR_PUBLIC_BASE_URL` is synchronized into CCR's public router endpoint. It does not publish a Docker port by itself, nor does it change the Nginx listen address.
 
 ## Domain, HTTPS, and reverse proxy
 
@@ -140,8 +140,8 @@ services:
     ports:
       - "127.0.0.1:3458:8080"
     environment:
-      CCR_PUBLIC_BASE_URL: https://ccr.example.com
-      CCR_WEB_AUTH_TOKEN: ${CCR_WEB_AUTH_TOKEN:?set CCR_WEB_AUTH_TOKEN}
+      AR_PUBLIC_BASE_URL: https://ccr.example.com
+      AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
 The reverse proxy should forward all paths to the CCR Nginx and must:
@@ -203,26 +203,26 @@ Upgrades run the migrations the current version needs against the persisted data
 
 ## Environment variable reference
 
-A typical deployment only needs `CCR_WEB_AUTH_TOKEN`, `CCR_PUBLIC_BASE_URL`, and the Docker port mapping. The internal listener variables normally do not need changing.
+A typical deployment only needs `AR_WEB_AUTH_TOKEN`, `AR_PUBLIC_BASE_URL`, and the Docker port mapping. The internal listener variables normally do not need changing.
 
 | Variable | Default | Description |
 | --- | --- | --- |
-| `CCR_WEB_AUTH_TOKEN` | Randomly generated per start | Management UI / RPC token. Persistent or remote deployments should set a fixed strong value. |
-| `CCR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | Full public address written into CCR configuration; takes precedence over Public Host / Port once set. |
-| `CCR_PUBLIC_HOST` | `127.0.0.1` | Only used to compose the public address when no full public URL is set; does not change the Docker port binding. |
-| `CCR_PUBLIC_PORT` | `3458` | Only used to compose the public address when no full public URL is set. |
-| `CCR_DATA_DIR` | `/data` | Data root, also used as the process `HOME`. |
-| `CCR_NGINX_PORT` | `8080` | Nginx listen port inside the container; should match the right side of the port mapping. |
-| `CCR_WEB_HOST` | `127.0.0.1` | Management service listen address inside the container. |
-| `CCR_WEB_PORT` | `3459` | Management service port inside the container. |
-| `CCR_GATEWAY_HOST` | `127.0.0.1` | Model gateway listen address inside the container. |
-| `CCR_GATEWAY_PORT` | `3456` | Model gateway port inside the container that Nginx proxies to. |
-| `CCR_GATEWAY_CORE_PORT` | `3457` | Core Gateway Runtime port inside the container. |
-| `CCR_NO_GATEWAY` | `0` | When set to `1`, `true`, or `yes`, only the management UI runs during startup. |
-| `CCR_DOCKER_INIT_CONFIG` | `1` | Set to `0` to disable the first-boot minimal `config.json` bootstrap. |
-| `CCR_DOCKER_SYNC_PUBLIC_ENDPOINT` | `1` | Set to `0` to stop synchronizing existing JSON / SQLite listener and public address fields at startup. |
+| `AR_WEB_AUTH_TOKEN` | Randomly generated per start | Management UI / RPC token. Persistent or remote deployments should set a fixed strong value. |
+| `AR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | Full public address written into CCR configuration; takes precedence over Public Host / Port once set. |
+| `AR_PUBLIC_HOST` | `127.0.0.1` | Only used to compose the public address when no full public URL is set; does not change the Docker port binding. |
+| `AR_PUBLIC_PORT` | `3458` | Only used to compose the public address when no full public URL is set. |
+| `AR_DATA_DIR` | `/data` | Data root, also used as the process `HOME`. |
+| `AR_NGINX_PORT` | `8080` | Nginx listen port inside the container; should match the right side of the port mapping. |
+| `AR_WEB_HOST` | `127.0.0.1` | Management service listen address inside the container. |
+| `AR_WEB_PORT` | `3459` | Management service port inside the container. |
+| `AR_GATEWAY_HOST` | `127.0.0.1` | Model gateway listen address inside the container. |
+| `AR_GATEWAY_PORT` | `3456` | Model gateway port inside the container that Nginx proxies to. |
+| `AR_GATEWAY_CORE_PORT` | `3457` | Core Gateway Runtime port inside the container. |
+| `AR_NO_GATEWAY` | `0` | When set to `1`, `true`, or `yes`, only the management UI runs during startup. |
+| `AR_DOCKER_INIT_CONFIG` | `1` | Set to `0` to disable the first-boot minimal `config.json` bootstrap. |
+| `AR_DOCKER_SYNC_PUBLIC_ENDPOINT` | `1` | Set to `0` to stop synchronizing existing JSON / SQLite listener and public address fields at startup. |
 
-Changing internal ports requires keeping the PM2 and Nginx variables consistent, with no benefit for normal deployments. Only `CCR_NGINX_PORT` should ever be published externally.
+Changing internal ports requires keeping the PM2 and Nginx variables consistent, with no benefit for normal deployments. Only `AR_NGINX_PORT` should ever be published externally.
 
 ## Build and smoke test
 
@@ -241,7 +241,7 @@ Run the Docker smoke test:
 npm run test:docker
 ```
 
-The test creates a temporary container and volume, verifies the single Nginx port, UI / RPC authentication, public address migration, gateway startup, and `/health`, then cleans up automatically. Use `CCR_DOCKER_TEST_SKIP_BUILD=1` to reuse an existing image, or `CCR_DOCKER_TEST_IMAGE` to select a local tag.
+The test creates a temporary container and volume, verifies the single Nginx port, UI / RPC authentication, public address migration, gateway startup, and `/health`, then cleans up automatically. Use `AR_DOCKER_TEST_SKIP_BUILD=1` to reuse an existing image, or `AR_DOCKER_TEST_IMAGE` to select a local tag.
 
 ## Daily operations commands
 
@@ -270,7 +270,7 @@ Reopen the bare root address so Nginx generates a URL containing the new token; 
 
 ### Clients still use the old port or domain
 
-Update `CCR_PUBLIC_BASE_URL` and recreate the container. Keep `CCR_DOCKER_SYNC_PUBLIC_ENDPOINT=1` so existing SQLite configuration is synchronized at startup.
+Update `AR_PUBLIC_BASE_URL` and recreate the container. Keep `AR_DOCKER_SYNC_PUBLIC_ENDPOINT=1` so existing SQLite configuration is synchronized at startup.
 
 ### Configuration disappears after a rebuild
 

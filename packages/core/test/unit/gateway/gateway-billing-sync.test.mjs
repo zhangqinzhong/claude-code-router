@@ -9,8 +9,8 @@ test("core gateway disables the full-trace billing webhook without disabling raw
   config.gateway.host = "0.0.0.0";
   config.gateway.port = 4567;
   config.observability.requestLogs = true;
-  const previousRawTraceEnabled = process.env.CCR_RAW_TRACE_ENABLED;
-  process.env.CCR_RAW_TRACE_ENABLED = "1";
+  const previousRawTraceEnabled = process.env.AR_RAW_TRACE_ENABLED;
+  process.env.AR_RAW_TRACE_ENABLED = "1";
 
   try {
     const compiled = await compileCoreGatewayConfig(
@@ -36,9 +36,9 @@ test("core gateway disables the full-trace billing webhook without disabling raw
     });
   } finally {
     if (previousRawTraceEnabled === undefined) {
-      delete process.env.CCR_RAW_TRACE_ENABLED;
+      delete process.env.AR_RAW_TRACE_ENABLED;
     } else {
-      process.env.CCR_RAW_TRACE_ENABLED = previousRawTraceEnabled;
+      process.env.AR_RAW_TRACE_ENABLED = previousRawTraceEnabled;
     }
   }
 });
@@ -48,7 +48,7 @@ test("Codex OAuth providers remove unsupported Responses request fields", async 
   config.providerPlugins = [{
     codexOauth: {},
     enabled: true,
-    key: "ccr-local-agent-codex-oauth-test",
+    key: "ar-local-agent-codex-oauth-test",
     providerName: "Codex API::openai_responses",
     request: {
       bodyRemove: ["custom-field"]
@@ -61,7 +61,7 @@ test("Codex OAuth providers remove unsupported Responses request fields", async 
     "billing-usage-token",
     "core-auth-token"
   );
-  const plugin = compiled.providerPlugins.find((item) => item.key === "ccr-local-agent-codex-oauth-test");
+  const plugin = compiled.providerPlugins.find((item) => item.key === "ar-local-agent-codex-oauth-test");
 
   assert.deepEqual(plugin.request.bodyRemove, ["custom-field", "max_output_tokens", "stop"]);
 });

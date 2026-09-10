@@ -35,7 +35,7 @@ Kilo Code is fixed to **CLI only**, so the entry mode is not editable. The field
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Kilo Code** | Creates a Kilo Code launch entry in CCR. |
-| Config name | Free text, e.g. `Kilo - Work` | Identifies the profile. Desktop commands use `ccr-app "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Kilo - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Effect scope | `Only opened from CCR` / `System default` | Keeps changes limited to CCR launches, or makes this the system-default Kilo profile. Only one enabled system-default Kilo profile is allowed. |
 | Provider ID | Default `claude-code-router` | Provider reference for this Kilo profile. |
@@ -49,7 +49,7 @@ Kilo Code is fixed to **CLI only**, so the entry mode is not editable. The field
 Desktop command copied from the profile card:
 
 ```text
-ccr-app "Kilo - Work"
+agentrouter "Kilo - Work"
 ```
 
 For CLI, run:
@@ -64,7 +64,7 @@ Create separate Kilo profiles when you want different models or providers.
 
 ## Verify
 
-1. Run the desktop `ccr-app` command copied from the profile card, or the CLI `ccr` command.
+1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `ccr` command.
 2. Send one message in Kilo and confirm it replies.
 3. Open **Request logs** in CCR and confirm the request passed through the gateway.
 

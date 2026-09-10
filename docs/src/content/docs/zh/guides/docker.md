@@ -88,7 +88,7 @@ docker run -d \
   --name claude-code-router \
   --restart unless-stopped \
   -p 127.0.0.1:3458:8080 \
-  -e CCR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
+  -e AR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
   -v ccr-data:/data \
   claude-code-router:local
 ```
@@ -99,24 +99,24 @@ docker run -d \
 
 | 凭据 | 用途 | 配置位置 |
 | --- | --- | --- |
-| `CCR_WEB_AUTH_TOKEN` | 管理 UI / RPC 鉴权 | 容器环境变量 |
+| `AR_WEB_AUTH_TOKEN` | 管理 UI / RPC 鉴权 | 容器环境变量 |
 | CCR 客户端 API Key | 模型网关请求鉴权 | UI 的 **API 密钥** 页面 |
 | 上游供应商凭据 | CCR 调用模型供应商 | UI 的 **供应商** 页面 |
 
-不设置 `CCR_WEB_AUTH_TOKEN` 时，EntryPoint 每次启动容器都会生成新的随机 Token。打开根地址仍可工作，因为 Nginx 会跳转到包含当前 Token 的 URL；但持久部署和远程部署应固定一个足够长的强 Token。
+不设置 `AR_WEB_AUTH_TOKEN` 时，EntryPoint 每次启动容器都会生成新的随机 Token。打开根地址仍可工作，因为 Nginx 会跳转到包含当前 Token 的 URL；但持久部署和远程部署应固定一个足够长的强 Token。
 
 不要把 Token 直接写进 Shell 历史。可以创建不进入版本控制的环境文件：
 
 ```dotenv
-CCR_WEB_AUTH_TOKEN=replace-with-a-long-random-value
-CCR_PUBLIC_BASE_URL=http://127.0.0.1:3458
+AR_WEB_AUTH_TOKEN=replace-with-a-long-random-value
+AR_PUBLIC_BASE_URL=http://127.0.0.1:3458
 ```
 
 通过 `docker run --env-file` 使用，或把同名变量映射到 Compose 服务的 `environment`。包含 `ccr_web_token` 的完整管理 URL 也应按密码保护，因为它可能出现在浏览器历史、反向代理日志、截图和工单中。
 
 ## 修改外部端口或地址
 
-宿主机对外地址与容器内部端口是两层配置。修改宿主机端口时，还要把 `CCR_PUBLIC_BASE_URL` 设置为客户端真实使用的完整地址：
+宿主机对外地址与容器内部端口是两层配置。修改宿主机端口时，还要把 `AR_PUBLIC_BASE_URL` 设置为客户端真实使用的完整地址：
 
 ```yaml
 services:
@@ -124,11 +124,11 @@ services:
     ports:
       - "127.0.0.1:8088:8080"
     environment:
-      CCR_PUBLIC_BASE_URL: http://127.0.0.1:8088
-      CCR_WEB_AUTH_TOKEN: ${CCR_WEB_AUTH_TOKEN:?set CCR_WEB_AUTH_TOKEN}
+      AR_PUBLIC_BASE_URL: http://127.0.0.1:8088
+      AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
-`CCR_PUBLIC_BASE_URL` 会同步到 CCR 的公开 Router Endpoint。它本身不会发布 Docker 端口，也不会改变 Nginx 监听地址。
+`AR_PUBLIC_BASE_URL` 会同步到 CCR 的公开 Router Endpoint。它本身不会发布 Docker 端口，也不会改变 Nginx 监听地址。
 
 ## 域名、HTTPS 与反向代理
 
@@ -140,8 +140,8 @@ services:
     ports:
       - "127.0.0.1:3458:8080"
     environment:
-      CCR_PUBLIC_BASE_URL: https://ccr.example.com
-      CCR_WEB_AUTH_TOKEN: ${CCR_WEB_AUTH_TOKEN:?set CCR_WEB_AUTH_TOKEN}
+      AR_PUBLIC_BASE_URL: https://ccr.example.com
+      AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
 反向代理应把全部路径交给 CCR Nginx，并满足：
@@ -203,26 +203,26 @@ docker compose logs --tail=200 ccr
 
 ## 环境变量完整参考
 
-一般部署只需要设置 `CCR_WEB_AUTH_TOKEN`、`CCR_PUBLIC_BASE_URL` 和 Docker Port Mapping。内部监听变量通常不需要修改。
+一般部署只需要设置 `AR_WEB_AUTH_TOKEN`、`AR_PUBLIC_BASE_URL` 和 Docker Port Mapping。内部监听变量通常不需要修改。
 
 | 变量 | 默认值 | 说明 |
 | --- | --- | --- |
-| `CCR_WEB_AUTH_TOKEN` | 每次启动随机生成 | 管理 UI / RPC Token。持久或远程部署应设置固定强值。 |
-| `CCR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | 写入 CCR 配置的完整公开地址；设置后优先于 Public Host / Port。 |
-| `CCR_PUBLIC_HOST` | `127.0.0.1` | 仅在没有完整公开 URL 时用于拼接公开地址，不会改变 Docker 端口绑定。 |
-| `CCR_PUBLIC_PORT` | `3458` | 仅在没有完整公开 URL 时用于拼接公开地址。 |
-| `CCR_DATA_DIR` | `/data` | 数据根目录，同时作为进程 `HOME`。 |
-| `CCR_NGINX_PORT` | `8080` | Nginx 容器内监听端口，应与 Port Mapping 右侧一致。 |
-| `CCR_WEB_HOST` | `127.0.0.1` | 管理服务容器内监听地址。 |
-| `CCR_WEB_PORT` | `3459` | 管理服务容器内端口。 |
-| `CCR_GATEWAY_HOST` | `127.0.0.1` | 模型网关容器内监听地址。 |
-| `CCR_GATEWAY_PORT` | `3456` | Nginx 转发到的模型网关容器内端口。 |
-| `CCR_GATEWAY_CORE_PORT` | `3457` | Core Gateway Runtime 容器内端口。 |
-| `CCR_NO_GATEWAY` | `0` | 设为 `1`、`true` 或 `yes` 时，启动阶段只运行管理 UI。 |
-| `CCR_DOCKER_INIT_CONFIG` | `1` | 设为 `0` 时禁用首次最小 `config.json` 引导。 |
-| `CCR_DOCKER_SYNC_PUBLIC_ENDPOINT` | `1` | 设为 `0` 时不再在启动时同步已有 JSON / SQLite 的监听和公开地址字段。 |
+| `AR_WEB_AUTH_TOKEN` | 每次启动随机生成 | 管理 UI / RPC Token。持久或远程部署应设置固定强值。 |
+| `AR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | 写入 CCR 配置的完整公开地址；设置后优先于 Public Host / Port。 |
+| `AR_PUBLIC_HOST` | `127.0.0.1` | 仅在没有完整公开 URL 时用于拼接公开地址，不会改变 Docker 端口绑定。 |
+| `AR_PUBLIC_PORT` | `3458` | 仅在没有完整公开 URL 时用于拼接公开地址。 |
+| `AR_DATA_DIR` | `/data` | 数据根目录，同时作为进程 `HOME`。 |
+| `AR_NGINX_PORT` | `8080` | Nginx 容器内监听端口，应与 Port Mapping 右侧一致。 |
+| `AR_WEB_HOST` | `127.0.0.1` | 管理服务容器内监听地址。 |
+| `AR_WEB_PORT` | `3459` | 管理服务容器内端口。 |
+| `AR_GATEWAY_HOST` | `127.0.0.1` | 模型网关容器内监听地址。 |
+| `AR_GATEWAY_PORT` | `3456` | Nginx 转发到的模型网关容器内端口。 |
+| `AR_GATEWAY_CORE_PORT` | `3457` | Core Gateway Runtime 容器内端口。 |
+| `AR_NO_GATEWAY` | `0` | 设为 `1`、`true` 或 `yes` 时，启动阶段只运行管理 UI。 |
+| `AR_DOCKER_INIT_CONFIG` | `1` | 设为 `0` 时禁用首次最小 `config.json` 引导。 |
+| `AR_DOCKER_SYNC_PUBLIC_ENDPOINT` | `1` | 设为 `0` 时不再在启动时同步已有 JSON / SQLite 的监听和公开地址字段。 |
 
-修改内部端口需要同时保证 PM2 和 Nginx 变量一致，正常部署没有收益。对外仍然只发布 `CCR_NGINX_PORT`。
+修改内部端口需要同时保证 PM2 和 Nginx 变量一致，正常部署没有收益。对外仍然只发布 `AR_NGINX_PORT`。
 
 ## 构建和烟雾测试
 
@@ -241,7 +241,7 @@ docker build \
 npm run test:docker
 ```
 
-测试会创建临时容器和数据卷，检查单一 Nginx 端口、UI / RPC 鉴权、公开地址迁移、网关启动和 `/health`，最后自动清理。使用 `CCR_DOCKER_TEST_SKIP_BUILD=1` 复用已有镜像，或通过 `CCR_DOCKER_TEST_IMAGE` 指定本地 Tag。
+测试会创建临时容器和数据卷，检查单一 Nginx 端口、UI / RPC 鉴权、公开地址迁移、网关启动和 `/health`，最后自动清理。使用 `AR_DOCKER_TEST_SKIP_BUILD=1` 复用已有镜像，或通过 `AR_DOCKER_TEST_IMAGE` 指定本地 Tag。
 
 ## 日常运维命令
 
@@ -270,7 +270,7 @@ docker compose config
 
 ### 客户端仍使用旧端口或域名
 
-更新 `CCR_PUBLIC_BASE_URL` 并重新创建容器。保持 `CCR_DOCKER_SYNC_PUBLIC_ENDPOINT=1`，让已有 SQLite 配置在启动时同步。
+更新 `AR_PUBLIC_BASE_URL` 并重新创建容器。保持 `AR_DOCKER_SYNC_PUBLIC_ENDPOINT=1`，让已有 SQLite 配置在启动时同步。
 
 ### 重建后配置消失
 

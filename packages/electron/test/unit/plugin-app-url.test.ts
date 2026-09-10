@@ -3,7 +3,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
 import { CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID } from "@ccr/core/contracts/app.ts";
-import { CCR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
+import { AR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
 import { builtInPluginAppForOpen, configForPluginAppOpen, isLegacyClaudeDesignUrl, pluginAppUrlForOpen } from "@ccr/electron/main/plugin-app-url.ts";
 
 const configWithIgnoredSavedDesignHtml = {
@@ -99,7 +99,7 @@ test("Claude Design app opening derives local frontend URL from configured asset
 });
 
 test("Claude Design app opening uses local frontend URL from environment", () => {
-  withEnv("CCR_CLAUDE_DESIGN_FRONTEND_URL", "http://127.0.0.1:6173/design", () => {
+  withEnv("AR_CLAUDE_DESIGN_FRONTEND_URL", "http://127.0.0.1:6173/design", () => {
     assert.equal(
       pluginAppUrlForOpen(
         configWithIgnoredSavedDesignHtml,
@@ -112,7 +112,7 @@ test("Claude Design app opening uses local frontend URL from environment", () =>
 });
 
 test("Claude Ship app opening derives local frontend URL from environment", () => {
-  withEnv("CCR_CLAUDE_SHIP_FRONTEND_ORIGIN", "http://127.0.0.1:6173", () => {
+  withEnv("AR_CLAUDE_SHIP_FRONTEND_ORIGIN", "http://127.0.0.1:6173", () => {
     assert.equal(
       pluginAppUrlForOpen(
         { plugins: [] } as any,
@@ -178,15 +178,15 @@ function bundledPluginModule(pluginId: string): string {
 }
 
 function withDesktopRuntime(run: () => void): void {
-  const previousDesktopApp = process.env[CCR_DESKTOP_APP_ENV];
+  const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
-    process.env[CCR_DESKTOP_APP_ENV] = "1";
+    process.env[AR_DESKTOP_APP_ENV] = "1";
     run();
   } finally {
     if (previousDesktopApp === undefined) {
-      delete process.env[CCR_DESKTOP_APP_ENV];
+      delete process.env[AR_DESKTOP_APP_ENV];
     } else {
-      process.env[CCR_DESKTOP_APP_ENV] = previousDesktopApp;
+      process.env[AR_DESKTOP_APP_ENV] = previousDesktopApp;
     }
   }
 }

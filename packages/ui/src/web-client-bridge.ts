@@ -1,7 +1,7 @@
 type CcrApi = NonNullable<Window["ccr"]>;
 
 const rpcEndpoint = "/api/ccr/rpc";
-const webAuthHeader = "x-ccr-web-auth";
+const webAuthHeader = "x-ar-web-auth";
 const webAuthQueryParam = "ccr_web_token";
 const webAuthStorageKey = "ccr.webAuthToken";
 const webAuthToken = readWebAuthToken();

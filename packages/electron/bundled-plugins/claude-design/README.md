@@ -20,10 +20,10 @@ Browser-saved Claude Design HTML and Claude app `ion-dist` assets are no longer 
 
 When `assetDir` contains a usable `design/index.html` or `index.html`, the plugin serves that saved HTML as the Design shell and does not mix in cached or remote-discovered entry bundles.
 
-When the packaged app owns the `ccr://` protocol handler, the window can also be opened with:
+When the packaged app owns the `agentrouter://` protocol handler, the window can also be opened with:
 
 ```sh
-open 'ccr://plugin/claude-design/open'
+open 'agentrouter://plugin/claude-design/open'
 ```
 
 The local test is considered healthy when Claude Design opens, can create a project, can list projects, and can send an agent message.

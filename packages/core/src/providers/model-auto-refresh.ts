@@ -458,7 +458,7 @@ function localAgentProviderPluginMatches(plugin: unknown, provider: GatewayProvi
     return false;
   }
   const key = readString(plugin.key)?.toLowerCase() ?? "";
-  if (!key.startsWith("ccr-local-agent-")) {
+  if (!key.startsWith("ar-local-agent-")) {
     return false;
   }
 

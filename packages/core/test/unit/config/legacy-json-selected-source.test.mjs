@@ -5,12 +5,12 @@ import test from "node:test";
 
 test("only the successfully parsed legacy JSON source is archived", async () => {
   const testRoot = path.join(
-    process.env.CCR_INTERNAL_HOME_DIR,
+    process.env.AR_INTERNAL_HOME_DIR,
     `legacy-json-selected-source-${process.pid}`
   );
-  process.env.CCR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
-  process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
-  process.env.CCR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+  process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
+  process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
+  process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
   const {
     LEGACY_ACTIVE_CONFIG_FILE,

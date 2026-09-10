@@ -46,6 +46,9 @@ export type AppCopy = {
     trayBalanceProgressNoData: string;
     trayBalanceProgressRequired: string;
     trayIcon: string;
+    trayIconLayered: string;
+    trayShowTokenUsage: string;
+    trayShowTokenUsageHint: string;
     trayIconCyan: string;
     trayIconOrange: string;
     trayIconProgress: string;
@@ -135,7 +138,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       languageEnglish: "English",
       languageSystem: "System",
       launchAtLogin: "Launch at login",
-      launchAtLoginDescription: "Open Claude Code Router automatically when you sign in to this computer.",
+      launchAtLoginDescription: "Open AgentRouter automatically when you sign in to this computer.",
       observability: "Logs & Observability",
       proxy: "Proxy",
       requestLogs: "Request logs",
@@ -159,7 +162,10 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       trayBalanceProgressData: "Data",
       trayBalanceProgressNoData: "No account data is available. Enable account monitoring on a provider first.",
       trayBalanceProgressRequired: "Choose an account and data to enable balance progress.",
-      trayIcon: "Tray mascot",
+      trayIcon: "Tray icon",
+      trayIconLayered: "Layered knot",
+      trayShowTokenUsage: "Show Token usage in the menu bar",
+      trayShowTokenUsageHint: "Turn off to show only the icon. Hover to see today's usage.",
       trayIconCyan: "Auralis",
       trayIconOrange: "Solara",
       trayIconProgress: "Balance progress",
@@ -231,6 +237,8 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "令牌": "Tokens",
       "成本": "Cost",
       "持续时间": "Duration",
+      "首 Token": "First token",
+      "输出速率": "Output rate",
       "反馈": "Feedback",
       "Failed requests": "Failed requests",
       "输入": "Input",
@@ -722,7 +730,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       languageEnglish: "英文",
       languageSystem: "跟随系统",
       launchAtLogin: "开机自启",
-      launchAtLoginDescription: "登录系统后自动打开 Claude Code Router。",
+      launchAtLoginDescription: "登录系统后自动打开 AgentRouter。",
       observability: "日志与观测",
       proxy: "代理",
       requestLogs: "请求日志",
@@ -746,7 +754,10 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       trayBalanceProgressData: "数据",
       trayBalanceProgressNoData: "暂无可用账户数据，请先为供应商启用账户监控。",
       trayBalanceProgressRequired: "请选择账户和数据后启用余额进度条。",
-      trayIcon: "托盘小精灵",
+      trayIcon: "托盘图标",
+      trayIconLayered: "双层结形",
+      trayShowTokenUsage: "菜单栏显示 Token 用量",
+      trayShowTokenUsageHint: "关闭后仅显示图标，悬停仍可查看今日用量。",
       trayIconCyan: "晴岚",
       trayIconOrange: "暖阳",
       trayIconProgress: "余额进度条",

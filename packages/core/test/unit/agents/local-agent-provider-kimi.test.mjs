@@ -53,7 +53,7 @@ default_effort = "max"
     const result = await importKimiProvider(candidate, []);
     assert.equal(result.provider.name, "Kimi CLI OAuth");
     assert.equal(result.provider.baseUrl, "https://api.kimi.com/coding/v1");
-    assert.equal(result.provider.apiKey, "ccr-local-agent-login");
+    assert.equal(result.provider.apiKey, "ar-local-agent-login");
     assert.equal(result.provider.account?.enabled, true);
     assert.equal(result.providerPlugins.length, 2);
     assert.match(result.providerPlugins[0].key, /kimi-cli-oauth$/);
@@ -62,7 +62,7 @@ default_effort = "max"
     assert.equal(result.providerPlugins[0].request.headers["User-Agent"], "kimi-code-cli/0.27.0-test");
     assert.equal(result.providerPlugins[0].request.headers["X-Msh-Platform"], "kimi_code_cli");
     assert.ok(result.providerPlugins[0].request.headers["X-Msh-Device-Id"]);
-    assert.equal(result.providerPlugins[1].providerName, "__CCR_PROVIDER_INTERNAL_NAME__");
+    assert.equal(result.providerPlugins[1].providerName, "__AR_PROVIDER_INTERNAL_NAME__");
   });
 });
 

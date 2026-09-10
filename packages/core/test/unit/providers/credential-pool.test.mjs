@@ -50,7 +50,7 @@ test("provider credential failures cool down the attempted credential and succes
 test("upstream credential response identity takes precedence over the planned chain", () => {
   const { attempt, config, first, provider, second } = fixture();
   const headers = new Headers({
-    "x-ccr-provider-credential-id": providerCredentialRuntimeId(provider, second)
+    "x-ar-provider-credential-id": providerCredentialRuntimeId(provider, second)
   });
 
   recordProviderCredentialOutcome(config, "POST", attempt, 429, headers);

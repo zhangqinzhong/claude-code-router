@@ -272,7 +272,7 @@ const response = await api.fetch(url, {
 | `array-remove` | `value` | 删除与 `value` 匹配的数组元素。 |
 | `array-replace` | `match`、`value` | 把与 `match` 匹配的数组元素替换为 `value`。 |
 
-改写的 `value` 和 `match` 必须是 JSON 值。`__proto__`、`constructor`、`prototype` 等不安全路径会被拒绝。脚本不能改写鉴权、Cookie、Host、Content-Length、连接控制 Header、`x-auth-*` 或 `x-ccr-*` 等受保护 Header。
+改写的 `value` 和 `match` 必须是 JSON 值。`__proto__`、`constructor`、`prototype` 等不安全路径会被拒绝。脚本不能改写鉴权、Cookie、Host、Content-Length、连接控制 Header、`x-auth-*` 或 `x-ar-*` 等受保护 Header。
 
 ##### 回退结构
 
@@ -306,7 +306,7 @@ if (!tenant) {
 }
 
 // 本地文件示例：{ "enterprise": { "model": "供应商/主模型" } }
-const policyFile = api.env("CCR_ROUTING_POLICY_FILE")
+const policyFile = api.env("AR_ROUTING_POLICY_FILE")
   ?? "~/.config/ccr/routing-policy.json";
 let policy = {};
 if (await api.fs.exists(policyFile)) {
@@ -315,13 +315,13 @@ if (await api.fs.exists(policyFile)) {
 }
 
 // 如果配置了策略服务，用远程结果覆盖本地策略。
-const policyUrl = api.env("CCR_ROUTING_POLICY_URL");
+const policyUrl = api.env("AR_ROUTING_POLICY_URL");
 if (policyUrl) {
   const response = await api.fetch(policyUrl, {
     method: "POST",
     headers: {
       "content-type": "application/json",
-      authorization: `Bearer ${api.env("CCR_ROUTING_POLICY_TOKEN") ?? ""}`
+      authorization: `Bearer ${api.env("AR_ROUTING_POLICY_TOKEN") ?? ""}`
     },
     body: JSON.stringify({
       tenant,
@@ -523,4 +523,4 @@ Header 名不区分大小写。Body 字段按点号路径读取，数字片段�
 - `resolved model`：最终请求的模型。
 - 状态码和错误信息。
 
-如果发生了回退，响应头里会带有 `x-ccr-fallback-attempts`、`x-ccr-fallback-failures`、延迟尝试的 `x-ccr-fallback-delays-ms`，以及最终命中的 `x-ccr-fallback-model`。请求日志详情里也会显示关联的重试尝试列表。
+如果发生了回退，响应头里会带有 `x-ar-fallback-attempts`、`x-ar-fallback-failures`、延迟尝试的 `x-ar-fallback-delays-ms`，以及最终命中的 `x-ar-fallback-model`。请求日志详情里也会显示关联的重试尝试列表。

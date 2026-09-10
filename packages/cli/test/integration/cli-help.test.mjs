@@ -63,7 +63,7 @@ function runCli(args) {
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_CLI_COMMAND_NAME: "ccr"
+      AR_CLI_COMMAND_NAME: "ccr"
     }
   });
 }

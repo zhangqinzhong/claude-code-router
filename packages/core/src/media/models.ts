@@ -6,7 +6,7 @@ import {
 } from "@ccr/core/contracts/app";
 import type { GatewayMediaProtocol, GatewayProviderConfig } from "@ccr/core/contracts/app";
 
-const localAgentProviderApiKey = "ccr-local-agent-login";
+const localAgentProviderApiKey = "ar-local-agent-login";
 
 export type GrokMediaKind = "image" | "video";
 

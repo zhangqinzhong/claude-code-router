@@ -1,6 +1,6 @@
 {
-  "appId": "com.claudecoderouter.desktop",
-  "productName": "Claude Code Router",
+  "appId": "com.agentrouter.desktop",
+  "productName": "AgentRouter",
   "asar": true,
   "asarUnpack": [
     "**/*.node",
@@ -24,8 +24,8 @@
   "afterAllArtifactBuild": "build/verify-update-metadata.cjs",
   "protocols": [
     {
-      "name": "Claude Code Router Provider Import",
-      "schemes": ["ccr"]
+      "name": "AgentRouter Provider Import",
+      "schemes": ["agentrouter"]
     }
   ],
   "files": [
@@ -48,7 +48,7 @@
     "entitlementsInherit": "build/entitlements.mac.inherit.plist",
     "notarize": true,
     "target": ["dmg", "zip"],
-    "artifactName": "Claude-Code-Router_${version}.${ext}"
+    "artifactName": "AgentRouter_${version}.${ext}"
   },
   "afterSign": "build/verify-macos-notarization.cjs",
   "win": {
@@ -59,12 +59,12 @@
         "arch": ["x64"]
       }
     ],
-    "artifactName": "Claude-Code-Router_${version}.${ext}"
+    "artifactName": "AgentRouter_${version}.${ext}"
   },
   "linux": {
-    "executableName": "claude-code-router",
+    "executableName": "agentrouter",
     "target": ["AppImage"],
-    "artifactName": "Claude-Code-Router_${version}.${ext}"
+    "artifactName": "AgentRouter_${version}.${ext}"
   },
   "nsis": {
     "oneClick": false,
@@ -75,6 +75,6 @@
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "runAfterFinish": true,
-    "shortcutName": "Claude Code Router"
+    "shortcutName": "AgentRouter"
   }
 }

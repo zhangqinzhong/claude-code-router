@@ -11,7 +11,7 @@ lead: "The interactive panel at the top of this page connects to your running CC
 - During trial, prefer **Only opened from CCR** (the default) so only agents launched from CCR are affected; switch to **System default** once it is stable.
 - Claude Code and Codex let you choose an **Entry mode** (CLI & APP / CLI only / App only); Grok CLI and Kimi CLI are CLI-only, and ZCode and WorkBuddy are App-only.
 - After saving, launch the agent from the buttons on its profile card (the terminal button opens the CLI, the play button opens the app), then verify with one request in **Request logs**.
-- Command names differ by distribution: the desktop app copies `ccr-app ...`; CLI uses `ccr ...` with the same profile name and optional `cli` / `app` suffix.
+- Command names differ by distribution: the desktop app copies `agentrouter ...`; CLI uses `ccr ...` with the same profile name and optional `cli` / `app` suffix.
 
 ## Claude Code
 
@@ -41,7 +41,7 @@ CLI-only, always scoped to **Only opened from CCR** — your global Grok config 
 
 1. **Add Profile** → choose **Grok CLI**, enter a **Profile name**.
 2. Choose a **Model**.
-3. **Save**, then run the profile command: desktop card `ccr-app "<profile-name>"`, or CLI `ccr "<profile-name>"`.
+3. **Save**, then run the profile command: desktop card `agentrouter "<profile-name>"`, or CLI `ccr "<profile-name>"`.
 4. Send a message in Grok to confirm it replies, and check **Request logs** to verify the request went through the gateway; use `/model` to switch CCR-exposed models.
 
 For all fields, see [Grok CLI setup and configuration](../../configuration/agents/grok/).
@@ -52,7 +52,7 @@ CLI-only, always scoped to **Only opened from CCR**.
 
 1. **Add Profile** → choose **Kimi CLI**, enter a **Profile name**.
 2. Choose a **Kimi model** (the default) and one or more **Available models**.
-3. **Save**, then run the profile command: desktop card `ccr-app "<profile-name>"`, or CLI `ccr "<profile-name>"`.
+3. **Save**, then run the profile command: desktop card `agentrouter "<profile-name>"`, or CLI `ccr "<profile-name>"`.
 4. Send a message in Kimi to confirm it replies, and check **Request logs** to verify the request went through the gateway; use `/model` to switch between the default and available models.
 
 For all fields, see [Kimi CLI setup and configuration](../../configuration/agents/kimi/).

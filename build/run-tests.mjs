@@ -46,9 +46,9 @@ async function runProject(project) {
         cwd: projectRoot,
         env: {
           ...process.env,
-          CCR_INTERNAL_APP_DATA_DIR: path.join(testHome, "app-data"),
-          CCR_INTERNAL_HOME_DIR: testHome,
-          CCR_INTERNAL_USER_DATA_DIR: path.join(testHome, "user-data"),
+          AR_INTERNAL_APP_DATA_DIR: path.join(testHome, "app-data"),
+          AR_INTERNAL_HOME_DIR: testHome,
+          AR_INTERNAL_USER_DATA_DIR: path.join(testHome, "user-data"),
           HOME: testHome,
           ...(runtime === "electron" ? { ELECTRON_RUN_AS_NODE: "1" } : {})
         },

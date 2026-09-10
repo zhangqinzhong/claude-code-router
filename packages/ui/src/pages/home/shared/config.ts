@@ -70,6 +70,7 @@ export function normalizeConfig(config: AppConfig): AppConfig {
     trayBalanceProgress,
     trayComponentVariants: normalizeTrayComponentVariants(config.trayComponentVariants),
     trayIcon: trayIcon === "progress" && !trayBalanceProgress ? "random" : trayIcon,
+    trayShowTokenUsage: config.trayShowTokenUsage === true,
     trayProgressTargetTokens: normalizeTrayProgressTargetTokens(config.trayProgressTargetTokens),
     trayWidgets: normalizeTrayWidgets(config.trayWidgets, config.trayWindowModules, config.trayComponentVariants),
     trayWindowModules: normalizeTrayWindowModules(config.trayWindowModules),

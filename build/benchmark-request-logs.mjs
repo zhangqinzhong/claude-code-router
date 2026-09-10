@@ -42,12 +42,12 @@ try {
     encoding: "utf8",
     env: {
       ...process.env,
-      CCR_REQUEST_LOG_BENCHMARK_LABEL: args.label,
-      CCR_REQUEST_LOG_BENCHMARK_SKIP_STORAGE: args.skipStorage ? "1" : "0",
-      CCR_REQUEST_LOG_BENCHMARK_SKIP_WEB: args.skipWeb ? "1" : "0",
-      CCR_REQUEST_LOG_BENCHMARK_WEB_BODY_BYTES: args.webBodyBytes,
-      CCR_REQUEST_LOG_BENCHMARK_WEB_CONCURRENCY: args.webConcurrency,
-      CCR_REQUEST_LOG_BENCHMARK_WEB_REQUESTS: args.webRequests,
+      AR_REQUEST_LOG_BENCHMARK_LABEL: args.label,
+      AR_REQUEST_LOG_BENCHMARK_SKIP_STORAGE: args.skipStorage ? "1" : "0",
+      AR_REQUEST_LOG_BENCHMARK_SKIP_WEB: args.skipWeb ? "1" : "0",
+      AR_REQUEST_LOG_BENCHMARK_WEB_BODY_BYTES: args.webBodyBytes,
+      AR_REQUEST_LOG_BENCHMARK_WEB_CONCURRENCY: args.webConcurrency,
+      AR_REQUEST_LOG_BENCHMARK_WEB_REQUESTS: args.webRequests,
       ...(runtime === "electron" ? { ELECTRON_RUN_AS_NODE: "1" } : {})
     },
     maxBuffer: 16 * 1024 * 1024,

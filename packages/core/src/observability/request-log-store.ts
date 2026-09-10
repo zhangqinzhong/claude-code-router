@@ -140,6 +140,8 @@ export type RequestLogRecordInput = {
   responseHeaders?: Headers | HeaderRecord;
   startedAt: string;
   statusCode: number;
+  timeToFirstTokenMs?: number;
+  streamOutputDurationMs?: number;
   url: string;
 };
 
@@ -169,6 +171,8 @@ export type RequestLogRawTraceUpdateInput = {
   responseBodyTruncated?: boolean;
   responseHeaders?: HeaderRecord;
   statusCode?: number;
+  timeToFirstTokenMs?: number;
+  streamOutputDurationMs?: number;
   url?: string;
 };
 
@@ -244,7 +248,9 @@ type StoredRequestLogEntry = {
   responseModel: string;
   responseHeaders: Record<string, string | string[]>;
   statusCode: number;
+  timeToFirstTokenMs?: number;
   totalTokens: number;
+  streamOutputDurationMs?: number;
   url: string;
 };
 
@@ -674,6 +680,8 @@ export class RequestLogStore {
         status_code,
         ok,
         duration_ms,
+        time_to_first_token_ms,
+        stream_output_duration_ms,
         input_tokens,
         output_tokens,
         reasoning_tokens,
@@ -697,7 +705,7 @@ export class RequestLogStore {
         response_body_truncated,
         response_body_ref,
         error
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     let inserted = false;
@@ -727,6 +735,8 @@ export class RequestLogStore {
         normalizeCount(input.statusCode),
         isSuccessStatus(input.statusCode, responseError) ? 1 : 0,
         normalizeCount(input.durationMs),
+        input.timeToFirstTokenMs ?? null,
+        input.streamOutputDurationMs ?? null,
         inputTokens,
         outputTokens,
         reasoningTokens,
@@ -875,6 +885,8 @@ export class RequestLogStore {
     pushValue("model", modelFromTrace);
     pushValue("resolved_model", resolvedModelFromTrace);
     pushValue("response_model", responseModelFromTrace);
+    pushValue("time_to_first_token_ms", rawInput.timeToFirstTokenMs === undefined ? undefined : optionalCount(rawInput.timeToFirstTokenMs));
+    pushValue("stream_output_duration_ms", rawInput.streamOutputDurationMs === undefined ? undefined : optionalCount(rawInput.streamOutputDurationMs));
     // The gateway's terminal failure is authoritative, even when it has only
     // an HTTP error status and no error string. A final-attempt raw failure may
     // still refine a gateway success (for example an SSE error inside HTTP 200).
@@ -1060,6 +1072,8 @@ export class RequestLogStore {
             status_code,
             ok,
             duration_ms,
+            time_to_first_token_ms,
+            stream_output_duration_ms,
             input_tokens,
             output_tokens,
             reasoning_tokens,
@@ -1386,6 +1400,8 @@ export class RequestLogStore {
         gateway_body_capture_policy TEXT NOT NULL DEFAULT 'none',
         gateway_body_capture_max_bytes INTEGER NOT NULL DEFAULT 0,
         duration_ms INTEGER NOT NULL DEFAULT 0,
+        time_to_first_token_ms INTEGER,
+        stream_output_duration_ms INTEGER,
         input_tokens INTEGER NOT NULL DEFAULT 0,
         output_tokens INTEGER NOT NULL DEFAULT 0,
         reasoning_tokens INTEGER NOT NULL DEFAULT 0,
@@ -1730,8 +1746,8 @@ function agentAnalysisCacheKey(filter: AgentAnalysisFilter): string {
 function extractAgentLogDetails(entry: StoredRequestLogEntry): AgentLogDetails {
   const requestPayloads = parseLogBodyPayloads(entry.requestBody);
   const responsePayloads = parseLogBodyPayloads(entry.responseBody);
-  const routeReason = readHeaderValue(entry.requestHeaders, "x-ccr-route-reason");
-  const routedModel = readHeaderValue(entry.requestHeaders, "x-ccr-routed-model");
+  const routeReason = readHeaderValue(entry.requestHeaders, "x-ar-route-reason");
+  const routedModel = readHeaderValue(entry.requestHeaders, "x-ar-routed-model");
   const subagentModel = extractSubagentModel(entry, requestPayloads, routeReason, routedModel);
   const agent = inferAgentKind(entry, requestPayloads, responsePayloads);
   const toolCalls = extractToolCalls(responsePayloads);
@@ -1817,7 +1833,7 @@ function readAgentHeaderSignals(headers: Record<string, string | string[]>): str
       normalizedKey === "user-agent" ||
       normalizedKey === "x-user-agent" ||
       normalizedKey === "x-client-user-agent" ||
-      normalizedKey === "x-ccr-client" ||
+      normalizedKey === "x-ar-client" ||
       normalizedKey === "x-client-name" ||
       normalizedKey.includes("user-agent") ||
       normalizedKey.endsWith("-ua")
@@ -4088,9 +4104,9 @@ function readHeaderValue(headers: HeaderRecord, name: string): string | undefine
 
 function hasCredentialLogHeaders(headers: HeaderRecord): boolean {
   return Boolean(
-    readHeaderValue(headers, "x-ccr-provider-credential-id") ||
-    readHeaderValue(headers, "x-ccr-provider-credential-chain") ||
-    readHeaderValue(headers, "x-ccr-provider-credential-saturated")
+    readHeaderValue(headers, "x-ar-provider-credential-id") ||
+    readHeaderValue(headers, "x-ar-provider-credential-chain") ||
+    readHeaderValue(headers, "x-ar-provider-credential-saturated")
   );
 }
 
@@ -4098,11 +4114,11 @@ function readCredentialLogInfo(
   responseHeaders: HeaderRecord,
   requestHeaders: HeaderRecord
 ): { chain: string[]; id: string; saturated: boolean } {
-  const responseChain = parseCredentialChain(readHeaderValue(responseHeaders, "x-ccr-provider-credential-chain"));
-  const requestChain = parseCredentialChain(readHeaderValue(requestHeaders, "x-ccr-provider-credential-chain"));
+  const responseChain = parseCredentialChain(readHeaderValue(responseHeaders, "x-ar-provider-credential-chain"));
+  const requestChain = parseCredentialChain(readHeaderValue(requestHeaders, "x-ar-provider-credential-chain"));
   const id = normalizeLabel(
-    readHeaderValue(responseHeaders, "x-ccr-provider-credential-id") ??
-      readHeaderValue(requestHeaders, "x-ccr-provider-credential-id") ??
+    readHeaderValue(responseHeaders, "x-ar-provider-credential-id") ??
+      readHeaderValue(requestHeaders, "x-ar-provider-credential-id") ??
       responseChain[0] ??
       requestChain[0],
     ""
@@ -4115,8 +4131,8 @@ function readCredentialLogInfo(
         ? [id]
         : [];
   const saturated = readHeaderFlag(
-    readHeaderValue(responseHeaders, "x-ccr-provider-credential-saturated") ??
-      readHeaderValue(requestHeaders, "x-ccr-provider-credential-saturated")
+    readHeaderValue(responseHeaders, "x-ar-provider-credential-saturated") ??
+      readHeaderValue(requestHeaders, "x-ar-provider-credential-saturated")
   );
   return { chain, id, saturated };
 }
@@ -4125,13 +4141,13 @@ function parseRequestLogRetryAttempts(
   responseHeaders: Record<string, string | string[]>,
   finalStatusCode: number
 ): RequestLogRetryAttempt[] {
-  const attemptCount = asNumber(readHeaderValue(responseHeaders, "x-ccr-fallback-attempts")) ?? 0;
+  const attemptCount = asNumber(readHeaderValue(responseHeaders, "x-ar-fallback-attempts")) ?? 0;
   if (attemptCount <= 1) {
     return [];
   }
 
-  const failures = splitHeaderCsv(readHeaderValue(responseHeaders, "x-ccr-fallback-failures"));
-  const delays = splitHeaderCsv(readHeaderValue(responseHeaders, "x-ccr-fallback-delays-ms"))
+  const failures = splitHeaderCsv(readHeaderValue(responseHeaders, "x-ar-fallback-failures"));
+  const delays = splitHeaderCsv(readHeaderValue(responseHeaders, "x-ar-fallback-delays-ms"))
     .map((value) => asNumber(value) ?? 0);
   const attempts: RequestLogRetryAttempt[] = [];
 
@@ -4264,6 +4280,8 @@ function ensureRequestLogSchema(database: SqlDatabase): void {
   addColumn("gateway_body_capture_policy", "TEXT NOT NULL DEFAULT 'none'");
   addColumn("gateway_body_capture_max_bytes", "INTEGER NOT NULL DEFAULT 0");
   addColumn("duration_ms", "INTEGER NOT NULL DEFAULT 0");
+  addColumn("time_to_first_token_ms", "INTEGER");
+  addColumn("stream_output_duration_ms", "INTEGER");
   addColumn("input_tokens", "INTEGER NOT NULL DEFAULT 0");
   addColumn("output_tokens", "INTEGER NOT NULL DEFAULT 0");
   addColumn("reasoning_tokens", "INTEGER NOT NULL DEFAULT 0");
@@ -4863,6 +4881,8 @@ function readRequestLogById(database: SqlDatabase, id: number): StoredRequestLog
         status_code,
         ok,
         duration_ms,
+        time_to_first_token_ms,
+        stream_output_duration_ms,
         input_tokens,
         output_tokens,
         reasoning_tokens,
@@ -4943,7 +4963,9 @@ function toRequestLogEntry(row: Record<string, SqlValue>): StoredRequestLogEntry
     responseHeaders,
     responseModel: normalizeLabel(String(row.response_model ?? ""), ""),
     statusCode: normalizeCount(row.status_code),
+    timeToFirstTokenMs: optionalCount(row.time_to_first_token_ms),
     totalTokens: normalizeCount(row.total_tokens),
+    streamOutputDurationMs: optionalCount(row.stream_output_duration_ms),
     url: String(row.url ?? "")
   };
 }
@@ -5592,7 +5614,7 @@ function finalAttemptFromHeaders(
   headers: Record<string, string | string[]>,
   routeAttemptCount?: number
 ): number {
-  const value = Number(headerValue(headers, "x-ccr-fallback-attempts"));
+  const value = Number(headerValue(headers, "x-ar-fallback-attempts"));
   if (Number.isFinite(value) && value >= 1) return Math.floor(value);
   return Number.isFinite(routeAttemptCount) && Number(routeAttemptCount) >= 1
     ? Math.floor(Number(routeAttemptCount))
@@ -6216,6 +6238,10 @@ function normalizeLabel(value: string | undefined, fallback: string): string {
 
 function normalizeCount(value: unknown): number {
   return asNumber(value) ?? 0;
+}
+
+function optionalCount(value: unknown): number | undefined {
+  return asNumber(value);
 }
 
 function asNumber(value: unknown): number | undefined {

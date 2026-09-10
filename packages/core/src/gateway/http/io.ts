@@ -9,7 +9,7 @@ import { coreGatewayAuthHeader, localObservabilityHeaderNames, proxyHeaderDenyLi
 
 export function inferGatewayClient(apiKey: ApiKeyConfig | undefined, headers: IncomingHttpHeaders): string | undefined {
   const explicit =
-    readHeader(headers["x-ccr-client"]) ??
+    readHeader(headers["x-ar-client"]) ??
     readHeader(headers["x-client-name"]) ??
     readHeader(headers["x-forwarded-client-cert"]);
   if (explicit) {
@@ -18,7 +18,7 @@ export function inferGatewayClient(apiKey: ApiKeyConfig | undefined, headers: In
 
   const apiKeyClient = apiKey?.name?.trim() || apiKey?.id?.trim();
   const userAgentClient = inferClientFromUserAgent(headers);
-  if (readHeader(headers["x-ccr-proxy-mode"]) === "gateway") {
+  if (readHeader(headers["x-ar-proxy-mode"]) === "gateway") {
     return userAgentClient ?? apiKeyClient;
   }
   return apiKeyClient ?? userAgentClient;

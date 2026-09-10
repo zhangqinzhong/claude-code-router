@@ -224,7 +224,7 @@ test("issue 1480 Fusion vision config injects core auth token into MCP gateway r
     undefined,
     {
       endpoint: "http://127.0.0.1:3456/__ccr/billing-usage-sync",
-      header: "x-ccr-billing-usage-token",
+      header: "x-ar-billing-usage-token",
       token: "usage-token"
     }
   );
@@ -234,9 +234,9 @@ test("issue 1480 Fusion vision config injects core auth token into MCP gateway r
   assert.equal(server.env.VISION_GATEWAY_BASE_URL, "http://127.0.0.1:3457/v1");
   assert.equal(server.env.VISION_GATEWAY_API_KEY, "core-token");
   assert.equal(server.env.VISION_API_KEY, undefined);
-  assert.equal(server.env.CCR_FUSION_USAGE_SYNC_ENDPOINT, "http://127.0.0.1:3456/__ccr/billing-usage-sync");
-  assert.equal(server.env.CCR_FUSION_USAGE_SYNC_HEADER, "x-ccr-billing-usage-token");
-  assert.equal(server.env.CCR_FUSION_USAGE_SYNC_TOKEN, "usage-token");
+  assert.equal(server.env.AR_FUSION_USAGE_SYNC_ENDPOINT, "http://127.0.0.1:3456/__ccr/billing-usage-sync");
+  assert.equal(server.env.AR_FUSION_USAGE_SYNC_HEADER, "x-ar-billing-usage-token");
+  assert.equal(server.env.AR_FUSION_USAGE_SYNC_TOKEN, "usage-token");
   assert.match(
     server.env.VISION_MODEL,
     /^provider-zhipu-ai-china---coding-plan-[a-f0-9]{10}::openai_chat_completions::cred:test-1\/glm-5v-turbo$/
@@ -331,7 +331,7 @@ test("gateway config passes proxy preload to Fusion built-in MCP runtimes", asyn
   ];
   const proxyPreloadFile = "/tmp/gateway-proxy-preload.cjs";
   const proxyEnv = {
-    CCR_UNDICI_MODULE: "/tmp/undici.js",
+    AR_UNDICI_MODULE: "/tmp/undici.js",
     CCR_UPSTREAM_PROXY_URL: "http://127.0.0.1:8888"
   };
 
@@ -344,7 +344,7 @@ test("gateway config passes proxy preload to Fusion built-in MCP runtimes", asyn
     proxyEnv,
     {
       endpoint: "http://127.0.0.1:3456/__ccr/billing-usage-sync",
-      header: "x-ccr-billing-usage-token",
+      header: "x-ar-billing-usage-token",
       token: "usage-token"
     }
   );
@@ -354,8 +354,8 @@ test("gateway config passes proxy preload to Fusion built-in MCP runtimes", asyn
   assert.deepEqual(server.args.slice(0, 2), ["--require", proxyPreloadFile]);
   assert.equal(server.args[2].endsWith("fusion-vision-mcp.js"), true);
   assert.equal(server.env.CCR_UPSTREAM_PROXY_URL, proxyEnv.CCR_UPSTREAM_PROXY_URL);
-  assert.equal(server.env.CCR_UNDICI_MODULE, proxyEnv.CCR_UNDICI_MODULE);
-  assert.equal(server.env.CCR_FUSION_USAGE_SYNC_ENDPOINT, undefined);
+  assert.equal(server.env.AR_UNDICI_MODULE, proxyEnv.AR_UNDICI_MODULE);
+  assert.equal(server.env.AR_FUSION_USAGE_SYNC_ENDPOINT, undefined);
   assert.equal(server.env.TAVILY_API_KEY, "tavily-key");
 });
 

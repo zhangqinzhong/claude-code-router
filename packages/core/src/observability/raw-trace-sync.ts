@@ -108,7 +108,7 @@ type RawTraceStorageLimits = {
   inboxMaxBytes: number;
 };
 
-const rawTraceInboxDirectoryName = ".ccr-inbox";
+const rawTraceInboxDirectoryName = ".ar-inbox";
 const rawTraceDeadLetterDirectoryName = ".ccr-dead-letter";
 const rawTraceStagingDirectoryName = ".ccr-staging";
 const rawTraceDeliveryFileName = ".ccr-delivery.json";
@@ -1497,7 +1497,7 @@ export function requestLogSampled(requestId: string, rate: number): boolean {
 
 
 function rawTraceEnabledFromEnv(): boolean {
-  const value = (process.env.CCR_RAW_TRACE_ENABLED ?? process.env.CCR_RAW_TRACE ?? "").trim().toLowerCase();
+  const value = (process.env.AR_RAW_TRACE_ENABLED ?? process.env.AR_RAW_TRACE ?? "").trim().toLowerCase();
   return value === "1" || value === "true" || value === "yes" || value === "on";
 }
 
@@ -1536,7 +1536,7 @@ export async function readRawTraceRequestLogBundle(
   const url = sanitizeUrlForLog(rawUrl);
   const attempt = positiveAttemptNumber(readUnknownHeader(
     clientRequestMetadata?.headers,
-    "x-ccr-route-attempt"
+    "x-ar-route-attempt"
   ));
 
   return {

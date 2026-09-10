@@ -17,7 +17,7 @@ test.afterAll(async () => {
   runtime = undefined;
 });
 
-test("uses CCR_WEB_AUTH_TOKEN for CLI web authentication", async () => {
+test("uses AR_WEB_AUTH_TOKEN for CLI web authentication", async () => {
   const current = requireRuntime();
   expect(current.token).toBe(cliWebAuthToken);
 });
@@ -50,7 +50,7 @@ test("handles authenticated web RPC requests", async ({ request }) => {
   const response = await request.post(`${current.baseUrl}/api/ccr/rpc`, {
     data: { args: [], method: "getAppInfo" },
     headers: {
-      "x-ccr-web-auth": current.token
+      "x-ar-web-auth": current.token
     }
   });
   const payload = await response.json();

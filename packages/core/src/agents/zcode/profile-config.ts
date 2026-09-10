@@ -1,3 +1,4 @@
+import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -24,8 +25,8 @@ type ZcodeGatewayConfigValues = {
 };
 
 const legacyZcodeTomlConfigFile = "~/.zcode/config.toml";
-const originalBackupSuffix = ".ccr-original";
-const originalMissingSuffix = ".ccr-original-missing";
+const originalBackupSuffix = ".ar-original";
+const originalMissingSuffix = ".ar-original-missing";
 const defaultZcodeContextWindow = 128_000;
 const defaultZcodeMaxOutputTokens = 8_192;
 
@@ -64,7 +65,7 @@ export function writeZcodeGatewayConfig(
     ])),
     models: modelCatalog.models.map((item) => item.slug),
     providerId,
-    providerName: profile.providerName?.trim() || "Claude Code Router",
+    providerName: profile.providerName?.trim() || "AgentRouter",
     token
   };
   const cliResult = writeJsonFile(file, buildZcodeGatewayConfig(readJsonObject(file), values), options);
@@ -268,10 +269,11 @@ function readJsonObject(file: string): Record<string, unknown> {
 
 function backupFilePath(file: string): string {
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  return `${file}.ccr-backup-${timestamp}`;
+  return `${file}.ar-backup-${timestamp}`;
 }
 
 function ensureOriginalSnapshot(file: string, previous: string | undefined): void {
+  adoptLegacyArtifacts(file);
   const originalBackup = `${file}${originalBackupSuffix}`;
   const originalMissing = `${file}${originalMissingSuffix}`;
   if (existsSync(originalBackup) || existsSync(originalMissing)) {

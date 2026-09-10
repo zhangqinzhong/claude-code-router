@@ -4,12 +4,12 @@ import test from "node:test";
 
 test("saving profiles synchronizes legacy profile enabled flags", async () => {
   const testRoot = path.join(
-    process.env.CCR_INTERNAL_HOME_DIR,
+    process.env.AR_INTERNAL_HOME_DIR,
     `profile-legacy-sync-${process.pid}`
   );
-  process.env.CCR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
-  process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
-  process.env.CCR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+  process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
+  process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
+  process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
   const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
   const { loadPersistedAppConfig, replacePersistedAppConfig } = await import("@ccr/core/config/config-repository.ts");
@@ -80,4 +80,42 @@ test("saving profiles synchronizes legacy profile enabled flags", async () => {
   assert.equal(loadedLegacyBooleanConfig.profile.claudeCode.managedCompact, true);
   assert.equal(loadedLegacyBooleanConfig.profile.codex.managedCompact, true);
   assert.equal(loadedLegacyBooleanConfig.profile.codex.showAllSessions, true);
+});
+
+test("saving an active Claude profile replaces stale legacy model fields", async () => {
+  const testRoot = path.join(
+    process.env.AR_INTERNAL_HOME_DIR,
+    `profile-legacy-model-sync-${process.pid}`
+  );
+  process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
+  process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
+  process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+
+  const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
+  const { loadPersistedAppConfig } = await import("@ccr/core/config/config-repository.ts");
+  const { saveAppConfig } = await import("@ccr/core/config/config.ts");
+
+  const config = createDefaultAppConfig();
+  const profile = config.profile.profiles.find((item) => item.agent === "claude-code");
+  assert.ok(profile);
+  const newModel = "DeepSeek/deepseek-v4.1-flash-expires-on-0910";
+  profile.model = newModel;
+  profile.fableModel = newModel;
+  profile.opusModel = newModel;
+  profile.sonnetModel = newModel;
+  profile.haikuModel = newModel;
+  profile.smallFastModel = newModel;
+  config.profile.claudeCode.model = "stale/legacy-model";
+  config.profile.claudeCode.fableModel = "stale/legacy-model";
+  config.profile.claudeCode.opusModel = "stale/legacy-model";
+  config.profile.claudeCode.sonnetModel = "stale/legacy-model";
+  config.profile.claudeCode.haikuModel = "stale/legacy-model";
+  config.profile.claudeCode.smallFastModel = "stale/legacy-model";
+
+  const saved = await saveAppConfig(config);
+  const persisted = await loadPersistedAppConfig();
+  for (const field of ["model", "fableModel", "opusModel", "sonnetModel", "haikuModel", "smallFastModel"]) {
+    assert.equal(saved.profile.claudeCode[field], newModel, field);
+    assert.equal(persisted.profile.claudeCode[field], newModel, `persisted ${field}`);
+  }
 });

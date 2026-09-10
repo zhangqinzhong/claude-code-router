@@ -93,14 +93,14 @@ test("OpenRouter discount router switches to the cheapest endpoint and reports s
       order: ["cheap"],
       require_parameters: true
     });
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-switched"], "true");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-reason"], "switched-cheaper-after-cache-loss");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-baseline-provider"], "expensive");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider-name"], "Cheap");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-cheapest-off-pct"], "76.00");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-gross-savings-usd"], "0.0152");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-savings-usd"], "0.0152");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-switched"], "true");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-reason"], "switched-cheaper-after-cache-loss");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-baseline-provider"], "expensive");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider-name"], "Cheap");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-cheapest-off-pct"], "76.00");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-gross-savings-usd"], "0.0152");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-savings-usd"], "0.0152");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -205,7 +205,7 @@ test("OpenRouter discount router cools down failed endpoint refreshes", async ()
 
     assert.equal(first, undefined);
     assert.equal(second, undefined);
-    assert.equal(third.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(third.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
     assert.equal(calls.length, 2);
     assert.match(warnings.join("\n"), /failed \(503\): temporary outage/);
     assert.match(warnings.join("\n"), /cooling down after failure/);
@@ -265,8 +265,8 @@ test("OpenRouter discount router includes cache write pricing in endpoint select
       }))
     );
 
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "steady");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-cache-write-tokens"], "1000");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "steady");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-cache-write-tokens"], "1000");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -328,8 +328,8 @@ test("OpenRouter discount router charges cache writes only for cache_control-mar
       }))
     );
 
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "write-expensive");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-cache-write-tokens"], "2");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "write-expensive");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-cache-write-tokens"], "2");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -369,7 +369,7 @@ test("OpenRouter discount router estimates prompt tokens from the current transf
       }))
     );
 
-    assert.ok(Number(result.responseHeaders["x-ccr-openrouter-discount-prompt-tokens"]) > 1);
+    assert.ok(Number(result.responseHeaders["x-ar-openrouter-discount-prompt-tokens"]) > 1);
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -423,12 +423,12 @@ test("OpenRouter discount router keeps the baseline when cache loss outweighs sa
       order: ["expensive"],
       require_parameters: true
     });
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-switched"], "false");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-reason"], "cache-loss-or-threshold");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-gross-savings-usd"], "0.00201");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-cache-loss-usd"], "0.0075");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-potential-net-savings-usd"], "-0.00549");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-savings-usd"], "0");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-switched"], "false");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-reason"], "cache-loss-or-threshold");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-gross-savings-usd"], "0.00201");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-cache-loss-usd"], "0.0075");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-potential-net-savings-usd"], "-0.00549");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-savings-usd"], "0");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -491,11 +491,11 @@ test("OpenRouter discount router excludes blacklisted providers before selecting
       order: ["mid"],
       require_parameters: true
     });
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-switched"], "true");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "mid");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider-name"], "Mid");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-ignored-providers"], "legacy-provider,cheap");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-savings-usd"], "0.01");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-switched"], "true");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "mid");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider-name"], "Mid");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-ignored-providers"], "legacy-provider,cheap");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-savings-usd"], "0.01");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -553,9 +553,9 @@ test("OpenRouter discount router caches endpoints for the default ten minute TTL
     now += 2_000;
     const third = await runTransform("default-cache-3");
 
-    assert.equal(first.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
-    assert.equal(second.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
-    assert.equal(third.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(first.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(second.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(third.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
     assert.equal(calls.length, 2);
   } finally {
     Date.now = originalNow;
@@ -606,7 +606,7 @@ test("OpenRouter discount router commits session baselines only after confirmed 
       }),
       transformContext(config)
     );
-    assert.equal(first.responseHeaders["x-ccr-openrouter-discount-reason"], "switched-cheaper-after-cache-loss");
+    assert.equal(first.responseHeaders["x-ar-openrouter-discount-reason"], "switched-cheaper-after-cache-loss");
 
     const beforeConfirm = await openRouterDiscountProviderRouterTransform(
       requestInput({
@@ -621,7 +621,7 @@ test("OpenRouter discount router commits session baselines only after confirmed 
       }),
       transformContext(config)
     );
-    assert.equal(beforeConfirm.responseHeaders["x-ccr-openrouter-discount-reason"], "initial-cheapest");
+    assert.equal(beforeConfirm.responseHeaders["x-ar-openrouter-discount-reason"], "initial-cheapest");
 
     finalizeOpenRouterDiscountProviderRouterSelection("session-confirm-1", {
       ok: true,
@@ -642,7 +642,7 @@ test("OpenRouter discount router commits session baselines only after confirmed 
       }),
       transformContext(config)
     );
-    assert.equal(afterConfirm.responseHeaders["x-ccr-openrouter-discount-reason"], "already-cheapest");
+    assert.equal(afterConfirm.responseHeaders["x-ar-openrouter-discount-reason"], "already-cheapest");
 
     finalizeOpenRouterDiscountProviderRouterSelection("session-confirm-2", { ok: false });
     finalizeOpenRouterDiscountProviderRouterSelection("session-confirm-3", { ok: false });
@@ -738,8 +738,8 @@ test("OpenRouter discount router respects existing OpenRouter provider constrain
       require_parameters: true,
       zdr: true
     });
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-switched"], "true");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "mid");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-switched"], "true");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "mid");
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -807,8 +807,8 @@ test("OpenRouter discount router deduplicates concurrent endpoint refreshes", as
     releaseFetch();
     const [first, second] = await Promise.all([firstPromise, secondPromise]);
 
-    assert.equal(first.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
-    assert.equal(second.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(first.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(second.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
     assert.equal(calls.length, 1);
   } finally {
     globalThis.fetch = originalFetch;
@@ -868,7 +868,7 @@ test("OpenRouter discount router does not cache empty endpoint responses", async
     const second = await runTransform("empty-cache-2");
 
     assert.equal(first, undefined);
-    assert.equal(second.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(second.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
     assert.equal(calls, 2);
   } finally {
     globalThis.fetch = originalFetch;
@@ -939,7 +939,7 @@ test("OpenRouter discount router bounds the endpoint cache", async () => {
 
     const firstModelAgain = await runTransform(models[0], "cache-bound-first-again");
 
-    assert.equal(firstModelAgain.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(firstModelAgain.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
     assert.equal(calls, models.length + 1);
   } finally {
     Date.now = originalNow;
@@ -994,11 +994,11 @@ test("OpenRouter discount router reports off percentages relative to the current
       }))
     );
 
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-baseline-provider"], "baseline");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-provider"], "cheap");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-cheapest-off-pct"], "20.00");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-selected-off-pct"], "20.00");
-    assert.equal(result.responseHeaders["x-ccr-openrouter-discount-savings-usd"], "0.002");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-baseline-provider"], "baseline");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-provider"], "cheap");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-cheapest-off-pct"], "20.00");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-selected-off-pct"], "20.00");
+    assert.equal(result.responseHeaders["x-ar-openrouter-discount-savings-usd"], "0.002");
   } finally {
     globalThis.fetch = originalFetch;
   }

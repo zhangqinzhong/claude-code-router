@@ -5,12 +5,12 @@ import test from "node:test";
 
 test("onboarding state falls back to the legacy marker when the config database cannot be read", async () => {
   const testRoot = path.join(
-    process.env.CCR_INTERNAL_HOME_DIR,
+    process.env.AR_INTERNAL_HOME_DIR,
     `onboarding-state-fallback-${process.pid}`
   );
-  process.env.CCR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
-  process.env.CCR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
-  process.env.CCR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+  process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
+  process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
+  process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
   const {
     APP_CONFIG_DB_FILE,

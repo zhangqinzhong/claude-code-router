@@ -7,6 +7,7 @@ import { APP_NAME, IPC_CHANNELS } from "@ccr/core/config/constants";
 import { getProviderAccountSnapshots } from "@ccr/core/providers/account-service";
 import { getTodayUsageTotals, onUsageRecorded } from "@ccr/core/usage/store";
 import windowsManager from "./windows";
+import { layeredTrayAssetName, trayUsageTitle } from "./tray-appearance";
 import type { AppConfig, ProviderAccountMeter, TrayBalanceProgressConfig, TrayIconPreference } from "@ccr/core/contracts/app";
 
 const popoverMenuWidth = 420;
@@ -24,6 +25,7 @@ const trayIconFallbackPath = path.join(__dirname, "../assets/tray.png");
 const trayMascotIconIds = ["violet", "orange", "cyan"] as const;
 
 type TrayMascotIconId = (typeof trayMascotIconIds)[number];
+type TrayStaticIconId = TrayMascotIconId | "layered";
 
 const trayMascotIconPaths: Record<TrayMascotIconId, string> = {
   cyan: path.join(__dirname, "../assets/tray-cyan.png"),
@@ -43,16 +45,22 @@ class TrayController {
   private suppressMainWindowActivationUntil = 0;
   private tray?: Tray;
   private trayBalanceProgress?: TrayBalanceProgressConfig;
-  private trayIconPreference: TrayIconPreference = "random";
+  private trayIconPreference: TrayIconPreference = "layered";
+  private trayShowTokenUsage = false;
   private trayTotalTokens = 0;
   private unsubscribeUsageUpdates?: () => void;
+  private readonly handleNativeThemeUpdated = (): void => {
+    if (this.trayIconPreference === "layered") {
+      this.applyTrayIcon("layered");
+    }
+  };
 
   start(): void {
     if (!supportsTrayPlatform() || this.tray) {
       return;
     }
 
-    const icon = createTrayIcon(this.resolveTrayIconId("random"));
+    const icon = createTrayIcon("layered");
     this.tray = new Tray(icon.isEmpty() ? nativeImage.createEmpty() : icon);
     this.applyTrayTitle(trayTokenFallbackTitle);
     this.tray.on("click", () => {
@@ -68,6 +76,9 @@ class TrayController {
       this.showContextMenu();
     });
     void this.refreshIconFromConfig();
+    if (process.platform === "win32") {
+      nativeTheme.on("updated", this.handleNativeThemeUpdated);
+    }
 
     this.unsubscribeUsageUpdates = onUsageRecorded(() => {
       this.refreshUsageTitle();
@@ -89,6 +100,9 @@ class TrayController {
 
   destroy(): void {
     this.clearDetailCloseTimer();
+    if (process.platform === "win32") {
+      nativeTheme.off("updated", this.handleNativeThemeUpdated);
+    }
     if (this.refreshTimer) {
       clearInterval(this.refreshTimer);
       this.refreshTimer = undefined;
@@ -134,7 +148,10 @@ class TrayController {
       this.resolvedRandomTrayIcon = undefined;
     }
     this.trayIconPreference = nextPreference;
+    this.trayShowTokenUsage = nextConfig.trayShowTokenUsage === true;
     this.trayBalanceProgress = normalizeTrayBalanceProgressConfig(nextConfig.trayBalanceProgress);
+    // Apply text preferences immediately, including the progress-icon path.
+    this.applyTrayTitle(formatTokenTitle(this.trayTotalTokens));
     if (nextPreference === "progress" && this.trayBalanceProgress) {
       await this.refreshBalanceProgressTrayIcon();
       return;
@@ -333,12 +350,12 @@ class TrayController {
       return;
     }
     if (supportsTrayTitle()) {
-      this.tray.setTitle(title);
+      this.tray.setTitle(trayUsageTitle(title, this.trayShowTokenUsage));
     }
     this.tray.setToolTip(`${APP_NAME} Usage\n${title}`);
   }
 
-  private applyTrayIcon(iconId: TrayMascotIconId): void {
+  private applyTrayIcon(iconId: TrayStaticIconId): void {
     if (!this.tray) {
       return;
     }
@@ -380,7 +397,10 @@ class TrayController {
     }
   }
 
-  private resolveTrayIconId(preference: TrayIconPreference): TrayMascotIconId {
+  private resolveTrayIconId(preference: TrayIconPreference): TrayStaticIconId {
+    if (preference === "layered") {
+      return preference;
+    }
     if (preference === "violet" || preference === "orange" || preference === "cyan") {
       return preference;
     }
@@ -582,9 +602,15 @@ function alignDimensionToDevicePixel(value: number, scaleFactor: number): number
   return Math.max(1, Math.round(value * scaleFactor) / scaleFactor);
 }
 
-function createTrayIcon(iconId: TrayMascotIconId): Electron.NativeImage {
+function createTrayIcon(iconId: TrayStaticIconId): Electron.NativeImage {
   const size = trayIconPixelSize();
-  const image = nativeImage.createFromPath(trayMascotIconPaths[iconId]);
+  const iconPath = iconId === "layered"
+    ? path.join(__dirname, "../assets", layeredTrayAssetName(
+      process.platform,
+      nativeTheme.shouldUseDarkColorsForSystemIntegratedUI
+    ))
+    : trayMascotIconPaths[iconId];
+  const image = nativeImage.createFromPath(iconPath);
   if (image.isEmpty()) {
     const fallback = nativeImage.createFromPath(trayIconFallbackPath);
     if (fallback.isEmpty()) {
@@ -593,6 +619,11 @@ function createTrayIcon(iconId: TrayMascotIconId): Electron.NativeImage {
     const fallbackIcon = fallback.resize({ height: size, width: size });
     fallbackIcon.setTemplateImage(process.platform === "darwin");
     return fallbackIcon;
+  }
+  if (iconId === "layered") {
+    // Keep the bundled 1x/2x/3x representations instead of flattening Retina art.
+    image.setTemplateImage(process.platform === "darwin");
+    return image;
   }
   const resized = image.resize({ height: size, width: size });
   resized.setTemplateImage(false);
@@ -616,9 +647,9 @@ function trayIconPixelSize(): number {
 }
 
 function normalizeTrayIconPreference(value: unknown): TrayIconPreference {
-  return value === "violet" || value === "orange" || value === "cyan" || value === "progress" || value === "random"
+  return value === "layered" || value === "violet" || value === "orange" || value === "cyan" || value === "progress" || value === "random"
     ? value
-    : "random";
+    : "layered";
 }
 
 function normalizeTrayBalanceProgressConfig(value: unknown): TrayBalanceProgressConfig | undefined {

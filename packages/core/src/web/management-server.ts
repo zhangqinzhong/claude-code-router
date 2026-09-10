@@ -124,7 +124,7 @@ type WebManagementSecurityContext = {
 const defaultWebHost = "127.0.0.1";
 const defaultWebPort = 3458;
 const maxRpcBodyBytes = 8 * 1024 * 1024;
-const webAuthHeader = "x-ccr-web-auth";
+const webAuthHeader = "x-ar-web-auth";
 const webAuthQueryParam = "ccr_web_token";
 const staticRoot = path.resolve(__dirname, "..", "renderer");
 const homeHtmlFile = path.join(staticRoot, "pages", "home", "index.html");
@@ -133,9 +133,9 @@ const webBridgeScriptTag = '    <script src="../../assets/web-client-bridge.js">
 
 
 export async function startWebManagementServer(options: WebManagementServerOptions = {}): Promise<WebManagementServerRuntime> {
-  const host = options.host?.trim() || readEnvString("CCR_WEB_HOST") || defaultWebHost;
-  const requestedPort = options.port ?? readEnvPort("CCR_WEB_PORT") ?? defaultWebPort;
-  const authToken = options.authToken?.trim() || readEnvString("CCR_WEB_AUTH_TOKEN") || randomBytes(32).toString("base64url");
+  const host = options.host?.trim() || readEnvString("AR_WEB_HOST") || defaultWebHost;
+  const requestedPort = options.port ?? readEnvPort("AR_WEB_PORT") ?? defaultWebPort;
+  const authToken = options.authToken?.trim() || readEnvString("AR_WEB_AUTH_TOKEN") || randomBytes(32).toString("base64url");
   let security: WebManagementSecurityContext | undefined;
   const server = createServer((request, response) => {
     if (!security) {
@@ -181,8 +181,8 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse,
   }
 
   // CORS: allow cross-origin browsers (e.g. the docs setup wizard) to call the
-  // RPC endpoint. Origin-gated to loopback + CCR_WEB_ALLOWED_ORIGINS. This only
-  // relaxes the browser same-origin policy; the x-ccr-web-auth token still
+  // RPC endpoint. Origin-gated to loopback + AR_WEB_ALLOWED_ORIGINS. This only
+  // relaxes the browser same-origin policy; the x-ar-web-auth token still
   // authorizes /api/ccr/rpc, so no credential is exposed.
   const corsOrigin = allowedWebCorsOrigin(request);
   if (corsOrigin) {
@@ -320,10 +320,10 @@ const rpcHandlers: Record<string, RpcHandler> = {
   getGatewayStatus: () => gatewayService.getStatus(),
   getServiceIdentity: (serviceToken) => ({
     pid: process.pid,
-    serviceTokenConfigured: Boolean(process.env.CCR_SERVICE_INSTANCE_TOKEN?.trim()),
+    serviceTokenConfigured: Boolean(process.env.AR_SERVICE_INSTANCE_TOKEN?.trim()),
     serviceTokenMatches: typeof serviceToken === "string" &&
       Boolean(serviceToken.trim()) &&
-      serviceToken === process.env.CCR_SERVICE_INSTANCE_TOKEN
+      serviceToken === process.env.AR_SERVICE_INSTANCE_TOKEN
   }),
   getLocalAgentProviderCandidates: () => getLocalAgentProviderCandidates(),
   getOnboardingFinished: () => loadOnboardingFinished(),
@@ -664,13 +664,13 @@ const loopbackWebCorsHosts = new Set(["localhost", "127.0.0.1", "::1", "0:0:0:0:
  * Returns the request `Origin` if cross-origin callers are permitted, else
  * undefined. Permits loopback origins (any port) unconditionally so local tools
  * like the docs setup wizard work, plus any exact origin listed in the
- * `CCR_WEB_ALLOWED_ORIGINS` env var (comma-separated) for remote deployments.
+ * `AR_WEB_ALLOWED_ORIGINS` env var (comma-separated) for remote deployments.
  */
 function allowedWebCorsOrigin(request: IncomingMessage): string | undefined {
   const origin = readHeaderValue(request.headers.origin);
   if (!origin) return undefined;
   const normalizedOrigin = origin.replace(/\/$/, "");
-  const configured = readEnvString("CCR_WEB_ALLOWED_ORIGINS");
+  const configured = readEnvString("AR_WEB_ALLOWED_ORIGINS");
   if (configured) {
     const allow = new Set(
       configured
@@ -691,7 +691,7 @@ function allowedWebCorsOrigin(request: IncomingMessage): string | undefined {
 function applyWebCorsHeaders(response: ServerResponse, origin: string): void {
   response.setHeader("Access-Control-Allow-Origin", origin);
   response.setHeader("Vary", "Origin");
-  response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-ccr-web-auth");
+  response.setHeader("Access-Control-Allow-Headers", "Content-Type, x-ar-web-auth");
   response.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
 }
 

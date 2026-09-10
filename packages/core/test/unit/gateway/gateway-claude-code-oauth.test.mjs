@@ -16,7 +16,7 @@ test("issue 1528 normalizes Claude Code OAuth auth to preserve the client anthro
         removeHeaders: ["x-api-key"],
         strict: true
       },
-      key: "ccr-local-agent-claude-code-api-claude-code-oauth",
+      key: "ar-local-agent-claude-code-api-claude-code-oauth",
       providerName: "Claude Code API"
     }
   ]);
@@ -57,7 +57,7 @@ test("issue 1528 merges Claude Code OAuth beta with client beta tokens only for 
           },
           strict: true
         },
-        key: "ccr-local-agent-claude-code-api-claude-code-oauth",
+        key: "ar-local-agent-claude-code-api-claude-code-oauth",
         providerName: claudeCodeProvider.name
       }
     ]

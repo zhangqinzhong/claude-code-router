@@ -593,7 +593,7 @@ function providerApiKey(provider: GatewayProviderConfig): string {
 
 function codexOauthPlugin(suffix: string, providerName = providerNamePlaceholder): Record<string, unknown> {
   return {
-    key: `ccr-local-agent-${providerNameSlugPlaceholder}-${suffix}`,
+    key: `ar-local-agent-${providerNameSlugPlaceholder}-${suffix}`,
     providerName,
     request: codexBackendRequestTransform()
   };
@@ -852,7 +852,7 @@ export function codexModelCatalogFromPayloadForTest(payload: unknown): LocalAgen
 }
 
 function codexHomeDir(): string {
-  return process.env.CCR_INTERNAL_HOME_DIR?.trim() || process.env.HOME?.trim() || process.env.USERPROFILE?.trim() || os.homedir();
+  return process.env.AR_INTERNAL_HOME_DIR?.trim() || process.env.HOME?.trim() || process.env.USERPROFILE?.trim() || os.homedir();
 }
 
 function readCodexIdTokenClaims(idToken: string | undefined): { accountId?: string; isFedrampAccount?: boolean } {

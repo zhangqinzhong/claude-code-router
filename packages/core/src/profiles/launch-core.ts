@@ -145,7 +145,7 @@ function buildOpenCodeLaunchPlan(
     args: extraArgs,
     command: path.join(configDir, "bin", openCodeWrapperFilename(profile)),
     env: {
-      CCR_PROFILE_SURFACE: "cli",
+      AR_PROFILE_SURFACE: "cli",
       OPENCODE_CONFIG: resolveOpenCodeProfileConfigFile(configDir, profile)
     },
     profile,
@@ -166,7 +166,7 @@ function buildKiloLaunchPlan(
     args: extraArgs,
     command: path.join(configDir, "bin", kiloWrapperFilename(profile)),
     env: {
-      CCR_PROFILE_SURFACE: "cli",
+      AR_PROFILE_SURFACE: "cli",
       KILO_CONFIG: resolveKiloProfileConfigFile(configDir, profile)
     },
     profile,
@@ -187,7 +187,7 @@ function buildGrokLaunchPlan(
     args: extraArgs,
     command: path.join(configDir, "bin", grokWrapperFilename(profile)),
     env: {
-      CCR_PROFILE_SURFACE: "cli"
+      AR_PROFILE_SURFACE: "cli"
     },
     profile,
     surface
@@ -207,7 +207,7 @@ function buildKimiLaunchPlan(
     args: extraArgs,
     command: path.join(configDir, "bin", kimiWrapperFilename(profile)),
     env: {
-      CCR_PROFILE_SURFACE: "cli"
+      AR_PROFILE_SURFACE: "cli"
     },
     profile,
     surface
@@ -227,7 +227,7 @@ function buildPiLaunchPlan(
     args: extraArgs,
     command: path.join(configDir, "bin", piWrapperFilename(profile)),
     env: {
-      CCR_PROFILE_SURFACE: "cli",
+      AR_PROFILE_SURFACE: "cli",
       PI_CODING_AGENT_DIR: resolvePiAgentDir(configDir, profile),
       PI_CODING_AGENT_SESSION_DIR: resolvePiSessionDir(configDir, profile)
     },
@@ -301,7 +301,7 @@ function buildCodexLaunchPlan(
     args: surface === "app" && extraArgs.length === 0 ? ["app"] : extraArgs,
     command: launcher,
     env: {
-      CCR_PROFILE_SURFACE: surface
+      AR_PROFILE_SURFACE: surface
     },
     profile,
     surface
@@ -324,7 +324,7 @@ function buildClaudeCodeLaunchPlan(
     command: launcher,
     env: {
       CLAUDE_CONFIG_DIR: path.dirname(settingsFile),
-      CCR_PROFILE_SURFACE: surface,
+      AR_PROFILE_SURFACE: surface,
       ...claudeCodeProfileModelEnv(profile),
       ...claudeCodeUtcTimezoneEnvOverride()
     },
@@ -356,43 +356,43 @@ function codexConfigSubdir(agent: ProfileConfig["agent"]): string {
 function claudeCodeWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "claude-code";
   return process.platform === "win32"
-    ? `ccr-claude-code-wrapper-${slug}.cmd`
-    : `ccr-claude-code-wrapper-${slug}`;
+    ? `ar-claude-code-wrapper-${slug}.cmd`
+    : `ar-claude-code-wrapper-${slug}`;
 }
 
 function grokWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "grok";
   return process.platform === "win32"
-    ? `ccr-grok-cli-wrapper-${slug}.cmd`
-    : `ccr-grok-cli-wrapper-${slug}`;
+    ? `ar-grok-cli-wrapper-${slug}.cmd`
+    : `ar-grok-cli-wrapper-${slug}`;
 }
 
 function kimiWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "kimi";
   return process.platform === "win32"
-    ? `ccr-kimi-cli-wrapper-${slug}.cmd`
-    : `ccr-kimi-cli-wrapper-${slug}`;
+    ? `ar-kimi-cli-wrapper-${slug}.cmd`
+    : `ar-kimi-cli-wrapper-${slug}`;
 }
 
 function openCodeWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "opencode";
   return process.platform === "win32"
-    ? `ccr-opencode-wrapper-${slug}.cmd`
-    : `ccr-opencode-wrapper-${slug}`;
+    ? `ar-opencode-wrapper-${slug}.cmd`
+    : `ar-opencode-wrapper-${slug}`;
 }
 
 function kiloWrapperFilename(profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent) || "kilo";
   return process.platform === "win32"
-    ? `ccr-kilo-wrapper-${slug}.cmd`
-    : `ccr-kilo-wrapper-${slug}`;
+    ? `ar-kilo-wrapper-${slug}.cmd`
+    : `ar-kilo-wrapper-${slug}`;
 }
 
 function codexMiddlewareFilename(profile: ProfileConfig, providerId: string): string {
   const slug = sanitizeCodexProviderId(profile.id || profile.name || providerId) || "codex";
   return process.platform === "win32"
-    ? `ccr-codex-cli-stdio-${slug}.cmd`
-    : `ccr-codex-cli-stdio-${slug}`;
+    ? `ar-codex-cli-stdio-${slug}.cmd`
+    : `ar-codex-cli-stdio-${slug}`;
 }
 
 function normalizeProfileSurface(value: ProfileConfig["surface"]): "auto" | "cli" | "app" {

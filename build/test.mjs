@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const ccrExtensionsRoot = path.resolve(process.env.CCR_EXTENSIONS_DIR || path.join(projectRoot, "..", "ccr-extensions"));
+const ccrExtensionsRoot = path.resolve(process.env.AR_EXTENSIONS_DIR || path.join(projectRoot, "..", "ccr-extensions"));
 const testsOutDir = path.join(projectRoot, ".test-dist");
 const packageRoots = {
   cli: path.join(projectRoot, "packages", "cli", "src"),

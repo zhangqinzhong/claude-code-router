@@ -464,14 +464,14 @@ function synchronizeLegacyClaudeCodeProfile(
   return {
     ...legacy,
     enabled: true,
-    fableModel: profile.fableModel ?? legacy.fableModel,
-    haikuModel: profile.haikuModel ?? legacy.haikuModel,
+    fableModel: profile.fableModel ?? "",
+    haikuModel: profile.haikuModel ?? "",
     managedCompact: profile.managedCompact ?? legacy.managedCompact,
     model: profile.model,
-    opusModel: profile.opusModel ?? legacy.opusModel,
+    opusModel: profile.opusModel ?? "",
     settingsFile: profile.settingsFile ?? legacy.settingsFile,
-    sonnetModel: profile.sonnetModel ?? legacy.sonnetModel,
-    smallFastModel: profile.smallFastModel ?? legacy.smallFastModel
+    sonnetModel: profile.sonnetModel ?? "",
+    smallFastModel: profile.smallFastModel ?? ""
   };
 }
 
@@ -758,6 +758,35 @@ function sanitizeProfileConfigForDisk(profile: AppConfig["profile"]): AppConfig[
   };
 }
 
+// Keys and sentinel values persisted before the AgentRouter rename. They are
+// rewritten on load so existing local provider accounts keep resolving.
+const legacyLocalAgentKeyPrefix = "ccr-local-agent-";
+const localAgentKeyPrefix = "ar-local-agent-";
+const legacyLocalAgentLoginKey = "ccr-local-agent-login";
+const localAgentLoginKey = "ar-local-agent-login";
+
+function migrateLegacyLocalAgentPlugin(plugin: unknown): unknown {
+  if (!plugin || typeof plugin !== "object" || Array.isArray(plugin)) {
+    return plugin;
+  }
+  const record = plugin as Record<string, unknown>;
+  const key = record.key;
+  if (typeof key !== "string" || !key.startsWith(legacyLocalAgentKeyPrefix)) {
+    return plugin;
+  }
+  return { ...record, key: `${localAgentKeyPrefix}${key.slice(legacyLocalAgentKeyPrefix.length)}` };
+}
+
+function migrateLegacyLocalAgentProvider(provider: unknown): unknown {
+  if (!provider || typeof provider !== "object" || Array.isArray(provider)) {
+    return provider;
+  }
+  const record = provider as Record<string, unknown>;
+  return record.api_key === legacyLocalAgentLoginKey
+    ? { ...record, api_key: localAgentLoginKey }
+    : provider;
+}
+
 function pickConfig(value: Partial<AppConfig>): LoadedAppConfig {
   const config: LoadedAppConfig = {};
 
@@ -783,10 +812,10 @@ function pickConfig(value: Partial<AppConfig>): LoadedAppConfig {
   }
   const providers = parseProviders((value as Record<string, unknown>).Providers ?? (value as Record<string, unknown>).providers);
   if (providers) {
-    config.Providers = providers;
+    config.Providers = providers.map(migrateLegacyLocalAgentProvider) as typeof providers;
   }
   if (Array.isArray((value as Record<string, unknown>).providerPlugins)) {
-    config.providerPlugins = (value as Record<string, unknown>).providerPlugins as unknown[];
+    config.providerPlugins = ((value as Record<string, unknown>).providerPlugins as unknown[]).map(migrateLegacyLocalAgentPlugin);
   }
   const virtualModelProfiles = (value as Record<string, unknown>).virtualModelProfiles;
   if (Array.isArray(virtualModelProfiles)) {
@@ -875,6 +904,7 @@ function pickConfig(value: Partial<AppConfig>): LoadedAppConfig {
   if (trayIcon) {
     config.trayIcon = trayIcon;
   }
+  config.trayShowTokenUsage = value.trayShowTokenUsage === true;
   const trayBalanceProgress = parseTrayBalanceProgress((value as Record<string, unknown>).trayBalanceProgress);
   if (trayBalanceProgress) {
     config.trayBalanceProgress = trayBalanceProgress;
@@ -1246,7 +1276,7 @@ function isShareOverviewWidgetType(type: OverviewWidgetType): boolean {
 }
 
 function parseTrayIconPreference(value: unknown): TrayIconPreference | undefined {
-  if (value === "random" || value === "violet" || value === "orange" || value === "cyan" || value === "progress") {
+  if (value === "layered" || value === "random" || value === "violet" || value === "orange" || value === "cyan" || value === "progress") {
     return value;
   }
   return undefined;
@@ -2671,7 +2701,7 @@ type GatewayPluginMigrationResult = {
   plugins: GatewayPluginConfig[];
 };
 
-const CCR_EXTENSIONS_PLUGIN_IDS = new Set([CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID, "cursor-proxy"]);
+const AR_EXTENSIONS_PLUGIN_IDS = new Set([CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID, "cursor-proxy"]);
 
 function migrateKnownGatewayPluginConfigs(plugins: GatewayPluginConfig[] | undefined): GatewayPluginMigrationResult {
   const sourcePlugins = plugins ?? [];
@@ -3105,7 +3135,7 @@ function isLegacyClaudeDesignModule(modulePath: string | undefined): boolean {
 }
 
 function isLegacyExternalizedPluginModule(pluginId: string, modulePath: string | undefined): boolean {
-  if (!CCR_EXTENSIONS_PLUGIN_IDS.has(pluginId)) {
+  if (!AR_EXTENSIONS_PLUGIN_IDS.has(pluginId)) {
     return false;
   }
   const normalized = modulePath?.replace(/\\/g, "/").toLowerCase() || "";
@@ -3117,7 +3147,7 @@ function isLegacyExternalizedPluginModule(pluginId: string, modulePath: string |
 
 function ccrExtensionsRootCandidates(previousModule: string | undefined): string[] {
   const candidates = [
-    process.env.CCR_EXTENSIONS_DIR,
+    process.env.AR_EXTENSIONS_DIR,
     ccrExtensionsRootFromLegacyModule(previousModule),
     path.resolve(process.cwd(), "..", "ccr-extensions"),
     path.resolve(process.cwd(), "ccr-extensions")
@@ -3702,7 +3732,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         model,
         name,
         providerId: readString(item.providerId) || readString(item.provider) || "claude-code-router",
-        providerName: readString(item.providerName) || "Claude Code Router",
+        providerName: readString(item.providerName) || "AgentRouter",
         remoteFrontendMode: parseCodexRemoteFrontendMode(readString(item.remoteFrontendMode) || readString(item.frontendMode) || readString(item.coreMode)) || "app",
         ...(routing ? { routing } : {}),
         scope: parseProfileScope(readString(item.scope) || readString(item.applyScope) || readString(item.effectScope)) || "global",

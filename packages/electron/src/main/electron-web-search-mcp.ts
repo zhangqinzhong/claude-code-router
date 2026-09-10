@@ -1119,16 +1119,16 @@ function parseSafeSearch(value: string | undefined): "moderate" | "off" | "stric
 }
 
 function browserSearchConcurrency(): number {
-  return clampInteger(readNumber(process.env.CCR_BROWSER_SEARCH_CONCURRENCY) ?? 2, 1, 4);
+  return clampInteger(readNumber(process.env.AR_BROWSER_SEARCH_CONCURRENCY) ?? 2, 1, 4);
 }
 
 function browserSearchOpenResultCount(): number {
-  return clampInteger(readNumber(process.env.CCR_BROWSER_SEARCH_OPEN_RESULT_COUNT) ?? 3, 0, 8);
+  return clampInteger(readNumber(process.env.AR_BROWSER_SEARCH_OPEN_RESULT_COUNT) ?? 3, 0, 8);
 }
 
 function browserSearchPageTimeoutMs(requestTimeoutMs: number): number {
   return clampInteger(
-    readNumber(process.env.CCR_BROWSER_SEARCH_PAGE_TIMEOUT_MS) ?? Math.min(requestTimeoutMs, 8_000),
+    readNumber(process.env.AR_BROWSER_SEARCH_PAGE_TIMEOUT_MS) ?? Math.min(requestTimeoutMs, 8_000),
     500,
     30_000
   );

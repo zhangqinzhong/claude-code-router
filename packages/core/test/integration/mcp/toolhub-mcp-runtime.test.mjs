@@ -193,7 +193,7 @@ test("built ToolHub MCP runtime expands browser automation bundles with handoff 
   }
 
   const backend = createMcpHttpServer({
-    serverName: "ccr-browser-automation",
+    serverName: "ar-browser-automation",
     tools: [
       {
         description: "Open a URL or attach an existing CCR built-in browser tab and create an automation session.",
@@ -243,7 +243,7 @@ test("built ToolHub MCP runtime expands browser automation bundles with handoff 
       ...process.env,
       TOOLHUB_MCP_SERVERS_JSON: JSON.stringify([
         {
-          name: "ccr-browser-automation",
+          name: "ar-browser-automation",
           transport: "streamable-http",
           url: `http://127.0.0.1:${backendPort}/mcp`
         }
@@ -310,7 +310,7 @@ test("built ToolHub MCP runtime deterministically resolves Chrome login import t
   }
 
   const backend = createMcpHttpServer({
-    serverName: "ccr-browser-automation",
+    serverName: "ar-browser-automation",
     tools: [
       {
         description: "Ask the user to confirm importing Chrome cookies and localStorage into CCR's in-app browser.",
@@ -350,7 +350,7 @@ test("built ToolHub MCP runtime deterministically resolves Chrome login import t
       ...process.env,
       TOOLHUB_MCP_SERVERS_JSON: JSON.stringify([
         {
-          name: "ccr-browser-automation",
+          name: "ar-browser-automation",
           transport: "streamable-http",
           url: `http://127.0.0.1:${backendPort}/mcp`
         }
@@ -436,7 +436,7 @@ test("built ToolHub MCP runtime does not add CCR handoff tools for non-CCR brows
   t.after(() => externalBrowser.close());
 
   const ccrBrowser = createMcpHttpServer({
-    serverName: "ccr-browser-automation",
+    serverName: "ar-browser-automation",
     tools: [
       {
         description: "Request human intervention for the current browser task.",
@@ -486,7 +486,7 @@ test("built ToolHub MCP runtime does not add CCR handoff tools for non-CCR brows
           url: `http://127.0.0.1:${externalBrowserPort}/mcp`
         },
         {
-          name: "ccr-browser-automation",
+          name: "ar-browser-automation",
           transport: "streamable-http",
           url: `http://127.0.0.1:${ccrBrowserPort}/mcp`
         }

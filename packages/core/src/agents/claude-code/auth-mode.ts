@@ -1,6 +1,6 @@
 import { spawnSync } from "node:child_process";
 
-export const CLAUDE_CODE_AUTH_MODE_ENV = "CCR_CLAUDE_CODE_AUTH_MODE";
+export const CLAUDE_CODE_AUTH_MODE_ENV = "AR_CLAUDE_CODE_AUTH_MODE";
 
 export type ClaudeCodeGatewayAuthMode = "api-key-helper" | "wif";
 export type ClaudeCodeGatewayAuthModePreference = ClaudeCodeGatewayAuthMode | "auto";
@@ -42,7 +42,7 @@ export function normalizeClaudeCodeGatewayAuthMode(value: string | undefined): C
 }
 
 function detectClaudeCodeCliVersion(profile: ClaudeCodeAuthProfile): [number, number, number] | undefined {
-  const command = profile.env?.CCR_CLAUDE_CODE_BIN?.trim() || "claude";
+  const command = profile.env?.AR_CLAUDE_CODE_BIN?.trim() || "claude";
   try {
     const result = spawnSync(command, ["--version"], {
       encoding: "utf8",

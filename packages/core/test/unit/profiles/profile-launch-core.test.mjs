@@ -187,16 +187,16 @@ test("buildProfileLaunchPlan creates CCR-managed launcher paths", () => {
 
   assert.equal(codexPlan.surface, "app");
   assert.deepEqual(codexPlan.args, ["app"]);
-  assert.equal(path.basename(codexPlan.command), process.platform === "win32" ? "ccr-codex-cli-stdio-codex-main.cmd" : "ccr-codex-cli-stdio-codex-main");
-  assert.equal(codexPlan.env.CCR_PROFILE_SURFACE, "app");
+  assert.equal(path.basename(codexPlan.command), process.platform === "win32" ? "ar-codex-cli-stdio-codex-main.cmd" : "ar-codex-cli-stdio-codex-main");
+  assert.equal(codexPlan.env.AR_PROFILE_SURFACE, "app");
 
   assert.equal(claudePlan.surface, "cli");
   assert.deepEqual(claudePlan.args, ["--debug"]);
-  assert.equal(path.basename(claudePlan.command), process.platform === "win32" ? "ccr-claude-code-wrapper-claude-main.cmd" : "ccr-claude-code-wrapper-claude-main");
-  assert.equal(claudePlan.env.CCR_PROFILE_SURFACE, "cli");
+  assert.equal(path.basename(claudePlan.command), process.platform === "win32" ? "ar-claude-code-wrapper-claude-main.cmd" : "ar-claude-code-wrapper-claude-main");
+  assert.equal(claudePlan.env.AR_PROFILE_SURFACE, "cli");
   assert.match(claudePlan.env.CLAUDE_CONFIG_DIR, /claude$/);
   assert.equal(claudePlan.env.ANTHROPIC_MODEL, "provider/model");
-  assert.equal(claudePlan.env.CCR_CLAUDE_CODE_MODEL, "provider/model");
+  assert.equal(claudePlan.env.AR_CLAUDE_CODE_MODEL, "provider/model");
   assert.equal(claudePlan.env.CODEXL_CLAUDE_CODE_MODEL, "provider/model");
   assert.equal(claudePlan.env.ANTHROPIC_DEFAULT_FABLE_MODEL, "provider/fable");
   assert.equal(claudePlan.env.ANTHROPIC_DEFAULT_OPUS_MODEL, "provider/opus");
@@ -206,38 +206,38 @@ test("buildProfileLaunchPlan creates CCR-managed launcher paths", () => {
 
   assert.equal(grokPlan.surface, "cli");
   assert.deepEqual(grokPlan.args, ["--debug"]);
-  assert.equal(path.basename(grokPlan.command), process.platform === "win32" ? "ccr-grok-cli-wrapper-grok-main.cmd" : "ccr-grok-cli-wrapper-grok-main");
-  assert.equal(grokPlan.env.CCR_PROFILE_SURFACE, "cli");
+  assert.equal(path.basename(grokPlan.command), process.platform === "win32" ? "ar-grok-cli-wrapper-grok-main.cmd" : "ar-grok-cli-wrapper-grok-main");
+  assert.equal(grokPlan.env.AR_PROFILE_SURFACE, "cli");
 
   assert.equal(kimiPlan.surface, "cli");
   assert.deepEqual(kimiPlan.args, ["--debug"]);
-  assert.equal(path.basename(kimiPlan.command), process.platform === "win32" ? "ccr-kimi-cli-wrapper-kimi-main.cmd" : "ccr-kimi-cli-wrapper-kimi-main");
-  assert.equal(kimiPlan.env.CCR_PROFILE_SURFACE, "cli");
+  assert.equal(path.basename(kimiPlan.command), process.platform === "win32" ? "ar-kimi-cli-wrapper-kimi-main.cmd" : "ar-kimi-cli-wrapper-kimi-main");
+  assert.equal(kimiPlan.env.AR_PROFILE_SURFACE, "cli");
 
   assert.equal(piPlan.surface, "cli");
   assert.deepEqual(piPlan.args, ["--debug"]);
-  assert.equal(path.basename(piPlan.command), process.platform === "win32" ? "ccr-pi-wrapper-pi-main.cmd" : "ccr-pi-wrapper-pi-main");
-  assert.equal(piPlan.env.CCR_PROFILE_SURFACE, "cli");
+  assert.equal(path.basename(piPlan.command), process.platform === "win32" ? "ar-pi-wrapper-pi-main.cmd" : "ar-pi-wrapper-pi-main");
+  assert.equal(piPlan.env.AR_PROFILE_SURFACE, "cli");
   assert.match(piPlan.env.PI_CODING_AGENT_DIR, /pi-main[\\/]pi$/);
   assert.match(piPlan.env.PI_CODING_AGENT_SESSION_DIR, /pi-main[\\/]pi[\\/]sessions$/);
 
   assert.equal(openCodePlan.surface, "cli");
   assert.deepEqual(openCodePlan.args, ["--debug"]);
-  assert.equal(path.basename(openCodePlan.command), process.platform === "win32" ? "ccr-opencode-wrapper-opencode-main.cmd" : "ccr-opencode-wrapper-opencode-main");
+  assert.equal(path.basename(openCodePlan.command), process.platform === "win32" ? "ar-opencode-wrapper-opencode-main.cmd" : "ar-opencode-wrapper-opencode-main");
   assert.match(openCodePlan.env.OPENCODE_CONFIG, /opencode[\\/]opencode\.jsonc$/);
   assert.throws(() => buildProfileLaunchPlan(configDir, openCodeProfile, "app"), /OpenCode App profiles/);
 
   assert.equal(kiloPlan.surface, "cli");
   assert.deepEqual(kiloPlan.args, ["--debug"]);
-  assert.equal(path.basename(kiloPlan.command), process.platform === "win32" ? "ccr-kilo-wrapper-kilo-main.cmd" : "ccr-kilo-wrapper-kilo-main");
-  assert.equal(kiloPlan.env.CCR_PROFILE_SURFACE, "cli");
+  assert.equal(path.basename(kiloPlan.command), process.platform === "win32" ? "ar-kilo-wrapper-kilo-main.cmd" : "ar-kilo-wrapper-kilo-main");
+  assert.equal(kiloPlan.env.AR_PROFILE_SURFACE, "cli");
   assert.match(kiloPlan.env.KILO_CONFIG, /kilo[\\/]kilo\.jsonc$/);
   assert.throws(() => buildProfileLaunchPlan(configDir, kiloProfile, "app"), /does not support APP/);
 
   assert.equal(workbuddyPlan.surface, "app");
   assert.deepEqual(workbuddyPlan.args, ["app"]);
-  assert.equal(path.basename(workbuddyPlan.command), process.platform === "win32" ? "ccr-codex-cli-stdio-workbuddy-main.cmd" : "ccr-codex-cli-stdio-workbuddy-main");
-  assert.equal(workbuddyPlan.env.CCR_PROFILE_SURFACE, "app");
+  assert.equal(path.basename(workbuddyPlan.command), process.platform === "win32" ? "ar-codex-cli-stdio-workbuddy-main.cmd" : "ar-codex-cli-stdio-workbuddy-main");
+  assert.equal(workbuddyPlan.env.AR_PROFILE_SURFACE, "app");
   assert.throws(() => buildProfileLaunchPlan(configDir, workbuddyProfile, "cli"), /does not support CLI/);
 
   assert.throws(() => buildProfileLaunchPlan(configDir, claudeProfile, "app"), /Claude App opening/);

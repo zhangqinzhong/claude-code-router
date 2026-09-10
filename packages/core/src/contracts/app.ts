@@ -1282,7 +1282,7 @@ export type ObservabilityConfig = {
   requestLogs: boolean;
 };
 
-export type TrayIconPreference = "random" | "violet" | "orange" | "cyan" | "progress";
+export type TrayIconPreference = "layered" | "random" | "violet" | "orange" | "cyan" | "progress";
 
 export type TrayBalanceProgressConfig = {
   meterId: string;
@@ -1833,6 +1833,7 @@ export type AppConfig = {
   trayProgressTargetTokens: number;
   trayComponentVariants: TrayComponentVariants;
   trayIcon: TrayIconPreference;
+  trayShowTokenUsage: boolean;
   trayWidgets: TrayWidgetConfig[];
   trayWindowModules: TrayWindowModuleId[];
   toolHub: ToolHubConfig;
@@ -2202,7 +2203,9 @@ export type RequestLogEntry = {
   responseModel?: string;
   responseHeaders: Record<string, string | string[]>;
   statusCode: number;
+  timeToFirstTokenMs?: number;
   totalTokens: number;
+  streamOutputDurationMs?: number;
   url: string;
 };
 

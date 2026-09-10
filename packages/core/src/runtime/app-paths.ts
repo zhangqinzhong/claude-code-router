@@ -1,12 +1,12 @@
 import os from "node:os";
 import path from "node:path";
 
-export const APP_NAME = "Claude Code Router";
-export const APP_STORAGE_NAME = "claude-code-router";
+export const APP_NAME = "AgentRouter";
+export const APP_STORAGE_NAME = "agentrouter";
 
-const homeDirEnv = "CCR_INTERNAL_HOME_DIR";
-const appDataDirEnv = "CCR_INTERNAL_APP_DATA_DIR";
-const userDataDirEnv = "CCR_INTERNAL_USER_DATA_DIR";
+const homeDirEnv = "AR_INTERNAL_HOME_DIR";
+const appDataDirEnv = "AR_INTERNAL_APP_DATA_DIR";
+const userDataDirEnv = "AR_INTERNAL_USER_DATA_DIR";
 
 type RuntimePathName = "appData" | "home" | "userData";
 
