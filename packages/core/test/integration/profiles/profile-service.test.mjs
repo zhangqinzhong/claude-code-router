@@ -58,10 +58,10 @@ test("profile service cleans stale generated bin backups only", () => {
     const deletedFiles = [
       "ar-claude-code-api-key-default.ar-backup-2026-01-01T00-00-00-000Z",
       "ar-claude-code-wif-token-default.ar-backup-2026-01-01T00-00-00-000Z",
-      "ar-claude-code-wrapper-default.ccr-original",
+      "ar-claude-code-wrapper-default.ar-original",
       "ar-codex-cli-stdio-default.ar-original-missing",
       "ar-codex-cli-middleware.js.ar-backup-2026-01-01T00-00-00-000Z",
-      "ar-pi-wrapper-default.ccr-original",
+      "ar-pi-wrapper-default.ar-original",
       "toolhub-mcp.js.ar-backup-2026-01-01T00-00-00-000Z"
     ];
     const keptFiles = [
@@ -91,7 +91,7 @@ test("profile service preserves user statusLine when the active global Claude ta
     rmSync(takeoverFile, { force: true });
     const settingsFile = path.join(root, ".claude", "settings.json");
     mkdirSync(path.dirname(settingsFile), { recursive: true });
-    writeFileSync(`${settingsFile}.ccr-original`, `${JSON.stringify({
+    writeFileSync(`${settingsFile}.ar-original`, `${JSON.stringify({
       env: {
         USER_VALUE: "kept"
       },
@@ -318,7 +318,7 @@ test("profile service does not rewrite user Claude settings for stale legacy pro
         allow: ["Bash(echo:*)"]
       }
     }, null, 2)}\n`;
-    writeFileSync(`${settingsFile}.ccr-original`, originalSettings);
+    writeFileSync(`${settingsFile}.ar-original`, originalSettings);
     writeFileSync(`${settingsFile}.ar-backup-2026-07-28T16-26-39-119Z`, backupSettings);
     writeFileSync(settingsFile, userSettings);
     writeFileSync(takeoverFile, `${JSON.stringify({
@@ -449,7 +449,7 @@ test("profile service can exclude ZCode from automatic synchronization", async (
         model: "Provider/model",
         name: "ZCode",
         providerId: "claude-code-router",
-        providerName: "Claude Code Router",
+        providerName: "AgentRouter",
         scope: "global",
         showAllSessions: false,
         surface: "app"
@@ -486,11 +486,11 @@ test("profile service overwrites generated bin files without creating backups", 
   ];
   writeFileSync(legacyApiKeyHelperFile, "old generated content\n");
   writeFileSync(`${legacyApiKeyHelperFile}.ar-backup-2026-01-01T00-00-00-000Z`, "old backup\n");
-  writeFileSync(`${legacyApiKeyHelperFile}.ccr-original`, "old original\n");
+  writeFileSync(`${legacyApiKeyHelperFile}.ar-original`, "old original\n");
   for (const file of generatedFiles) {
     writeFileSync(file, "old generated content\n");
     writeFileSync(`${file}.ar-backup-2026-01-01T00-00-00-000Z`, "old backup\n");
-    writeFileSync(`${file}.ccr-original`, "old original\n");
+    writeFileSync(`${file}.ar-original`, "old original\n");
   }
   for (const file of staleClaudeCodeGeneratedFiles) {
     writeFileSync(file, "stale generated content\n");
@@ -607,8 +607,8 @@ test("profile service overwrites generated bin files without creating backups", 
   const settingsFile = path.join(claudeProfileDir, "settings.json");
   const settings = JSON.parse(readFileSync(settingsFile, "utf8"));
   assert.equal(settings.apiKeyHelper, undefined);
-  assert.equal(settings.env.ANTHROPIC_FEDERATION_RULE_ID, "ccr-local");
-  assert.equal(settings.env.ANTHROPIC_ORGANIZATION_ID, "ccr-local");
+  assert.equal(settings.env.ANTHROPIC_FEDERATION_RULE_ID, "ar-local");
+  assert.equal(settings.env.ANTHROPIC_ORGANIZATION_ID, "ar-local");
   assert.equal(settings.env.ANTHROPIC_IDENTITY_TOKEN_FILE, wifTokenFile);
   assert.equal(settings.env.ANTHROPIC_MODEL, "Provider/long[1m]");
   assert.equal(settings.env.AR_CLAUDE_CODE_MODEL, "Provider/long[1m]");
@@ -746,7 +746,7 @@ test("Codex profile launcher bypasses middleware for Browser and Computer Use he
       model: "Provider/model",
       name: "Browser Helper Bypass",
       providerId: "claude-code-router",
-      providerName: "Claude Code Router",
+      providerName: "AgentRouter",
       scope: "ccr",
       showAllSessions: false,
       surface: "app"
@@ -843,7 +843,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
       model: "Provider/model",
       name: "Codex ToolHub Test",
       providerId: "claude-code-router",
-      providerName: "Claude Code Router",
+      providerName: "AgentRouter",
       scope: "ccr",
       showAllSessions: false,
       surface: "auto"
@@ -1025,7 +1025,7 @@ test("profile service injects Context Archive MCP for managed Codex profile", { 
       model: "Provider/model",
       name: "Managed Compact Codex",
       providerId: "claude-code-router",
-      providerName: "Claude Code Router",
+      providerName: "AgentRouter",
       scope: "ccr",
       showAllSessions: false,
       surface: "auto"
@@ -1433,7 +1433,7 @@ test("profile service writes an OpenCode CLI wrapper and shared CLI/App config",
       model: "Provider/model",
       name: "OpenCode Gateway Test",
       providerId: "claude-code-router",
-      providerName: "Claude Code Router",
+      providerName: "AgentRouter",
       scope: "ccr",
       surface: "auto"
     }
@@ -1496,7 +1496,7 @@ test("profile service removes disabled and deleted OpenCode wrappers and API key
     model: "Provider/model",
     name: "OpenCode Cleanup Test",
     providerId: "claude-code-router",
-    providerName: "Claude Code Router",
+    providerName: "AgentRouter",
     scope: "ccr",
     surface: "auto"
   };
@@ -1718,7 +1718,7 @@ test("profile service restores global agent configs on exit", () => {
       if (file === zcodeCacheFile) {
         writeFileSync(`${file}.ar-original-missing`, "");
       } else {
-        writeFileSync(`${file}.ccr-original`, original);
+        writeFileSync(`${file}.ar-original`, original);
       }
       writeFileSync(`${file}.ar-backup-2026-07-11T00-00-00-000Z`, latestSnapshots.get(file));
     }

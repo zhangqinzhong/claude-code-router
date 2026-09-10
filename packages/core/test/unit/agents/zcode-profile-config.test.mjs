@@ -47,7 +47,7 @@ function testProfile(root) {
     model: "Codex API,gpt-5.6-sol",
     name: "ZCode Main",
     providerId: "claude-code-router",
-    providerName: "Claude Code Router",
+    providerName: "AgentRouter",
     scope: "global",
     surface: "app"
   };

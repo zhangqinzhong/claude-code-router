@@ -91,7 +91,7 @@ test("gateway sanitizer hook forwards client headers without overriding provider
         "x-hop-only": "remove-me",
         "x-target-model": "internal-provider/internal-model",
         "x-target-provider": "internal-provider",
-        "x-title": "Claude Code Router"
+        "x-title": "AgentRouter"
       }
     },
     upstreamRequest
@@ -107,7 +107,7 @@ test("gateway sanitizer hook forwards client headers without overriding provider
     "x-auth-provider-extension": "provider-extension",
     "x-custom-provider-header": "custom-value",
     "x-custom-list": "one,two",
-    "x-title": "Claude Code Router"
+    "x-title": "AgentRouter"
   });
 });
 

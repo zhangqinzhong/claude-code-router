@@ -160,7 +160,7 @@ test("AddProfileForm uses Codex-specific enhanced route info for Codex profiles"
   assert.doesNotMatch(html, /Provider name/);
   assert.equal(isProfileDraftSubmittable(draft), true);
   assert.equal(profileConfigFromDraft(draft, []).providerId, "claude-code-router");
-  assert.equal(profileConfigFromDraft(draft, []).providerName, "Claude Code Router");
+  assert.equal(profileConfigFromDraft(draft, []).providerName, "AgentRouter");
 });
 
 test("explicit allowed model lists require a default model", () => {

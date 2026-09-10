@@ -28,7 +28,7 @@ function testProfile(overrides = {}) {
     model: "Provider,model-a",
     name: "Kilo Main",
     providerId: "claude-code-router",
-    providerName: "Claude Code Router",
+    providerName: "AgentRouter",
     scope: "ccr",
     surface: "cli",
     ...overrides

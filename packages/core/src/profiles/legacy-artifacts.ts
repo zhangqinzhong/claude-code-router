@@ -100,5 +100,19 @@ function renamedLegacyBinEntry(entry: string): string | undefined {
   if (entry === "ccr-app.cmd") {
     return "agentrouter.cmd";
   }
-  return entry.startsWith("ccr-") ? `ar-${entry.slice("ccr-".length)}` : undefined;
+  if (entry.startsWith("ccr-")) {
+    return `ar-${entry.slice("ccr-".length)}`;
+  }
+  // Bin artifacts carry the same backup suffixes as config files.
+  for (let index = 0; index < legacyOriginalSuffixes.length; index += 1) {
+    const legacySuffix = legacyOriginalSuffixes[index];
+    if (entry.endsWith(legacySuffix)) {
+      return `${entry.slice(0, -legacySuffix.length)}${originalSuffixes[index]}`;
+    }
+  }
+  const backupIndex = entry.indexOf(legacyBackupMarker);
+  if (backupIndex !== -1) {
+    return `${entry.slice(0, backupIndex)}${backupMarker}${entry.slice(backupIndex + legacyBackupMarker.length)}`;
+  }
+  return undefined;
 }

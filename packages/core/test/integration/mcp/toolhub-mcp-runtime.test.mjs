@@ -227,7 +227,7 @@ test("built ToolHub MCP runtime expands browser automation bundles with handoff 
   const backendPort = backend.address().port;
   t.after(() => backend.close());
 
-  const resolver = createFixedResolverServer(["mcp.ccr_browser_automation.browser_session_open"]);
+  const resolver = createFixedResolverServer(["mcp.ar_browser_automation.browser_session_open"]);
   try {
     await listen(resolver);
   } catch (error) {
@@ -294,10 +294,10 @@ test("built ToolHub MCP runtime expands browser automation bundles with handoff 
   });
   assert.equal(response.error, undefined);
   assert.deepEqual(response.result.selectedToolNames, [
-    "mcp.ccr_browser_automation.browser_session_open",
-    "mcp.ccr_browser_automation.browser_handoff_request",
-    "mcp.ccr_browser_automation.browser_handoff_status",
-    "mcp.ccr_browser_automation.browser_handoff_wait"
+    "mcp.ar_browser_automation.browser_session_open",
+    "mcp.ar_browser_automation.browser_handoff_request",
+    "mcp.ar_browser_automation.browser_handoff_status",
+    "mcp.ar_browser_automation.browser_handoff_wait"
   ]);
   assert.match(response.result.tsDefinitions, /browser_handoff_wait/);
 });
@@ -401,8 +401,8 @@ test("built ToolHub MCP runtime deterministically resolves Chrome login import t
   });
   assert.equal(response.error, undefined);
   assert.deepEqual(response.result.selectedToolNames, [
-    "mcp.ccr_browser_automation.browser_chrome_login_import",
-    "mcp.ccr_browser_automation.browser_chrome_login_import_status"
+    "mcp.ar_browser_automation.browser_chrome_login_import",
+    "mcp.ar_browser_automation.browser_chrome_login_import_status"
   ]);
   assert.match(response.result.tsDefinitions, /browser_chrome_login_import/);
 });
