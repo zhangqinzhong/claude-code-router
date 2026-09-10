@@ -714,7 +714,11 @@ export class GatewayRequestPipeline {
       const upstreamPreparationChanges: RequestRouteTraceChange[] = contentLengthHeader === undefined
         ? []
         : [{ before: contentLengthHeader, operation: "remove", path: "/headers/content-length", scope: "headers" }];
-      const upstreamUrl = new URL(upstreamPath, this.status.coreEndpoint).toString();
+      const upstreamRequestUrl = new URL(upstreamPath, this.status.coreEndpoint);
+      // Keep the client's query string. Some clients carry options there (for
+      // example ?beta=true) and rebuilding the URL from the path alone dropped them.
+      upstreamRequestUrl.search = new URL(requestUrl).search;
+      const upstreamUrl = upstreamRequestUrl.toString();
       let upstreamResult: UpstreamFetchResult;
 
       try {
