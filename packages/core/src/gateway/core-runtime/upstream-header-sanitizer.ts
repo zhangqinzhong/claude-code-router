@@ -4,6 +4,7 @@ import { applyResponsesSessionAffinity } from "@ccr/core/gateway/core-runtime/re
 import type { ResponsesSessionAffinityInput } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
 import { applyResponsesToolStrictness } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
 import type { ResponsesToolStrictnessInput } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
+import { sdkCompatibleTokenHeaderNames } from "@ccr/core/gateway/internal/shared";
 
 type UpstreamRequest = {
   body: unknown;
@@ -42,11 +43,7 @@ const ccrRoutingHeaderNames = new Set([
   "x-target-providers"
 ]);
 
-const clientAuthHeaderNames = new Set([
-  "api-key",
-  "authorization",
-  "x-api-key"
-]);
+const clientAuthHeaderNames = new Set<string>(sdkCompatibleTokenHeaderNames);
 
 const proxyMetadataHeaderNames = new Set([
   "forwarded",

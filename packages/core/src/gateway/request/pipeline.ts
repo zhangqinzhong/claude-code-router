@@ -9,7 +9,7 @@ import {
 } from "@ccr/core/observability/request-log-store";
 import { requestLogRequestedModel, requestLogResponseModel } from "@ccr/core/observability/request-log-model";
 import { recordGatewayUsageCapture, type UsageCaptureInput } from "@ccr/core/usage/store";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin";
+import { ClaudeCodeRouterPlugin, type ClaudeCodeRouteDecision } from "@ccr/core/gateway/claude-code-router-plugin";
 import {
   codexCompactResponseStream,
   contextArchiveHandoffResponseStream,
@@ -36,20 +36,31 @@ import { prepareCursorOpenAICompatChatBody } from "@ccr/core/gateway/features/cu
 import { filteredResponseHeaders, formatError, formatUpstreamErrorForLog, forwardHeaders, inferGatewayClient, readRequestBody, sendJson, shouldCaptureGatewayUsage, shouldSendBody, stripLocalGatewayAuthHeaders } from "@ccr/core/gateway/http/io";
 import { parseJsonObjectSafe, serializeJsonBody, takeJsonObject } from "@ccr/core/gateway/http/body";
 import { createGatewayModelsResponse, prepareClaudeAppDiscoveredModelRequest, prepareClaudeCodeDiscoveredModelRequest, shouldServeGatewayModelsResponse } from "@ccr/core/gateway/features/model-discovery";
-import { resolveProviderLogName, resolveResponseProviderProtocol, sanitizeHeaderValue } from "@ccr/core/providers/runtime-topology";
+import { providerProtocolForClientProtocol, resolveProviderLogName, resolveResponseProviderProtocol, sanitizeHeaderValue } from "@ccr/core/providers/runtime-topology";
 import { createBodySampler, requestLogSampled, shouldRecordRequestLogs } from "@ccr/core/observability/raw-trace-sync";
 import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace";
 import { createStreamMetricsTracker } from "@ccr/core/observability/stream-metrics";
 import { coreGatewayUsageAttributionConfig } from "@ccr/core/gateway/core-runtime/config-compiler";
 import { providerModelPricingForUsage } from "@ccr/core/models/pricing-service";
-import { clientClosedRequestStatusCode, clientDisconnectMessage, resolveStreamRequestLogOutcome, UpstreamRequestError } from "@ccr/core/gateway/internal/shared";
+import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
+import { clientClosedRequestStatusCode, clientDisconnectMessage, coreGatewayAuthHeader, resolveStreamRequestLogOutcome, UpstreamRequestError } from "@ccr/core/gateway/internal/shared";
 import type { BrowserWebSearchMcpIntegration, BrowserWebSearchProtocolRecord, UpstreamFetchResult } from "@ccr/core/gateway/internal/shared";
 import { cancelResponseBody, destroyResponseStreams, fetchUpstreamWithFallback, mergeFallbackResponseHeaders, rewriteCapabilityResponseHeaders, uniqueStreams, upstreamResponseHeaders } from "@ccr/core/gateway/upstream/executor";
 import { requestProtocolForPath, shouldApplyGatewayRouting } from "@ccr/core/routing/protocol-endpoints";
+import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
 import { createClaudeCodeWebSearchContinuationContext, createHostedWebSearchProtocolContext, hostedWebSearchProtocolResponseStream, hostedWebSearchUnavailableMessage, prepareClaudeCodeWebSearchContinuationRequestBody, prepareHostedWebSearchProtocolRequestBody, selectClaudeCodeWebSearchContinuationRecords, selectHostedWebSearchProtocolRecords } from "@ccr/core/gateway/features/hosted-web-search/index";
 import { isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
 import { pluginService } from "@ccr/core/plugins/service";
 import { finalizeOpenRouterDiscountProviderRouterSelection } from "@ccr/core/plugins/built-ins/openrouter-discount-provider-router";
+import {
+  ccrRouteHeaderNames,
+  ccrRouteDiagnosticsHeader,
+  ccrRouteReasonHeader,
+  ccrRouteSourceHeader,
+  ccrRoutedModelHeader,
+  ccrRouterHttpRoutePath
+} from "@ccr/core/gateway/core-runtime/router-plugin-contract";
+import { isRecord } from "@ccr/core/gateway/internal/value";
 
 export type GatewayRequestPipelineDependencies = {
   getBrowserWebSearchMcpIntegration: () => BrowserWebSearchMcpIntegration | undefined;
@@ -81,6 +92,24 @@ function isReportedRouteChange(change: RequestRouteTraceChange | undefined): cha
   return change !== undefined;
 }
 
+function stripUntrustedCcrRouteHeaders(headers: Record<string, string>): RequestRouteTraceChange[] {
+  const changes: RequestRouteTraceChange[] = [];
+  for (const headerName of ccrRouteHeaderNames) {
+    const previous = headers[headerName];
+    if (previous === undefined) {
+      continue;
+    }
+    delete headers[headerName];
+    changes.push({
+      before: previous,
+      operation: "remove",
+      path: `/headers/${headerName}`,
+      scope: "headers"
+    });
+  }
+  return changes;
+}
+
 export class GatewayRequestPipeline {
   constructor(private readonly dependencies: GatewayRequestPipelineDependencies) {}
 
@@ -110,6 +139,7 @@ export class GatewayRequestPipeline {
       routeTrace?.captureIngress();
       const headerNormalizationStartedAt = Date.now();
       const headers = forwardHeaders(request.headers);
+      const strippedCcrRouteHeaderChanges = stripUntrustedCcrRouteHeaders(headers);
       const previousAuthorization = headers.authorization;
       const previousApiKey = headers["x-api-key"];
       const previousLegacyApiKey = headers["api-key"];
@@ -124,6 +154,7 @@ export class GatewayRequestPipeline {
       headers["x-client-request-id"] = requestId;
       routeTrace?.capture({
         changes: [
+          ...strippedCcrRouteHeaderChanges,
           ...(apiKey ? [
             reportedRouteChange("headers", "/headers/authorization", previousAuthorization, undefined),
             reportedRouteChange("headers", "/headers/x-api-key", previousApiKey, undefined),
@@ -346,7 +377,15 @@ export class GatewayRequestPipeline {
             startedAtMs: routeAdaptationStartedAt
           });
         }
-        const routed = await this.plugin.routeRequest({
+        const routed = await routeRequestWithCoreGatewayPlugin({
+          body: adaptation.body,
+          coreAuthToken: this.coreAuthToken,
+          coreEndpoint: this.status.coreEndpoint,
+          headers: headers as Record<string, string | string[] | undefined>,
+          method,
+          path,
+          url: request.url ?? path
+        }) ?? await this.plugin.routeRequest({
           body: adaptation.body,
           bodyOwnership: "owned",
           headers: headers as Record<string, string | string[] | undefined>,
@@ -356,16 +395,16 @@ export class GatewayRequestPipeline {
         });
         const serialized = serializeJsonBody(restoreRouteRequestBody(routed.body, adaptation));
         headers["content-type"] = "application/json";
-        headers["x-ar-route-reason"] = sanitizeHeaderValue(routed.decision.reason);
-        headers["x-ar-route-source"] = routed.decision.source;
+        headers[ccrRouteReasonHeader] = sanitizeHeaderValue(routed.decision.reason);
+        headers[ccrRouteSourceHeader] = routed.decision.source;
         if (routed.decision.diagnostics.length > 0) {
-          headers["x-ar-route-diagnostics"] = String(routed.decision.diagnostics.length);
+          headers[ccrRouteDiagnosticsHeader] = String(routed.decision.diagnostics.length);
         }
         routeFallback = routed.decision.fallback ?? routeFallback;
         routedSessionId = routed.decision.sessionId;
         routedTokenCount = routed.decision.tokenCount;
         if (routed.decision.model) {
-          headers["x-ar-routed-model"] = sanitizeHeaderValue(routed.decision.model);
+          headers[ccrRoutedModelHeader] = sanitizeHeaderValue(routed.decision.model);
           routedModel = routed.decision.model;
         }
         bodyToForward = serialized;
@@ -373,9 +412,9 @@ export class GatewayRequestPipeline {
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" },
-            { after: headers["x-ar-route-reason"], operation: "add", path: "/headers/x-ar-route-reason", scope: "headers" },
-            { after: headers["x-ar-route-source"], operation: "add", path: "/headers/x-ar-route-source", scope: "headers" },
-            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: "/headers/x-ar-routed-model", scope: "headers" as const }] : [])
+            { after: headers[ccrRouteReasonHeader], operation: "add", path: `/headers/${ccrRouteReasonHeader}`, scope: "headers" },
+            { after: headers[ccrRouteSourceHeader], operation: "add", path: `/headers/${ccrRouteSourceHeader}`, scope: "headers" },
+            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: `/headers/${ccrRoutedModelHeader}`, scope: "headers" as const }] : [])
           ],
           decision: {
             diagnostics: routed.decision.diagnostics,
@@ -405,15 +444,23 @@ export class GatewayRequestPipeline {
         return;
       }
 
-      const codexBridgeStartedAt = Date.now();
-      const codexApplyPatchBridgeRequest = prepareCodexApplyPatchBridgeRequest({
-        body: bodyToForward,
-        config: this.config,
-        headers: request.headers,
-        method,
+      const skipCodexBridgeForNativeResponses = shouldBypassCodexBridgeForNativeResponsesTarget(
+        this.config,
+        bodyToForward,
         path,
         routedModel
-      });
+      );
+      const codexBridgeStartedAt = Date.now();
+      const codexApplyPatchBridgeRequest = skipCodexBridgeForNativeResponses
+        ? undefined
+        : prepareCodexApplyPatchBridgeRequest({
+            body: bodyToForward,
+            config: this.config,
+            headers: request.headers,
+            method,
+            path,
+            routedModel
+          });
       if (codexApplyPatchBridgeRequest) {
         bodyToForward = codexApplyPatchBridgeRequest.body;
         codexApplyPatchBridgeActive = true;
@@ -434,14 +481,16 @@ export class GatewayRequestPipeline {
       }
 
       const codexMultiAgentBridgeStartedAt = Date.now();
-      const codexMultiAgentBridgeRequest = prepareCodexMultiAgentBridgeRequest({
-        body: bodyToForward,
-        config: this.config,
-        headers: request.headers,
-        method,
-        path,
-        routedModel
-      });
+      const codexMultiAgentBridgeRequest = skipCodexBridgeForNativeResponses
+        ? undefined
+        : prepareCodexMultiAgentBridgeRequest({
+            body: bodyToForward,
+            config: this.config,
+            headers: request.headers,
+            method,
+            path,
+            routedModel
+          });
       if (codexMultiAgentBridgeRequest) {
         bodyToForward = codexMultiAgentBridgeRequest.body;
         codexMultiAgentBridgeActive = true;
@@ -1060,6 +1109,101 @@ export class GatewayRequestPipeline {
       statusCode: result.response.status
     };
   }
+}
+
+async function routeRequestWithCoreGatewayPlugin(input: {
+  body: Record<string, unknown>;
+  coreAuthToken: string;
+  coreEndpoint: string;
+  headers: Record<string, string | string[] | undefined>;
+  method: string;
+  path: string;
+  url: string;
+}): Promise<{ body: Record<string, unknown>; decision: ClaudeCodeRouteDecision } | undefined> {
+  if (!input.coreEndpoint || !input.coreAuthToken) {
+    return undefined;
+  }
+
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 500);
+  try {
+    const response = await fetchWithSystemProxy(new URL(ccrRouterHttpRoutePath, input.coreEndpoint), {
+      body: JSON.stringify({
+        body: input.body,
+        headers: input.headers,
+        method: input.method,
+        path: input.path,
+        url: input.url
+      }),
+      headers: {
+        "content-type": "application/json",
+        [coreGatewayAuthHeader]: input.coreAuthToken
+      },
+      method: "POST",
+      signal: controller.signal
+    });
+    if (response.status === 404 || response.status === 405) {
+      return undefined;
+    }
+    if (!response.ok || !response.headers.get("content-type")?.toLowerCase().includes("application/json")) {
+      await response.body?.cancel().catch(() => undefined);
+      return undefined;
+    }
+    const payload = await response.json().catch(() => undefined) as unknown;
+    return normalizeCoreRouterPluginResponse(payload);
+  } catch {
+    return undefined;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+function normalizeCoreRouterPluginResponse(
+  payload: unknown
+): { body: Record<string, unknown>; decision: ClaudeCodeRouteDecision } | undefined {
+  if (!isRecord(payload) || !isRecord(payload.body) || !isRecord(payload.decision)) {
+    return undefined;
+  }
+  const decision = payload.decision;
+  if (
+    typeof decision.reason !== "string" ||
+    typeof decision.source !== "string" ||
+    typeof decision.tokenCount !== "number" ||
+    !Array.isArray(decision.diagnostics) ||
+    !isRecord(decision.fallback)
+  ) {
+    return undefined;
+  }
+
+  return {
+    body: payload.body,
+    decision: {
+      diagnostics: decision.diagnostics as ClaudeCodeRouteDecision["diagnostics"],
+      fallback: decision.fallback as ClaudeCodeRouteDecision["fallback"],
+      ...(typeof decision.model === "string" ? { model: decision.model } : {}),
+      reason: decision.reason,
+      ...(typeof decision.sessionId === "string" ? { sessionId: decision.sessionId } : {}),
+      source: decision.source as ClaudeCodeRouteDecision["source"],
+      tokenCount: decision.tokenCount
+    }
+  };
+}
+
+function shouldBypassCodexBridgeForNativeResponsesTarget(
+  config: AppConfig,
+  body: Buffer | undefined,
+  path: string,
+  routedModel: string | undefined
+): boolean {
+  const protocol = requestProtocolForPath(path);
+  if (protocol !== "openai_responses") {
+    return false;
+  }
+
+  const model = routedModel ?? (body ? requestLogRequestedModel(body, path) : undefined);
+  const resolved = modelRegistryForConfig(config).resolve(model);
+  return resolved?.kind === "provider" &&
+    providerProtocolForClientProtocol(resolved.provider, protocol) === "openai_responses";
 }
 
 function profileDeniedModel(

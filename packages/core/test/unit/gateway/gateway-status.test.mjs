@@ -157,8 +157,13 @@ test("gateway start completes the IPC and health handshake with the bundled runt
   try {
     await gatewayService.stop();
     delete process.env.AR_GATEWAY_ENTRY;
-    const status = await gatewayService.start(gatewayTestConfig(await findAvailablePort()));
+    const config = gatewayTestConfig(await findAvailablePort());
+    // The bundled gateway uses the public port in single-runtime mode.
+    config.gateway.port = await findAvailablePort();
+    const status = await gatewayService.start(config);
     assert.equal(status.state, "running", status.lastError);
+    assert.equal(status.endpoint, `http://127.0.0.1:${config.gateway.port}`);
+    assert.equal(status.coreEndpoint, status.endpoint);
 
     const marker = await loadPersistedRuntimeState("gateway");
     const healthResponse = await fetch(new URL("/health", status.coreEndpoint));
