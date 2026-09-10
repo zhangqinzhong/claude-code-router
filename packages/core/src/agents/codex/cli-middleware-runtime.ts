@@ -4967,7 +4967,7 @@ class RemoteSyncClient {
     this.pollTimer = null;
     this.ready = null;
     this.seenInbound = new Set();
-    this.sessionId = nonEmptyEnv("AR_REMOTE_SYNC_SESSION_ID") || "ccr-" + safePathSegment(options.profileId || options.profileName || options.mode) + "-" + uuid();
+    this.sessionId = nonEmptyEnv("AR_REMOTE_SYNC_SESSION_ID") || "ar-" + safePathSegment(options.profileId || options.profileName || options.mode) + "-" + uuid();
   }
 
   start(onInbound) {

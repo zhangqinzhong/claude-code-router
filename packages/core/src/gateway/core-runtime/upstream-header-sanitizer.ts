@@ -205,7 +205,7 @@ export function createGatewayPlugin() {
           try {
             const url = new URL(upstreamRequest.url);
             if (url.protocol === "https:" && url.hostname === "opencode.ai" && /^\/zen\/go\/v1(?:\/|$)/.test(url.pathname)) {
-              upstreamRequest.headers["x-opencode-session"] = `ccr-${input.request?.id || randomUUID()}`;
+              upstreamRequest.headers["x-opencode-session"] = `ar-${input.request?.id || randomUUID()}`;
             }
           } catch {
             // Invalid URLs are reported by the upstream transport.

@@ -2735,7 +2735,7 @@ const snapshotScript = function(options: { limit?: number; maxElements: number; 
     }
     for (let attempt = 0; attempt < 1000; attempt += 1) {
       win.__ccrBrowserRefSeq = (win.__ccrBrowserRefSeq || 0) + 1;
-      const nextRef = `ccr-${win.__ccrBrowserRefSeq}`;
+      const nextRef = `ar-${win.__ccrBrowserRefSeq}`;
       const selector = `[${refAttribute}="${cssEscape(nextRef)}"]`;
       if (!document.querySelector(selector)) {
         el.setAttribute(refAttribute, nextRef);

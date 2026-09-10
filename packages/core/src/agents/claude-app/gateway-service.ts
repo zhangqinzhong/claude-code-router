@@ -263,7 +263,7 @@ function ensureClaudeAppGatewayState(config: AppConfig): ClaudeAppApplyState {
   const generatedApiKey: ApiKeyConfig = {
     createdAt: new Date().toISOString(),
     id: randomUUID(),
-    key: `ccr-${randomBytes(24).toString("hex")}`,
+    key: `ar-${randomBytes(24).toString("hex")}`,
     name: "Claude App"
   };
 
