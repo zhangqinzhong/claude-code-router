@@ -286,7 +286,7 @@ const DESIGN_AGENT_SYSTEM_PROMPT = [
   "When the user asks you to create or change a design, produce concrete project files.",
   "Return the primary UI as a complete fenced code block for index.html, for example ```html filename=index.html ... ```.",
   "Use self-contained HTML/CSS/JavaScript unless the user asks for separate files.",
-  "Do not only ask clarifying questions; make reasonable assumptions and create the design."
+  "If design preferences are unclear, ask the user before creating files; proceed when the user provides enough detail or asks you to decide."
 ].join(" ");
 const FALLBACK_ASSET_CACHE_PREFIX = "fallback:claude-design-v1:";
 const FALLBACK_ASSET_CACHE_TTL_MS = 60 * 60 * 1000;
@@ -11289,7 +11289,7 @@ function normalizeGatewayMessagesRequest(runtime, body) {
     : text
       ? [{ content: text, role: "user" }]
       : [{ content: "Continue.", role: "user" }];
-  const messages = withDesignAgentSystemPrompt(baseMessages);
+  const messages = withDesignAgentSystemPrompt(baseMessages, record);
   const maxTokens = Math.max(128, Number(record.max_tokens || record.maxTokens) || 16000);
   return {
     ...record,
@@ -11499,13 +11499,17 @@ function openGeneratedDesignFile(runtime, projectId, filePath) {
   });
 }
 
-function withDesignAgentSystemPrompt(messages) {
+function withDesignAgentSystemPrompt(messages, request) {
+  // The Design frontend supplies its own workflow and interactive tools.
+  // Extra file-generation instructions can override its questions_v2 turn.
+  const hasSystemPrompt = Boolean(stringValue(request.system)) ||
+    (Array.isArray(request.system) && request.system.length > 0);
+  const hasTools = Array.isArray(request.tools) && request.tools.length > 0;
   const hasPrompt = messages.some((message) =>
     isRecord(message) &&
-    stringValue(message.role) === "system" &&
-    String(message.content || "").includes("local CCR project workspace")
+    stringValue(message.role) === "system"
   );
-  if (hasPrompt) {
+  if (hasSystemPrompt || hasTools || hasPrompt) {
     return messages;
   }
   return [
