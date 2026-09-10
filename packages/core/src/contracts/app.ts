@@ -2277,11 +2277,6 @@ export type UsageStatsSnapshot = {
   totals: UsageTotals;
 };
 
-export type UsageStatsResetResult = {
-  deletedEvents: number;
-  resetAt: string;
-};
-
 export type AgentKind = "claude-code" | "codex" | "grok" | "kimi" | "kilo" | "opencode" | "pi" | "workbuddy" | "zcode" | "claude-design" | "unknown";
 
 export type AgentAnalysisFilter = {
