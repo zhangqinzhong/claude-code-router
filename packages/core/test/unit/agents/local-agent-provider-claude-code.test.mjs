@@ -321,11 +321,20 @@ test("Claude Code local provider reports a missing candidate when no keychain it
 async function withClaudeCodeHome(run) {
   const home = mkdtempSync(path.join(os.tmpdir(), "ar-claude-code-provider-"));
   const previousHome = process.env.HOME;
+  // Claude Code derives its keychain service name from the config dir, so an
+  // inherited CLAUDE_CONFIG_DIR (these tests may run inside AgentRouter) would
+  // point the lookup at a different service than the one asserted here.
+  const previousConfigDir = process.env.CLAUDE_CONFIG_DIR;
+  const previousSecureStorageDir = process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR;
   process.env.HOME = home;
+  delete process.env.CLAUDE_CONFIG_DIR;
+  delete process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR;
   try {
     await run(home);
   } finally {
     restoreEnv("HOME", previousHome);
+    restoreEnv("CLAUDE_CONFIG_DIR", previousConfigDir);
+    restoreEnv("CLAUDE_SECURESTORAGE_CONFIG_DIR", previousSecureStorageDir);
     rmSync(home, { force: true, recursive: true });
   }
 }

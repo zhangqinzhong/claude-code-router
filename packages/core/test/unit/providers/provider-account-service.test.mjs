@@ -493,10 +493,17 @@ function useTemporaryHome(t, prefix) {
   const previousOsHome = process.env.HOME;
   const previousZcodeHome = process.env.ZCODE_HOME;
   const previousZcodeStorageDir = process.env.ZCODE_STORAGE_DIR;
+  // The keychain service name is derived from Claude Code's config dir, so an
+  // inherited CLAUDE_CONFIG_DIR (these tests may run inside AgentRouter) would
+  // change which keychain entry the fake `security` lookup targets.
+  const previousClaudeConfigDir = process.env.CLAUDE_CONFIG_DIR;
+  const previousClaudeSecureStorageDir = process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR;
   const home = mkdtempSync(path.join(os.tmpdir(), prefix));
   process.env.AR_INTERNAL_HOME_DIR = home;
   delete process.env.ZCODE_HOME;
   delete process.env.ZCODE_STORAGE_DIR;
+  delete process.env.CLAUDE_CONFIG_DIR;
+  delete process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR;
   t.after(() => {
     if (previousHome === undefined) {
       delete process.env.AR_INTERNAL_HOME_DIR;
@@ -517,6 +524,16 @@ function useTemporaryHome(t, prefix) {
       delete process.env.ZCODE_STORAGE_DIR;
     } else {
       process.env.ZCODE_STORAGE_DIR = previousZcodeStorageDir;
+    }
+    if (previousClaudeConfigDir === undefined) {
+      delete process.env.CLAUDE_CONFIG_DIR;
+    } else {
+      process.env.CLAUDE_CONFIG_DIR = previousClaudeConfigDir;
+    }
+    if (previousClaudeSecureStorageDir === undefined) {
+      delete process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR;
+    } else {
+      process.env.CLAUDE_SECURESTORAGE_CONFIG_DIR = previousClaudeSecureStorageDir;
     }
     rmSync(home, { force: true, recursive: true });
   });

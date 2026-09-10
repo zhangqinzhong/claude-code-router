@@ -145,7 +145,13 @@ function claudeCodeProfile(overrides = {}) {
 }
 
 function claudeAppPaths() {
-  const dataDir = path.join(testRoot, "app-data", "Claude-3p");
+  // Mirror getClaudeApp3pDataDir(): the Claude app stores its data under a
+  // platform-specific root, so a hardcoded layout only passes on one platform.
+  const dataDir = process.platform === "darwin"
+    ? path.join(testRoot, "home", "Library", "Application Support", "Claude-3p")
+    : process.platform === "win32"
+      ? path.join(process.env.LOCALAPPDATA || path.join(testRoot, "app-data", "..", "Local"), "Claude-3p")
+      : path.join(testRoot, "app-data", "Claude-3p");
   return {
     configLibraryFile: path.join(dataDir, "configLibrary", "8f69f2f1-3275-4ad8-9317-4aa7e972f311.json"),
     dataDir,
