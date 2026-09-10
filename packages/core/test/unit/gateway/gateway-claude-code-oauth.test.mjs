@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   normalizeClaudeCodeOauthProviderPlugins,
   prepareGatewayUpstreamAttemptForTest
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 
 test("issue 1528 normalizes Claude Code OAuth auth to preserve the client anthropic-beta header", () => {
   const [plugin] = normalizeClaudeCodeOauthProviderPlugins([

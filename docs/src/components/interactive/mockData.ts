@@ -1,9 +1,9 @@
 /**
- * Real data fixtures exported from a running local CCR instance via the
+ * Real data fixtures exported from a running local AgentRouter instance via the
  * management RPC. NOT mocked — these are actual request logs and agent
  * analysis snapshots captured from the app.
  */
-import type { AgentAnalysisSnapshot, RequestLogPage } from "@ccr/core/contracts/app";
+import type { AgentAnalysisSnapshot, RequestLogPage } from "@agentrouter/core/contracts/app";
 
 import requestLogsFixture from "./fixtures-request-logs.json";
 import agentAnalysisFixture from "./fixtures-agent-analysis.json";

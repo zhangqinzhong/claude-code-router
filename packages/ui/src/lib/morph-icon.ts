@@ -1,4 +1,4 @@
-import { cloneAsset, getPresetById, type MorphAsset } from "@musistudio/lucide-morph-react";
+import { cloneAsset, getPresetById, type MorphAsset } from "@/vendor/lucide-morph";
 
 function directMorphAsset(preset: string): MorphAsset {
   const asset = cloneAsset(getPresetById(preset));

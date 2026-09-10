@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { providerModelMetadataFromConfigForTest } from "@ccr/core/config/config.ts";
+import { providerModelMetadataFromConfigForTest } from "@agentrouter/core/config/config.ts";
 
 test("provider model metadata config preserves context fields", () => {
   assert.deepEqual(providerModelMetadataFromConfigForTest({

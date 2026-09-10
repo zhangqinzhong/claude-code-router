@@ -1,16 +1,16 @@
-import { BUILTIN_FUSION_VISION_TOOL_NAME, BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME, effectiveContextWindowPercentFor, isGatewayProviderEnabled } from "@ccr/core/contracts/app";
-import type { AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProviderModelMetadata, ProviderReasoningLevel, VirtualModelProfileConfig } from "@ccr/core/contracts/app";
+import { BUILTIN_FUSION_VISION_TOOL_NAME, BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME, effectiveContextWindowPercentFor, isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
+import type { AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProviderModelMetadata, ProviderReasoningLevel, VirtualModelProfileConfig } from "@agentrouter/core/contracts/app";
 import {
   findModelCatalogEntry,
   modelCatalogMaxInputTokens,
   readCatalogCapability,
   type ModelCatalogEntry
-} from "@ccr/core/gateway/model-catalog";
-import { codexDefaultBaseUrl, readCodexLocalModelCatalog } from "@ccr/core/agents/local-providers/codex";
-import { localAgentProviderApiKey } from "@ccr/core/agents/local-providers/shared";
-import { normalizeProviderBaseUrl } from "@ccr/core/providers/url";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
-import { filterModelIdsByAllowedModels } from "@ccr/core/profiles/model-allowlist";
+} from "@agentrouter/core/gateway/model-catalog";
+import { codexDefaultBaseUrl, readCodexLocalModelCatalog } from "@agentrouter/core/agents/local-providers/codex";
+import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-providers/shared";
+import { normalizeProviderBaseUrl } from "@agentrouter/core/providers/url";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
+import { filterModelIdsByAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
 
 const fusionModelProviderName = "Fusion";
 const codexDefaultContextWindow = 128_000;
@@ -170,7 +170,7 @@ function codexModelCatalogItem(
     default_reasoning_level: profile.defaultReasoningLevel,
     default_reasoning_effort: profile.defaultReasoningLevel,
     default_reasoning_summary: profile.defaultReasoningSummary,
-    description: profile.description ?? `CCR gateway model ${model}`,
+    description: profile.description ?? `AgentRouter gateway model ${model}`,
     displayName: model,
     display_name: model,
     effective_context_window_percent: effectiveContextWindowPercent,

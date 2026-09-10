@@ -2,7 +2,7 @@
 title: Slack AgentClaw 配置
 pageTitle: Slack AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入 Slack 频道或私聊，电脑锁屏后可接力到 Slack。本页覆盖创建 Slack 应用、CCR 所需的两个 Token 和接入验证。
+lead: 把 Agent 消息接入 Slack 频道或私聊，电脑锁屏后可接力到 Slack。本页覆盖创建 Slack 应用、AgentRouter 所需的两个 Token 和接入验证。
 ---
 
 ## 这个方式适合谁
@@ -13,7 +13,7 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 
 ## 你会用到哪些字段
 
-| Slack 后台里的名字 | CCR 字段 | 长什么样 | 什么时候需要 |
+| Slack 后台里的名字 | AgentRouter 字段 | 长什么样 | 什么时候需要 |
 | --- | --- | --- | --- |
 | Bot User OAuth Token | Bot Token | `xoxb-...` | 必填，让 Bot 收发消息 |
 | App-Level Token | App Token | `xapp-...` | 让 Socket Mode 建立连接 |
@@ -23,7 +23,7 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 1. 打开 [Slack API Apps](https://api.slack.com/apps)。
 2. 点 `Create New App`。
 3. 选 `From scratch`。
-4. 填应用名，比如 `CCR`。
+4. 填应用名，比如 `AgentRouter`。
 5. 选要接入的 Slack workspace。
 6. 点 `Create App`。
 
@@ -32,9 +32,9 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 1. 在应用左侧打开 `Socket Mode`。
 2. 打开 `Enable Socket Mode`。
 3. 页面提示需要 App-Level Token 时，点创建 token。
-4. Token 名字随便填，比如 `ccr-socket`。
+4. Token 名字随便填，比如 `ar-socket`。
 5. Scope 选 `connections:write`。
-6. 创建后复制 `xapp-...` 开头的 App-Level Token，待会儿填到 CCR 的 App Token。
+6. 创建后复制 `xapp-...` 开头的 App-Level Token，待会儿填到 AgentRouter 的 App Token。
 
 ## 第三步：添加 Bot 权限并安装
 
@@ -44,7 +44,7 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 4. 要收发文件再加 `files:read`、`files:write`。
 5. 要在私有频道用再加 `groups:history`、`groups:read`。
 6. 回到页面顶部点 `Install to Workspace`，授权。
-7. 安装后复制 `Bot User OAuth Token`（`xoxb-` 开头），待会儿填到 CCR 的 Bot Token。
+7. 安装后复制 `Bot User OAuth Token`（`xoxb-` 开头），待会儿填到 AgentRouter 的 Bot Token。
 
 ## 第四步：把 Bot 拉进目标频道
 
@@ -56,9 +56,9 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 
 > 没把 Bot 邀请进频道，它通常只能收到私聊，看不到频道消息。
 
-## 在 CCR 中接入
+## 在 AgentRouter 中接入
 
-1. 打开 CCR 的 **Bot 管理** 页面，点 **添加 Bot**。
+1. 打开 AgentRouter 的 **Bot 管理** 页面，点 **添加 Bot**。
 2. 平台选 **Slack**。
 3. 认证方式默认是 **Bot Token**，保持即可（除非你明确要走 OAuth 流程）。
 4. 把 `xoxb-...` 填进 **Bot Token**。
@@ -67,7 +67,7 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 7. 打开 **Agent 配置**，编辑你要接 Bot 的那个 Agent 配置。
 8. 打开 **Bot** 开关，选刚保存的 Bot。
 9. 按需打开 **转发 Agent 消息** 或 **接力**（见下一节）。
-10. 从 CCR 重新打开 Agent。
+10. 从 AgentRouter 重新打开 Agent。
 
 ## 转发还是接力
 
@@ -78,7 +78,7 @@ Slack 适合团队把 Agent 消息接入已有的频道、私聊或工作区应�
 
 ## 测试
 
-1. 从 CCR 打开 Agent，触发一条消息。
+1. 从 AgentRouter 打开 Agent，触发一条消息。
 2. 到 Slack 里确认 Bot 能收到并回复。
 3. 用频道的话，先确认 Bot 已经在频道里。
 

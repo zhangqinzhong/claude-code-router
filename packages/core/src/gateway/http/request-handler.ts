@@ -1,28 +1,28 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { ApiKeyConfig, AppConfig } from "@ccr/core/contracts/app";
-import { handleNetworkCaptureMcpRequest, isNetworkCaptureMcpPath } from "@ccr/core/mcp/network-capture-mcp";
-import { LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX, MEDIA_ARTIFACT_PATH_PREFIX, handleMediaArtifactRequest, handleMediaToolsMcpRequest } from "@ccr/core/mcp/grok-media-mcp";
-import { LEGACY_GROK_MEDIA_MCP_PATH, MEDIA_TOOLS_MCP_PATH } from "@ccr/core/mcp/grok-media-config";
-import { BROWSER_AUTOMATION_MCP_PATH, browserAutomationMcpEnabled } from "@ccr/core/mcp/toolhub-config";
-import { pluginService } from "@ccr/core/plugins/service";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin";
-import { createClaudeCliBootstrapResponse, shouldServeClaudeCliBootstrapResponse } from "@ccr/core/gateway/features/model-discovery";
+import type { ApiKeyConfig, AppConfig } from "@agentrouter/core/contracts/app";
+import { handleNetworkCaptureMcpRequest, isNetworkCaptureMcpPath } from "@agentrouter/core/mcp/network-capture-mcp";
+import { LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX, MEDIA_ARTIFACT_PATH_PREFIX, handleMediaArtifactRequest, handleMediaToolsMcpRequest } from "@agentrouter/core/mcp/grok-media-mcp";
+import { LEGACY_GROK_MEDIA_MCP_PATH, MEDIA_TOOLS_MCP_PATH } from "@agentrouter/core/mcp/grok-media-config";
+import { BROWSER_AUTOMATION_MCP_PATH, browserAutomationMcpEnabled } from "@agentrouter/core/mcp/toolhub-config";
+import { pluginService } from "@agentrouter/core/plugins/service";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin";
+import { createClaudeCliBootstrapResponse, shouldServeClaudeCliBootstrapResponse } from "@agentrouter/core/gateway/features/model-discovery";
 import {
   contextArchiveConfigForApiKey,
   handleContextArchiveMcpRequest,
   isContextArchiveMcpPath,
   type ContextArchiveReplayExecutor
-} from "@ccr/core/gateway/context-archive";
-import { ccrRemoteControlPathPrefix, ccrRemoteControlService } from "@ccr/core/gateway/remote-control-service";
-import { gatewayRuntimeConfigControlPath } from "@ccr/core/gateway/runtime-config-control";
-import { authorize, claudeCodeWifTokenPath, handleClaudeCodeWifTokenRequest, reserveApiKeyLimits } from "@ccr/core/gateway/auth/api-key-authorizer";
-import { parseJsonObject, readRequestBody, sendJson } from "@ccr/core/gateway/http/io";
-import { shouldRecordRequestLogs } from "@ccr/core/observability/raw-trace-sync";
-import { requestLogRequestedModel } from "@ccr/core/observability/request-log-model";
-import { isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
-import { applyCors, shouldServeGatewayRequest } from "@ccr/core/gateway/core-runtime/supervisor";
-import { billingUsageSyncPath, rawTraceSyncPath } from "@ccr/core/gateway/internal/shared";
-import type { BrowserAutomationMcpIntegration } from "@ccr/core/gateway/internal/shared";
+} from "@agentrouter/core/gateway/context-archive";
+import { arRemoteControlPathPrefix, arRemoteControlService } from "@agentrouter/core/gateway/remote-control-service";
+import { gatewayRuntimeConfigControlPath } from "@agentrouter/core/gateway/runtime-config-control";
+import { authorize, claudeCodeWifTokenPath, handleClaudeCodeWifTokenRequest, reserveApiKeyLimits } from "@agentrouter/core/gateway/auth/api-key-authorizer";
+import { parseJsonObject, readRequestBody, sendJson } from "@agentrouter/core/gateway/http/io";
+import { shouldRecordRequestLogs } from "@agentrouter/core/observability/raw-trace-sync";
+import { requestLogRequestedModel } from "@agentrouter/core/observability/request-log-model";
+import { isModelAllowedForProfile, profileForApiKey } from "@agentrouter/core/profiles/model-allowlist";
+import { applyCors, shouldServeGatewayRequest } from "@agentrouter/core/gateway/core-runtime/supervisor";
+import { billingUsageSyncPath, rawTraceSyncPath } from "@agentrouter/core/gateway/internal/shared";
+import type { BrowserAutomationMcpIntegration } from "@agentrouter/core/gateway/internal/shared";
 
 export type GatewayHttpRequestHandlerDependencies = {
   getBrowserAutomationMcpIntegration: () => BrowserAutomationMcpIntegration | undefined;
@@ -86,7 +86,7 @@ export class GatewayHttpRequestHandler {
           return;
         }
         if (!this.config.APIKEY || authorization.apiKey?.key !== this.config.APIKEY) {
-          sendJson(response, 403, { error: { message: "The primary CCR API key is required for runtime configuration control." } });
+          sendJson(response, 403, { error: { message: "The primary AgentRouter API key is required for runtime configuration control." } });
           return;
         }
         if (request.method === "GET") {
@@ -120,12 +120,12 @@ export class GatewayHttpRequestHandler {
         return;
       }
 
-      if (path === ccrRemoteControlPathPrefix || path.startsWith(`${ccrRemoteControlPathPrefix}/`)) {
+      if (path === arRemoteControlPathPrefix || path.startsWith(`${arRemoteControlPathPrefix}/`)) {
         const authorization = await authorize(request, response, this.config);
         if (!authorization.ok) {
           return;
         }
-        await ccrRemoteControlService.handleRequest({
+        await arRemoteControlService.handleRequest({
           endpoint: this.status.endpoint,
           path,
           readBody: readRequestBody,
@@ -140,7 +140,7 @@ export class GatewayHttpRequestHandler {
         if (!browserAutomationMcpEnabled(this.config)) {
           sendJson(response, 404, {
             error: {
-              message: "CCR browser automation MCP is disabled."
+              message: "AgentRouter browser automation MCP is disabled."
             }
           });
           return;
@@ -152,7 +152,7 @@ export class GatewayHttpRequestHandler {
         if (!this.browserAutomationMcpIntegration) {
           sendJson(response, 503, {
             error: {
-              message: "CCR browser automation MCP is only available in the Electron desktop app."
+              message: "AgentRouter browser automation MCP is only available in the Electron desktop app."
             }
           });
           return;
@@ -168,7 +168,7 @@ export class GatewayHttpRequestHandler {
         }
         const contextArchiveConfig = contextArchiveConfigForApiKey(this.config, authorization.apiKey);
         if (!contextArchiveConfig) {
-          sendJson(response, 404, { error: { message: "CCR context archive MCP is disabled." } });
+          sendJson(response, 404, { error: { message: "AgentRouter context archive MCP is disabled." } });
           return;
         }
         await handleContextArchiveMcpRequest(
@@ -182,7 +182,7 @@ export class GatewayHttpRequestHandler {
 
       if ([MEDIA_TOOLS_MCP_PATH, LEGACY_GROK_MEDIA_MCP_PATH].some((mcpPath) => path === mcpPath || path === `${mcpPath}/`)) {
         if (!this.config.mediaTools.enabled) {
-          sendJson(response, 404, { error: { message: "CCR Media Tools MCP is disabled." } });
+          sendJson(response, 404, { error: { message: "AgentRouter Media Tools MCP is disabled." } });
           return;
         }
         const authorization = await authorize(request, response, this.config);

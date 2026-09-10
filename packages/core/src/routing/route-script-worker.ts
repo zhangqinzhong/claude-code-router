@@ -6,7 +6,7 @@ import { parentPort } from "node:worker_threads";
 import type {
   RouteScriptWorkerRequest,
   RouteScriptWorkerResponse
-} from "@ccr/core/routing/route-script-worker-protocol";
+} from "@agentrouter/core/routing/route-script-worker-protocol";
 
 const maxFileBytes = 1024 * 1024;
 const maxFetchBodyBytes = 256 * 1024;

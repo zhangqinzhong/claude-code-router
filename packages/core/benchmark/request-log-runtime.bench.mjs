@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { monitorEventLoopDelay, performance } from "node:perf_hooks";
 import process from "node:process";
-import * as requestLogs from "@ccr/core/observability/request-log-store.ts";
+import * as requestLogs from "@agentrouter/core/observability/request-log-store.ts";
 
 const scenarios = [
   { bodyBytes: 256, hops: 0, name: "small-no-trace", records: 2_000 },
@@ -61,7 +61,7 @@ async function main() {
 }
 
 async function runScenario(scenario) {
-  const dir = mkdtempSync(path.join(tmpdir(), `ccr-log-bench-${scenario.name}-`));
+  const dir = mkdtempSync(path.join(tmpdir(), `ar-log-bench-${scenario.name}-`));
   const target = createTarget(path.join(dir, "request-logs.sqlite"));
   const eventLoop = monitorEventLoopDelay({ resolution: 1 });
   const batchDurations = [];
@@ -133,7 +133,7 @@ async function runScenario(scenario) {
 }
 
 async function runWebScenario(mode, options) {
-  const dir = mkdtempSync(path.join(tmpdir(), `ccr-log-web-bench-${mode}-`));
+  const dir = mkdtempSync(path.join(tmpdir(), `ar-log-web-bench-${mode}-`));
   const target = createWebTarget(mode, path.join(dir, "request-logs.sqlite"), options);
   const counters = { accepted: 0, rejected: 0 };
   const server = createServer((request, response) => {

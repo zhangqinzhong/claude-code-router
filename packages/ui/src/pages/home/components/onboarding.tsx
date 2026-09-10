@@ -30,7 +30,7 @@ const onboardingStepDetails: Record<OnboardingStepId, {
     tone: "orange"
   },
   enter: {
-    description: "Start using CCR.",
+    description: "Start using AgentRouter.",
     icon: Gauge,
     title: "Let's start",
     tone: "cyan"

@@ -15,7 +15,7 @@ test("only the successfully parsed legacy JSON source is archived", async () => 
   const {
     LEGACY_ACTIVE_CONFIG_FILE,
     LEGACY_WINDOWS_CONFIG_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   mkdirSync(path.dirname(LEGACY_ACTIVE_CONFIG_FILE), { recursive: true });
   mkdirSync(path.dirname(LEGACY_WINDOWS_CONFIG_FILE), { recursive: true });
 
@@ -23,7 +23,7 @@ test("only the successfully parsed legacy JSON source is archived", async () => 
   writeFileSync(LEGACY_ACTIVE_CONFIG_FILE, malformedConfig, "utf8");
   writeFileSync(LEGACY_WINDOWS_CONFIG_FILE, JSON.stringify({ PORT: 4567 }), "utf8");
 
-  const { loadAppConfig } = await import("@ccr/core/config/config.ts");
+  const { loadAppConfig } = await import("@agentrouter/core/config/config.ts");
   const config = await loadAppConfig();
 
   assert.equal(config.PORT, 4567);

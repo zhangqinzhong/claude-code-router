@@ -1,7 +1,7 @@
 import { readFileSync, rmSync } from "node:fs";
 import path from "node:path";
-import { CdpClient } from "@ccr/core/agents/cdp-client";
-import { MEDIA_ARTIFACT_PATH_PREFIX } from "@ccr/core/mcp/grok-media-config";
+import { CdpClient } from "@agentrouter/core/agents/cdp-client";
+import { MEDIA_ARTIFACT_PATH_PREFIX } from "@agentrouter/core/mcp/grok-media-config";
 
 type CodexMediaPreviewLogger = Pick<Console, "info" | "warn">;
 
@@ -42,7 +42,7 @@ type LoadedMediaArtifact = {
 };
 
 const codexDevToolsActivePortFile = "DevToolsActivePort";
-const codexMediaPreviewBinding = "__ccrMediaPreviewRequest";
+const codexMediaPreviewBinding = "__arMediaPreviewRequest";
 const codexMediaPreviewConnectTimeoutMs = 20_000;
 const codexMediaPreviewFetchTimeoutMs = 60_000;
 const codexMediaPreviewPollIntervalMs = 250;
@@ -219,7 +219,7 @@ export class CodexAppMediaPreviewBridge {
     await client.send("Runtime.evaluate", {
       awaitPromise: false,
       ...(typeof executionContextId === "number" ? { contextId: executionContextId } : {}),
-      expression: `globalThis.__ccrMediaPreviewBridge?.receive(${JSON.stringify(message)})`
+      expression: `globalThis.__arMediaPreviewBridge?.receive(${JSON.stringify(message)})`
     });
   }
 }
@@ -273,9 +273,9 @@ function isCodexAppPageTarget(target: DevToolsTarget): boolean {
 function validateCodexMediaArtifactUrl(value: string, endpoint: string): ValidatedArtifactUrl {
   const expected = new URL(endpoint);
   const url = new URL(value);
-  if (url.protocol !== "http:" || url.origin !== expected.origin) throw new Error("Artifact origin is not the configured CCR gateway.");
+  if (url.protocol !== "http:" || url.origin !== expected.origin) throw new Error("Artifact origin is not the configured AgentRouter gateway.");
   if (url.username || url.password || url.hash) throw new Error("Artifact URL contains unsupported credentials or fragments.");
-  if (!url.pathname.startsWith(MEDIA_ARTIFACT_PATH_PREFIX)) throw new Error("Artifact URL does not use the CCR media artifact path.");
+  if (!url.pathname.startsWith(MEDIA_ARTIFACT_PATH_PREFIX)) throw new Error("Artifact URL does not use the AgentRouter media artifact path.");
   const encodedId = url.pathname.slice(MEDIA_ARTIFACT_PATH_PREFIX.length);
   if (!encodedId || encodedId.includes("/")) throw new Error("Artifact URL contains an invalid identifier.");
   const artifactId = decodeURIComponent(encodedId);
@@ -299,22 +299,22 @@ async function loadCodexMediaArtifact(validated: ValidatedArtifactUrl, signal: A
       signal
     });
   } catch {
-    throw new Error("The CCR artifact request failed.");
+    throw new Error("The AgentRouter artifact request failed.");
   }
-  if (!response.ok) throw new Error(`The CCR artifact endpoint returned HTTP ${response.status}.`);
-  if (response.redirected) throw new Error("The CCR artifact endpoint attempted a redirect.");
+  if (!response.ok) throw new Error(`The AgentRouter artifact endpoint returned HTTP ${response.status}.`);
+  if (response.redirected) throw new Error("The AgentRouter artifact endpoint attempted a redirect.");
   const declaredMimeType = (response.headers.get("content-type") || "").split(";", 1)[0].trim().toLowerCase();
   const declaredKind = mediaKind(declaredMimeType);
-  if (!declaredKind) throw new Error("The CCR artifact endpoint returned a non-media content type.");
+  if (!declaredKind) throw new Error("The AgentRouter artifact endpoint returned a non-media content type.");
   const maxBytes = declaredKind === "video" ? codexMediaPreviewMaxVideoBytes : codexMediaPreviewMaxImageBytes;
   const declaredLength = Number(response.headers.get("content-length") || "0");
   if (declaredLength && (!Number.isSafeInteger(declaredLength) || declaredLength < 1 || declaredLength > maxBytes)) {
-    throw new Error("The CCR media artifact exceeds the inline preview size limit.");
+    throw new Error("The AgentRouter media artifact exceeds the inline preview size limit.");
   }
   if (response.headers.get("content-encoding") && response.headers.get("content-encoding") !== "identity") {
-    throw new Error("Compressed CCR media artifacts are not accepted for inline preview.");
+    throw new Error("Compressed AgentRouter media artifacts are not accepted for inline preview.");
   }
-  if (!response.body) throw new Error("The CCR artifact response had no body.");
+  if (!response.body) throw new Error("The AgentRouter artifact response had no body.");
   const reader = response.body.getReader();
   const chunks: Buffer[] = [];
   let total = 0;
@@ -325,16 +325,16 @@ async function loadCodexMediaArtifact(validated: ValidatedArtifactUrl, signal: A
     total += part.value.byteLength;
     if (total > maxBytes) {
       await reader.cancel();
-      throw new Error("The CCR media artifact exceeds the inline preview size limit.");
+      throw new Error("The AgentRouter media artifact exceeds the inline preview size limit.");
     }
     chunks.push(Buffer.from(part.value));
   }
-  if (!total) throw new Error("The CCR artifact response was empty.");
-  if (declaredLength && total !== declaredLength) throw new Error("The CCR artifact response length did not match its headers.");
+  if (!total) throw new Error("The AgentRouter artifact response was empty.");
+  if (declaredLength && total !== declaredLength) throw new Error("The AgentRouter artifact response length did not match its headers.");
   const bytes = Buffer.concat(chunks, total);
   const detectedMimeType = detectMediaMimeType(bytes);
   if (!detectedMimeType || mediaKind(detectedMimeType) !== declaredKind) {
-    throw new Error("The CCR artifact content did not match its declared media type.");
+    throw new Error("The AgentRouter artifact content did not match its declared media type.");
   }
   return { bytes, mimeType: detectedMimeType };
 }
@@ -386,10 +386,10 @@ function codexMediaPreviewPageBootstrap(config: {
   type PreviewTransfer = { chunks: Uint8Array[]; mimeType: string; received: number; size: number };
   type HiddenState = { count: number; display: string; hidden: boolean };
   type PreviewScope = typeof globalThis & {
-    __ccrMediaPreviewBridge?: { dispose: () => void; receive: (message: Record<string, unknown>) => void; scan: () => void; version: string };
+    __arMediaPreviewBridge?: { dispose: () => void; receive: (message: Record<string, unknown>) => void; scan: () => void; version: string };
   };
   const scope = globalThis as PreviewScope;
-  const existing = scope.__ccrMediaPreviewBridge;
+  const existing = scope.__arMediaPreviewBridge;
   if (existing?.version === config.version) {
     existing.scan();
     return;
@@ -572,7 +572,7 @@ function codexMediaPreviewPageBootstrap(config: {
       media.preload = "metadata";
       media.src = asset.blobUrl;
     } else {
-      media.alt = "CCR generated image";
+      media.alt = "AgentRouter generated image";
       media.decoding = "async";
       media.src = asset.blobUrl;
     }
@@ -701,7 +701,7 @@ function codexMediaPreviewPageBootstrap(config: {
     scan();
   }
 
-  scope.__ccrMediaPreviewBridge = { dispose, receive, scan, version: config.version };
+  scope.__arMediaPreviewBridge = { dispose, receive, scan, version: config.version };
   start();
 }
 

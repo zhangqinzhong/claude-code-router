@@ -29,7 +29,7 @@ function uiAssetsAsUrlPlugin() {
   };
 }
 
-const site = process.env.ASTRO_SITE ?? "https://ccrdesk.top";
+const site = process.env.ASTRO_SITE?.trim() || undefined;
 const base = process.env.ASTRO_BASE ?? "/";
 
 const agentClawPlatforms = [
@@ -97,7 +97,7 @@ export default defineConfig({
     resolve: {
       alias: {
         "@": new URL("./../packages/ui/src", import.meta.url).pathname,
-        "@ccr/core": new URL("./../packages/core/src", import.meta.url).pathname,
+        "@agentrouter/core": new URL("./../packages/core/src", import.meta.url).pathname,
       },
     },
   },

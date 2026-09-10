@@ -2,7 +2,7 @@
 title: AgentClaw Slack setup
 pageTitle: AgentClaw Slack
 eyebrow: AgentClaw
-lead: "Connect agent messages to Slack channels or DMs, with optional handoff after your screen locks. Covers creating the Slack app, the two tokens CCR needs, and verifying the connection."
+lead: "Connect agent messages to Slack channels or DMs, with optional handoff after your screen locks. Covers creating the Slack app, the two tokens AgentRouter needs, and verifying the connection."
 ---
 
 ## Who this is for
@@ -13,7 +13,7 @@ Slack is for teams that want agent messages in an existing channel, DM, or works
 
 ## The fields you'll use
 
-| Name in the Slack dashboard | CCR field | Looks like | When you need it |
+| Name in the Slack dashboard | AgentRouter field | Looks like | When you need it |
 | --- | --- | --- | --- |
 | Bot User OAuth Token | Bot Token | `xoxb-...` | Required — lets the bot send and receive |
 | App-Level Token | App Token | `xapp-...` | Lets Socket Mode establish the connection |
@@ -23,7 +23,7 @@ Slack is for teams that want agent messages in an existing channel, DM, or works
 1. Open [Slack API Apps](https://api.slack.com/apps).
 2. Click `Create New App`.
 3. Choose `From scratch`.
-4. Name it, e.g. `CCR`.
+4. Name it, e.g. `AgentRouter`.
 5. Pick the Slack workspace to connect.
 6. Click `Create App`.
 
@@ -32,9 +32,9 @@ Slack is for teams that want agent messages in an existing channel, DM, or works
 1. Open `Socket Mode` on the left.
 2. Enable `Socket Mode`.
 3. When prompted for an App-Level Token, create one.
-4. Name it anything, e.g. `ccr-socket`.
+4. Name it anything, e.g. `ar-socket`.
 5. Choose the `connections:write` scope.
-6. Copy the `xapp-...` App-Level Token for CCR's App Token.
+6. Copy the `xapp-...` App-Level Token for AgentRouter's App Token.
 
 ## Step 3: Add bot scopes and install
 
@@ -44,7 +44,7 @@ Slack is for teams that want agent messages in an existing channel, DM, or works
 4. Add `files:read` and `files:write` to send/receive files.
 5. Add `groups:history` and `groups:read` for private channels.
 6. Click `Install to Workspace` at the top and authorize.
-7. Copy the `Bot User OAuth Token` (starts with `xoxb-`) for CCR's Bot Token.
+7. Copy the `Bot User OAuth Token` (starts with `xoxb-`) for AgentRouter's Bot Token.
 
 ## Step 4: Invite the bot into a channel
 
@@ -56,9 +56,9 @@ Skip this if you only use DMs.
 
 > Without an invite, the bot usually only gets DMs — not channel messages.
 
-## Wire it up in CCR
+## Wire it up in AgentRouter
 
-1. Open CCR's **Bot Management** page and click **Add Bot**.
+1. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 2. Pick **Slack** as the platform.
 3. Keep the default **Bot Token** auth (unless you specifically need OAuth).
 4. Paste `xoxb-...` into **Bot Token**.
@@ -67,7 +67,7 @@ Skip this if you only use DMs.
 7. Open **Agent Profiles** and edit the Agent Profiles you want to attach it to.
 8. Turn on **Bot** and select the bot you just saved.
 9. Optionally enable **Forward agent messages** or **Handoff** (next section).
-10. Reopen the agent from CCR.
+10. Reopen the agent from AgentRouter.
 
 ## Forward or handoff
 
@@ -78,7 +78,7 @@ Skip this if you only use DMs.
 
 ## Test it
 
-1. Open the agent from CCR and trigger a message.
+1. Open the agent from AgentRouter and trigger a message.
 2. Check Slack to confirm the bot received it and replied.
 3. If you use a channel, make sure the bot is in it.
 

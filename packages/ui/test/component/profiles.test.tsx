@@ -2,10 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { ProfileConfig } from "@ccr/core/contracts/app.ts";
-import { AddProfileForm, DeleteProfileDialog, ProfileView } from "@ccr/ui/pages/home/components/profiles.tsx";
-import { AppI18nContext, appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
-import { createProfileDraft, createProfileDraftFromProfile, isProfileDraftSubmittable, normalizeUnknownProfileItem, profileAgentLogoUrl, profileConfigFromDraft, profileDraftWithDetectedAppPath, profileSummaryItems } from "@ccr/ui/pages/home/shared/profiles.ts";
+import type { ProfileConfig } from "@agentrouter/core/contracts/app.ts";
+import { AddProfileForm, DeleteProfileDialog, ProfileView } from "@agentrouter/ui/pages/home/components/profiles.tsx";
+import { AppI18nContext, appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
+import { createProfileDraft, createProfileDraftFromProfile, isProfileDraftSubmittable, normalizeUnknownProfileItem, profileAgentLogoUrl, profileConfigFromDraft, profileDraftWithDetectedAppPath, profileSummaryItems } from "@agentrouter/ui/pages/home/shared/profiles.ts";
 import { appConfigFixture } from "../fixtures/index.ts";
 
 const profile: ProfileConfig = {
@@ -112,7 +112,7 @@ test("AddProfileForm shows enhanced route as a sibling of profile routing", () =
   assert.match(html, /rounded-b-none/);
   assert.match(html, /rounded-b-md border border-t-0/);
   assert.doesNotMatch(html, /Profile routes/);
-  assert.match(html, /CCR built-in Claude Code routing optimizes requests to third-party models for this profile\./);
+  assert.match(html, /AgentRouter built-in Claude Code routing optimizes requests to third-party models for this profile\./);
 });
 
 test("AddProfileForm shows private profile routes when profile routing is enabled", () => {
@@ -134,7 +134,7 @@ test("AddProfileForm shows private profile routes when profile routing is enable
   assert.match(html, /Enhanced route/);
   assert.match(html, /Profile routes/);
   assert.ok(html.indexOf("Enhanced route") < html.indexOf("Profile routing"));
-  assert.match(html, /CCR built-in Claude Code routing optimizes requests to third-party models for this profile\./);
+  assert.match(html, /AgentRouter built-in Claude Code routing optimizes requests to third-party models for this profile\./);
   assert.match(html, /data-ui-tooltip-trigger/);
 });
 
@@ -155,7 +155,7 @@ test("AddProfileForm uses Codex-specific enhanced route info for Codex profiles"
   );
 
   assert.match(html, /Enhanced route/);
-  assert.match(html, /CCR built-in Codex routing optimizes requests to third-party models for this profile\./);
+  assert.match(html, /AgentRouter built-in Codex routing optimizes requests to third-party models for this profile\./);
   assert.doesNotMatch(html, /Provider ID/);
   assert.doesNotMatch(html, /Provider name/);
   assert.equal(isProfileDraftSubmittable(draft), true);
@@ -367,7 +367,7 @@ test("AddProfileForm shows Kimi allowed models as selected by default", () => {
   assert.equal(profileConfigFromDraft(draft, []).availableModels, undefined);
 });
 
-test("AddProfileForm treats Pi as a CCR-only CLI profile", () => {
+test("AddProfileForm treats Pi as a AR-only CLI profile", () => {
   const config = appConfigFixture();
   const draft = createProfileDraft("pi");
   const html = renderToStaticMarkup(
@@ -389,7 +389,7 @@ test("AddProfileForm treats Pi as a CCR-only CLI profile", () => {
   assert.doesNotMatch(html, /Allowed model list/);
 });
 
-test("AddProfileForm treats Claude Design as a CCR-only App profile", () => {
+test("AddProfileForm treats Claude Design as a AR-only App profile", () => {
   const config = appConfigFixture();
   const draft = createProfileDraft("claude-design");
   const html = renderToStaticMarkup(
@@ -554,7 +554,7 @@ test("profileSummaryItems omits disabled profile properties from cards", () => {
   }, config, (value) => value);
 
   assert.match(enabledItems.map((item) => item.label).join(" "), /Show all sessions/);
-  assert.match(enabledItems.map((item) => item.label).join(" "), /CCR managed compact/);
+  assert.match(enabledItems.map((item) => item.label).join(" "), /AgentRouter managed compact/);
   assert.doesNotMatch(enabledItems.map((item) => item.label).join(" "), /Provider ID/);
 });
 
@@ -604,7 +604,7 @@ test("detected WORKBUDDY_APP_PATH is used as the Workbuddy profile default", () 
   assert.equal(profileDraftWithDetectedAppPath({ ...draft, appPath: "/custom/workbuddy" }, undefined, undefined, detectedPath).appPath, "/custom/workbuddy");
 });
 
-test("Grok CLI profile defaults to a CCR-scoped CLI entry", () => {
+test("Grok CLI profile defaults to a AR-scoped CLI entry", () => {
   const draft = createProfileDraft("grok");
 
   assert.equal(draft.name, "Grok CLI");

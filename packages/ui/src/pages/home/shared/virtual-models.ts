@@ -17,7 +17,7 @@ import {
   MEDIA_JOB_GET_TOOL_PREFIX,
   MEDIA_VIDEO_START_TOOL_PREFIX,
   ROUTER_FALLBACK_MAX_RETRY_COUNT
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   GatewayMcpServerConfig,
@@ -28,7 +28,7 @@ import type {
   VirtualModelFusionWebSearchConfig,
   VirtualModelFusionWebSearchProvider,
   VirtualModelProfileConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   customFusionToolName,
   defaultFusionWebSearchProvider,
@@ -43,7 +43,7 @@ import {
 import { isPlainRecord, normalizeProviderModelSelector, stringValue, uniqueStrings } from "./common";
 import { sanitizeConfigId } from "./extensions";
 import { createRouteModelOptions, numberValue } from "./providers";
-import { createGrokMediaModelOptions, migrateLegacyGrokMediaModelSelector } from "@ccr/core/media/models";
+import { createGrokMediaModelOptions, migrateLegacyGrokMediaModelSelector } from "@agentrouter/core/media/models";
 import { clampNumber } from "./services";
 import { fusionCustomToolMetadataKey, fusionMediaMetadataKey, fusionVisionMetadataKey, fusionWebSearchMetadataKey } from "./types";
 import type { KeyValueDraftRow, McpServerDraft, VirtualModelDraft, VirtualModelMatchMode, VirtualModelToolDraft } from "./types";

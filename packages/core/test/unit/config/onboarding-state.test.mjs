@@ -15,12 +15,12 @@ test("onboarding state falls back to the legacy marker when the config database 
   const {
     APP_CONFIG_DB_FILE,
     ONBOARDING_FINISHED_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   mkdirSync(path.dirname(APP_CONFIG_DB_FILE), { recursive: true });
   writeFileSync(APP_CONFIG_DB_FILE, "not a SQLite database", "utf8");
   writeFileSync(ONBOARDING_FINISHED_FILE, "", "utf8");
 
-  const { loadOnboardingFinished } = await import("@ccr/core/config/onboarding-state.ts");
+  const { loadOnboardingFinished } = await import("@agentrouter/core/config/onboarding-state.ts");
   assert.equal(await loadOnboardingFinished(), true);
 
   rmSync(ONBOARDING_FINISHED_FILE);

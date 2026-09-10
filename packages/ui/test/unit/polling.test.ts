@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { preserveEqualPollingSnapshot } from "@ccr/ui/pages/home/shared/polling.ts";
+import { preserveEqualPollingSnapshot } from "@agentrouter/ui/pages/home/shared/polling.ts";
 
 test("polling snapshots preserve the current reference when nested content is unchanged", () => {
   const current = {

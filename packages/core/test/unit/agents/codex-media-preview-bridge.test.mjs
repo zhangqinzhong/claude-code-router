@@ -4,12 +4,12 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { codexElectronArgsForTest } from "@ccr/core/agents/codex/app-launch.ts";
+import { codexElectronArgsForTest } from "@agentrouter/core/agents/codex/app-launch.ts";
 import {
   codexMediaPreviewBridgeForTest,
   prepareCodexAppCdpUserDataDir,
   shouldEnableCodexMediaPreviewBridge
-} from "@ccr/core/agents/codex/media-preview-bridge.ts";
+} from "@agentrouter/core/agents/codex/media-preview-bridge.ts";
 import { waitForTcpListener } from "../../support/loopback-listener.mjs";
 
 const token = "A".repeat(32);
@@ -41,7 +41,7 @@ test("Codex inline media bridge is enabled only for configured Fusion media and 
 });
 
 test("Codex App launch uses a random loopback DevTools port and removes stale discovery state", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-cdp-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-codex-cdp-"));
   try {
     const activePort = path.join(root, "DevToolsActivePort");
     writeFileSync(activePort, "49152\n/devtools/browser/stale\n");
@@ -57,15 +57,15 @@ test("Codex App launch uses a random loopback DevTools port and removes stale di
   }
 });
 
-test("Codex media artifact URLs are restricted to the configured CCR origin, current path, UUID, and token", () => {
+test("Codex media artifact URLs are restricted to the configured AgentRouter origin, current path, UUID, and token", () => {
   const endpoint = "http://127.0.0.1:3457";
-  const valid = `${endpoint}/__ccr/media/artifacts/${imageId}?token=${token}`;
+  const valid = `${endpoint}/__ar/media/artifacts/${imageId}?token=${token}`;
   assert.deepEqual(codexMediaPreviewBridgeForTest.validateUrl(valid, endpoint), {
     artifactId: imageId,
     url: valid
   });
   assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(valid.replace("127.0.0.1", "localhost"), endpoint), /origin/);
-  assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(valid.replace("/__ccr/media/", "/__ccr/grok-media/"), endpoint), /artifact path/);
+  assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(valid.replace("/__ar/media/", "/__ar/grok-media/"), endpoint), /artifact path/);
   assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(valid.replace(imageId, "not-an-id"), endpoint), /identifier/);
   assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(`${valid}&extra=1`, endpoint), /access token/);
   assert.throws(() => codexMediaPreviewBridgeForTest.validateUrl(valid.replace(token, "short"), endpoint), /access token/);
@@ -74,7 +74,7 @@ test("Codex media artifact URLs are restricted to the configured CCR origin, cur
 test("Codex page bootstrap uses Blob media, semantic response hooks, readiness gating, and no CSP bypass", () => {
   const script = codexMediaPreviewBridgeForTest.injectionScript("http://127.0.0.1:3457");
   assert.doesNotThrow(() => new Function(script));
-  assert.match(script, /__ccrMediaPreviewRequest/);
+  assert.match(script, /__arMediaPreviewRequest/);
   assert.match(script, /MutationObserver/);
   assert.match(script, /data-response-annotation-conversation/);
   assert.match(script, /Open Web preview/);
@@ -109,7 +109,7 @@ test("Codex media loader accepts signed image and video bytes and rejects redire
       return;
     }
     if (id === redirectId) {
-      response.writeHead(302, { location: `/__ccr/media/artifacts/${imageId}?token=${token}` });
+      response.writeHead(302, { location: `/__ar/media/artifacts/${imageId}?token=${token}` });
       response.end();
       return;
     }
@@ -124,7 +124,7 @@ test("Codex media loader accepts signed image and video bytes and rejects redire
   const address = server.address();
   assert.ok(address && typeof address === "object");
   const endpoint = `http://127.0.0.1:${address.port}`;
-  const artifactUrl = (id) => `${endpoint}/__ccr/media/artifacts/${id}?token=${token}`;
+  const artifactUrl = (id) => `${endpoint}/__ar/media/artifacts/${id}?token=${token}`;
 
   const image = await codexMediaPreviewBridgeForTest.loadArtifact(artifactUrl(imageId), endpoint);
   assert.equal(image.mimeType, "image/png");

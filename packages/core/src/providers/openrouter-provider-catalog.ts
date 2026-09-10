@@ -2,7 +2,7 @@ import type {
   OpenRouterProviderCatalogItem,
   OpenRouterProviderCatalogRequest,
   OpenRouterProviderCatalogResult
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 const providerCache = new Map<string, { fetchedAt: number; providers: OpenRouterProviderCatalogItem[] }>();
 const providerCacheTtlMs = 10 * 60_000;

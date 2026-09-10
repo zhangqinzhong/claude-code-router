@@ -35,7 +35,7 @@ async function runProject(project) {
     return;
   }
 
-  const testHome = mkdtempSync(path.join(os.tmpdir(), `ccr-${project}-test-home-`));
+  const testHome = mkdtempSync(path.join(os.tmpdir(), `ar-${project}-test-home-`));
   const runtime = resolveRuntime(testProjects[project].runtime);
   const executable = runtime === "electron" ? electron : process.execPath;
   console.log(`\nRunning ${project} tests with ${runtime}...`);

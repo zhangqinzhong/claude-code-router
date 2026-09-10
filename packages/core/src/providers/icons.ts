@@ -2,10 +2,10 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { PROVIDER_ICON_CACHE_DIR } from "@ccr/core/config/constants";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import type { ProviderIconDetectionRequest, ProviderIconDetectionResult } from "@ccr/core/contracts/app";
-import { compactProviderUrl, providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+import { PROVIDER_ICON_CACHE_DIR } from "@agentrouter/core/config/constants";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import type { ProviderIconDetectionRequest, ProviderIconDetectionResult } from "@agentrouter/core/contracts/app";
+import { compactProviderUrl, providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 
 const faviconServiceUrl = "https://t0.gstatic.com/faviconV2";
 const maxProviderIconBytes = 1024 * 1024;

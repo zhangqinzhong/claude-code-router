@@ -1,7 +1,7 @@
-import type { ApiKeyConfig, AppConfig, ProfileConfig } from "@ccr/core/contracts/app";
-import { resolveClaudeAppGatewayRouteModel } from "@ccr/core/agents/claude-app/gateway-routes";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key";
-import { modelRegistryForConfig, normalizeRouteSelector } from "@ccr/core/routing/model-registry";
+import type { ApiKeyConfig, AppConfig, ProfileConfig } from "@agentrouter/core/contracts/app";
+import { resolveClaudeAppGatewayRouteModel } from "@agentrouter/core/agents/claude-app/gateway-routes";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key";
+import { modelRegistryForConfig, normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
 
 export type ProfileModelAllowlistConfig = Pick<AppConfig, "Providers" | "profile" | "virtualModelProfiles">;
 export type ModelAllowlistResolutionConfig = Pick<AppConfig, "Providers" | "virtualModelProfiles"> & Partial<Pick<AppConfig, "profile">>;

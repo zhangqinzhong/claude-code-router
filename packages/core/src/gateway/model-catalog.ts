@@ -1,6 +1,6 @@
-import { loadModelCatalogPayload } from "@ccr/core/models/catalog-file";
-import type { GatewayProviderConfig } from "@ccr/core/contracts/app";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
+import { loadModelCatalogPayload } from "@agentrouter/core/models/catalog-file";
+import type { GatewayProviderConfig } from "@agentrouter/core/contracts/app";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
 
 const claudeCodeDefaultContextTokens = 200_000;
 let modelCatalogIndex: ModelCatalogIndex | undefined;

@@ -1,9 +1,9 @@
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { DATADIR } from "@ccr/core/config/constants";
-import { GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, type GatewayPluginAppConfig, type GatewayPluginPermission, type GatewayPluginSurface, type PluginDependency, type PluginMarketplaceEntry } from "@ccr/core/contracts/app";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
+import { DATADIR } from "@agentrouter/core/config/constants";
+import { GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, type GatewayPluginAppConfig, type GatewayPluginPermission, type GatewayPluginSurface, type PluginDependency, type PluginMarketplaceEntry } from "@agentrouter/core/contracts/app";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
 
 type MarketplaceCache = {
   entries: PluginMarketplaceEntry[];
@@ -11,7 +11,7 @@ type MarketplaceCache = {
   url: string;
 };
 
-const defaultMarketplaceUrl = "https://raw.githubusercontent.com/musistudio/ccr-extensions/main/marketplace/plugins.json";
+const defaultMarketplaceUrl = "https://raw.githubusercontent.com/zhangqinzhong/ar-extensions/main/marketplace/plugins.json";
 const marketplaceCacheDir = path.join(DATADIR, "plugin-marketplace");
 const marketplaceModuleCacheDir = path.join(marketplaceCacheDir, "modules");
 const marketplaceManifestCacheFile = path.join(marketplaceCacheDir, "plugins.json");
@@ -354,7 +354,7 @@ function normalizeMarketplacePluginAppUrl(value: string | undefined): string {
     throw new Error("Marketplace plugin app URL cannot be protocol-relative.");
   }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
-    throw new Error("Marketplace plugin app URL must be an http(s) URL or a CCR gateway path.");
+    throw new Error("Marketplace plugin app URL must be an http(s) URL or a AgentRouter gateway path.");
   }
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }

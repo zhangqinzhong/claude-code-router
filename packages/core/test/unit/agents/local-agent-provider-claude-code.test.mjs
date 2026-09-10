@@ -4,9 +4,9 @@ import { chmodSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:f
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { claudeCodeCandidate, importClaudeCodeProvider } from "@ccr/core/agents/local-providers/claude-code.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
+import { claudeCodeCandidate, importClaudeCodeProvider } from "@agentrouter/core/agents/local-providers/claude-code.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
 
 test("Claude Code local provider prefers macOS Keychain credentials over stale file credentials", { skip: process.platform === "win32" }, async () => {
   await withClaudeCodeHome(async (home) => {
@@ -363,7 +363,7 @@ async function withFakeSecurityFailure(run) {
 // Pins $USER as well as PATH: the provider looks the keychain item up under the
 // current account, so the expected item name has to be deterministic.
 async function withFakeSecurityScript(body, run) {
-  const binDir = mkdtempSync(path.join(os.tmpdir(), "ccr-security-bin-"));
+  const binDir = mkdtempSync(path.join(os.tmpdir(), "ar-security-bin-"));
   const securityPath = path.join(binDir, "security");
   const previousPath = process.env.PATH;
   const previousUser = process.env.USER;
@@ -380,7 +380,7 @@ async function withFakeSecurityScript(body, run) {
   }
 }
 
-const keychainAccount = "ccr-test-user";
+const keychainAccount = "ar-test-user";
 
 // Stands in for the macOS keychain: `find-generic-password` matches on
 // service+account, an omitted `-a` matches the first item registered for the

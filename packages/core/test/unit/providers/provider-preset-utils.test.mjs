@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   normalizeProviderPresetCapabilitiesForTest
-} from "@ccr/core/config/config.ts";
+} from "@agentrouter/core/config/config.ts";
 import {
   findProviderPresetByBaseUrlInList,
   findProviderPresetByIdentityInList,
@@ -10,39 +10,39 @@ import {
   providerEndpointCanReceiveProviderApiKeyInList,
   providerIdentitySafetyIssueInList,
   providerPresetMatchesBaseUrl
-} from "@ccr/core/providers/presets/utils.ts";
+} from "@agentrouter/core/providers/presets/utils.ts";
 import {
   fennoProviderPreset
-} from "@ccr/core/providers/presets/fenno/index.ts";
+} from "@agentrouter/core/providers/presets/fenno/index.ts";
 import {
   infistarAiProviderPreset
-} from "@ccr/core/providers/presets/infistar-ai/index.ts";
+} from "@agentrouter/core/providers/presets/infistar-ai/index.ts";
 import {
   moonshotChinaProviderPreset,
   moonshotGlobalProviderPreset
-} from "@ccr/core/providers/presets/moonshot/index.ts";
+} from "@agentrouter/core/providers/presets/moonshot/index.ts";
 import {
   nvidiaProviderPreset
-} from "@ccr/core/providers/presets/nvidia/index.ts";
+} from "@agentrouter/core/providers/presets/nvidia/index.ts";
 import {
   providerPresets
-} from "@ccr/core/providers/presets/index.ts";
+} from "@agentrouter/core/providers/presets/index.ts";
 import {
   normalizedProviderCapabilities,
   providerCapabilityForClientProtocol
-} from "@ccr/core/providers/runtime-topology.ts";
+} from "@agentrouter/core/providers/runtime-topology.ts";
 import {
   qiniuAiProviderPreset
-} from "@ccr/core/providers/presets/qiniu-ai/index.ts";
+} from "@agentrouter/core/providers/presets/qiniu-ai/index.ts";
 import {
   unity2ProviderPreset
-} from "@ccr/core/providers/presets/unity2/index.ts";
+} from "@agentrouter/core/providers/presets/unity2/index.ts";
 import {
   xiaomiMimoProviderPreset,
   xiaomiMimoTokenPlanChinaProviderPreset,
   xiaomiMimoTokenPlanEuropeProviderPreset,
   xiaomiMimoTokenPlanSingaporeProviderPreset
-} from "@ccr/core/providers/presets/xiaomi/index.ts";
+} from "@agentrouter/core/providers/presets/xiaomi/index.ts";
 
 const openAiPreset = {
   aliases: ["OpenAI", "ChatGPT"],
@@ -89,7 +89,7 @@ test("provider identity lookup prefers exact Kimi regional names over shared ali
 });
 
 test("sponsor provider presets expose requested endpoints and protocols", () => {
-  assert.equal(fennoProviderPreset.websiteUrl, "https://api.fenno.ai/register?redirect=/purchase?tab=subscription%26group=16&aff=9HHHAB5QLAES");
+  assert.equal(fennoProviderPreset.websiteUrl, "https://api.fenno.ai/register?redirect=/purchase?tab=subscription%26group=16");
   assert.deepEqual(fennoProviderPreset.endpoints[0]?.protocols, [
     "openai_chat_completions",
     "openai_responses",
@@ -120,7 +120,7 @@ test("sponsor provider presets expose requested endpoints and protocols", () => 
 
   assert.equal(providerPresets.find((preset) => preset.id === "infistar-ai"), infistarAiProviderPreset);
   assert.equal(infistarAiProviderPreset.name, "无限星河");
-  assert.equal(infistarAiProviderPreset.websiteUrl, "https://www.infistar.cc/register?aff=CCRCCR&ref_source=link");
+  assert.equal(infistarAiProviderPreset.websiteUrl, "https://www.infistar.cc/register");
   assert.deepEqual(infistarAiProviderPreset.defaultModels, ["gpt-4o"]);
   assert.equal(providerPresetMatchesBaseUrl(infistarAiProviderPreset, "https://infistar.ai/v1/models"), true);
   assert.equal(providerPresetMatchesBaseUrl(infistarAiProviderPreset, "https://api.infistar.ai/v1"), false);

@@ -1,12 +1,12 @@
 import { join as pathJoin } from "node:path";
-import type { AppConfig, GatewayMcpServerConfig } from "@ccr/core/contracts/app";
-import { MEDIA_TOOLS_MCP_SERVER_NAME } from "@ccr/core/contracts/app";
-import { mediaMcpToolDefinition, mediaToolBindingsForConfig } from "@ccr/core/media/tools";
+import type { AppConfig, GatewayMcpServerConfig } from "@agentrouter/core/contracts/app";
+import { MEDIA_TOOLS_MCP_SERVER_NAME } from "@agentrouter/core/contracts/app";
+import { mediaMcpToolDefinition, mediaToolBindingsForConfig } from "@agentrouter/core/media/tools";
 
-export const MEDIA_TOOLS_MCP_PATH = "/__ccr/media/mcp";
-export const LEGACY_GROK_MEDIA_MCP_PATH = "/__ccr/grok-media/mcp";
-export const MEDIA_ARTIFACT_PATH_PREFIX = "/__ccr/media/artifacts/";
-export const LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX = "/__ccr/grok-media/artifacts/";
+export const MEDIA_TOOLS_MCP_PATH = "/__ar/media/mcp";
+export const LEGACY_GROK_MEDIA_MCP_PATH = "/__ar/grok-media/mcp";
+export const MEDIA_ARTIFACT_PATH_PREFIX = "/__ar/media/artifacts/";
+export const LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX = "/__ar/grok-media/artifacts/";
 
 export function mediaToolsMcpEnabled(config: AppConfig | undefined): boolean {
   return Boolean(config?.mediaTools?.enabled);

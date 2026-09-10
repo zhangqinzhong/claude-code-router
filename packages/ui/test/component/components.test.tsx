@@ -2,20 +2,20 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { Badge } from "@ccr/ui/components/ui/badge.tsx";
-import { Button } from "@ccr/ui/components/ui/button.tsx";
-import { Card, CardContent, CardHeader, CardTitle } from "@ccr/ui/components/ui/card.tsx";
-import { Checkbox } from "@ccr/ui/components/ui/checkbox.tsx";
-import { Dialog, DialogContent } from "@ccr/ui/components/ui/dialog.tsx";
-import { Input } from "@ccr/ui/components/ui/input.tsx";
-import { Label } from "@ccr/ui/components/ui/label.tsx";
-import { PopoverPortal } from "@ccr/ui/components/ui/popover.tsx";
-import { Select } from "@ccr/ui/components/ui/select.tsx";
-import { Switch } from "@ccr/ui/components/ui/switch.tsx";
-import { Tabs, TabsList, TabsTrigger } from "@ccr/ui/components/ui/tabs.tsx";
-import { Textarea } from "@ccr/ui/components/ui/textarea.tsx";
-import { Tooltip, TooltipPortal } from "@ccr/ui/components/ui/tooltip.tsx";
-import { collapseSidebarToExpandInspectorMorph, playPauseMorph } from "@ccr/ui/lib/morph-icon.ts";
+import { Badge } from "@agentrouter/ui/components/ui/badge.tsx";
+import { Button } from "@agentrouter/ui/components/ui/button.tsx";
+import { Card, CardContent, CardHeader, CardTitle } from "@agentrouter/ui/components/ui/card.tsx";
+import { Checkbox } from "@agentrouter/ui/components/ui/checkbox.tsx";
+import { Dialog, DialogContent } from "@agentrouter/ui/components/ui/dialog.tsx";
+import { Input } from "@agentrouter/ui/components/ui/input.tsx";
+import { Label } from "@agentrouter/ui/components/ui/label.tsx";
+import { PopoverPortal } from "@agentrouter/ui/components/ui/popover.tsx";
+import { Select } from "@agentrouter/ui/components/ui/select.tsx";
+import { Switch } from "@agentrouter/ui/components/ui/switch.tsx";
+import { Tabs, TabsList, TabsTrigger } from "@agentrouter/ui/components/ui/tabs.tsx";
+import { Textarea } from "@agentrouter/ui/components/ui/textarea.tsx";
+import { Tooltip, TooltipPortal } from "@agentrouter/ui/components/ui/tooltip.tsx";
+import { collapseSidebarToExpandInspectorMorph, playPauseMorph } from "@agentrouter/ui/lib/morph-icon.ts";
 
 test("Button renders default button semantics and variant classes", () => {
   const html = renderToStaticMarkup(

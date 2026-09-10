@@ -4,16 +4,16 @@ import type {
   RouterFallbackConfig,
   RouterRule,
   RouterRuleRewrite
-} from "@ccr/core/contracts/app";
-import { ROUTER_SCRIPT_MAX_SOURCE_BYTES, ROUTER_SCRIPT_MAX_TIMEOUT_MS } from "@ccr/core/contracts/app";
-import type { RouteDiagnostic, RouteModelRef } from "@ccr/core/routing/contracts";
-import { ModelRegistry } from "@ccr/core/routing/model-registry";
+} from "@agentrouter/core/contracts/app";
+import { ROUTER_SCRIPT_MAX_SOURCE_BYTES, ROUTER_SCRIPT_MAX_TIMEOUT_MS } from "@agentrouter/core/contracts/app";
+import type { RouteDiagnostic, RouteModelRef } from "@agentrouter/core/routing/contracts";
+import { ModelRegistry } from "@agentrouter/core/routing/model-registry";
 import {
   compileConfiguredRouteRewrite,
   effectiveBodyModelRewriteValue,
   effectiveTargetProviderName,
   type CompiledRouteRewrite
-} from "@ccr/core/routing/rewrite";
+} from "@agentrouter/core/routing/rewrite";
 
 export type CompiledRouterRule = {
   active: boolean;

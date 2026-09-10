@@ -2,10 +2,10 @@ import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readlinkSync
 import { createHash } from "node:crypto";
 import os from "node:os";
 import path from "node:path";
-import { CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV, NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, availableGatewayModelIds, enforceSingleEnabledGlobalProfilePerAgent, hasAvailableGatewayModels, isGatewayProviderEnabled, type AppConfig, type ProfileApplyResult, type ProfileClientApplyStatus, type ProfileClientKind, type ProfileConfig } from "@ccr/core/contracts/app";
-import { CLAUDE_CODE_AUTH_MODE_ENV, resolveClaudeCodeGatewayAuthMode, type ClaudeCodeGatewayAuthMode } from "@ccr/core/agents/claude-code/auth-mode";
-import { replacePersistedApiKeys } from "@ccr/core/config/config-repository";
-import { botGatewayProfileEnv } from "@ccr/core/agents/bot-gateway/env";
+import { CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV, NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, availableGatewayModelIds, enforceSingleEnabledGlobalProfilePerAgent, hasAvailableGatewayModels, isGatewayProviderEnabled, type AppConfig, type ProfileApplyResult, type ProfileClientApplyStatus, type ProfileClientKind, type ProfileConfig } from "@agentrouter/core/contracts/app";
+import { CLAUDE_CODE_AUTH_MODE_ENV, resolveClaudeCodeGatewayAuthMode, type ClaudeCodeGatewayAuthMode } from "@agentrouter/core/agents/claude-code/auth-mode";
+import { replacePersistedApiKeys } from "@agentrouter/core/config/config-repository";
+import { botGatewayProfileEnv } from "@agentrouter/core/agents/bot-gateway/env";
 import {
   CLAUDE_CODE_MCP_CONFIG_ENV,
   CODEXL_CLAUDE_CODE_MCP_CONFIG_ENV,
@@ -16,39 +16,39 @@ import {
   clearClaudeCodeManagedModelEnv,
   isClaudeCodeManagedModelEnvKey,
   normalizeClaudeCodeClientModel
-} from "@ccr/core/agents/claude-code/environment";
-import { writeCodexCompatibleAppModelCatalog } from "@ccr/core/agents/codex/app-launch";
-import { codexCliMiddlewareRuntimeScript } from "@ccr/core/agents/codex/cli-middleware-runtime";
-import { codexModelCatalogJson } from "@ccr/core/agents/codex/model-catalog";
+} from "@agentrouter/core/agents/claude-code/environment";
+import { writeCodexCompatibleAppModelCatalog } from "@agentrouter/core/agents/codex/app-launch";
+import { codexCliMiddlewareRuntimeScript } from "@agentrouter/core/agents/codex/cli-middleware-runtime";
+import { codexModelCatalogJson } from "@agentrouter/core/agents/codex/model-catalog";
 import {
   isManagedKiloConfigContent,
   kiloProviderId,
   resolveKiloConfigFile,
   writeKiloGatewayConfig
-} from "@ccr/core/agents/kilo/profile-config";
+} from "@agentrouter/core/agents/kilo/profile-config";
 import {
   isManagedOpenCodeConfigContent,
   openCodeProviderId,
   resolveOpenCodeConfigFile,
   writeOpenCodeGatewayConfig
-} from "@ccr/core/agents/opencode/profile-config";
+} from "@agentrouter/core/agents/opencode/profile-config";
 import {
   piWrapperFilename,
   resolvePiAgentDir,
   writePiGatewayConfig
-} from "@ccr/core/agents/pi/profile-config";
-import { CONFIGDIR, LEGACY_CONFIGDIR } from "@ccr/core/config/constants";
-import { adoptLegacyArtifacts, adoptLegacyBinArtifacts } from "@ccr/core/profiles/legacy-artifacts";
-import { pruneInactiveProfileApiKeysFromList, syncProfileApiKeys } from "@ccr/core/profiles/api-key";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
-import { refreshClaudeAppModelDiscoveryCache } from "@ccr/core/agents/claude-app/gateway-service";
-import { resolveClaudeAppProfileUserDataDir } from "@ccr/core/agents/claude-app/launch";
-import { resolveZcodeConfigFile, writeZcodeGatewayConfig, zcodeHomeFromConfigFile } from "@ccr/core/agents/zcode/profile-config";
-import { CONTEXT_ARCHIVE_MCP_SERVER_NAME, contextArchiveConfigForProfile, contextArchiveMcpEnabled, contextArchiveMcpServer } from "@ccr/core/gateway/context-archive";
-import { claudeClientDiscoveryPayloads, createClaudeCliAutoCompactWindows } from "@ccr/core/gateway/features/model-discovery";
-import { claudeCodeOneMillionContextSuffix } from "@ccr/core/gateway/internal/shared";
-import { normalizeRouteSelector } from "@ccr/core/gateway/claude-code-router-plugin";
-import { findModelCatalogEntry, modelCatalogMaxInputTokens, readCatalogCapability, type ModelCatalogEntry } from "@ccr/core/gateway/model-catalog";
+} from "@agentrouter/core/agents/pi/profile-config";
+import { CONFIGDIR, LEGACY_CONFIGDIR } from "@agentrouter/core/config/constants";
+import { adoptLegacyArtifacts, adoptLegacyBinArtifacts } from "@agentrouter/core/profiles/legacy-artifacts";
+import { pruneInactiveProfileApiKeysFromList, syncProfileApiKeys } from "@agentrouter/core/profiles/api-key";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
+import { refreshClaudeAppModelDiscoveryCache } from "@agentrouter/core/agents/claude-app/gateway-service";
+import { resolveClaudeAppProfileUserDataDir } from "@agentrouter/core/agents/claude-app/launch";
+import { resolveZcodeConfigFile, writeZcodeGatewayConfig, zcodeHomeFromConfigFile } from "@agentrouter/core/agents/zcode/profile-config";
+import { CONTEXT_ARCHIVE_MCP_SERVER_NAME, contextArchiveConfigForProfile, contextArchiveMcpEnabled, contextArchiveMcpServer } from "@agentrouter/core/gateway/context-archive";
+import { claudeClientDiscoveryPayloads, createClaudeCliAutoCompactWindows } from "@agentrouter/core/gateway/features/model-discovery";
+import { claudeCodeOneMillionContextSuffix } from "@agentrouter/core/gateway/internal/shared";
+import { normalizeRouteSelector } from "@agentrouter/core/gateway/claude-code-router-plugin";
+import { findModelCatalogEntry, modelCatalogMaxInputTokens, readCatalogCapability, type ModelCatalogEntry } from "@agentrouter/core/gateway/model-catalog";
 import {
   TOOL_HUB_MCP_RUNTIME_FILE_NAME,
   TOOL_HUB_MCP_SERVER_NAME,
@@ -57,19 +57,19 @@ import {
   toolHubMcpRuntimeConfig,
   type ClaudeCodeMcpServerConfig,
   type ToolHubMcpRuntimeConfig
-} from "@ccr/core/mcp/toolhub-config";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+} from "@agentrouter/core/mcp/toolhub-config";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 
-const managedRootStart = "# BEGIN CCR managed profile";
-const managedRootEnd = "# END CCR managed profile";
-const managedProviderStart = "# BEGIN CCR managed Codex provider";
-const managedProviderEnd = "# END CCR managed Codex provider";
-const managedToolHubMcpStart = "# BEGIN CCR managed ToolHub MCP";
-const managedToolHubMcpEnd = "# END CCR managed ToolHub MCP";
-const managedContextArchiveMcpStart = "# BEGIN CCR managed Context Archive MCP";
-const managedContextArchiveMcpEnd = "# END CCR managed Context Archive MCP";
-const managedConfiguredModelPrefix = "# CCR configured model = ";
+const managedRootStart = "# BEGIN AgentRouter managed profile";
+const managedRootEnd = "# END AgentRouter managed profile";
+const managedProviderStart = "# BEGIN AgentRouter managed Codex provider";
+const managedProviderEnd = "# END AgentRouter managed Codex provider";
+const managedToolHubMcpStart = "# BEGIN AgentRouter managed ToolHub MCP";
+const managedToolHubMcpEnd = "# END AgentRouter managed ToolHub MCP";
+const managedContextArchiveMcpStart = "# BEGIN AgentRouter managed Context Archive MCP";
+const managedContextArchiveMcpEnd = "# END AgentRouter managed Context Archive MCP";
+const managedConfiguredModelPrefix = "# AgentRouter configured model = ";
 const originalBackupSuffix = ".ar-original";
 const backupMarker = ".ar-backup-";
 const originalMissingSuffix = ".ar-original-missing";
@@ -381,7 +381,7 @@ function applyClaudeDesignProfile(profile: ProfileConfig, appliedAt: string): Pr
     appliedAt,
     client: "claude-design",
     enabled: profile.enabled,
-    message: "Claude Design profile is managed by CCR Desktop.",
+    message: "Claude Design profile is managed by AgentRouter Desktop.",
     ok: true,
     path: resolveUserPath(CONFIGDIR)
   };
@@ -455,8 +455,8 @@ function applyClaudeCodeProfile(config: AppConfig, profile: ProfileConfig, token
       client: "claude-code",
       enabled: true,
       message: changed
-        ? `Claude Code settings are managed by CCR (wrapper ${wrapperResult.file}).`
-        : "Claude Code settings already match CCR.",
+        ? `Claude Code settings are managed by AgentRouter (wrapper ${wrapperResult.file}).`
+        : "Claude Code settings already match AgentRouter.",
       ok: true,
       path: settingsFile
     };
@@ -610,8 +610,8 @@ function applyCodexProfile(config: AppConfig, profile: ProfileConfig, token: str
       client: profile.agent,
       enabled: true,
       message: changed
-        ? `${clientName} config is managed by CCR${extras.length ? ` (${extras.join(", ")})` : ""}.`
-        : `${clientName} config already matches CCR.`,
+        ? `${clientName} config is managed by AgentRouter${extras.length ? ` (${extras.join(", ")})` : ""}.`
+        : `${clientName} config already matches AgentRouter.`,
       ok: true,
       path: configFile
     };
@@ -640,8 +640,8 @@ function applyGrokProfile(config: AppConfig, profile: ProfileConfig, token: stri
       client: "grok",
       enabled: true,
       message: wrapperResult.changed
-        ? `Grok CLI is configured to use CCR (wrapper ${wrapperResult.file}).`
-        : "Grok CLI already points to CCR.",
+        ? `Grok CLI is configured to use AgentRouter (wrapper ${wrapperResult.file}).`
+        : "Grok CLI already points to AgentRouter.",
       ok: true,
       path: wrapperResult.file
     };
@@ -671,8 +671,8 @@ function applyKimiProfile(config: AppConfig, profile: ProfileConfig, token: stri
       client: "kimi",
       enabled: true,
       message: wrapperResult.changed
-        ? `Kimi CLI is configured to use CCR (wrapper ${wrapperResult.file}).`
-        : "Kimi CLI already points to CCR.",
+        ? `Kimi CLI is configured to use AgentRouter (wrapper ${wrapperResult.file}).`
+        : "Kimi CLI already points to AgentRouter.",
       ok: true,
       path: wrapperResult.file
     };
@@ -701,8 +701,8 @@ function applyPiProfile(config: AppConfig, profile: ProfileConfig, token: string
       client: "pi",
       enabled: true,
       message: wrapperResult.changed
-        ? `Pi is configured to use CCR (config ${wrapperResult.configFile}, wrapper ${wrapperResult.file}).`
-        : "Pi config already matches CCR.",
+        ? `Pi is configured to use AgentRouter (config ${wrapperResult.configFile}, wrapper ${wrapperResult.file}).`
+        : "Pi config already matches AgentRouter.",
       ok: true,
       path: wrapperResult.configFile
     };
@@ -738,8 +738,8 @@ function applyOpenCodeProfile(config: AppConfig, profile: ProfileConfig, token: 
       client: "opencode",
       enabled: true,
       message: configResult.changed || wrapperResult.changed
-        ? `OpenCode is configured to use CCR (config ${configResult.file}, wrapper ${wrapperResult.file}).`
-        : "OpenCode config already matches CCR.",
+        ? `OpenCode is configured to use AgentRouter (config ${configResult.file}, wrapper ${wrapperResult.file}).`
+        : "OpenCode config already matches AgentRouter.",
       ok: true,
       path: configResult.file
     };
@@ -775,8 +775,8 @@ function applyKiloProfile(config: AppConfig, profile: ProfileConfig, token: stri
       client: "kilo",
       enabled: true,
       message: configResult.changed || wrapperResult.changed
-        ? `Kilo CLI is configured to use CCR (config ${configResult.file}, wrapper ${wrapperResult.file}).`
-        : "Kilo CLI config already matches CCR.",
+        ? `Kilo CLI is configured to use AgentRouter (config ${configResult.file}, wrapper ${wrapperResult.file}).`
+        : "Kilo CLI config already matches AgentRouter.",
       ok: true,
       path: configResult.file
     };
@@ -820,8 +820,8 @@ function applyZcodeProfile(config: AppConfig, profile: ProfileConfig, token: str
       client: "zcode",
       enabled: true,
       message: changed
-        ? `ZCode config is managed by CCR${extras.length ? ` (${extras.join(", ")})` : ""}.`
-        : "ZCode config already matches CCR.",
+        ? `ZCode config is managed by AgentRouter${extras.length ? ` (${extras.join(", ")})` : ""}.`
+        : "ZCode config already matches AgentRouter.",
       ok: true,
       path: configResult.file
     };
@@ -886,13 +886,13 @@ function profilePath(profile: ProfileConfig): string {
 
 function resolveClaudeCodeSettingsFile(profile: ProfileConfig): string {
   if (isGeneratedProfileScope(profile.scope)) {
-    return path.join(ccrManagedProfileDir(profile), "claude", "settings.json");
+    return path.join(arManagedProfileDir(profile), "claude", "settings.json");
   }
   return resolveUserPath(profile.settingsFile || "~/.claude/settings.json");
 }
 
 function claudeCodeToolHubMcpConfigFile(profile: ProfileConfig): string {
-  return path.join(ccrManagedProfileDir(profile), "claude", "toolhub-mcp.json");
+  return path.join(arManagedProfileDir(profile), "claude", "toolhub-mcp.json");
 }
 
 function writeClaudeCodeToolHubMcpConfig(config: AppConfig, profile: ProfileConfig, token: string): { changed: boolean; file?: string } {
@@ -991,7 +991,7 @@ function writeCodexToolHubMcpRuntimeConfig(config: AppConfig, token: string): { 
 function ensureToolHubMcpRuntimeFile(file: string): { changed: boolean } {
   const source = bundledToolHubMcpEntryPathCandidates().find((candidate) => existsSync(candidate));
   if (!source) {
-    throw new Error(`ToolHub MCP runtime was not found. Rebuild or reinstall CCR and try again. Checked: ${bundledToolHubMcpEntryPathCandidates().join(", ")}`);
+    throw new Error(`ToolHub MCP runtime was not found. Rebuild or reinstall AgentRouter and try again. Checked: ${bundledToolHubMcpEntryPathCandidates().join(", ")}`);
   }
   return writeGeneratedFileIfChanged(file, readFileSync(source, "utf8"), { mode: publicExecutableMode });
 }
@@ -1001,7 +1001,7 @@ function resolveCodexConfigFile(profile: ProfileConfig): string {
     return resolveZcodeConfigFile(profile);
   }
   if (isGeneratedProfileScope(profile.scope)) {
-    return path.join(ccrManagedProfileDir(profile), codexConfigSubdir(profile.agent), "config.toml");
+    return path.join(arManagedProfileDir(profile), codexConfigSubdir(profile.agent), "config.toml");
   }
   const codexHome = profile.codexHome?.trim();
   if (codexHome) {
@@ -1011,14 +1011,14 @@ function resolveCodexConfigFile(profile: ProfileConfig): string {
 }
 
 function codexModelCatalogFile(configFile: string): string {
-  return path.join(path.dirname(configFile), "ccr-model-catalog.json");
+  return path.join(path.dirname(configFile), "ar-model-catalog.json");
 }
 
 function zcodeMiddlewareModelCatalogFile(configFile: string): string {
-  return path.join(path.dirname(configFile), "ccr-zcode-middleware-model-catalog.json");
+  return path.join(path.dirname(configFile), "ar-zcode-middleware-model-catalog.json");
 }
 
-function ccrManagedProfileDir(profile: ProfileConfig): string {
+function arManagedProfileDir(profile: ProfileConfig): string {
   const slug = sanitizeProfilePathSegment(profile.id || profile.name || profile.agent);
   const baseDir = path.join(CONFIGDIR, "profiles", slug || "profile");
   return profile.scope === "custom" ? path.join(baseDir, "custom") : baseDir;
@@ -1336,7 +1336,7 @@ function claudeCodeWrapperShellScript(
 ): string {
   const realClaude = profile.env?.AR_CLAUDE_CODE_BIN?.trim() || "claude";
   const surface = normalizeProfileSurface(profile.surface);
-  const remoteEndpoint = `${gatewayEndpoint(config)}/__ccr/remote`;
+  const remoteEndpoint = `${gatewayEndpoint(config)}/__ar/remote`;
   const settingsDir = path.dirname(resolveClaudeCodeSettingsFile(profile));
   const envExports = Object.entries(profileEnv(profile))
     .filter(([key]) => key !== "AR_CLAUDE_CODE_BIN" && !isClaudeCodeManagedModelEnvKey(key) && !isClaudeCodeFirstPartyProviderEnvKey(key) && !isClaudeCodeWifEnvKey(key))
@@ -1375,7 +1375,7 @@ function claudeCodeWrapperCmdScript(
 ): string {
   const realClaude = profile.env?.AR_CLAUDE_CODE_BIN?.trim() || "claude";
   const surface = normalizeProfileSurface(profile.surface);
-  const remoteEndpoint = `${gatewayEndpoint(config)}/__ccr/remote`;
+  const remoteEndpoint = `${gatewayEndpoint(config)}/__ar/remote`;
   const settingsDir = path.dirname(resolveClaudeCodeSettingsFile(profile));
   const envExports = Object.entries(profileEnv(profile))
     .filter(([key]) => key !== "AR_CLAUDE_CODE_BIN" && !isClaudeCodeManagedModelEnvKey(key) && !isClaudeCodeFirstPartyProviderEnvKey(key) && !isClaudeCodeWifEnvKey(key))
@@ -2448,7 +2448,7 @@ function cmdCodexlProfileSurfaceExports(): string[] {
 
 function codexNativeHelperBypassShellLines(): string[] {
   return [
-    "# Browser's native-pipe authorizer requires helper processes to bypass the CCR middleware.",
+    "# Browser's native-pipe authorizer requires helper processes to bypass the AgentRouter middleware.",
     "if [ \"${1:-}\" = 'sandbox' ] || { [ \"${1:-}\" = 'app-server' ] && [ \"${2:-}\" = '--listen' ] && [ \"${3:-}\" = 'stdio://' ]; }; then",
     "  unset CODEX_CLI_PATH",
     "  exec \"$AR_BUNDLED_CODEX_CLI_PATH\" \"$@\"",
@@ -2460,15 +2460,15 @@ function nodeRuntimeCmdExecLines(runtimeFile: string): string[] {
   const quotedRuntime = cmdQuote(runtimeFile);
   const quotedHost = cmdQuote(process.execPath);
   return [
-    "if not defined AR_NODE_BIN goto ccr_try_system_node",
+    "if not defined AR_NODE_BIN goto ar_try_system_node",
     `"%AR_NODE_BIN%" ${quotedRuntime} %*`,
     "exit /b %ERRORLEVEL%",
-    ":ccr_try_system_node",
+    ":ar_try_system_node",
     "where node >nul 2>nul",
-    "if errorlevel 1 goto ccr_use_electron_node",
+    "if errorlevel 1 goto ar_use_electron_node",
     `node ${quotedRuntime} %*`,
     "exit /b %ERRORLEVEL%",
-    ":ccr_use_electron_node",
+    ":ar_use_electron_node",
     "set \"ELECTRON_RUN_AS_NODE=1\"",
     `${quotedHost} ${quotedRuntime} %*`,
     "exit /b %ERRORLEVEL%"
@@ -3352,7 +3352,7 @@ function inactiveGlobalCleanupStatus(
     client,
     enabled: false,
     message: restoreResult.missingBackup
-      ? `No active global ${codexCompatibleClientName(client)} profile is configured, but the global config is managed by CCR and no original backup was found.`
+      ? `No active global ${codexCompatibleClientName(client)} profile is configured, but the global config is managed by AgentRouter and no original backup was found.`
       : `${codexCompatibleClientName(client)} global config was restored because no active global profile is configured.`,
     ok: !restoreResult.missingBackup,
     path: resolveUserPath(file)
@@ -3418,8 +3418,8 @@ function restoreDisabledZcodeProfile(profile: ProfileConfig, configFile: string)
       ? `${disabledMessage} No original ZCode config backup was found for ${profile.name || profile.id || "this profile"}.`
       : restored
         ? changed
-          ? "ZCode config was restored from the CCR backup because the global profile is disabled."
-          : "ZCode config already matches the CCR backup; profile is disabled."
+          ? "ZCode config was restored from the AgentRouter backup because the global profile is disabled."
+          : "ZCode config already matches the AgentRouter backup; profile is disabled."
         : disabledMessage,
     ok: !missingBackup,
     path: resolveUserPath(configFile)
@@ -3441,8 +3441,8 @@ function disabledRestoreStatus(
       ? `${disabledMessage} No original ${codexCompatibleClientName(client)} config backup was found for ${profileName}.`
       : restoreResult.restored
         ? restoreResult.changed
-          ? `${codexCompatibleClientName(client)} config was restored from the CCR backup because the global profile is disabled.`
-          : `${codexCompatibleClientName(client)} config already matches the CCR backup; profile is disabled.`
+          ? `${codexCompatibleClientName(client)} config was restored from the AgentRouter backup because the global profile is disabled.`
+          : `${codexCompatibleClientName(client)} config already matches the AgentRouter backup; profile is disabled.`
         : disabledMessage,
     ok: !restoreResult.missingBackup,
     path: resolveUserPath(file)
@@ -3497,9 +3497,9 @@ function originalSnapshotCandidate(
   file: string,
   isManagedContent: (content: string) => boolean
 ): { content: string; file: string } | undefined {
-  // Prefer the most recent non-CCR snapshot captured immediately before the
+  // Prefer the most recent non-AgentRouter snapshot captured immediately before the
   // latest takeover. The permanent .ccr-original file can be stale when the
-  // user changes the agent config between separate CCR sessions.
+  // user changes the agent config between separate AgentRouter sessions.
   for (const candidate of [...backupFiles(file).reverse(), originalBackupFilePath(file)]) {
     if (!existsSync(candidate)) {
       continue;

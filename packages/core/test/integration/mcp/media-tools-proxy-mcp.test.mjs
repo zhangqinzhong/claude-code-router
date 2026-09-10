@@ -4,7 +4,7 @@ import { createServer } from "node:http";
 import path from "node:path";
 import test from "node:test";
 
-test("media tools stdio proxy exposes its compiled catalog and forwards calls with CCR auth", async (t) => {
+test("media tools stdio proxy exposes its compiled catalog and forwards calls with AgentRouter auth", async (t) => {
   const seen = { authorization: "", payload: undefined };
   const server = createServer(async (request, response) => {
     seen.authorization = request.headers.authorization ?? "";
@@ -33,7 +33,7 @@ test("media tools stdio proxy exposes its compiled catalog and forwards calls wi
   const child = spawn(process.execPath, [runtime], {
     env: {
       ...process.env,
-      AR_MEDIA_MCP_API_KEY: "ccr-profile-test",
+      AR_MEDIA_MCP_API_KEY: "ar-profile-test",
       AR_MEDIA_MCP_REQUEST_TIMEOUT_MS: "5000",
       AR_MEDIA_MCP_TOOLS_JSON: JSON.stringify([{
         description: "Generate an image.",
@@ -62,7 +62,7 @@ test("media tools stdio proxy exposes its compiled catalog and forwards calls wi
     }
   });
   assert.equal(called.result.content[0].text, "generated");
-  assert.equal(seen.authorization, "Bearer ccr-profile-test");
+  assert.equal(seen.authorization, "Bearer ar-profile-test");
   assert.equal(seen.payload.method, "tools/call");
   assert.equal(seen.payload.params.name, "image_generate_glm_5_2v");
 });

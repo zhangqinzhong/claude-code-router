@@ -8,16 +8,16 @@ import {
   replacePersistedApiKeys,
   replacePersistedAppConfig,
   replacePersistedConfigSnapshot
-} from "@ccr/core/config/config-repository";
-import { LEGACY_ACTIVE_CONFIG_FILE, LEGACY_CONFIG_FILE, LEGACY_WINDOWS_CONFIG_FILE } from "@ccr/core/config/constants";
-import { normalizeCodexProviderAccountConfig } from "@ccr/core/agents/local-providers/codex";
-import { normalizeGrokProviderAccountConfig, normalizeGrokProviderMediaCapabilities } from "@ccr/core/agents/local-providers/grok";
-import { removeOpenCodeProviderAccountConfig } from "@ccr/core/agents/local-providers/opencode";
-import { CLAUDE_CODE_DEFAULT_ENV, CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV, CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID, DEFAULT_TRAY_COMPONENT_VARIANTS, GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, OVERVIEW_WIDGET_SIZE_VALUES, ROUTER_FALLBACK_MAX_RETRY_COUNT, ROUTER_SCRIPT_API_VERSION, ROUTER_SCRIPT_DEFAULT_TIMEOUT_MS, ROUTER_SCRIPT_MAX_TIMEOUT_MS, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS, enforceSingleEnabledGlobalProfilePerAgent, isEnabledGlobalProfile, knownGatewayPluginDefaultApps, knownGatewayPluginDefaultPermissions, knownGatewayPluginDefaultSurfaces } from "@ccr/core/contracts/app";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config";
-import { maxRequestLogBodyBytes } from "@ccr/core/observability/request-log-limits";
-import { findProviderPresetByBaseUrl, primaryProviderPresetEndpoint, providerApiKeySafetyIssue, providerEndpointCanReceiveProviderApiKey } from "@ccr/core/providers/presets/index";
-import { isDesktopAppRuntime } from "@ccr/core/runtime/desktop-app";
+} from "@agentrouter/core/config/config-repository";
+import { LEGACY_ACTIVE_CONFIG_FILE, LEGACY_CONFIG_FILE, LEGACY_WINDOWS_CONFIG_FILE } from "@agentrouter/core/config/constants";
+import { normalizeCodexProviderAccountConfig } from "@agentrouter/core/agents/local-providers/codex";
+import { normalizeGrokProviderAccountConfig, normalizeGrokProviderMediaCapabilities } from "@agentrouter/core/agents/local-providers/grok";
+import { removeOpenCodeProviderAccountConfig } from "@agentrouter/core/agents/local-providers/opencode";
+import { CLAUDE_CODE_DEFAULT_ENV, CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV, CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID, DEFAULT_TRAY_COMPONENT_VARIANTS, GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, OVERVIEW_WIDGET_SIZE_VALUES, ROUTER_FALLBACK_MAX_RETRY_COUNT, ROUTER_SCRIPT_API_VERSION, ROUTER_SCRIPT_DEFAULT_TIMEOUT_MS, ROUTER_SCRIPT_MAX_TIMEOUT_MS, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS, enforceSingleEnabledGlobalProfilePerAgent, isEnabledGlobalProfile, knownGatewayPluginDefaultApps, knownGatewayPluginDefaultPermissions, knownGatewayPluginDefaultSurfaces } from "@agentrouter/core/contracts/app";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config";
+import { maxRequestLogBodyBytes } from "@agentrouter/core/observability/request-log-limits";
+import { findProviderPresetByBaseUrl, primaryProviderPresetEndpoint, providerApiKeySafetyIssue, providerEndpointCanReceiveProviderApiKey } from "@agentrouter/core/providers/presets/index";
+import { isDesktopAppRuntime } from "@agentrouter/core/runtime/desktop-app";
 import type {
   AppConfig,
   ApiKeyConfig,
@@ -77,7 +77,7 @@ import type {
   TrayWidgetType,
   TrayWidgetVariant,
   TrayWindowModuleId
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type LoadedProfileConfig = Partial<Omit<ProfileRuntimeConfig, "claudeCode" | "codex" | "profiles">> & {
   claudeCode?: Partial<ClaudeCodeProfileConfig>;
@@ -3029,7 +3029,7 @@ function withClaudeProductRuntimePluginConfig(config: AppConfig, pluginId: strin
     return config;
   }
   if (!isDesktopAppRuntime()) {
-    throw new Error(`${productName} is only available in CCR Desktop.`);
+    throw new Error(`${productName} is only available in AgentRouter Desktop.`);
   }
   const plugin = claudeProductRuntimePluginConfig(pluginId);
   if (!plugin) {
@@ -3098,7 +3098,7 @@ function resolveBundledOrExternalizedPluginModule(pluginId: string, previousModu
   if (bundledModule) {
     return bundledModule;
   }
-  for (const root of ccrExtensionsRootCandidates(previousModule)) {
+  for (const root of arExtensionsRootCandidates(previousModule)) {
     const candidate = path.join(root, "plugins", pluginId, "index.cjs");
     if (existsSync(candidate)) {
       return candidate;
@@ -3156,17 +3156,17 @@ function isLegacyExternalizedPluginModule(pluginId: string, modulePath: string |
     normalized.endsWith(`/examples/plugins/${pluginId}/index.cjs`);
 }
 
-function ccrExtensionsRootCandidates(previousModule: string | undefined): string[] {
+function arExtensionsRootCandidates(previousModule: string | undefined): string[] {
   const candidates = [
     process.env.AR_EXTENSIONS_DIR,
-    ccrExtensionsRootFromLegacyModule(previousModule),
-    path.resolve(process.cwd(), "..", "ccr-extensions"),
-    path.resolve(process.cwd(), "ccr-extensions")
+    arExtensionsRootFromLegacyModule(previousModule),
+    path.resolve(process.cwd(), "..", "ar-extensions"),
+    path.resolve(process.cwd(), "ar-extensions")
   ];
   return uniqueStrings(candidates.filter((candidate): candidate is string => Boolean(candidate?.trim())));
 }
 
-function ccrExtensionsRootFromLegacyModule(modulePath: string | undefined): string {
+function arExtensionsRootFromLegacyModule(modulePath: string | undefined): string {
   if (!modulePath) {
     return "";
   }
@@ -3176,7 +3176,7 @@ function ccrExtensionsRootFromLegacyModule(modulePath: string | undefined): stri
   if (index <= 0) {
     return "";
   }
-  return path.join(path.sep, ...segments.slice(1, index), "ccr-extensions");
+  return path.join(path.sep, ...segments.slice(1, index), "ar-extensions");
 }
 
 export function migrateKnownGatewayPluginConfigsForTest(plugins: GatewayPluginConfig[] | undefined): GatewayPluginMigrationResult {
@@ -3849,8 +3849,8 @@ function parseProfileAgent(value: unknown): ProfileConfig["agent"] | undefined {
 function readManagedCompact(value: Record<string, unknown>): boolean | undefined {
   const candidate = value.managedCompact ??
     value.managed_compact ??
-    value.ccrManagedCompact ??
-    value.ccr_managed_compact ??
+    value.arManagedCompact ??
+    value.ar_managed_compact ??
     value.contextArchiveCompact ??
     value.context_archive_compact;
   return typeof candidate === "boolean" ? candidate : undefined;
@@ -3971,7 +3971,7 @@ function parseProfileScope(value: string | undefined): ProfileConfig["scope"] | 
     return undefined;
   }
   const normalized = value.trim().toLowerCase().replace(/_/g, "-").replace(/\s+/g, "-");
-  if (normalized === "ccr" || normalized === "managed" || normalized === "local" || normalized === "ccr-only" || normalized === "only-ccr") {
+  if (normalized === "ccr" || normalized === "managed" || normalized === "local" || normalized === "ar-only" || normalized === "only-ccr") {
     return "ccr";
   }
   if (normalized === "global" || normalized === "system" || normalized === "system-default" || normalized === "default") {

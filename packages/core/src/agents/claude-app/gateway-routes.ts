@@ -1,11 +1,11 @@
-import type { AppConfig } from "@ccr/core/contracts/app";
-import { availableGatewayModelIds, effectiveContextWindowPercentFor, normalizeProfileScopeValue } from "@ccr/core/contracts/app";
-import { findModelCatalogEntry, findProviderModelCatalogEntry, type ModelCatalogEntry } from "@ccr/core/gateway/model-catalog";
-import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
+import { availableGatewayModelIds, effectiveContextWindowPercentFor, normalizeProfileScopeValue } from "@agentrouter/core/contracts/app";
+import { findModelCatalogEntry, findProviderModelCatalogEntry, type ModelCatalogEntry } from "@agentrouter/core/gateway/model-catalog";
+import { modelRegistryForConfig } from "@agentrouter/core/routing/model-registry";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 
 export const CLAUDE_APP_ONE_MILLION_CONTEXT_SUFFIX = "[1m]";
-const CLAUDE_APP_ENCODED_ROUTE_PREFIX = "anthropic/claude-ccr-h";
+const CLAUDE_APP_ENCODED_ROUTE_PREFIX = "anthropic/claude-ar-h";
 
 export type ClaudeAppGatewayModelRoute = {
   displayName: string;
@@ -307,7 +307,7 @@ function claudeAppGatewayNativeModelNameIsSafe(model: string): boolean {
 
 function claudeAppGatewayEncodedRouteId(model: string, variant?: number): string {
   const routePrefix = variant && variant > 1
-    ? `anthropic/claude-ccr${variant}-h`
+    ? `anthropic/claude-ar${variant}-h`
     : CLAUDE_APP_ENCODED_ROUTE_PREFIX;
   return `${routePrefix}${encodeClaudeAppGatewayRouteModel(model)}`;
 }
@@ -318,7 +318,7 @@ function encodeClaudeAppGatewayRouteModel(model: string): string {
 
 export function decodeClaudeAppGatewayRouteId(routeId: string): string | undefined {
   const normalized = stripClaudeAppGatewayOneMillionContextSuffix(routeId).toLowerCase();
-  const match = /^anthropic\/claude-ccr(?:\d+)?-h([0-9a-f]+)$/.exec(normalized);
+  const match = /^anthropic\/claude-ar(?:\d+)?-h([0-9a-f]+)$/.exec(normalized);
   const encoded = match?.[1];
   if (!encoded || encoded.length % 2 !== 0) {
     return undefined;

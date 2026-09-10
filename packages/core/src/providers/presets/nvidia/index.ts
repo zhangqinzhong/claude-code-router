@@ -1,4 +1,4 @@
-import { defaultProviderAccountConfig, type ProviderPreset } from "@ccr/core/providers/presets/types";
+import { defaultProviderAccountConfig, type ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 export const nvidiaProviderPreset: ProviderPreset = {
   account: defaultProviderAccountConfig,

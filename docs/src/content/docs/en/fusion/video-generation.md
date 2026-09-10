@@ -19,13 +19,13 @@ Video generation always runs asynchronously. The start call returns a job ID imm
 4. Select a video model, for example `Provider/model`.
 5. Save the Fusion model and use it as an Agent model or routing target.
 
-After importing a Grok Agent, CCR automatically provides `grok-imagine-video`. ai-gateway reuses the existing OAuth login to access `api.x.ai`; it does not start Grok CLI.
+After importing a Grok Agent, AgentRouter automatically provides `grok-imagine-video`. ai-gateway reuses the existing OAuth login to access `api.x.ai`; it does not start Grok CLI.
 
-Video generation has its own retry count and fallback video models. If the selected video model fails with a retryable media-provider error, CCR retries that video model first, then tries the configured fallback video models. The base text model remains unchanged.
+Video generation has its own retry count and fallback video models. If the selected video model fails with a retryable media-provider error, AgentRouter retries that video model first, then tries the configured fallback video models. The base text model remains unchanged.
 
 ## Supported requests
 
-CCR calls providers through ai-gateway's generic media protocol:
+AgentRouter calls providers through ai-gateway's generic media protocol:
 
 | Request | Purpose |
 | --- | --- |
@@ -36,18 +36,18 @@ Tool calls accept an optional `idempotency_key`. Reuse a stable key for one user
 
 ## Runtime behavior
 
-The video generation tool lets CCR manage the job lifecycle:
+The video generation tool lets AgentRouter manage the job lifecycle:
 
 - Start the job and return a job ID.
 - Poll job status and report progress back to the model.
 - Return video artifact metadata when the job completes.
 - Attempt to cancel or stop waiting when the user cancels the request.
 
-Request timeout and client cancellation still apply. Concurrency, retention, and job timeout are CCR internal safety policies and normally do not need Fusion UI configuration.
+Request timeout and client cancellation still apply. Concurrency, retention, and job timeout are AgentRouter internal safety policies and normally do not need Fusion UI configuration.
 
 ## Artifacts
 
-Generated videos are stored in CCR's private data directory. Results include:
+Generated videos are stored in AgentRouter's private data directory. Results include:
 
 - Local file path
 - MIME type

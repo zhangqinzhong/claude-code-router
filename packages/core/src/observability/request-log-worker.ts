@@ -2,17 +2,17 @@ import { closeSync, fstatSync, openSync, readSync, realpathSync } from "node:fs"
 import { resolve as pathResolve, sep as pathSep } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { parentPort, workerData } from "node:worker_threads";
-import { RAW_TRACE_SPOOL_DIR } from "@ccr/core/config/constants";
+import { RAW_TRACE_SPOOL_DIR } from "@agentrouter/core/config/constants";
 import {
   RequestLogStore,
   type RequestLogRawTraceFile,
   type RequestLogRawTraceFiles,
   type RequestLogRecordInput,
   type RequestLogStoreWriteCommand
-} from "@ccr/core/observability/request-log-store";
-import { resolveRawTraceBodyLimit } from "@ccr/core/observability/request-log-limits";
-import { compactBase64ImagePayloads } from "@ccr/core/observability/request-log-body";
-import { preloadUsagePriceCatalog } from "@ccr/core/models/pricing-service";
+} from "@agentrouter/core/observability/request-log-store";
+import { resolveRawTraceBodyLimit } from "@agentrouter/core/observability/request-log-limits";
+import { compactBase64ImagePayloads } from "@agentrouter/core/observability/request-log-body";
+import { preloadUsagePriceCatalog } from "@agentrouter/core/models/pricing-service";
 
 type RevivedRawTraceBody = RequestLogRawTraceFile & {
   text: string;

@@ -7,13 +7,13 @@ lead: "Connect agent messages to DingTalk, with optional handoff after your scre
 
 ## Who this is for
 
-DingTalk is for bringing agent messages into an enterprise collaboration environment. CCR connects to DingTalk apps using App Secret auth.
+DingTalk is for bringing agent messages into an enterprise collaboration environment. AgentRouter connects to DingTalk apps using App Secret auth.
 
 > New to AgentClaw? Read the AgentClaw overview and usage and configuration first, then come back here for a single platform.
 
 ## The fields you'll use
 
-| Name in the DingTalk dashboard | CCR field | Required | Notes |
+| Name in the DingTalk dashboard | AgentRouter field | Required | Notes |
 | --- | --- | --- | --- |
 | Client ID / AppKey | App Key | Required | App identifier |
 | Client Secret / AppSecret | App Secret | Required | App secret |
@@ -28,7 +28,7 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 3. Pick the dev organization to connect.
 4. Open `应用开发` (App Development) at the top.
 5. Click `创建应用` (Create App).
-6. Name it, e.g. `CCR`.
+6. Name it, e.g. `AgentRouter`.
 7. Fill in the description; leave other options default.
 8. Click create.
 
@@ -36,8 +36,8 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 
 1. Open the app you just created.
 2. On the left, open `应用信息` (App Info) or `凭证与基础信息` (Credentials & Basic Info).
-3. Copy `Client ID` for CCR's App Key.
-4. Copy `Client Secret` for CCR's App Secret.
+3. Copy `Client ID` for AgentRouter's App Key.
+4. Copy `Client Secret` for AgentRouter's App Secret.
 
 > The dashboard may still show the old names `AppKey` / `AppSecret` — map them by field name.
 
@@ -48,7 +48,7 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 3. Fill in the bot name, avatar, and description.
 4. Choose **Stream mode** for message receiving.
 5. Save.
-6. If the page shows a `RobotCode`, copy it for CCR's Robot Code.
+6. If the page shows a `RobotCode`, copy it for AgentRouter's Robot Code.
 
 ## Step 4: Publish the app and join a chat
 
@@ -58,9 +58,9 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 4. After release, search the bot name in the DingTalk client.
 5. Open the bot chat, or add the bot to the target group via group settings.
 
-## Wire it up in CCR
+## Wire it up in AgentRouter
 
-1. Open CCR's **Bot Management** page and click **Add Bot**.
+1. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 2. Pick **DingTalk** as the platform.
 3. Auth is **App Secret**.
 4. Paste the Client ID into **App Key**.
@@ -70,7 +70,7 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 8. Open **Agent Profiles** and edit the Agent Profiles you want to attach it to.
 9. Turn on **Bot** and select the bot.
 10. Optionally enable **Forward agent messages** or **Handoff** (next section).
-11. Reopen the agent from CCR.
+11. Reopen the agent from AgentRouter.
 
 ## Forward or handoff
 
@@ -81,7 +81,7 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 
 ## Test it
 
-1. Open the agent from CCR and trigger a message.
+1. Open the agent from AgentRouter and trigger a message.
 2. Check DingTalk to confirm the app received it and replied.
 3. For groups, confirm the app or bot is in the target group and can post.
 
@@ -91,6 +91,6 @@ DingTalk is for bringing agent messages into an enterprise collaboration environ
 
 - **Auth fails**: re-copy App Key and App Secret.
 - **Bot-identifier errors**: check that Robot Code matches the platform dashboard.
-- **Bot receives nothing**: confirm the bot capability is enabled in the app and the receive mode matches CCR's config.
+- **Bot receives nothing**: confirm the bot capability is enabled in the app and the receive mode matches AgentRouter's config.
 - **Users can't find the bot**: check that the app is published and the visibility scope includes the current user or group members.
 - **Handoff doesn't trigger**: confirm the screen is locked, and check the Handoff toggle, idle time, and target device.

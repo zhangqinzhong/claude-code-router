@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createStreamMetricsTracker } from "@ccr/core/observability/stream-metrics.ts";
+import { createStreamMetricsTracker } from "@agentrouter/core/observability/stream-metrics.ts";
 
 test("stream metrics records first and last token offsets for SSE deltas", () => {
   const tracker = createStreamMetricsTracker(1_000);

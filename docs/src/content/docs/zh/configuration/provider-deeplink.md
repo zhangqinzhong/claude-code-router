@@ -2,12 +2,12 @@
 title: 一键导入供应商
 pageTitle: 一键导入供应商
 eyebrow: 一键导入
-lead: 通过预设按钮或 agentrouter://provider 深度链接（deeplink）一键导入模型供应商：CCR 先展示将写入的配置，确认后再保存。供应商也可以嵌入按钮或发布 manifest，让用户从网页完成导入。
+lead: 通过预设按钮或 agentrouter://provider 深度链接（deeplink）一键导入模型供应商：AgentRouter 先展示将写入的配置，确认后再保存。供应商也可以嵌入按钮或发布 manifest，让用户从网页完成导入。
 ---
 
 ## 一键导入
 
-选择下面的供应商即可开始添加。CCR 会先显示即将添加的内容，确认无误后再保存；使用自定义入口时，请确保来源可信。
+选择下面的供应商即可开始添加。AgentRouter 会先显示即将添加的内容，确认无误后再保存；使用自定义入口时，请确保来源可信。
 
 <div class="provider-import-grid" aria-label="Preset provider import buttons">
   <a class="provider-import-button provider-openai" href="agentrouter://provider?name=OpenAI&amp;base_url=https%3A%2F%2Fapi.openai.com%2Fv1&amp;protocol=openai_responses&amp;models=gpt-5.5%2Cgpt-5.5-pro%2Cgpt-5.5-instant%2Cgpt-5.4-mini" aria-label="导入 OpenAI 官方供应商">
@@ -98,11 +98,11 @@ lead: 通过预设按钮或 agentrouter://provider 深度链接（deeplink）一
     <span class="provider-import-icon-shell"><img src="../../provider-icons/qiniu-ai.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">七牛云 AI</span><span class="provider-import-meta">Chat / Responses / Anthropic / Gemini Generate</span></span>
   </a>
-  <a class="provider-import-button provider-fenno" href="agentrouter://provider?name=Fenno.ai&amp;base_url=https%3A%2F%2Fapi.fenno.ai&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fapi.fenno.ai%2Fregister%3Fredirect%3D%2Fpurchase%3Ftab%3Dsubscription%2526group%3D16%26aff%3D9HHHAB5QLAES" aria-label="导入 Fenno.ai 供应商">
+  <a class="provider-import-button provider-fenno" href="agentrouter://provider?name=Fenno.ai&amp;base_url=https%3A%2F%2Fapi.fenno.ai&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fapi.fenno.ai%2Fregister%3Fredirect%3D%2Fpurchase%3Ftab%3Dsubscription%2526group%3D16" aria-label="导入 Fenno.ai 供应商">
     <span class="provider-import-icon-shell"><img src="../../provider-icons/fenno.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Fenno.ai</span><span class="provider-import-meta">Chat / Responses / Anthropic</span></span>
   </a>
-  <a class="provider-import-button provider-infistar-ai" href="agentrouter://provider?name=%E6%97%A0%E9%99%90%E6%98%9F%E6%B2%B3&amp;base_url=https%3A%2F%2Finfistar.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=gpt-4o&amp;source=https%3A%2F%2Finfistar.ai%2Fregister%3Faff%3DCCRCCR%26ref_source%3Dlink" aria-label="导入无限星河供应商">
+  <a class="provider-import-button provider-infistar-ai" href="agentrouter://provider?name=%E6%97%A0%E9%99%90%E6%98%9F%E6%B2%B3&amp;base_url=https%3A%2F%2Finfistar.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=gpt-4o&amp;source=https%3A%2F%2Finfistar.ai%2Fregister" aria-label="导入无限星河供应商">
     <span class="provider-import-icon-shell"><img src="../../provider-icons/infistar-ai.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">无限星河</span><span class="provider-import-meta">OpenAI 兼容网关</span></span>
   </a>
@@ -116,85 +116,9 @@ lead: 通过预设按钮或 agentrouter://provider 深度链接（deeplink）一
   </a>
 </div>
 
-## 嵌入式按钮组件
-
-CCR 也提供了一个无框架的按钮脚本，供应商可以嵌入到自己的网页，让用户一键把该供应商导入 CCR。脚本会自动注册 Web Components。
-
-### HTML 写法
-
-```html
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js" defer></script>
-
-<ccr-provider-button
-  name="Example AI"
-  base_url="https://api.example.com/v1"
-  protocol="openai_chat_completions"
-  models="example-chat,example-coder"
-  icon="https://example.com/icon.png"
-  source="https://example.com"
-></ccr-provider-button>
-```
-
-如果配置较大，可以只传 manifest：
-
-```html
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js" defer></script>
-
-<ccr-provider-button
-  name="Example AI"
-  manifest="https://example.com/.well-known/ccr-provider.json"
-></ccr-provider-button>
-```
-
-### JS 写法
-
-```html
-<div id="ccr-buttons"></div>
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js"></script>
-<script>
-  CCRProviderButtons.render("#ccr-buttons", {
-    name: "Example AI",
-    base_url: "https://api.example.com/v1",
-    api_key: "sk-user-key",
-    protocol: "openai_chat_completions",
-    models: ["example-chat", "example-coder"],
-    icon: "https://example.com/icon.png",
-    source: "https://example.com"
-  });
-</script>
-```
-
-### render 参数
-
-`CCRProviderButtons.render(target, options)` 和 `<ccr-provider-button>` 支持同一组参数，参数名与 `agentrouter://provider` 协议保持一致：
-
-| 参数 | 说明 |
-| --- | --- |
-| `name` | 供应商展示名称 |
-| `base_url` | 供应商 API Base URL，直链导入时必填 |
-| `api_key` | 可选供应商 API Key |
-| `protocol` | 协议类型，支持 `openai_chat_completions`、`openai_responses`、`anthropic_messages`、`gemini_generate_content`、`gemini_interactions` |
-| `models` | 模型列表。HTML 中用逗号或换行分隔，JS 中可传字符串或数组 |
-| `icon` | 供应商图标 URL |
-| `source` | 供应商官网或配置来源 |
-| `manifest` | 远程 manifest URL。传入后按钮会生成 manifest 导入链接 |
-| `payload` | JSON 或 base64url JSON 配置。JS 中也可以传对象 |
-| `usage_url` | 可选账号用量接口 |
-| `fetch_usage` | 是否启用账号用量读取 |
-| `usage_method` | 用量接口请求方法，`GET` 或 `POST` |
-| `usage_headers` | 用量接口请求头。JS 中可传对象，HTML 中传 JSON 字符串 |
-| `usage_body` | 用量接口请求体。JS 中可传对象，HTML 中传 JSON 字符串 |
-| `balance` | 余额字段路径 |
-| `balance_unit` | 余额单位 |
-| `subscription` | 订阅剩余额度字段路径 |
-| `subscription_limit` | 订阅总额度字段路径 |
-| `subscription_reset` | 订阅重置时间字段路径 |
-| `subscription_unit` | 订阅额度单位 |
-| `subscription_window` | 订阅窗口，例如 `monthly` |
-
 ## 协议格式
 
-CCR 支持两种写法，推荐使用 host 写法：
+AgentRouter 支持两种写法，推荐使用 host 写法：
 
 ```text
 agentrouter://provider?name=Example%20AI&base_url=https%3A%2F%2Fapi.example.com%2Fv1&protocol=openai_chat_completions&models=example-chat%2Cexample-coder
@@ -217,10 +141,10 @@ agentrouter://provider?payload=%7B%22name%22%3A%22Example%20AI%22%2C%22base_url%
 供应商也可以只传一个 manifest URL：
 
 ```text
-agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Fccr-provider.json
+agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Far-provider.json
 ```
 
-Manifest 必须使用 HTTPS，返回 JSON，不能指向本地或内网地址，体积不能超过 128 KB。CCR 会在 App 内拉取 manifest，展示确认页，然后再写入配置。
+Manifest 必须使用 HTTPS，返回 JSON，不能指向本地或内网地址，体积不能超过 128 KB。AgentRouter 会在 App 内拉取 manifest，展示确认页，然后再写入配置。
 
 Manifest 可以把供应商信息放在顶层 `provider` 对象中：
 

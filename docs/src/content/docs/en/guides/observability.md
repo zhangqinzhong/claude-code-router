@@ -2,7 +2,7 @@
 title: Enable logging and observability
 pageTitle: Enable logging and observability
 eyebrow: Quick start
-lead: "The first-run verification path after connecting CCR: enable request logs and Agent observability in Settings, send one request, then confirm the trace appears in the request logs and on the Observability page."
+lead: "The first-run verification path after connecting AgentRouter: enable request logs and Agent observability in Settings, send one request, then confirm the trace appears in the request logs and on the Observability page."
 ---
 
 ## Enable logging and observability
@@ -20,7 +20,7 @@ It helps diagnose stuck agents, unexpected tool results, slow steps, or context 
 
 ## Request logs
 
-Request logs record model request details passing through CCR, including request time, request ID, client, path, requested model, final provider and model, credential, status code, duration, tokens, cost estimate, request body, response body, and errors.
+Request logs record model request details passing through AgentRouter, including request time, request ID, client, path, requested model, final provider and model, credential, status code, duration, tokens, cost estimate, request body, response body, and errors.
 
 The Logs page supports filtering by status, provider, model, credential, request ID, model name, request body, or response body. A single record shows the main request and response fields, including `request model`, `resolved provider`, `resolved model`, status code, response body, errors, duration, tokens, and cost estimate.
 

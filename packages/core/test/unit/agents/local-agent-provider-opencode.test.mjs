@@ -7,8 +7,8 @@ import {
   importOpenCodeProvider,
   opencodeCandidates,
   removeOpenCodeProviderAccountConfig
-} from "@ccr/core/agents/local-providers/opencode.ts";
-import { localAgentProviderApiKey } from "@ccr/core/agents/local-providers/shared.ts";
+} from "@agentrouter/core/agents/local-providers/opencode.ts";
+import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-providers/shared.ts";
 
 test("OpenCode local provider imports Zen models using each model's native protocol", async () => {
   await withOpenCodeHome(async (home) => {
@@ -253,12 +253,12 @@ test("OpenCode removes the previously generated local account usage connector", 
     account: {
       connectors: [
         {
-          message: "Local usage from CCR history. OpenCode does not expose cloud balance through its API.",
+          message: "Local usage from AgentRouter history. OpenCode does not expose cloud balance through its API.",
           type: "local-estimate",
           windows: [
-            { id: "opencode_monthly_spend", label: "CCR monthly spend", unit: "USD", window: "monthly" },
-            { id: "opencode_monthly_tokens", label: "CCR monthly tokens", unit: "tokens", window: "monthly" },
-            { id: "opencode_monthly_requests", label: "CCR monthly requests", unit: "requests", window: "monthly" }
+            { id: "opencode_monthly_spend", label: "AgentRouter monthly spend", unit: "USD", window: "monthly" },
+            { id: "opencode_monthly_tokens", label: "AgentRouter monthly tokens", unit: "tokens", window: "monthly" },
+            { id: "opencode_monthly_requests", label: "AgentRouter monthly requests", unit: "requests", window: "monthly" }
           ]
         }
       ],
@@ -288,7 +288,7 @@ async function withOpenCodeHome(run) {
     "OPENCODE_CONFIG_CONTENT"
   ];
   const previousEnvironment = Object.fromEntries(environmentNames.map((name) => [name, process.env[name]]));
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-test-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-opencode-test-"));
   process.env.AR_INTERNAL_HOME_DIR = home;
   for (const name of environmentNames.slice(1)) {
     delete process.env[name];

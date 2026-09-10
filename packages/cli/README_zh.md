@@ -1,15 +1,15 @@
-# Claude Code Router CLI
+# AgentRouter CLI
 
-[English](README.md) · [完整文档](https://ccrdesk.top/) · [GitHub](https://github.com/musistudio/claude-code-router)
+[English](README.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
 
-`@musistudio/claude-code-router` 是 Claude Code Router 的 Node.js 发行版。它通过 `ccr` 命令提供浏览器管理界面、本地模型网关和 Agent 配置启动能力，不需要安装 Electron。
+`@musistudio/claude-code-router` 是 AgentRouter 的 Node.js 发行版。它通过 `ccr` 命令提供浏览器管理界面、本地模型网关和 Agent 配置启动能力，不需要安装 Electron。
 
 CLI 适合开发机和无桌面的服务器。如果你需要系统托盘、桌面通知、应用自动更新或桌面端专属的浏览器集成，请安装桌面应用。
 
 ## 环境要求与安装
 
 - Node.js 22 或更高版本
-- 一个可用的上游模型供应商，或 CCR 支持导入的本机 Agent 登录态
+- 一个可用的上游模型供应商，或 AgentRouter 支持导入的本机 Agent 登录态
 - 使用配置启动命令时，本机需要已经安装对应 Agent
 
 全局安装：
@@ -26,7 +26,7 @@ npm install -g @musistudio/claude-code-router@latest
 npm uninstall -g @musistudio/claude-code-router
 ```
 
-卸载 npm 包不会删除 CCR 的本地配置和数据库。
+卸载 npm 包不会删除 AgentRouter 的本地配置和数据库。
 
 ## 快速开始
 
@@ -39,12 +39,12 @@ ccr ui
 然后按以下顺序配置：
 
 1. 添加上游供应商和至少一个模型。
-2. 在 **API 密钥** 页面创建 CCR 客户端密钥。
+2. 在 **API 密钥** 页面创建 AgentRouter 客户端密钥。
 3. 如果默认供应商 / 模型不够用，再配置路由规则。
 4. 在 **服务** 页面确认网关已经运行。
 5. 把客户端指向界面显示的网关地址。网关默认是 `http://127.0.0.1:3456`，管理界面默认是 `http://127.0.0.1:3458`。
 
-管理 Token 和 CCR 客户端 API Key 是两种不同凭据。管理 Token 保护浏览器 UI 和 RPC 接口，CCR 客户端 Key 用于验证发送到模型网关的请求。
+管理 Token 和 AgentRouter 客户端 API Key 是两种不同凭据。管理 Token 保护浏览器 UI 和 RPC 接口，AgentRouter 客户端 Key 用于验证发送到模型网关的请求。
 
 ## 服务命令
 
@@ -84,7 +84,7 @@ ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 
 `serve` 会留在当前终端并处理 `SIGINT` / `SIGTERM`，适合交给进程管理器托管。`ccr stop` 只管理后台服务；前台服务需要在终端或进程管理器中停止。
 
-如果首选管理端口已被占用，CCR 会继续尝试后续端口并打印实际 URL。`start` 或 `ui` 复用已运行服务时，新传入的 Host、Port 和 `--no-gateway` 不会重配该进程；要修改这些选项，请先运行 `ccr stop`。
+如果首选管理端口已被占用，AgentRouter 会继续尝试后续端口并打印实际 URL。`start` 或 `ui` 复用已运行服务时，新传入的 Host、Port 和 `--no-gateway` 不会重配该进程；要修改这些选项，请先运行 `ccr stop`。
 
 ## Agent 配置启动
 
@@ -104,11 +104,11 @@ ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 ```
 
 - `--cli` 和 `--app` 也可以代替位置形式的入口类型。
-- Agent 自己的参数建议统一放到 `--` 后，避免被识别为 CCR 参数。
+- Agent 自己的参数建议统一放到 `--` 后，避免被识别为 AgentRouter 参数。
 - 省略入口类型时，Claude Code、Codex、Grok CLI、Kimi CLI、Pi 默认使用 CLI，ZCode 默认使用 App。
 - Grok CLI、Kimi CLI 和 Pi 只支持 CLI，ZCode 只支持 App。Claude App 和 ZCode App 不接受额外 Agent 参数。
 - 启动桌面 App 时，本机必须已安装对应应用，并且当前环境必须有图形会话。
-- 大多数配置需要先启动 CCR 服务。Grok CLI、Kimi CLI 和 Pi 配置可以自动启动一个临时共享服务，并在最后一个受管会话退出后停止。
+- 大多数配置需要先启动 AgentRouter 服务。Grok CLI、Kimi CLI 和 Pi 配置可以自动启动一个临时共享服务，并在最后一个受管会话退出后停止。
 
 桌面应用会安装一个相关命令 `agentrouter`。桌面 Agent 配置档案卡片复制出来的命令使用 `agentrouter`；本文介绍的 npm 包安装的是 `ccr`。
 
@@ -127,7 +127,7 @@ ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 - `gateway.config.json`：生成的网关运行配置。
 - `profiles/` 和 `bin/`：隔离的 Agent 配置和启动包装器。
 
-CCR 写入 SQLite 时不要直接编辑或复制活跃数据库。优先使用 UI 导出；要做文件级备份，请先停止 CCR。
+AgentRouter 写入 SQLite 时不要直接编辑或复制活跃数据库。优先使用 UI 导出；要做文件级备份，请先停止 AgentRouter。
 
 ## 环境变量与安全
 
@@ -137,9 +137,9 @@ CCR 写入 SQLite 时不要直接编辑或复制活跃数据库。优先使用 U
 | `AR_WEB_PORT` | 省略 `--port` 时使用的管理服务端口。 |
 | `AR_WEB_AUTH_TOKEN` | 固定管理 UI / RPC 的认证 Token；不设置时每个进程会生成随机 Token。 |
 
-认证后的管理 URL 会在查询参数中包含 `ccr_web_token`。请把这个 URL 当作密码，不要复制到日志、工单或公开的 Shell 历史中。除非确实需要远程访问，否则监听地址应保持 `127.0.0.1`。远程访问时，应同时使用防火墙或私网，并在可信反向代理上启用 TLS。
+认证后的管理 URL 会在查询参数中包含 `ar_web_token`。请把这个 URL 当作密码，不要复制到日志、工单或公开的 Shell 历史中。除非确实需要远程访问，否则监听地址应保持 `127.0.0.1`。远程访问时，应同时使用防火墙或私网，并在可信反向代理上启用 TLS。
 
-不要在未创建 CCR 客户端 API Key 的情况下暴露网关。上游供应商凭据保存在 CCR 本地数据目录中，因此也要保护该目录及其备份。
+不要在未创建 AgentRouter 客户端 API Key 的情况下暴露网关。上游供应商凭据保存在 AgentRouter 本地数据目录中，因此也要保护该目录及其备份。
 
 ## 常见问题
 
@@ -156,7 +156,7 @@ npm prefix -g
 
 ### 管理 URL 的端口发生变化
 
-首选端口已被占用。请使用 CCR 打印的实际 URL，或停止占用端口的进程后重启 CCR。
+首选端口已被占用。请使用 AgentRouter 打印的实际 URL，或停止占用端口的进程后重启 AgentRouter。
 
 ### UI 能打开，但网关不可用
 
@@ -177,7 +177,7 @@ ccr start --host 127.0.0.1 --port 3458
 
 ## Docker
 
-仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `ccr` 命令。请参阅 [Docker 部署文档](https://github.com/musistudio/claude-code-router/blob/main/docker/README.md)。
+仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `ccr` 命令。请参阅 [Docker 部署文档](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md)。
 
 ## 许可证
 

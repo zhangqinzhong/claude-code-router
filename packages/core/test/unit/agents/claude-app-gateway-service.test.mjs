@@ -3,11 +3,11 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { applyClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service.ts";
-import { resolveClaudeAppGatewayRouteModel } from "@ccr/core/agents/claude-app/gateway-routes.ts";
+import { applyClaudeAppGatewayConfig } from "@agentrouter/core/agents/claude-app/gateway-service.ts";
+import { resolveClaudeAppGatewayRouteModel } from "@agentrouter/core/agents/claude-app/gateway-routes.ts";
 
 test("Claude App gateway config uses static gateway credentials with current schema", () => {
-  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-gateway-config-"));
+  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ar-claude-app-gateway-config-"));
   const activeDataDir = `${dataDir}-3p`;
 
   try {
@@ -46,7 +46,7 @@ test("Claude App gateway config uses static gateway credentials with current sch
 });
 
 test("Claude App gateway config writes the selected default model first", () => {
-  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-gateway-default-"));
+  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ar-claude-app-gateway-default-"));
   const activeDataDir = `${dataDir}-3p`;
   const config = createConfig({
     Providers: [
@@ -75,7 +75,7 @@ test("Claude App gateway config writes the selected default model first", () => 
 });
 
 test("Claude App gateway config preserves unknown keys when rewriting config library", () => {
-  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-gateway-preserve-"));
+  const dataDir = mkdtempSync(path.join(os.tmpdir(), "ar-claude-app-gateway-preserve-"));
   const activeDataDir = `${dataDir}-3p`;
   const configId = "8f69f2f1-3275-4ad8-9317-4aa7e972f311.json";
   const applyOptions = { backup: false, dataDir };

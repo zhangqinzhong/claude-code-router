@@ -1,10 +1,10 @@
-import { readClaudeCodeOauth, readGrokAuth, readKimiAuth, resolveGrokAuth, resolveKimiAuth } from "@ccr/core/agents/local-providers/service";
-import { grokAccessTokenExpired, grokClientVersion } from "@ccr/core/agents/local-providers/grok";
-import { kimiAccessTokenExpired, kimiIdentityHeaders } from "@ccr/core/agents/local-providers/kimi";
-import { transformCodexApplyPatchBridgeRequestBody } from "@ccr/core/gateway/features/codex-patch-bridge";
-import { claudeCodeOauthBetaHeader, claudeCodeOauthRequiredBeta } from "@ccr/core/gateway/internal/shared";
-import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
-import { mergeAnthropicBetaValues } from "@ccr/core/providers/oauth-plugin";
+import { readClaudeCodeOauth, readGrokAuth, readKimiAuth, resolveGrokAuth, resolveKimiAuth } from "@agentrouter/core/agents/local-providers/service";
+import { grokAccessTokenExpired, grokClientVersion } from "@agentrouter/core/agents/local-providers/grok";
+import { kimiAccessTokenExpired, kimiIdentityHeaders } from "@agentrouter/core/agents/local-providers/kimi";
+import { transformCodexApplyPatchBridgeRequestBody } from "@agentrouter/core/gateway/features/codex-patch-bridge";
+import { claudeCodeOauthBetaHeader, claudeCodeOauthRequiredBeta } from "@agentrouter/core/gateway/internal/shared";
+import { isRecord, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { mergeAnthropicBetaValues } from "@agentrouter/core/providers/oauth-plugin";
 
 const configProviderPluginKeyPrefix = "config:";
 const localAgentProviderPluginKeyPrefix = "ar-local-agent-";

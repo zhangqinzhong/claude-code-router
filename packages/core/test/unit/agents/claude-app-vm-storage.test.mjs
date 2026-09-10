@@ -8,7 +8,7 @@ import {
   resolveClaudeAppDefaultUserDataDirs,
   resolveClaudeAppVmBundleDir,
   resolveSharedClaudeAppVmSeedBundleDir
-} from "@ccr/core/agents/claude-app/vm-storage.ts";
+} from "@agentrouter/core/agents/claude-app/vm-storage.ts";
 
 test("Claude App VM storage prepares profile bundle from the default Claude App data dir", () => {
   withRuntimeEnv((root) => {
@@ -25,7 +25,7 @@ test("Claude App VM storage prepares profile bundle from the default Claude App 
   });
 });
 
-test("Claude App VM storage can seed new profiles from an existing CCR profile", () => {
+test("Claude App VM storage can seed new profiles from an existing AgentRouter profile", () => {
   withRuntimeEnv((root) => {
     const configDir = path.join(root, "ccr");
     const sourceUserDataDir = path.join(configDir, "profiles", "source", "claude", ".claude-code-router", "claude-app-user-data", "source");
@@ -92,7 +92,7 @@ function readRootfs(bundleDir) {
 }
 
 function withRuntimeEnv(run) {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-vm-storage-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-app-vm-storage-"));
   const previous = {
     appData: process.env.AR_INTERNAL_APP_DATA_DIR,
     home: process.env.AR_INTERNAL_HOME_DIR,

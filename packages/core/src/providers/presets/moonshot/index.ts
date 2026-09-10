@@ -1,5 +1,5 @@
-import type { ProviderAccountConfig } from "@ccr/core/contracts/app";
-import type { ProviderPreset } from "@ccr/core/providers/presets/types";
+import type { ProviderAccountConfig } from "@agentrouter/core/contracts/app";
+import type { ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 const moonshotGlobalProviderAccountConfig: ProviderAccountConfig = {
   connectors: [
@@ -81,12 +81,12 @@ export const moonshotChinaProviderPreset: ProviderPreset = {
     {
       baseUrl: "https://api.moonshot.cn/v1",
       protocols: ["openai_chat_completions"],
-      websiteUrl: "https://platform.kimi.com/?aff=ccr"
+      websiteUrl: "https://platform.kimi.com/"
     }
   ],
   id: "moonshot",
   name: "Kimi API (China)",
-  websiteUrl: "https://platform.kimi.com/?aff=ccr"
+  websiteUrl: "https://platform.kimi.com/"
 };
 
 export const moonshotGlobalProviderPreset: ProviderPreset = {
@@ -97,10 +97,10 @@ export const moonshotGlobalProviderPreset: ProviderPreset = {
     {
       baseUrl: "https://api.moonshot.ai/v1",
       protocols: ["openai_chat_completions"],
-      websiteUrl: "https://platform.kimi.ai/?aff=ccr"
+      websiteUrl: "https://platform.kimi.ai/"
     }
   ],
   id: "moonshot-global",
   name: "Kimi API (Global)",
-  websiteUrl: "https://platform.kimi.ai/?aff=ccr"
+  websiteUrl: "https://platform.kimi.ai/"
 };

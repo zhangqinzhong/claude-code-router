@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { TraySettingsPage } from "@ccr/ui/pages/home/components/settings.tsx";
-import { appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
+import { TraySettingsPage } from "@agentrouter/ui/pages/home/components/settings.tsx";
+import { appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
 import { installBrowserGlobals } from "../fixtures/index.ts";
 
 installBrowserGlobals();

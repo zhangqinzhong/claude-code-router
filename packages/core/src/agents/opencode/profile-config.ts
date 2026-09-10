@@ -1,14 +1,14 @@
-import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
+import { adoptLegacyArtifacts } from "@agentrouter/core/profiles/legacy-artifacts";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { buildCodexModelCatalog, type CodexModelCatalogItem } from "@ccr/core/agents/codex/model-catalog";
-import { parseJsoncRecord } from "@ccr/core/agents/local-providers/shared";
-import { isGatewayProviderEnabled, type AppConfig, type GatewayProviderConfig, type ProfileConfig, type ProviderModelMetadata } from "@ccr/core/contracts/app";
-import { findModelCatalogEntry, findProviderModelCatalogEntry, type ModelCatalogEntry, modelCatalogMaxInputTokens, modelCatalogMaxOutputTokens } from "@ccr/core/gateway/model-catalog";
-import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
+import { buildCodexModelCatalog, type CodexModelCatalogItem } from "@agentrouter/core/agents/codex/model-catalog";
+import { parseJsoncRecord } from "@agentrouter/core/agents/local-providers/shared";
+import { isGatewayProviderEnabled, type AppConfig, type GatewayProviderConfig, type ProfileConfig, type ProviderModelMetadata } from "@agentrouter/core/contracts/app";
+import { findModelCatalogEntry, findProviderModelCatalogEntry, type ModelCatalogEntry, modelCatalogMaxInputTokens, modelCatalogMaxOutputTokens } from "@agentrouter/core/gateway/model-catalog";
+import { modelRegistryForConfig } from "@agentrouter/core/routing/model-registry";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
 
 export type OpenCodeProfileConfigWriteResult = {
   backupFile?: string;

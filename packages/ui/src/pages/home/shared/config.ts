@@ -1,6 +1,6 @@
 import type {
   AppConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   fallbackConfig
 } from "./fallbacks";

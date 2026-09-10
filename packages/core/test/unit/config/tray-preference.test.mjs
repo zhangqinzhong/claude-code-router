@@ -3,7 +3,7 @@ import { mkdtempSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test, { before } from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 
 const testRoot = mkdtempSync(path.join(process.env.AR_INTERNAL_HOME_DIR || os.tmpdir(), "tray-preferences-"));
 process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
@@ -15,8 +15,8 @@ let saveAppConfig;
 let loadPersistedAppConfig;
 let replacePersistedAppConfig;
 before(async () => {
-  ({ loadAppConfig, saveAppConfig } = await import("@ccr/core/config/config.ts"));
-  ({ loadPersistedAppConfig, replacePersistedAppConfig } = await import("@ccr/core/config/config-repository.ts"));
+  ({ loadAppConfig, saveAppConfig } = await import("@agentrouter/core/config/config.ts"));
+  ({ loadPersistedAppConfig, replacePersistedAppConfig } = await import("@agentrouter/core/config/config-repository.ts"));
 });
 
 test("new configurations default to the layered icon with no menu bar text", () => {

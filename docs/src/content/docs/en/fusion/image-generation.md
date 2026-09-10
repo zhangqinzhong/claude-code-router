@@ -24,13 +24,13 @@ It is different from **Built-in vision**:
 4. Select an image model, for example `Provider/model`.
 5. Save the Fusion model and use it as an Agent model or routing target.
 
-After importing a Grok Agent, CCR automatically provides `grok-imagine-image-quality`. ai-gateway reuses the existing OAuth login to access `api.x.ai`; it does not start Grok CLI.
+After importing a Grok Agent, AgentRouter automatically provides `grok-imagine-image-quality`. ai-gateway reuses the existing OAuth login to access `api.x.ai`; it does not start Grok CLI.
 
-Image generation has its own retry count and fallback image models. If the selected image model fails with a retryable media-provider error, CCR retries that image model first, then tries the configured fallback image models. The base text model remains unchanged.
+Image generation has its own retry count and fallback image models. If the selected image model fails with a retryable media-provider error, AgentRouter retries that image model first, then tries the configured fallback image models. The base text model remains unchanged.
 
 ## Supported requests
 
-CCR calls providers through ai-gateway's generic media protocol:
+AgentRouter calls providers through ai-gateway's generic media protocol:
 
 | Request | Purpose |
 | --- | --- |
@@ -41,13 +41,13 @@ Tool calls accept an optional `idempotency_key`. Reuse a stable key for one user
 
 ## Local image inputs
 
-Image editing validates canonical paths, file signatures, and file sizes. By default, CCR allows scoped access to the current working directory, the system temporary directory, and the CCR config directory.
+Image editing validates canonical paths, file signatures, and file sizes. By default, AgentRouter allows scoped access to the current working directory, the system temporary directory, and the AgentRouter config directory.
 
 Do not implicitly allow the filesystem root, the user home directory, or directories above the user home. Add an explicit `allowedInputRoots` entry only when broader file access is intentional.
 
 ## Artifacts
 
-Generated images are stored in CCR's private data directory. Results include:
+Generated images are stored in AgentRouter's private data directory. Results include:
 
 - Local file path
 - MIME type
@@ -55,7 +55,7 @@ Generated images are stored in CCR's private data directory. Results include:
 - SHA-256
 - Expiring URL
 
-The expiring URL uses a separate token and does not reuse the CCR API key.
+The expiring URL uses a separate token and does not reuse the AgentRouter API key.
 
 ## Troubleshooting
 

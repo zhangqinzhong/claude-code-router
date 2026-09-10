@@ -9,9 +9,9 @@ import {
   virtualModelProfileFromDraft,
   virtualModelProfilesUseMediaTools,
   virtualModelToolSummary
-} from "@ccr/ui/pages/home/shared/virtual-models.ts";
-import { BUILTIN_FUSION_IMAGE_GENERATION_TOOL_NAME, BUILTIN_FUSION_VIDEO_GENERATION_TOOL_NAME } from "@ccr/core/contracts/app.ts";
-import { fusionToolOptions } from "@ccr/ui/pages/home/shared/options.ts";
+} from "@agentrouter/ui/pages/home/shared/virtual-models.ts";
+import { BUILTIN_FUSION_IMAGE_GENERATION_TOOL_NAME, BUILTIN_FUSION_VIDEO_GENERATION_TOOL_NAME } from "@agentrouter/core/contracts/app.ts";
+import { fusionToolOptions } from "@agentrouter/ui/pages/home/shared/options.ts";
 import { appConfigFixture } from "../fixtures/index.ts";
 
 test("Fusion draft saves multiple selected tools into one profile", () => {

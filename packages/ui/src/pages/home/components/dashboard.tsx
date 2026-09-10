@@ -1979,7 +1979,7 @@ function overviewBreakdownDataOptions(): Array<{ label: string; value: "model-di
 function overviewShareCardDataOptions(): Array<{ label: string; value: ShareOverviewWidgetType }> {
   return [
     { label: "AI Usage Wrapped", value: "share-usage-wrapped" },
-    { label: "CCR Route Map", value: "share-route-map" },
+    { label: "AgentRouter Route Map", value: "share-route-map" },
     { label: "Model Leaderboard", value: "share-model-leaderboard" },
     { label: "AI Fuel Cockpit", value: "share-fuel-cockpit" },
     { label: "Token Calendar Poster", value: "share-token-calendar" },
@@ -2155,7 +2155,7 @@ function overviewWidgetTypeLabel(type: OverviewWidgetType): string {
   if (type === "provider-analysis") return "Provider Analysis";
   if (type === "share-fuel-cockpit") return "AI Fuel Cockpit";
   if (type === "share-model-leaderboard") return "Model Leaderboard";
-  if (type === "share-route-map") return "CCR Route Map";
+  if (type === "share-route-map") return "AgentRouter Route Map";
   if (type === "share-spend-receipt") return "Spend Receipt";
   if (type === "share-token-calendar") return "Token Calendar Poster";
   if (type === "share-usage-wrapped") return "AI Usage Wrapped";
@@ -3640,7 +3640,7 @@ function CodexResetCreditDialog({
     if (status !== "idle" || !activeDetail?.id || activeDetail.redeemable === false) {
       return;
     }
-    if (!window.ccr?.resetCodexRateLimitCredit) {
+    if (!window.agentrouter?.resetCodexRateLimitCredit) {
       setError(t("Reset is unavailable."));
       return;
     }
@@ -3649,7 +3649,7 @@ function CodexResetCreditDialog({
     setStatus("resetting");
     const cardTransition = delay(650);
     try {
-      await window.ccr.resetCodexRateLimitCredit({
+      await window.agentrouter.resetCodexRateLimitCredit({
         credentialId: account.credentialId,
         creditId: activeDetail.id,
         provider: account.provider
@@ -4735,7 +4735,7 @@ function AgentSessionRequestLogDialog({
     setError("");
     setLoading(true);
 
-    if (!window.ccr?.getRequestLogDetail) {
+    if (!window.agentrouter?.getRequestLogDetail) {
       setError(t("Request log detail is unavailable."));
       setLoading(false);
       return () => {
@@ -4743,7 +4743,7 @@ function AgentSessionRequestLogDialog({
       };
     }
 
-    void window.ccr.getRequestLogDetail({ id: requestLogId })
+    void window.agentrouter.getRequestLogDetail({ id: requestLogId })
       .then((detail) => {
         if (!active) {
           return;
@@ -5721,7 +5721,7 @@ function TracePayloadPane({
     setFull(undefined);
     setLoadFailed(false);
 
-    if (typeof requestLogId !== "number" || !requestPart || !window.ccr?.getAgentTracePayload) {
+    if (typeof requestLogId !== "number" || !requestPart || !window.agentrouter?.getAgentTracePayload) {
       setLoading(false);
       return () => {
         cancelled = true;
@@ -5734,7 +5734,7 @@ function TracePayloadPane({
       part: requestPart,
       requestLogId
     };
-    window.ccr.getAgentTracePayload(payloadRequest)
+    window.agentrouter.getAgentTracePayload(payloadRequest)
       .then((result) => {
         if (!cancelled) {
           setFull(result);

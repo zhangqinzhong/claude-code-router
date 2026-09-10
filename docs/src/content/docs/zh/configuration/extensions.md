@@ -2,19 +2,19 @@
 title: 扩展机制
 pageTitle: 扩展机制
 eyebrow: 扩展
-lead: 了解 CCR 扩展如何加载、能注册哪些能力，并从零创建、安装和调试自己的扩展。
+lead: 了解 AgentRouter 扩展如何加载、能注册哪些能力，并从零创建、安装和调试自己的扩展。
 ---
 
 ## 扩展类型
 
-CCR 的扩展分为两层：
+AgentRouter 的扩展分为两层：
 
 | 类型 | 配置位置 | 运行位置 | 适合做什么 |
 | --- | --- | --- | --- |
-| Wrapper plugin | `plugins` | CCR Desktop 的 Electron wrapper 进程 | 注册本地 HTTP 路由、启动本地后端、拦截代理流量、添加内置浏览器入口、连接供应商账号用量 |
+| Wrapper plugin | `plugins` | AgentRouter Desktop 的 Electron wrapper 进程 | 注册本地 HTTP 路由、启动本地后端、拦截代理流量、添加内置浏览器入口、连接供应商账号用量 |
 | Core gateway plugin | `providerPlugins` 或 `plugins[].coreGateway.providerPlugins` | core gateway runtime | 扩展上游供应商、认证方式或 core gateway 内部能力 |
 
-多数用户自定义扩展应从 Wrapper plugin 开始。它能拿到 CCR 配置、私有数据目录和日志对象，并通过 `ctx` 注册能力。
+多数用户自定义扩展应从 Wrapper plugin 开始。它能拿到 AgentRouter 配置、私有数据目录和日志对象，并通过 `ctx` 注册能力。
 
 `plugins[]` 是扩展包的安装单位。一个扩展包可以分别暴露三个运行面：
 
@@ -28,14 +28,14 @@ CCR 的扩展分为两层：
 
 ## 加载机制
 
-启动网关时，CCR 会读取配置里的 `plugins` 数组，并按顺序处理每个 `enabled !== false` 的扩展：
+启动网关时，AgentRouter 会读取配置里的 `plugins` 数组，并按顺序处理每个 `enabled !== false` 的扩展：
 
 1. 先按启用的运行面应用配置：App 运行面的 `apps`，Gateway 运行面的 `proxy.routes`、`coreGateway.virtualModelProfiles` 和 `coreGateway.config`，以及 Provider 运行面的 `coreGateway.providerPlugins`。
-2. 当任一启用的运行面需要 JavaScript 注册能力时，会加载扩展模块。`module` 必须解析到明确的本地 JavaScript 文件路径，例如绝对路径、`~/` 开头路径，或相对 CCR 配置目录的 `./...` 路径。
-3. 任何通过 `module` 加载 JavaScript 的扩展都必须显式声明 `trusted-code` 权限。权限不是操作系统级沙箱；它用于限制 CCR 插件 API，并把“执行本地代码”的信任边界显式化。
-4. 如果没有配置 `module`，CCR 不会再加载内置兜底扩展。
+2. 当任一启用的运行面需要 JavaScript 注册能力时，会加载扩展模块。`module` 必须解析到明确的本地 JavaScript 文件路径，例如绝对路径、`~/` 开头路径，或相对 AgentRouter 配置目录的 `./...` 路径。
+3. 任何通过 `module` 加载 JavaScript 的扩展都必须显式声明 `trusted-code` 权限。权限不是操作系统级沙箱；它用于限制 AgentRouter 插件 API，并把“执行本地代码”的信任边界显式化。
+4. 如果没有配置 `module`，AgentRouter 不会再加载内置兜底扩展。
 5. 模块可以导出函数，也可以导出包含 `setup(ctx)` 或 `activate(ctx)` 的对象。
-6. 扩展停止时，CCR 会反向执行 `stop`、`onStop` 钩子，并关闭该扩展注册的 HTTP 后端和 SQLite store。
+6. 扩展停止时，AgentRouter 会反向执行 `stop`、`onStop` 钩子，并关闭该扩展注册的 HTTP 后端和 SQLite store。
 
 扩展模块常见导出形式：
 
@@ -72,12 +72,12 @@ module.exports = async function setup(ctx) {
 | --- | --- |
 | `ctx.pluginId` | 当前扩展 ID |
 | `ctx.pluginConfig` | `plugins[].config` 中的自定义配置 |
-| `ctx.config` | 当前 CCR AppConfig 快照 |
+| `ctx.config` | 当前 AgentRouter AppConfig 快照 |
 | `ctx.logger` | 带 `[plugin:<id>]` 前缀的 `debug/info/warn/error` 日志 |
-| `ctx.paths.configDir` | CCR 配置目录 |
-| `ctx.paths.dataDir` | CCR 数据目录 |
+| `ctx.paths.configDir` | AgentRouter 配置目录 |
+| `ctx.paths.dataDir` | AgentRouter 数据目录 |
 | `ctx.paths.pluginDataDir` | 当前扩展专属数据目录 |
-| `ctx.registerGatewayRoute(route)` | 在 CCR 网关上注册本地 HTTP 路由 |
+| `ctx.registerGatewayRoute(route)` | 在 AgentRouter 网关上注册本地 HTTP 路由 |
 | `ctx.registerHttpBackend(backend)` | 启动一个本地 HTTP 后端，返回 `{ url, host, port }` |
 | `ctx.registerProxyRoute(route)` | 把代理模式捕获到的某个 host/path 转发到扩展后端或其他 upstream |
 | `ctx.registerApp(app)` | 在内置浏览器应用列表里添加入口 |
@@ -86,7 +86,7 @@ module.exports = async function setup(ctx) {
 | `ctx.registerCoreGatewayProviderPlugin(plugin)` | 向 core gateway 注入 provider plugin |
 | `ctx.registerCoreGatewayVirtualModelProfile(profile)` | 向 core gateway 注入虚拟模型配置 |
 
-Provider account connector 的 `resolve(request)` 会收到 `request.fetchProviderAccountJson({ endpoint, method, requestOrigin, credentials, headers, body, timeoutMs })`。它通过 CCR Desktop 的内置浏览器会话发请求，因此 `credentials: "include"` 可以为同源账号 API 带上浏览器 Cookie。
+Provider account connector 的 `resolve(request)` 会收到 `request.fetchProviderAccountJson({ endpoint, method, requestOrigin, credentials, headers, body, timeoutMs })`。它通过 AgentRouter Desktop 的内置浏览器会话发请求，因此 `credentials: "include"` 可以为同源账号 API 带上浏览器 Cookie。
 
 Gateway route handler 会额外收到 helper：
 
@@ -96,11 +96,11 @@ Gateway route handler 会额外收到 helper：
 | `helpers.readJson(request)` | 读取并解析 JSON body |
 | `helpers.sendJson(response, statusCode, body)` | 返回 JSON 响应 |
 
-`registerGatewayRoute` 默认使用 `auth: "gateway"`。如果 CCR 配置了 API Key，请求必须带 `Authorization: Bearer <key>` 或 `x-api-key: <key>`。仅调试或本地公开状态页建议使用 `auth: "none"`。
+`registerGatewayRoute` 默认使用 `auth: "gateway"`。如果 AgentRouter 配置了 API Key，请求必须带 `Authorization: Bearer <key>` 或 `x-api-key: <key>`。仅调试或本地公开状态页建议使用 `auth: "none"`。
 
 ## 创建第一个扩展
 
-创建一个目录，例如 `~/ccr-extensions/hello-extension`：
+创建一个目录，例如 `~/ar-extensions/hello-extension`：
 
 ```text
 hello-extension/
@@ -108,7 +108,7 @@ hello-extension/
   index.cjs
 ```
 
-`plugin.json` 用于让 CCR 的本地扩展选择器识别扩展 ID、名称和入口文件：
+`plugin.json` 用于让 AgentRouter 的本地扩展选择器识别扩展 ID、名称和入口文件：
 
 ```json
 {
@@ -143,7 +143,7 @@ module.exports = {
         helpers.sendJson(response, 200, {
           ok: true,
           plugin: ctx.pluginId,
-          message: ctx.pluginConfig?.message || "hello from CCR"
+          message: ctx.pluginConfig?.message || "hello from AgentRouter"
         });
       }
     });
@@ -178,8 +178,8 @@ module.exports = {
 
 这个扩展会暴露：
 
-- `GET /plugins/hello`：直接挂在 CCR 网关上，用来验证扩展是否加载。
-- 一个本地 echo 后端：由 CCR 自动分配端口。
+- `GET /plugins/hello`：直接挂在 AgentRouter 网关上，用来验证扩展是否加载。
+- 一个本地 echo 后端：由 AgentRouter 自动分配端口。
 - 一个代理规则：当代理模式捕获到 `api.example.local/v1...` 时转发到 echo 后端。
 
 ## 安装扩展
@@ -192,7 +192,7 @@ module.exports = {
 4. 保存配置。
 5. 打开 **Server** 页面，重启网关。
 
-CCR 的运行配置存储在 SQLite 中。请通过 UI 添加扩展；旧版 JSON 配置文件仅用于参考。扩展条目的配置结构如下：
+AgentRouter 的运行配置存储在 SQLite 中。请通过 UI 添加扩展；旧版 JSON 配置文件仅用于参考。扩展条目的配置结构如下：
 
 ```json
 {
@@ -200,7 +200,7 @@ CCR 的运行配置存储在 SQLite 中。请通过 UI 添加扩展；旧版 JSO
     {
       "id": "hello-extension",
       "enabled": true,
-      "module": "/Users/you/ccr-extensions/hello-extension/index.cjs",
+      "module": "/Users/you/ar-extensions/hello-extension/index.cjs",
       "surfaces": { "apps": true, "gateway": true, "provider": false },
       "permissions": ["trusted-code", "apps", "gateway-routes", "http-backends", "proxy-routes"],
       "config": {
@@ -216,12 +216,12 @@ CCR 的运行配置存储在 SQLite 中。请通过 UI 添加扩展；旧版 JSO
 本地目录选择器会按顺序识别这些入口信息：
 
 - `plugin.json`
-- `ccr-plugin.json`
-- `.ccr-plugin/plugin.json`
+- `ar-plugin.json`
+- `.ar-plugin/plugin.json`
 - `.codex-plugin/plugin.json`
-- `package.json` 里的 `main`、`ccr.module` 或 `ccrPlugin.module`
+- `package.json` 里的 `main`、`ccr.module` 或 `arPlugin.module`
 
-如果没有显式入口文件，CCR 会尝试目录里的 `index.cjs`、`index.mjs`、`index.js`、`plugin.cjs`、`plugin.mjs` 或 `plugin.js`。
+如果没有显式入口文件，AgentRouter 会尝试目录里的 `index.cjs`、`index.mjs`、`index.js`、`plugin.cjs`、`plugin.mjs` 或 `plugin.js`。
 
 ## 调试扩展
 
@@ -230,21 +230,21 @@ CCR 的运行配置存储在 SQLite 中。请通过 UI 添加扩展；旧版 JSO
 CommonJS 扩展可以运行：
 
 ```bash
-node --check ~/ccr-extensions/hello-extension/index.cjs
+node --check ~/ar-extensions/hello-extension/index.cjs
 ```
 
 如果扩展依赖 npm 包，先在扩展目录安装依赖，并确保入口文件能被 Node 解析。
 
-### 2. 用源码模式启动 CCR
+### 2. 用源码模式启动 AgentRouter
 
-在 CCR 仓库根目录运行：
+在 AgentRouter 仓库根目录运行：
 
 ```bash
 npm install
 npm run dev
 ```
 
-扩展里的 `ctx.logger.info/warn/error` 会出现在启动 CCR 的终端中，前缀类似 `[plugin:hello-extension]`。
+扩展里的 `ctx.logger.info/warn/error` 会出现在启动 AgentRouter 的终端中，前缀类似 `[plugin:hello-extension]`。
 
 ### 3. 验证 Gateway route
 
@@ -254,7 +254,7 @@ npm run dev
 curl http://127.0.0.1:3456/plugins/hello
 ```
 
-如果路由使用默认的 `auth: "gateway"`，并且 CCR 已配置 API Key：
+如果路由使用默认的 `auth: "gateway"`，并且 AgentRouter 已配置 API Key：
 
 ```bash
 curl -H "Authorization: Bearer <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
@@ -274,7 +274,7 @@ curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 
 - `host` 必须匹配目标 hostname，支持精确 host、`.example.com` 后缀和 `*.example.com` 通配。
 - `paths` 为空时匹配该 host 的所有路径。
-- 多个路径匹配时，CCR 会选最长的 path prefix。
+- 多个路径匹配时，AgentRouter 会选最长的 path prefix。
 - `stripPathPrefix` 会从转发路径中移除匹配前缀。
 - `rewritePathPrefix` 会把匹配前缀替换成指定前缀。
 
@@ -285,7 +285,7 @@ curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
 | 扩展没有加载 | 检查 `plugins[].enabled`、`plugins[].module` 路径和终端里的 `[plugin:<id>]` 报错 |
 | `GET /plugins/hello` 返回 404 | 确认网关已重启，路由 `path` 或 `pathPrefix` 是否以 `/` 开头 |
 | 返回 401 | 路由默认需要 gateway API Key；调试路由可显式设置 `auth: "none"` |
-| 修改代码不生效 | Wrapper plugin 会在网关重启时重新加载；只有进程卡住时才需要重启 CCR |
+| 修改代码不生效 | Wrapper plugin 会在网关重启时重新加载；只有进程卡住时才需要重启 AgentRouter |
 | 端口被占用 | `registerHttpBackend` 不传 `port` 会自动分配端口；固定端口冲突时改回自动分配 |
 | 代理规则不命中 | 检查代理模式是否开启、证书是否安装、host 是否匹配真实请求的 hostname |
 

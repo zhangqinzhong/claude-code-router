@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { closeSync, copyFileSync, existsSync, mkdirSync, openSync, readFileSync, readSync, renameSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { MediaArtifact, MediaJob } from "@ccr/core/media/contracts";
+import type { MediaArtifact, MediaJob } from "@agentrouter/core/media/contracts";
 
 type JobStoreFile = {
   jobs: MediaJob[];

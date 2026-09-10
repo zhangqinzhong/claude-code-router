@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import http from "node:http";
 import test from "node:test";
-import { GatewayMediaExecutor } from "@ccr/core/media/executors.ts";
+import { GatewayMediaExecutor } from "@agentrouter/core/media/executors.ts";
 
 // Starts a loopback server that reports a large content-length but never ends
 // the body, so the client keeps the connection open unless it explicitly

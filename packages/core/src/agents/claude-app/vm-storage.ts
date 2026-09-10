@@ -2,7 +2,7 @@ import { constants, copyFileSync, existsSync, lstatSync, mkdirSync, readdirSync,
 import { spawnSync } from "node:child_process";
 import os from "node:os";
 import path from "node:path";
-import { resolveRuntimeAppPath } from "@ccr/core/runtime/app-paths";
+import { resolveRuntimeAppPath } from "@agentrouter/core/runtime/app-paths";
 
 const claudeAppVmBundlesDir = "vm_bundles";
 const claudeAppVmBundleName = "claudevm.bundle";
@@ -158,7 +158,7 @@ function findClaudeAppVmSeedBundle(configDir: string, userDataDir: string): stri
     ...configuredSeedBundleCandidates(),
     resolveSharedClaudeAppVmSeedBundleDir(configDir),
     ...resolveClaudeAppDefaultUserDataDirs().map(resolveClaudeAppVmBundleDir),
-    ...existingCcrProfileVmBundleCandidates(configDir)
+    ...existingArProfileVmBundleCandidates(configDir)
   ]).find((candidate) =>
     !samePath(candidate, targetBundleDir) &&
     isUsableClaudeAppVmBundle(candidate)
@@ -182,7 +182,7 @@ function configuredSeedBundleCandidates(): string[] {
     });
 }
 
-function existingCcrProfileVmBundleCandidates(configDir: string): string[] {
+function existingArProfileVmBundleCandidates(configDir: string): string[] {
   const profilesDir = path.join(configDir, "profiles");
   if (!isDirectory(profilesDir)) {
     return [];
@@ -271,7 +271,7 @@ function isReplaceableIncompleteBundle(bundleDir: string): boolean {
 
 function cloneDirectory(sourceDir: string, targetDir: string): void {
   const parentDir = path.dirname(targetDir);
-  const tempDir = path.join(parentDir, `.${path.basename(targetDir)}.ccr-clone-${process.pid}-${Date.now()}`);
+  const tempDir = path.join(parentDir, `.${path.basename(targetDir)}.ar-clone-${process.pid}-${Date.now()}`);
   rmSync(tempDir, { force: true, recursive: true });
   try {
     copyDirectoryContents(sourceDir, tempDir);

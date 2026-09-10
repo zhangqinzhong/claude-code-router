@@ -4,7 +4,7 @@ import {
   estimateUsageCostUsd,
   estimateUsageCostUsdFromLoadedCatalog,
   providerModelPricingForUsage
-} from "@ccr/core/models/pricing-service.ts";
+} from "@agentrouter/core/models/pricing-service.ts";
 
 const pricing = {
   cacheReadUsdPerMillionTokens: 0.5,

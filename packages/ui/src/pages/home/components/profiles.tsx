@@ -280,7 +280,7 @@ function ManagedCompactSetting({
   onChange: (checked: boolean) => void;
 }) {
   const t = useAppText();
-  const title = t("CCR managed compact");
+  const title = t("AgentRouter managed compact");
 
   return (
     <div className="rounded-md border border-border bg-muted/20 px-3 py-3">
@@ -291,7 +291,7 @@ function ManagedCompactSetting({
             <div className="min-w-0">
               <div className="truncate text-[13px] font-semibold">{title}</div>
               <div className="mt-0.5 text-[12px] leading-5 text-muted-foreground">
-                {t("Use CCR context archive for this profile's auto compact requests.")}
+                {t("Use AgentRouter context archive for this profile's auto compact requests.")}
               </div>
             </div>
           </div>
@@ -1338,7 +1338,7 @@ function appPathFromDropEvent(event: ReactDragEvent<HTMLElement>): string {
 
 function filePathFromDroppedFile(file: File): string {
   try {
-    const bridgedPath = window.ccr?.getFilePath?.(file)?.trim();
+    const bridgedPath = window.agentrouter?.getFilePath?.(file)?.trim();
     if (bridgedPath) {
       return bridgedPath;
     }
@@ -1371,7 +1371,7 @@ function appPathFromDroppedText(value: string): string {
 }
 
 const ADD_BOT_SELECT_VALUE = "__add_bot__";
-const HANDOFF_TARGET_NONE_VALUE = "__ccr_handoff_target_none__";
+const HANDOFF_TARGET_NONE_VALUE = "__ar_handoff_target_none__";
 
 type BotHandoffScanState = {
   error: string;
@@ -1415,8 +1415,8 @@ function BotGatewaySelectForm({
   const scanHandoffTargets = useCallback(async (kind: "bluetooth" | "wifi") => {
     const setScan = kind === "wifi" ? setWifiScan : setBluetoothScan;
     const scanner = kind === "wifi"
-      ? window.ccr?.scanBotHandoffWifiTargets
-      : window.ccr?.scanBotHandoffBluetoothTargets;
+      ? window.agentrouter?.scanBotHandoffWifiTargets
+      : window.agentrouter?.scanBotHandoffBluetoothTargets;
     if (!scanner) {
       setScan({
         error: t("Handoff target scan is available in the Electron app."),
@@ -1488,7 +1488,7 @@ function BotGatewaySelectForm({
     });
   }
 
-  const botScopeHint = t("Bot only forwards messages when opening the APP from CCR. CLI does not forward messages yet.");
+  const botScopeHint = t("Bot only forwards messages when opening the APP from AgentRouter. CLI does not forward messages yet.");
 
   return (
     <div className="rounded-md border border-border bg-muted/20 px-3 py-2">

@@ -4,15 +4,15 @@
 import type { IncomingHttpHeaders } from "node:http";
 import { Readable, Transform } from "node:stream";
 import { StringDecoder } from "node:string_decoder";
-import type { AppConfig } from "@ccr/core/contracts/app";
-import { normalizeRouteSelector } from "@ccr/core/routing/model-registry";
-import { isRecord, rawStringValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { readHeader } from "@ccr/core/gateway/http/io";
-import { codexPatchBridgeInstructionText, codexPatchBridgeShellToolGuidance, virtualApplyPatchLarkGrammar, virtualApplyPatchToolName } from "@ccr/core/gateway/internal/shared";
-import { parseJsonObjectSafe, serializeJsonBody } from "@ccr/core/gateway/http/body";
-import { requestProtocolForPath } from "@ccr/core/routing/protocol-endpoints";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
-import { hasCodexResponsesCompactionTrigger, isCodexResponsesCompactPath } from "@ccr/core/gateway/context-archive/protocol";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
+import { normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
+import { isRecord, rawStringValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { readHeader } from "@agentrouter/core/gateway/http/io";
+import { codexPatchBridgeInstructionText, codexPatchBridgeShellToolGuidance, virtualApplyPatchLarkGrammar, virtualApplyPatchToolName } from "@agentrouter/core/gateway/internal/shared";
+import { parseJsonObjectSafe, serializeJsonBody } from "@agentrouter/core/gateway/http/body";
+import { requestProtocolForPath } from "@agentrouter/core/routing/protocol-endpoints";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
+import { hasCodexResponsesCompactionTrigger, isCodexResponsesCompactPath } from "@agentrouter/core/gateway/context-archive/protocol";
 
 
 export function prepareCodexApplyPatchBridgeRequest(input: {
@@ -418,24 +418,24 @@ function patchInputFromVirtualApplyPatchArguments(value: unknown): string | unde
 
 
 type CodexPatchBridgeSseTransform = Transform & {
-  __ccrCodexPatchBridgeSseDecoder?: StringDecoder;
-  __ccrCodexPatchBridgeSsePending?: string;
+  __arCodexPatchBridgeSseDecoder?: StringDecoder;
+  __arCodexPatchBridgeSsePending?: string;
 };
 
 function transformSseChunk(stream: Transform, chunk: Buffer | string): void {
   const state = stream as CodexPatchBridgeSseTransform;
-  const decoder = state.__ccrCodexPatchBridgeSseDecoder ?? new StringDecoder("utf8");
-  state.__ccrCodexPatchBridgeSseDecoder = decoder;
-  state.__ccrCodexPatchBridgeSsePending = (state.__ccrCodexPatchBridgeSsePending ?? "") +
+  const decoder = state.__arCodexPatchBridgeSseDecoder ?? new StringDecoder("utf8");
+  state.__arCodexPatchBridgeSseDecoder = decoder;
+  state.__arCodexPatchBridgeSsePending = (state.__arCodexPatchBridgeSsePending ?? "") +
     decoder.write(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  while (state.__ccrCodexPatchBridgeSsePending) {
-    const match = /\r?\n\r?\n/.exec(state.__ccrCodexPatchBridgeSsePending);
+  while (state.__arCodexPatchBridgeSsePending) {
+    const match = /\r?\n\r?\n/.exec(state.__arCodexPatchBridgeSsePending);
     if (!match || match.index === undefined) {
       break;
     }
-    const block = state.__ccrCodexPatchBridgeSsePending.slice(0, match.index);
+    const block = state.__arCodexPatchBridgeSsePending.slice(0, match.index);
     const delimiter = match[0];
-    state.__ccrCodexPatchBridgeSsePending = state.__ccrCodexPatchBridgeSsePending.slice(match.index + delimiter.length);
+    state.__arCodexPatchBridgeSsePending = state.__arCodexPatchBridgeSsePending.slice(match.index + delimiter.length);
     stream.push(transformCodexApplyPatchBridgeSseEvent(block) + delimiter);
   }
 }
@@ -443,11 +443,11 @@ function transformSseChunk(stream: Transform, chunk: Buffer | string): void {
 
 function flushSseTransform(stream: Transform): void {
   const state = stream as CodexPatchBridgeSseTransform;
-  state.__ccrCodexPatchBridgeSsePending = (state.__ccrCodexPatchBridgeSsePending ?? "") +
-    (state.__ccrCodexPatchBridgeSseDecoder?.end() ?? "");
-  if (state.__ccrCodexPatchBridgeSsePending) {
-    stream.push(transformCodexApplyPatchBridgeSseEvent(state.__ccrCodexPatchBridgeSsePending));
-    state.__ccrCodexPatchBridgeSsePending = "";
+  state.__arCodexPatchBridgeSsePending = (state.__arCodexPatchBridgeSsePending ?? "") +
+    (state.__arCodexPatchBridgeSseDecoder?.end() ?? "");
+  if (state.__arCodexPatchBridgeSsePending) {
+    stream.push(transformCodexApplyPatchBridgeSseEvent(state.__arCodexPatchBridgeSsePending));
+    state.__arCodexPatchBridgeSsePending = "";
   }
 }
 

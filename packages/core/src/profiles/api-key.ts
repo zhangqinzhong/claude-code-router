@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import type { ApiKeyConfig, ProfileConfig } from "@ccr/core/contracts/app";
+import type { ApiKeyConfig, ProfileConfig } from "@agentrouter/core/contracts/app";
 
 type ProfileApiKeySource = Pick<ProfileConfig, "agent" | "id" | "name">;
 
@@ -99,7 +99,7 @@ export function profileApiKeyName(profile: ProfileApiKeySource): string {
 }
 
 export function generateProfileApiKey(): string {
-  return `ccr-profile-${randomBase64Url(24)}`;
+  return `ar-profile-${randomBase64Url(24)}`;
 }
 
 function randomBase64Url(byteLength: number): string {

@@ -1,4 +1,4 @@
-import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
+import { isRecord, stringValue } from "@agentrouter/core/gateway/internal/value";
 
 export function isLocalClaudeCodeOauthProviderPlugin(value: unknown): value is Record<string, unknown> {
   if (!isRecord(value)) return false;

@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "nod
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { importKimiProvider, kimiCandidates, resolveKimiAuth } from "@ccr/core/agents/local-providers/kimi.ts";
+import { importKimiProvider, kimiCandidates, resolveKimiAuth } from "@agentrouter/core/agents/local-providers/kimi.ts";
 
 test("Kimi CLI OAuth login is discovered from inline TOML and imported", async () => {
   await withKimiHome(async (kimiHome) => {
@@ -264,7 +264,7 @@ oauth = { storage = "file", key = "oauth/kimi-code", oauth_host = "http://127.0.
 });
 
 async function withKimiHome(run) {
-  const kimiHome = mkdtempSync(path.join(os.tmpdir(), "ccr-kimi-provider-"));
+  const kimiHome = mkdtempSync(path.join(os.tmpdir(), "ar-kimi-provider-"));
   const previous = {
     KIMI_CODE_BASE_URL: process.env.KIMI_CODE_BASE_URL,
     KIMI_CODE_HOME: process.env.KIMI_CODE_HOME,

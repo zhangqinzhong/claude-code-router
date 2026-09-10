@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { createServer } from "node:http";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { GatewayHttpRequestHandler } from "@ccr/core/gateway/http/request-handler.ts";
-import { GatewayRequestPipeline } from "@ccr/core/gateway/request/pipeline.ts";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin.ts";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { GatewayHttpRequestHandler } from "@agentrouter/core/gateway/http/request-handler.ts";
+import { GatewayRequestPipeline } from "@agentrouter/core/gateway/request/pipeline.ts";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin.ts";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key.ts";
 import { waitForTcpListener } from "../../support/loopback-listener.mjs";
 
 test("gateway HTTP model discovery and request access honor profile model allowlists", async (t) => {
@@ -62,18 +62,18 @@ test("gateway HTTP model discovery and request access honor profile model allowl
     const endpoint = `http://127.0.0.1:${serverPort(server)}`;
     status.endpoint = endpoint;
 
-    const runtimeConfigStatus = await fetchJson(`${endpoint}/__ccr/runtime/config`, {
+    const runtimeConfigStatus = await fetchJson(`${endpoint}/__ar/runtime/config`, {
       headers: authHeaders("gateway-key")
     });
     assert.equal(runtimeConfigStatus.revision, runtimeConfigRevision);
     assert.equal(runtimeConfigStatus.state, "running");
 
-    const deniedRuntimeConfigStatus = await fetch(`${endpoint}/__ccr/runtime/config`, {
+    const deniedRuntimeConfigStatus = await fetch(`${endpoint}/__ar/runtime/config`, {
       headers: authHeaders("profile-alpha-key")
     });
     assert.equal(deniedRuntimeConfigStatus.status, 403);
 
-    const runtimeConfigReload = await fetch(`${endpoint}/__ccr/runtime/config`, {
+    const runtimeConfigReload = await fetch(`${endpoint}/__ar/runtime/config`, {
       body: JSON.stringify({ configRevision: runtimeConfigRevision, forceRestart: true }),
       headers: {
         ...authHeaders("gateway-key"),

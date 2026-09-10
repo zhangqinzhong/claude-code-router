@@ -1,9 +1,9 @@
 import { lookup } from "node:dns/promises";
 import https from "node:https";
 import net from "node:net";
-import { parseProviderManifestPayload } from "@ccr/core/contracts/deep-link";
-import { findProviderPresetByBaseUrl, providerEndpointCanReceiveProviderApiKey, providerIdentitySafetyIssue } from "@ccr/core/providers/presets/index";
-import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+import { parseProviderManifestPayload } from "@agentrouter/core/contracts/deep-link";
+import { findProviderPresetByBaseUrl, providerEndpointCanReceiveProviderApiKey, providerIdentitySafetyIssue } from "@agentrouter/core/providers/presets/index";
+import { providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 import type {
   ProviderAccountConnectorConfig,
   ProviderAccountHttpJsonConnectorConfig,
@@ -11,7 +11,7 @@ import type {
   ProviderDeepLinkPayload,
   ProviderManifestFetchRequest,
   ProviderManifestFetchResult
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type SafeAddress = {
   address: string;

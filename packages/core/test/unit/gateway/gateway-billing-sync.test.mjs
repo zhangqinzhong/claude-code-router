@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
-import { rawTraceSyncHeader, rawTraceSyncPath } from "@ccr/core/gateway/internal/shared.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
+import { rawTraceSyncHeader, rawTraceSyncPath } from "@agentrouter/core/gateway/internal/shared.ts";
 
 test("core gateway disables the full-trace billing webhook without disabling raw-trace observability", async () => {
   const config = createDefaultAppConfig();
@@ -25,7 +25,7 @@ test("core gateway disables the full-trace billing webhook without disabling raw
     assert.deepEqual(compiled.billing, { enabled: true });
     const upstreamHeaderSanitizer = compiled.plugins?.at(-1);
     assert.equal(upstreamHeaderSanitizer?.enabled, true);
-    assert.equal(upstreamHeaderSanitizer?.key, "ccr-upstream-header-sanitizer");
+    assert.equal(upstreamHeaderSanitizer?.key, "ar-upstream-header-sanitizer");
     assert.match(upstreamHeaderSanitizer?.modulePath, /upstream-header-sanitizer\.js$/);
     assert.equal(compiled.rawTrace?.enabled, true);
     assert.deepEqual(compiled.rawTrace?.sync, {

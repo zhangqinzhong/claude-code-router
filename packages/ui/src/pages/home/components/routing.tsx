@@ -15,7 +15,7 @@ import {
   ROUTER_FALLBACK_MAX_RETRY_COUNT,
   ROUTER_SCRIPT_API_VERSION,
   type RouterRuleScript
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 export function RoutingView({
   addRule,
   config,
@@ -191,8 +191,8 @@ export function RoutingView({
 }
 
 function openExternalUrl(url: string) {
-  if (window.ccr?.openExternal) {
-    void window.ccr.openExternal(url).catch(() => undefined);
+  if (window.agentrouter?.openExternal) {
+    void window.agentrouter.openExternal(url).catch(() => undefined);
     return;
   }
   window.open(url, "_blank", "noopener,noreferrer");
@@ -442,9 +442,9 @@ export function AddRoutingRuleDialog({
 
   function selectScriptFile(file: File | undefined) {
     if (!file) return;
-    const filePath = window.ccr?.getFilePath?.(file);
+    const filePath = window.agentrouter?.getFilePath?.(file);
     if (!filePath) {
-      setScriptMessage({ ok: false, text: t("Selecting a local script file requires CCR Desktop. Enter the server-local path manually when using the web UI.") });
+      setScriptMessage({ ok: false, text: t("Selecting a local script file requires AgentRouter Desktop. Enter the server-local path manually when using the web UI.") });
       return;
     }
     onChange({ scriptFile: filePath });
@@ -455,7 +455,7 @@ export function AddRoutingRuleDialog({
     setScriptBusy(action);
     setScriptMessage(undefined);
     try {
-      const ccr = window.ccr;
+      const ccr = window.agentrouter;
       if (!ccr) throw new Error(t("Gateway API is unavailable"));
       const result = await ccr.validateRouteScript({ script: scriptFromDraft() });
       const message = result.ok
@@ -476,7 +476,7 @@ export function AddRoutingRuleDialog({
     setScriptBusy("test");
     setScriptMessage(undefined);
     try {
-      const ccr = window.ccr;
+      const ccr = window.agentrouter;
       if (!ccr) throw new Error(t("Gateway API is unavailable"));
       const parsed = JSON.parse(scriptSample) as unknown;
       const request = normalizeRouteScriptSampleRequest(parsed);

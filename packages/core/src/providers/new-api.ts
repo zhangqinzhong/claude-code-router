@@ -1,5 +1,5 @@
-import type { ProviderAccountConfig, ProviderAccountHttpJsonConnectorConfig } from "@ccr/core/contracts/app";
-import { compactProviderUrl, providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+import type { ProviderAccountConfig, ProviderAccountHttpJsonConnectorConfig } from "@agentrouter/core/contracts/app";
+import { compactProviderUrl, providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 
 export type DetectedProviderKind = "new-api";
 

@@ -1,13 +1,13 @@
 ---
-title: Claude Code Router 快速开始
+title: AgentRouter 快速开始
 pageTitle: 快速开始
 eyebrow: 快速开始
-lead: 本页是 CCR 的首次上手路径：安装并启动服务、接入第一个供应商、把 Agent 指向 CCR 网关，最后用请求日志和观测面板确认链路生效。适合第一次部署 CCR 的读者。
+lead: 本页是 AgentRouter 的首次上手路径：安装并启动服务、接入第一个供应商、把 Agent 指向 AgentRouter 网关，最后用请求日志和观测面板确认链路生效。适合第一次部署 AgentRouter 的读者。
 ---
 
-## 安装并启动 CCR
+## 安装并启动 AgentRouter
 
-CCR 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 Docker 单入口部署。
+AgentRouter 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 Docker 单入口部署。
 
 | 方式 | 启动入口 | 默认管理地址 | 默认模型网关 |
 | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ CCR 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 D
 
 ## 接入供应商
 
-供应商是 CCR 转发请求的上游模型服务，比如 OpenRouter、DeepSeek、Z.AI，或者任何兼容 OpenAI / Anthropic / Gemini 协议的服务。
+供应商是 AgentRouter 转发请求的上游模型服务，比如 OpenRouter、DeepSeek、Z.AI，或者任何兼容 OpenAI / Anthropic / Gemini 协议的服务。
 
 ### 添加供应商
 
@@ -28,7 +28,7 @@ CCR 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 D
 3. 如果服务不在预设里，选择 **其他 / 自定义 API 地址**，并填写 **名称** 和 **API 地址**。
 4. 在 **添加凭据** 步骤填写 **API 密钥**。
 
-填写 API 地址和密钥后，CCR 会自动探测该端点支持的协议与可用模型。
+填写 API 地址和密钥后，AgentRouter 会自动探测该端点支持的协议与可用模型。
 
 ### 协议
 
@@ -59,17 +59,17 @@ CCR 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，以及 D
 
 ## 接入 Agent 配置
 
-Agent 配置让 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 等 Agent 使用 CCR 的供应商、路由和模型选择配置。
+Agent 配置让 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 等 Agent 使用 AgentRouter 的供应商、路由和模型选择配置。
 
 通用建议：
 
-- 试用阶段优先选择“仅从 CCR 打开时生效”，只影响从 CCR 打开的 Agent。
+- 试用阶段优先选择“仅从 AgentRouter 打开时生效”，只影响从 AgentRouter 打开的 Agent。
 - 稳定后再考虑系统默认配置。
-- 应用后尽量使用 CCR 里的“打开 Agent”启动 Agent。
+- 应用后尽量使用 AgentRouter 里的“打开 Agent”启动 Agent。
 
 ### Claude Code
 
-在 **Agent 配置** 中选择 Claude Code，设置模型、小型快速模型和设置文件，然后点击应用。从 CCR 打开 Claude Code 后，发一次请求到请求日志里验证。
+在 **Agent 配置** 中选择 Claude Code，设置模型、小型快速模型和设置文件，然后点击应用。从 AgentRouter 打开 Claude Code 后，发一次请求到请求日志里验证。
 
 ### Codex
 
@@ -77,7 +77,7 @@ Agent 配置让 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 等
 
 ### Grok CLI
 
-选择 Grok CLI 并设置默认模型，然后运行复制出的 `agentrouter <配置名称>` 命令。即使 CCR Desktop 网关尚未运行，该命令也会启动一个可共享的临时网关服务；并发 Grok 会话会共同保持服务运行，直到最后一个会话退出。CCR 会把 Grok 的模型发现和推理请求指向本地网关；进入 Grok 后可以用 `/model` 切换 CCR 模型。
+选择 Grok CLI 并设置默认模型，然后运行复制出的 `agentrouter <配置名称>` 命令。即使 AgentRouter Desktop 网关尚未运行，该命令也会启动一个可共享的临时网关服务；并发 Grok 会话会共同保持服务运行，直到最后一个会话退出。AgentRouter 会把 Grok 的模型发现和推理请求指向本地网关；进入 Grok 后可以用 `/model` 切换 AgentRouter 模型。
 
 ### ZCode
 

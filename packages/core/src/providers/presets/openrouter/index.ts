@@ -1,5 +1,5 @@
-import type { ProviderAccountConfig } from "@ccr/core/contracts/app";
-import type { ProviderPreset } from "@ccr/core/providers/presets/types";
+import type { ProviderAccountConfig } from "@agentrouter/core/contracts/app";
+import type { ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 const openRouterProviderAccountConfig: ProviderAccountConfig = {
   connectors: [

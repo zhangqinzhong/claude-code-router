@@ -2,15 +2,15 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { existsSync, mkdirSync, readdirSync, readFileSync, statSync, unlinkSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import type { AppConfig, ProfileConfig } from "@ccr/core/contracts/app";
-import { botGatewayProfileEnv } from "@ccr/core/agents/bot-gateway/env";
-import { buildCodexModelCatalog, type CodexModelCatalog, type CodexModelCatalogItem } from "@ccr/core/agents/codex/model-catalog";
-import { prepareCodexAppCdpUserDataDir } from "@ccr/core/agents/codex/media-preview-bridge";
-import { buildProfileLaunchPlan, resolveCodexConfigFile } from "@ccr/core/profiles/launch-core";
-import { normalizeWindowsDesktopAppCandidate, windowsDesktopAppCandidates } from "@ccr/core/platform/windows-app-discovery";
-import { buildZcodeModelCatalog } from "@ccr/core/agents/zcode/model-catalog";
-import { writeZcodeGatewayConfig, zcodeHomeFromConfigFile } from "@ccr/core/agents/zcode/profile-config";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
+import type { AppConfig, ProfileConfig } from "@agentrouter/core/contracts/app";
+import { botGatewayProfileEnv } from "@agentrouter/core/agents/bot-gateway/env";
+import { buildCodexModelCatalog, type CodexModelCatalog, type CodexModelCatalogItem } from "@agentrouter/core/agents/codex/model-catalog";
+import { prepareCodexAppCdpUserDataDir } from "@agentrouter/core/agents/codex/media-preview-bridge";
+import { buildProfileLaunchPlan, resolveCodexConfigFile } from "@agentrouter/core/profiles/launch-core";
+import { normalizeWindowsDesktopAppCandidate, windowsDesktopAppCandidates } from "@agentrouter/core/platform/windows-app-discovery";
+import { buildZcodeModelCatalog } from "@agentrouter/core/agents/zcode/model-catalog";
+import { writeZcodeGatewayConfig, zcodeHomeFromConfigFile } from "@agentrouter/core/agents/zcode/profile-config";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
 
 export type CodexAppLookupResult = {
   checked: string[];
@@ -97,7 +97,7 @@ const codexAppSpec: CodexCompatibleAppSpec = {
     "/usr/bin/codex-app"
   ],
   macAppNames: ["ChatGPT.app", "OpenAI ChatGPT.app", "Codex.app", "OpenAI Codex.app"],
-  modelCatalogFilename: "ccr-codex-model-catalog.json",
+  modelCatalogFilename: "ar-codex-model-catalog.json",
   userDataDirName: "codex-app-user-data",
   windowsAppDirs: ["ChatGPT", "OpenAI ChatGPT", "OpenAIChatGPT", "Codex", "OpenAI Codex", "OpenAICodex"],
   windowsExeNames: [
@@ -155,7 +155,7 @@ const zcodeAppSpec: CodexCompatibleAppSpec = {
     "/usr/bin/zai-code"
   ],
   macAppNames: ["ZCode.app", "Z Code.app", "Z.AI Code.app", "ZAI Code.app"],
-  modelCatalogFilename: "ccr-zcode-model-catalog.json",
+  modelCatalogFilename: "ar-zcode-model-catalog.json",
   userDataDirName: "zcode-app-user-data",
   windowsAppDirs: ["ZCode", "Z Code", "ZAI Code", "Z.AI Code", "Zhipu ZCode"],
   windowsExeNames: [
@@ -205,7 +205,7 @@ const workbuddyAppSpec: CodexCompatibleAppSpec = {
     "/usr/bin/workbuddy"
   ],
   macAppNames: ["WorkBuddy AI.app", "WorkBuddy.app", "WorkBuddyAI.app", "Workbuddy.app"],
-  modelCatalogFilename: "ccr-workbuddy-model-catalog.json",
+  modelCatalogFilename: "ar-workbuddy-model-catalog.json",
   userDataDirName: "workbuddy-app-user-data",
   windowsAppDirs: ["WorkBuddy AI", "WorkBuddyAI", "WorkBuddy", "Workbuddy", "CodeBuddy"],
   windowsExeNames: [

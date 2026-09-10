@@ -20,8 +20,8 @@ import {
 } from "../shared/index";
 import { PopoverPortal } from "@/components/ui/popover";
 import { Tooltip, TooltipPortal } from "@/components/ui/tooltip";
-import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
-import type { ChromeLoginImportJob, LocalAgentProviderCandidate, OpenRouterProviderCatalogItem, OpenRouterProviderCatalogRequest, ProviderAccountHttpJsonConnectorConfig, ProviderAccountWebContentJsonConnectorConfig } from "@ccr/core/contracts/app";
+import { providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
+import type { ChromeLoginImportJob, LocalAgentProviderCandidate, OpenRouterProviderCatalogItem, OpenRouterProviderCatalogRequest, ProviderAccountHttpJsonConnectorConfig, ProviderAccountWebContentJsonConnectorConfig } from "@agentrouter/core/contracts/app";
 import type { ReactNode } from "react";
 
 const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
@@ -872,7 +872,7 @@ export function ProviderDeepLinkDialog({
                   <span>{t("Remote provider manifest")}</span>
                 </div>
                 <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
-                  {t("CCR will fetch this HTTPS manifest with strict safety checks before showing provider details.")}
+                  {t("AgentRouter will fetch this HTTPS manifest with strict safety checks before showing provider details.")}
                 </div>
               </div>
               <ProviderDeepLinkDetail label={t("Manifest URL")} value={manifest.url} mono />
@@ -1269,8 +1269,8 @@ function providerImportPlatformUrl(provider: ProviderDeepLinkPayload, baseUrl: s
 }
 
 function openExternalUrl(url: string) {
-  if (window.ccr?.openExternal) {
-    void window.ccr.openExternal(url).catch(() => undefined);
+  if (window.agentrouter?.openExternal) {
+    void window.agentrouter.openExternal(url).catch(() => undefined);
     return;
   }
   window.open(url, "_blank", "noopener,noreferrer");
@@ -1385,13 +1385,13 @@ function LocalAgentProviderImportPanel({
   const [importingId, setImportingId] = useState("");
 
   useEffect(() => {
-    if (mode !== "add" || !window.ccr?.getLocalAgentProviderCandidates) {
+    if (mode !== "add" || !window.agentrouter?.getLocalAgentProviderCandidates) {
       return;
     }
     let cancelled = false;
     setLoading(true);
     setError("");
-    void window.ccr.getLocalAgentProviderCandidates()
+    void window.agentrouter.getLocalAgentProviderCandidates()
       .then((items) => {
         if (!cancelled) {
           setCandidates(items.filter((item) =>
@@ -1420,13 +1420,13 @@ function LocalAgentProviderImportPanel({
   }
 
   async function importCandidate(candidate: LocalAgentProviderCandidate) {
-    if (!window.ccr?.importLocalAgentProvider || !candidate.importable) {
+    if (!window.agentrouter?.importLocalAgentProvider || !candidate.importable) {
       return;
     }
     setImportingId(candidate.id);
     setError("");
     try {
-      const result = await window.ccr.importLocalAgentProvider({
+      const result = await window.agentrouter.importLocalAgentProvider({
         id: candidate.id,
         providerNames: providers.map((provider) => provider.name)
       });
@@ -1464,7 +1464,7 @@ function LocalAgentProviderImportPanel({
       <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-[12px] font-semibold text-foreground">{t("Import local agent provider")}</div>
-          <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{t("CCR scanned this computer for local Claude Code, Codex, Grok CLI, Kimi CLI, OpenCode CLI, and ZCode providers. Click Import to add one as a gateway provider.")}</div>
+          <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{t("AgentRouter scanned this computer for local Claude Code, Codex, Grok CLI, Kimi CLI, OpenCode CLI, and ZCode providers. Click Import to add one as a gateway provider.")}</div>
         </div>
         {loading ? <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" /> : null}
       </div>
@@ -1755,10 +1755,10 @@ function ProviderConnectionStatusPanel({
         ? "Protocols detected"
         : "Waiting for provider details";
   const protocolDescription = probeLoading
-    ? "CCR is checking which API protocols this endpoint supports."
+    ? "AgentRouter is checking which API protocols this endpoint supports."
     : protocolDetected
       ? "Compatible API protocols were found automatically. You can turn off auto detection in Advanced settings and select protocols manually."
-      : "Choose a provider endpoint so CCR can detect compatible protocols.";
+      : "Choose a provider endpoint so AgentRouter can detect compatible protocols.";
   const requestTitle = connectivityLoading
     ? "Checking connection"
     : localAgentImport
@@ -1769,7 +1769,7 @@ function ProviderConnectionStatusPanel({
           ? "Not verified yet"
           : "Waiting for required fields";
   const requestDescription = connectivityLoading
-    ? "CCR is sending a limited real model request."
+    ? "AgentRouter is sending a limited real model request."
     : localAgentImport
       ? "The imported local agent login is connected when this provider is saved."
       : connectionVerified
@@ -2110,7 +2110,7 @@ export function AddProviderForm({
     setIconDetecting(false);
 
     const baseUrl = draft.baseUrl.trim();
-    const ccr = window.ccr;
+    const ccr = window.agentrouter;
     if (!customEndpoint || !baseUrl || draft.icon || !ccr?.detectProviderIcon) {
       return;
     }
@@ -2917,11 +2917,11 @@ function ProviderUsageSettings({
   }, [draft.accountMode, draft.usageBrowserLoginUrl, draft.usageBrowserRequestOrigin, draft.usageRequestUrl]);
 
   useEffect(() => {
-    if (!chromeImportJob || chromeImportJob.status !== "pending" || !window.ccr?.getChromeLoginImport) {
+    if (!chromeImportJob || chromeImportJob.status !== "pending" || !window.agentrouter?.getChromeLoginImport) {
       return;
     }
     const interval = window.setInterval(() => {
-      void window.ccr?.getChromeLoginImport?.(chromeImportJob.id).then((job) => {
+      void window.agentrouter?.getChromeLoginImport?.(chromeImportJob.id).then((job) => {
         if (job) {
           setChromeImportJob(job);
         }
@@ -2931,7 +2931,7 @@ function ProviderUsageSettings({
   }, [chromeImportJob]);
 
   async function testUsageRequest() {
-    if (!window.ccr?.testProviderAccountConnector) {
+    if (!window.agentrouter?.testProviderAccountConnector) {
       setTestError(t("Request failed."));
       return;
     }
@@ -2958,7 +2958,7 @@ function ProviderUsageSettings({
     setTestLoading(true);
     setTestError("");
     try {
-      const result = await window.ccr.testProviderAccountConnector({
+      const result = await window.agentrouter.testProviderAccountConnector({
         apiKey: connector.type === "http-json" ? usageApiKey : undefined,
         baseUrl: draft.baseUrl.trim(),
         connector,
@@ -2974,7 +2974,7 @@ function ProviderUsageSettings({
   }
 
   async function openBrowserLogin() {
-    if (!window.ccr?.openBuiltInBrowser) {
+    if (!window.agentrouter?.openBuiltInBrowser) {
       setTestError(t("Built-in browser is unavailable."));
       return;
     }
@@ -2985,14 +2985,14 @@ function ProviderUsageSettings({
     }
     setTestError("");
     try {
-      await window.ccr.openBuiltInBrowser(targetUrl);
+      await window.agentrouter.openBuiltInBrowser(targetUrl);
     } catch (error) {
       setTestError(formatError(error));
     }
   }
 
   async function startChromeImportFromBrowserConfig() {
-    if (!window.ccr?.startChromeLoginImport) {
+    if (!window.agentrouter?.startChromeLoginImport) {
       setTestError(t("Chrome login import is unavailable."));
       return;
     }
@@ -3005,7 +3005,7 @@ function ProviderUsageSettings({
     setChromeImportMessage("");
     setTestError("");
     try {
-      const job = await window.ccr.startChromeLoginImport({
+      const job = await window.agentrouter.startChromeLoginImport({
         domains,
         openConfirmationPage: true,
         target: "browser"
@@ -3076,7 +3076,7 @@ function ProviderUsageSettings({
 
           {draft.accountMode === "standard" ? (
             <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[11px] leading-4 text-muted-foreground">
-              {t("Standard usage endpoint will try provider-hosted CCR account endpoints.")}
+              {t("Standard usage endpoint will try provider-hosted AgentRouter account endpoints.")}
               {customEndpoint ? <span> {t("Switch to HTTP JSON request to configure method, URL, headers, body, and response fields.")}</span> : null}
             </div>
           ) : null}
@@ -3100,7 +3100,7 @@ function ProviderUsageSettings({
               {draft.accountMode === "browser" ? (
                 <>
                   <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[11px] leading-4 text-muted-foreground">
-                    {t("Browser request uses CCR Desktop's built-in browser login state. Sign in in the in-app browser before testing.")}
+                    {t("Browser request uses AgentRouter Desktop's built-in browser login state. Sign in in the in-app browser before testing.")}
                   </div>
                   <Field className="sm:col-span-2" label={t("Browser login URL")}>
                     <div className="grid grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_auto_auto]">
@@ -4396,7 +4396,7 @@ function OpenRouterProviderBlacklistSelect({
   }
 
   async function loadProviders(force = false) {
-    if (!window.ccr?.getOpenRouterProviderCatalog) {
+    if (!window.agentrouter?.getOpenRouterProviderCatalog) {
       return;
     }
     if (!force && (providers.length > 0 || loading)) {
@@ -4409,7 +4409,7 @@ function OpenRouterProviderBlacklistSelect({
     setLoading(true);
     setError("");
     try {
-      const result = await window.ccr.getOpenRouterProviderCatalog(request);
+      const result = await window.agentrouter.getOpenRouterProviderCatalog(request);
       setProviders(result.providers);
     } catch (errorValue) {
       setProviders([]);

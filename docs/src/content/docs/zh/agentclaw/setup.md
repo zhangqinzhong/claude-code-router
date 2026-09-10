@@ -7,7 +7,7 @@ lead: 从创建 IM Bot 到绑定 Agent 配置、选择转发或接力模式的�
 
 ## 前置条件
 
-1. CCR 桌面 App 已运行，网关服务可用。
+1. AgentRouter 桌面 App 已运行，网关服务可用。
 2. 已在 **供应商配置** 中添加可用模型，或准备好要使用的 Fusion 模型。
 3. 已创建一个 **Agent 配置**，且 **入口模式** 包含 App。完整 AgentClaw 接力目前支持 Claude App、Codex/ChatGPT App、OpenCode App、ZCode App 和 WorkBuddy App；CLI-only Agent 不转发 Bot 消息。
 4. 目标 IM 平台已准备好 Bot 凭据、应用权限或二维码登录条件。
@@ -22,7 +22,7 @@ lead: 从创建 IM Bot 到绑定 Agent 配置、选择转发或接力模式的�
 6. 打开 **Bot** 开关，选择刚保存的 Bot。
 7. 按需配置转发、接力、语言、超时、附件、流式回复和 **允许 Agent 使用 Shell 工具**。
 8. 保存 Agent 配置。
-9. 从 CCR 重新打开 Claude App、Codex/ChatGPT App、OpenCode App、ZCode App 或 WorkBuddy App。AgentClaw 只在受管 App 存活期间在线。
+9. 从 AgentRouter 重新打开 Claude App、Codex/ChatGPT App、OpenCode App、ZCode App 或 WorkBuddy App。AgentClaw 只在受管 App 存活期间在线。
 
 ## 模式选择
 
@@ -39,7 +39,7 @@ lead: 从创建 IM Bot 到绑定 Agent 配置、选择转发或接力模式的�
 | 配置项 | 建议 |
 | --- | --- |
 | Bot 语言 | 选 `自动` 可跟随 conversation；团队频道建议固定为中文或英文 |
-| 最长 turn 时间 | 根据 Agent 任务时长设置；超时后 CCR 会中断 turn 并回报最终状态 |
+| 最长 turn 时间 | 根据 Agent 任务时长设置；超时后 AgentRouter 会中断 turn 并回报最终状态 |
 | Session 空闲重置 | 设为 `0` 表示不自动重置；需要每次离开都准备新会话时再设置分钟数 |
 | 消息分片字符数 | 按平台消息长度限制设置；Slack/Discord 可稍大，微信/LINE 建议保守 |
 | 附件上限 | 限制 IM 入站文件大小，避免把过大的文件交给 Agent |
@@ -49,7 +49,7 @@ lead: 从创建 IM Bot 到绑定 Agent 配置、选择转发或接力模式的�
 
 ## 使用方式
 
-从 CCR 打开 Agent App 后，在 IM 中先选择工作区：
+从 AgentRouter 打开 Agent App 后，在 IM 中先选择工作区：
 
 ```text
 /project list
@@ -82,7 +82,7 @@ Agent 请求权限或输入时，可以用平台卡片按钮，也可以用文�
 
 ## 验证
 
-1. 从 CCR 打开目标 Agent App。
+1. 从 AgentRouter 打开目标 Agent App。
 2. 在 IM 发送 `/project current`，确认 Bot 在线且能读取当前 Project。
 3. 发送 `/session list`，确认能列出当前 Project 下的 Session。
 4. 发送一条普通消息，确认 Agent 能执行并把回复发回同一个 IM conversation。

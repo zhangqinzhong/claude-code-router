@@ -3,13 +3,13 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig, coreGatewayUsageAttributionConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
-import { pluginService } from "@ccr/core/plugins/service.ts";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig, coreGatewayUsageAttributionConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
+import { pluginService } from "@agentrouter/core/plugins/service.ts";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution.ts";
 
 test("plugin service skips failed plugins and rolls back their registrations", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-plugin-service-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-plugin-service-test-"));
   const warnings = [];
   const originalWarn = console.warn;
   console.warn = (...args) => warnings.push(args.map(String).join(" "));
@@ -187,7 +187,7 @@ module.exports = {
 });
 
 test("plugin service does not fail startup when every enabled plugin fails", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-plugin-service-all-failed-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-plugin-service-all-failed-"));
   const warnings = [];
   const originalWarn = console.warn;
   console.warn = (...args) => warnings.push(args.map(String).join(" "));
@@ -346,7 +346,7 @@ test("built-in OpenRouter discount routing only runs for enabled provider models
 });
 
 test("plugin gateway route failures are contained to the plugin response", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-plugin-route-failure-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-plugin-route-failure-"));
   const warnings = [];
   const originalWarn = console.warn;
   console.warn = (...args) => warnings.push(args.map(String).join(" "));

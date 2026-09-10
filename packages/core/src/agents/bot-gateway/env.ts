@@ -2,8 +2,8 @@ import os from "node:os";
 import { createRequire } from "node:module";
 import { existsSync } from "node:fs";
 import path from "node:path";
-import type { AppConfig, BotGatewayRuntimeConfig, ProfileConfig, ProfileOpenSurface } from "@ccr/core/contracts/app";
-import { CONFIGDIR } from "@ccr/core/config/constants";
+import type { AppConfig, BotGatewayRuntimeConfig, ProfileConfig, ProfileOpenSurface } from "@agentrouter/core/contracts/app";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
 
 const requireFromHere = createRequire(__filename);
 
@@ -51,7 +51,7 @@ export function botGatewayProfileEnv(config: AppConfig, profile: ProfileConfig, 
     AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS: String(bot.startupTimeoutMs ?? 10000),
     AR_BOT_GATEWAY_STATE_DIR: stateDir,
     AR_BOT_GATEWAY_STREAM_REPLIES: boolEnv(bot.streamReplies),
-    AR_BOT_GATEWAY_TENANT_ID: bot.tenantId ?? "ccr",
+    AR_BOT_GATEWAY_TENANT_ID: bot.tenantId ?? "ar",
     AR_BOT_HANDOFF_ENABLED: boolEnv(handoff.enabled),
     AR_BOT_HANDOFF_IDLE_SECONDS: String(handoff.idleSeconds ?? 30),
     AR_BOT_HANDOFF_PHONE_BLUETOOTH_TARGETS: (handoff.phoneBluetoothTargets ?? []).join("\n"),
@@ -66,7 +66,7 @@ export function botGatewayProfileEnv(config: AppConfig, profile: ProfileConfig, 
     CODEXL_BOT_GATEWAY_INTEGRATION_ID: bot.integrationId ?? "",
     CODEXL_BOT_GATEWAY_PLATFORM: bot.platform,
     CODEXL_BOT_GATEWAY_STATE_DIR: stateDir,
-    CODEXL_BOT_GATEWAY_TENANT_ID: bot.tenantId ?? "ccr",
+    CODEXL_BOT_GATEWAY_TENANT_ID: bot.tenantId ?? "ar",
     CODEXL_BOT_HANDOFF_ENABLED: boolEnv(handoff.enabled),
     CODEXL_BOT_HANDOFF_IDLE_SECONDS: String(handoff.idleSeconds ?? 30),
     CODEXL_BOT_HANDOFF_PHONE_BLUETOOTH_TARGETS: (handoff.phoneBluetoothTargets ?? []).join("\n"),

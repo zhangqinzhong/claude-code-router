@@ -19,7 +19,7 @@ import {
   BUILTIN_FUSION_VISION_TOOL_NAME,
   BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME,
   OVERVIEW_WIDGET_SIZE_VALUES
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AgentKind,
   AppConfig,
@@ -42,7 +42,7 @@ import type {
   VirtualModelExecutionMode,
   VirtualModelFusionWebSearchProvider,
   VirtualModelToolVisibility
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import anthropicProviderIconUrl from "@/assets/provider-icons/anthropic.png";
 import bailianProviderIconUrl from "@/assets/provider-icons/bailian.ico";
 import claudeapiProviderIconUrl from "@/assets/provider-icons/claudeapi.png";
@@ -150,7 +150,7 @@ export function profileAgentOptionsForRuntime(desktop: boolean): ProfileAgentOpt
 }
 
 export const profileScopeOptions: Array<{ label: string; value: ProfileScope }> = [
-  { label: "Only opened from CCR", value: "ccr" },
+  { label: "Only opened from AgentRouter", value: "ccr" },
   { label: "System default", value: "global" }
 ];
 

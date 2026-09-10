@@ -69,22 +69,22 @@ test("loads the Electron preload bridge and IPC contract", async () => {
   const page = current.mainPage;
 
   await page.waitForFunction(() => {
-    return Boolean(window.ccr?.getAppInfo && document.querySelector("#root")?.childElementCount);
+    return Boolean(window.agentrouter?.getAppInfo && document.querySelector("#root")?.childElementCount);
   });
 
-  const appInfo = await page.evaluate(async () => window.ccr?.getAppInfo());
+  const appInfo = await page.evaluate(async () => window.agentrouter?.getAppInfo());
   expect(appInfo?.desktop).toBe(true);
   expect(appInfo?.name).toBe("Claude Code Router");
   expect(appInfo?.configDir).toContain(current.testHome);
   expect(appInfo?.configDbFile).toContain("config.sqlite");
 
-  const config = await page.evaluate(async () => window.ccr?.getConfig());
+  const config = await page.evaluate(async () => window.agentrouter?.getConfig());
   expect(config?.gateway.enabled).toBe(false);
   expect(config?.gateway.port).toBe(current.gatewayPort);
   expect(config?.routerEndpoint).toBe(`http://${host}:${current.gatewayPort}`);
   expect(config?.APIKEYS.some((item) => item.key === "sk-electron-cdp-legacy")).toBe(true);
 
-  const gatewayStatus = await page.evaluate(async () => window.ccr?.getGatewayStatus());
+  const gatewayStatus = await page.evaluate(async () => window.agentrouter?.getGatewayStatus());
   expect(gatewayStatus?.state).toBe("stopped");
 
   const configDir = path.join(current.testHome, ".claude-code-router");
@@ -109,7 +109,7 @@ test("loads the Electron preload bridge and IPC contract", async () => {
 test("starts the managed gateway from IPC without runtime config JSON", async () => {
   const current = requireRuntime();
   const status = await current.mainPage.evaluate(async () => {
-    const config = await window.ccr?.getConfig();
+    const config = await window.agentrouter?.getConfig();
     if (!config) {
       throw new Error("Config bridge is unavailable.");
     }
@@ -123,8 +123,8 @@ test("starts the managed gateway from IPC without runtime config JSON", async ()
     }];
     config.preferredProvider = "Electron CDP Provider";
     config.gateway.enabled = true;
-    await window.ccr?.saveConfig(config, { applyProfile: false });
-    return window.ccr?.getGatewayStatus();
+    await window.agentrouter?.saveConfig(config, { applyProfile: false });
+    return window.agentrouter?.getGatewayStatus();
   });
 
   expect(status?.state).toBe("running");
@@ -138,7 +138,7 @@ test("starts the managed gateway from IPC without runtime config JSON", async ()
     runtimeId: expect.any(String)
   });
 
-  await current.mainPage.evaluate(() => window.ccr?.stopGateway());
+  await current.mainPage.evaluate(() => window.agentrouter?.stopGateway());
 
   expect(readGatewayRuntimeMarker(path.join(configDir, "config.sqlite"))).toBeUndefined();
 });
@@ -147,7 +147,7 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
   const current = requireRuntime();
   const profileId = "workbuddy-e2e";
   const result = await current.mainPage.evaluate(async (input) => {
-    const config = await window.ccr?.getConfig();
+    const config = await window.agentrouter?.getConfig();
     if (!config) {
       throw new Error("Config bridge is unavailable.");
     }
@@ -186,8 +186,8 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
       }]
     };
 
-    const saved = await window.ccr?.saveConfig(config, { applyProfile: false });
-    const applyResult = await window.ccr?.applyProfile();
+    const saved = await window.agentrouter?.saveConfig(config, { applyProfile: false });
+    const applyResult = await window.agentrouter?.applyProfile();
     return { applyResult, saved };
   }, { profileId });
 
@@ -214,7 +214,7 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
   const toml = readFileSync(configFile, "utf8");
   expect(toml).toContain('model_provider = "claude-code-router"');
   expect(toml).toContain('model = "Workbuddy E2E Provider/gpt-5-codex"');
-  expect(toml).toContain(`model_catalog_json = "${path.join(profileHome, "ccr-model-catalog.json")}"`);
+  expect(toml).toContain(`model_catalog_json = "${path.join(profileHome, "ar-model-catalog.json")}"`);
   expect(toml).toContain(`base_url = "http://${host}:${current.gatewayPort}/v1"`);
   expect(toml).toContain('wire_api = "responses"');
   expect(toml).not.toContain("show_all_sessions = true");
@@ -256,7 +256,7 @@ async function startElectronOverCdp(): Promise<ElectronCdpRuntime> {
   const gatewayPort = await findAvailablePort();
   const gatewayCorePort = await findAvailablePort();
   const proxyPort = await findAvailablePort();
-  const testHome = mkdtempSync(path.join(os.tmpdir(), "ccr-electron-cdp-home-"));
+  const testHome = mkdtempSync(path.join(os.tmpdir(), "ar-electron-cdp-home-"));
   const output: ProcessOutput = { stderr: "", stdout: "" };
   let browser: Browser | undefined;
   let child: ElectronChild | undefined;
@@ -325,7 +325,7 @@ async function startElectronOverCdp(): Promise<ElectronCdpRuntime> {
 }
 
 async function stopElectronOverCdp(current: ElectronCdpRuntime): Promise<void> {
-  await current.mainPage.evaluate(() => window.ccr?.quitApp()).catch(() => undefined);
+  await current.mainPage.evaluate(() => window.agentrouter?.quitApp()).catch(() => undefined);
   await current.browser.close().catch(() => undefined);
   await stopElectronProcess(current.child);
 }

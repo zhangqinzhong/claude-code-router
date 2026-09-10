@@ -4,10 +4,10 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { Worker } from "node:worker_threads";
-import { RequestLogAdmissionStore } from "@ccr/core/observability/request-log-admission-store.ts";
-import { createRequestLogRuntime, RequestLogStore } from "@ccr/core/observability/request-log-store.ts";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.ts";
-import { createBetterSqliteDatabase } from "@ccr/core/storage/sqlite-native.ts";
+import { RequestLogAdmissionStore } from "@agentrouter/core/observability/request-log-admission-store.ts";
+import { createRequestLogRuntime, RequestLogStore } from "@agentrouter/core/observability/request-log-store.ts";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace.ts";
+import { createBetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native.ts";
 
 const workerFile = [
   path.resolve(__dirname, "../../../runtime/request-log-worker.js"),
@@ -16,7 +16,7 @@ const workerFile = [
 assert.ok(workerFile, "compiled request-log-worker.js must exist");
 
 test("RequestLogRuntime writes through a worker and reads through the query worker", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-test-"));
   const runtime = createRuntime(dir);
   try {
     const result = runtime.enqueueRecord(createRecord("worker-request"));
@@ -39,7 +39,7 @@ test("RequestLogRuntime writes through a worker and reads through the query work
 });
 
 test("RequestLogRuntime merges a raw trace update that arrives before its request record", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-order-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-order-test-"));
   const runtime = createRuntime(dir);
   try {
     assert.equal(runtime.enqueueRawTrace({
@@ -63,7 +63,7 @@ test("RequestLogRuntime merges a raw trace update that arrives before its reques
 });
 
 test("RequestLogStore resolves unknown raw trace body capture from the final request status", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-raw-policy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-raw-policy-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     await store.writeBatch([
@@ -129,7 +129,7 @@ test("RequestLogStore resolves unknown raw trace body capture from the final req
 });
 
 test("RequestLogStore retains deferred raw trace bodies across independently committed batches", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-deferred-cross-batch-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-deferred-cross-batch-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     await store.writeBatch([
@@ -186,7 +186,7 @@ test("RequestLogStore retains deferred raw trace bodies across independently com
 });
 
 test("RequestLogRuntime restores deferred file bodies after the raw trace batch ACK cleans its spool", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-deferred-file-cross-batch-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-deferred-file-cross-batch-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const requestFile = path.join(bundleDir, "request.json");
@@ -235,7 +235,7 @@ test("RequestLogRuntime restores deferred file bodies after the raw trace batch 
 });
 
 test("RequestLogStore applies same-batch raw trace updates in sequence order", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-raw-sequence-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-raw-sequence-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     await store.writeBatch([
@@ -279,7 +279,7 @@ test("RequestLogStore applies same-batch raw trace updates in sequence order", a
 });
 
 test("RequestLogRuntime rejects an event that exceeds its hard queue byte limit", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-bound-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-bound-test-"));
   const runtime = createRequestLogRuntime({
     dbFile: path.join(dir, "request-logs.sqlite"),
     queueMaxBytes: 1_024,
@@ -301,7 +301,7 @@ test("RequestLogRuntime rejects an event that exceeds its hard queue byte limit"
 });
 
 test("RequestLogRuntime persists unmatched raw trace updates across worker restarts", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-pending-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-pending-test-"));
   const first = createRuntime(dir);
   try {
     first.enqueueRawTrace({ model: "persisted-trace-model", requestId: "restart-request" });
@@ -324,7 +324,7 @@ test("RequestLogRuntime persists unmatched raw trace updates across worker resta
 });
 
 test("RequestLogStore stores oversized unmatched raw trace bodies in sidecar storage", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-pending-entry-budget-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-pending-entry-budget-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     const body = "s".repeat(3 * 1024 * 1024);
@@ -358,7 +358,7 @@ test("RequestLogStore stores oversized unmatched raw trace bodies in sidecar sto
 });
 
 test("RequestLogStore stores unmatched request and response bodies independently", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-pending-body-budget-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-pending-body-budget-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     const requestBody = "q".repeat(3 * 1024 * 1024);
@@ -396,7 +396,7 @@ test("RequestLogStore stores unmatched request and response bodies independently
 });
 
 test("RequestLogStore enforces a total byte budget for unmatched raw trace rows", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-pending-total-budget-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-pending-total-budget-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     for (let index = 0; index < 18; index += 1) {
@@ -440,7 +440,7 @@ test("RequestLogStore enforces a total byte budget for unmatched raw trace rows"
 });
 
 test("RequestLogRuntime preserves original response sizes when normal body capture is truncated or disabled", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-response-size-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-response-size-test-"));
   const runtime = createRuntime(dir);
   try {
     const fullResponse = "x".repeat(1024 * 1024);
@@ -482,7 +482,7 @@ test("RequestLogRuntime preserves original response sizes when normal body captu
 });
 
 test("RequestLogRuntime strips route trace body values when max body capture is zero", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-zero-body-trace-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-zero-body-trace-test-"));
   const runtime = createRuntime(dir);
   try {
     const result = runtime.enqueueRecord({
@@ -507,7 +507,7 @@ test("RequestLogRuntime strips route trace body values when max body capture is 
 });
 
 test("RequestLogRuntime strips route trace body values when queue pressure removes bodies", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-pressure-trace-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-pressure-trace-test-"));
   const runtime = createRuntime(dir, {
     batchMaxBytes: 64 * 1024,
     batchMaxWaitMs: 60_000,
@@ -543,7 +543,7 @@ test("RequestLogRuntime strips route trace body values when queue pressure remov
 });
 
 test("RequestLogRuntime keeps the record body-removal policy for later file-backed raw traces", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-pressure-raw-policy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-pressure-raw-policy-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response.txt");
@@ -597,7 +597,7 @@ test("RequestLogRuntime keeps the record body-removal policy for later file-back
 });
 
 test("RequestLogRuntime stores large inline raw trace bodies in sidecar storage", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-body-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-body-test-"));
   const runtime = createRuntime(dir);
   try {
     const body = "r".repeat(3 * 1024 * 1024);
@@ -625,7 +625,7 @@ test("RequestLogRuntime stores large inline raw trace bodies in sidecar storage"
 });
 
 test("RequestLogRuntime stores file-backed raw bodies and cleans bundles only after ACK", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-file-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-file-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response_stream.txt");
@@ -666,7 +666,7 @@ test("RequestLogRuntime stores file-backed raw bodies and cleans bundles only af
 });
 
 test("RequestLogRuntime compacts Base64 images while reading file-backed raw traces", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-base64-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-base64-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const requestFile = path.join(bundleDir, "upstream_request.json");
@@ -712,7 +712,7 @@ test("RequestLogRuntime compacts Base64 images while reading file-backed raw tra
 });
 
 test("RequestLogRuntime does not let a source-truncated raw image overwrite complete JSON", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-partial-raw-base64-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-partial-raw-base64-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const requestFile = path.join(bundleDir, "upstream_request.json");
@@ -762,7 +762,7 @@ test("RequestLogRuntime does not let a source-truncated raw image overwrite comp
 });
 
 test("RequestLogRuntime keeps raw trace files until the writer ACK is received", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-ack-cleanup-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-ack-cleanup-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response.txt");
@@ -806,7 +806,7 @@ test("RequestLogRuntime keeps raw trace files until the writer ACK is received",
 });
 
 test("RequestLogRuntime replays a committed raw trace idempotently when its body file is already missing", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-replay-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   mkdirSync(bundleDir, { recursive: true });
@@ -840,7 +840,7 @@ test("RequestLogRuntime replays a committed raw trace idempotently when its body
 });
 
 test("RequestLogRuntime isolates and drops a poison raw trace without blocking later records", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-poison-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-poison-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const outsideFile = path.join(dir, "outside-spool.txt");
   mkdirSync(spoolDir, { recursive: true });
@@ -868,7 +868,7 @@ test("RequestLogRuntime isolates and drops a poison raw trace without blocking l
 });
 
 test("RequestLogRuntime retains raw trace bundles when enqueue is rejected", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-reject-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-reject-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response.txt");
@@ -896,7 +896,7 @@ test("RequestLogRuntime retains raw trace bundles when enqueue is rejected", asy
 });
 
 test("RequestLogRuntime accounts bounded file-backed raw bodies against queue memory", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-raw-queue-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-raw-queue-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response.txt");
@@ -925,7 +925,7 @@ test("RequestLogRuntime accounts bounded file-backed raw bodies against queue me
 });
 
 test("RequestLogRuntime terminally rejects delayed raw traces for records dropped by overload", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-shared-admission-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-shared-admission-test-"));
   const realDateNow = Date.now;
   const runtime = createRequestLogRuntime({
     batchMaxBytes: 64 * 1024,
@@ -962,7 +962,7 @@ test("RequestLogRuntime terminally rejects delayed raw traces for records droppe
 });
 
 test("RequestLogRuntime persists tombstones across restart without capacity eviction", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-persistent-tombstone-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-persistent-tombstone-test-"));
   const options = {
     batchMaxBytes: 64 * 1024,
     batchMaxItems: 50,
@@ -1000,7 +1000,7 @@ test("RequestLogRuntime persists tombstones across restart without capacity evic
 });
 
 test("RequestLogRuntime recovers a record committed before its admission ACK", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-admission-ack-crash-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-admission-ack-crash-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const store = new RequestLogStore(dbFile);
@@ -1049,7 +1049,7 @@ test("RequestLogRuntime recovers a record committed before its admission ACK", a
 });
 
 test("RequestLogRuntime reconstructs a missing admission from the committed request log", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-admission-rebuild-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-admission-rebuild-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const first = createRequestLogRuntime({ admissionDbFile, dbFile, workerFile });
@@ -1090,7 +1090,7 @@ test("RequestLogRuntime reconstructs a missing admission from the committed requ
 });
 
 test("RequestLogAdmissionStore does not reconcile a pending admission owned by a live runtime", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-live-admission-owner-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-live-admission-owner-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const first = new RequestLogAdmissionStore(admissionDbFile, dbFile, "live-runtime-a");
@@ -1115,7 +1115,7 @@ test("RequestLogAdmissionStore does not reconcile a pending admission owned by a
 });
 
 test("RequestLogAdmissionStore polls an existing raw admission without rewriting it", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-poll-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-poll-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const requestLogs = new RequestLogStore(dbFile);
@@ -1156,7 +1156,7 @@ test("RequestLogAdmissionStore polls an existing raw admission without rewriting
 });
 
 test("RequestLogAdmissionStore keeps interrupted admissions pending when reconciliation I/O fails", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-reconcile-failure-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-reconcile-failure-test-"));
   const admissionDbFile = path.join(dir, "admissions.sqlite");
   const first = new RequestLogAdmissionStore(admissionDbFile, dir, "interrupted-runtime");
   let second;
@@ -1177,7 +1177,7 @@ test("RequestLogAdmissionStore keeps interrupted admissions pending when reconci
 });
 
 test("RequestLogAdmissionStore prunes terminal admissions and provides reconciliation indexes", () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-retention-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-retention-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const admissions = new RequestLogAdmissionStore(admissionDbFile, dbFile, "retention-runtime");
@@ -1210,7 +1210,7 @@ test("RequestLogAdmissionStore prunes terminal admissions and provides reconcili
 });
 
 test("RequestLogRuntime makes persisted missing-record admissions terminal after their TTL", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-pending-admission-ttl-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-pending-admission-ttl-test-"));
   const options = {
     dbFile: path.join(dir, "request-logs.sqlite"),
     pendingAdmissionTtlMs: 25,
@@ -1242,7 +1242,7 @@ test("RequestLogRuntime makes persisted missing-record admissions terminal after
 });
 
 test("RequestLogRuntime retains admission operations across a long SQLite lock without blocking the event loop", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-lock-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-lock-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const admissionDbFile = `${dbFile}.admissions.sqlite`;
   const runtime = createRequestLogRuntime({ admissionDbFile, dbFile, workerFile });
@@ -1321,7 +1321,7 @@ test("RequestLogRuntime retains admission operations across a long SQLite lock w
 });
 
 test("RequestLogRuntime bounds overlay and retry memory during a permanent admission failure", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-bound-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-bound-test-"));
   const invalidAdmissionFile = path.join(dir, "admission-is-a-directory");
   mkdirSync(invalidAdmissionFile, { recursive: true });
   const runtime = createRequestLogRuntime({
@@ -1357,7 +1357,7 @@ test("RequestLogRuntime bounds overlay and retry memory during a permanent admis
 });
 
 test("RequestLogRuntime releases admission overlay entries after persistence succeeds", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-admission-overlay-release-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-admission-overlay-release-test-"));
   const runtime = createRuntime(dir);
   try {
     for (let index = 0; index < 100; index += 1) {
@@ -1377,7 +1377,7 @@ test("RequestLogRuntime releases admission overlay entries after persistence suc
 });
 
 test("RequestLogRuntime persists degraded body admission across restart", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-persistent-body-policy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-persistent-body-policy-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const responseFile = path.join(bundleDir, "response.txt");
@@ -1442,7 +1442,7 @@ test("RequestLogRuntime persists degraded body admission across restart", async 
 });
 
 test("RequestLogRuntime waits for an admission before accepting an ambiguous stream trace", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-stream-admission-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-stream-admission-test-"));
   const runtime = createRuntime(dir);
   try {
     const pending = runtime.enqueueRawTrace({
@@ -1468,7 +1468,7 @@ test("RequestLogRuntime waits for an admission before accepting an ambiguous str
 });
 
 test("RequestLogRuntime keeps every upstream 2xx provisional until the record writer ACK", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-provisional-2xx-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-provisional-2xx-test-"));
   const runtime = createRuntime(dir);
   try {
     assert.equal(runtime.enqueueRecord(createRecord("provisional-http-2xx")).accepted, true);
@@ -1495,7 +1495,7 @@ test("RequestLogRuntime keeps every upstream 2xx provisional until the record wr
 });
 
 test("RequestLogRuntime persists errors-only admission until raw SSE outcome detection after restart", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-errors-policy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-errors-policy-test-"));
   const first = createRuntime(dir);
   try {
     assert.equal(first.enqueueRecord({
@@ -1539,7 +1539,7 @@ test("RequestLogRuntime persists errors-only admission until raw SSE outcome det
 });
 
 test("RequestLogRuntime default queue accepts one maximum request and response raw trace", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-max-raw-event-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-max-raw-event-test-"));
   const spoolDir = path.join(dir, "raw-trace-spool");
   const bundleDir = path.join(spoolDir, "bundle");
   const requestFile = path.join(bundleDir, "request.txt");
@@ -1570,7 +1570,7 @@ test("RequestLogRuntime default queue accepts one maximum request and response r
 });
 
 test("RequestLogRuntime compacts Base64 images before applying queue and body limits", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-base64-image-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-base64-image-test-"));
   const runtime = createRuntime(dir, { queueMaxBytes: 64 * 1024 });
   try {
     const image = "A".repeat(512 * 1024);
@@ -1608,7 +1608,7 @@ test("RequestLogRuntime compacts Base64 images before applying queue and body li
 });
 
 test("RequestLogStore deduplicates replayed writer events", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-runtime-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-runtime-replay-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   try {
     const command = {

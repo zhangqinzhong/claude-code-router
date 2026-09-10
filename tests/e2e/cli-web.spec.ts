@@ -24,13 +24,13 @@ test("uses AR_WEB_AUTH_TOKEN for CLI web authentication", async () => {
 
 test("serves the management UI in a browser", async ({ page }) => {
   const current = requireRuntime();
-  await page.goto(`${current.baseUrl}/?ccr_web_token=${current.token}`);
+  await page.goto(`${current.baseUrl}/?ar_web_token=${current.token}`);
   await expect(page).toHaveTitle("Claude Code Router");
   await expect(page.locator("#root")).toBeAttached();
   await expect(page.locator("body")).toContainText(/Configure provider|Connect agent|Let's start/, { timeout: 15_000 });
-  await expect(page.evaluate(() => Boolean(window.ccr?.getAppInfo))).resolves.toBe(true);
+  await expect(page.evaluate(() => Boolean(window.agentrouter?.getAppInfo))).resolves.toBe(true);
   await expect(page.evaluate(async () => {
-    const presets = await window.ccr?.getProviderPresets?.();
+    const presets = await window.agentrouter?.getProviderPresets?.();
     return presets?.map((preset) => preset.id) ?? [];
   })).resolves.toContain("openai");
 
@@ -47,7 +47,7 @@ test("serves static assets used by the web UI", async ({ request }) => {
 
 test("handles authenticated web RPC requests", async ({ request }) => {
   const current = requireRuntime();
-  const response = await request.post(`${current.baseUrl}/api/ccr/rpc`, {
+  const response = await request.post(`${current.baseUrl}/api/ar/rpc`, {
     data: { args: [], method: "getAppInfo" },
     headers: {
       "x-ar-web-auth": current.token
@@ -65,7 +65,7 @@ test("handles authenticated web RPC requests", async ({ request }) => {
 
 test("rejects RPC requests without the web auth token", async ({ request }) => {
   const current = requireRuntime();
-  const response = await request.post(`${current.baseUrl}/api/ccr/rpc`, {
+  const response = await request.post(`${current.baseUrl}/api/ar/rpc`, {
     data: { args: [], method: "getAppInfo" }
   });
   const payload = await response.json();

@@ -3,19 +3,19 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { loadModelCatalogPayload, modelCatalogPathCandidates, resolveModelCatalogPath } from "@ccr/core/models/catalog-file.ts";
+import { loadModelCatalogPayload, modelCatalogPathCandidates, resolveModelCatalogPath } from "@agentrouter/core/models/catalog-file.ts";
 
 test("modelCatalogPathCandidates prefers env paths and removes duplicates", () => {
   const previousCatalogPath = process.env.AR_MODEL_CATALOG_PATH;
   const previousModelsPath = process.env.AR_MODELS_JSON_PATH;
   try {
-    process.env.AR_MODEL_CATALOG_PATH = "/tmp/ccr-models.json";
-    process.env.AR_MODELS_JSON_PATH = "/tmp/ccr-models.json";
+    process.env.AR_MODEL_CATALOG_PATH = "/tmp/ar-models.json";
+    process.env.AR_MODELS_JSON_PATH = "/tmp/ar-models.json";
 
     const candidates = modelCatalogPathCandidates();
 
-    assert.equal(candidates[0], "/tmp/ccr-models.json");
-    assert.equal(candidates.filter((candidate) => candidate === "/tmp/ccr-models.json").length, 1);
+    assert.equal(candidates[0], "/tmp/ar-models.json");
+    assert.equal(candidates.filter((candidate) => candidate === "/tmp/ar-models.json").length, 1);
     assert.ok(candidates.some((candidate) => candidate.endsWith("models.json")));
   } finally {
     if (previousCatalogPath === undefined) {
@@ -34,7 +34,7 @@ test("modelCatalogPathCandidates prefers env paths and removes duplicates", () =
 test("loadModelCatalogPayload reads the first configured existing catalog", () => {
   const previousCatalogPath = process.env.AR_MODEL_CATALOG_PATH;
   const previousModelsPath = process.env.AR_MODELS_JSON_PATH;
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-model-catalog-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-model-catalog-test-"));
   try {
     const catalogFile = path.join(dir, "models.json");
     writeFileSync(catalogFile, JSON.stringify({ models: [{ id: "test-model" }] }), "utf8");

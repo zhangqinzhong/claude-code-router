@@ -3,12 +3,12 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { codexDefaultBaseUrl } from "@ccr/core/agents/local-providers/codex.ts";
+import { codexDefaultBaseUrl } from "@agentrouter/core/agents/local-providers/codex.ts";
 import {
   hasAutoFetchModelProviders,
   refreshAutoFetchProviderModels,
   runProviderModelAutoRefreshNow
-} from "@ccr/core/providers/model-auto-refresh.ts";
+} from "@agentrouter/core/providers/model-auto-refresh.ts";
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -281,9 +281,9 @@ test("auto model refresh does not save stale results after the switch is disable
 });
 
 test("auto model refresh uses Codex local model catalog during hot apply", async (t) => {
-  const previousCcrHome = process.env.AR_INTERNAL_HOME_DIR;
+  const previousArHome = process.env.AR_INTERNAL_HOME_DIR;
   const previousHome = process.env.HOME;
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-local-catalog-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-codex-local-catalog-"));
   mkdirSync(path.join(home, ".codex"), { recursive: true });
   writeFileSync(path.join(home, ".codex", "models_cache.json"), JSON.stringify({
     models: [
@@ -300,10 +300,10 @@ test("auto model refresh uses Codex local model catalog during hot apply", async
   process.env.AR_INTERNAL_HOME_DIR = home;
   process.env.HOME = home;
   t.after(() => {
-    if (previousCcrHome === undefined) {
+    if (previousArHome === undefined) {
       delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.AR_INTERNAL_HOME_DIR = previousCcrHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousArHome;
     }
     if (previousHome === undefined) {
       delete process.env.HOME;

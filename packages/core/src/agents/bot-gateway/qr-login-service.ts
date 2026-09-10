@@ -1,7 +1,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { CONFIGDIR } from "@ccr/core/config/constants";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
 import type {
   BotGatewayQrLoginCancelRequest,
   BotGatewayQrLoginCancelResult,
@@ -10,7 +10,7 @@ import type {
   BotGatewayQrLoginWaitRequest,
   BotGatewayQrLoginWaitResult,
   BotGatewayRuntimeConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import { botGatewaySdkImportSpecifier } from "./sdk-import";
 
 type BotGatewayClientWithRequest = {
@@ -356,7 +356,7 @@ async function resolveWeixinQrIntegrationId(
     if (id) return id;
   }
 
-  return requested || safePathSegment(`weixin-ilink-${tenant || "ccr"}`);
+  return requested || safePathSegment(`weixin-ilink-${tenant || "ar"}`);
 }
 
 function normalizeBotGatewayForQr(bot: BotGatewayRuntimeConfig): BotGatewayRuntimeConfig {
@@ -368,7 +368,7 @@ function normalizeBotGatewayForQr(bot: BotGatewayRuntimeConfig): BotGatewayRunti
     credentials: sanitizeBotGatewayRecord(bot.credentials),
     integrationConfig: websocketBotGatewayIntegrationConfig(platform, bot.integrationConfig),
     platform,
-    tenantId: bot.tenantId.trim() || "ccr"
+    tenantId: bot.tenantId.trim() || "ar"
   };
 }
 

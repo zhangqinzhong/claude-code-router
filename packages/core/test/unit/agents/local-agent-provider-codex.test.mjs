@@ -7,8 +7,8 @@ import {
   codexProviderAccountConfig,
   codexRateLimitResetCreditDetails,
   normalizeCodexProviderAccountConfig
-} from "@ccr/core/agents/local-providers/codex.ts";
-import { localAgentProviderApiKey } from "@ccr/core/agents/local-providers/shared.ts";
+} from "@agentrouter/core/agents/local-providers/codex.ts";
+import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-providers/shared.ts";
 
 test("Codex provider account config includes manual reset meter", () => {
   const config = codexProviderAccountConfig();

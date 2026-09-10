@@ -2,7 +2,7 @@ import type {
   AppConfig,
   ApiKeyConfig,
   ApiKeyLimitConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 import { isPlainRecord, stringValue } from "./common";
 import type { AddApiKeyDraft, ApiKeyLimitDraftRow, ApiKeyLimitMetric, ApiKeyListItem, LimitWindowPreset } from "./types";

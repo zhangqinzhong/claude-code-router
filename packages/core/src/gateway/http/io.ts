@@ -2,9 +2,9 @@
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
 import type { IncomingHttpHeaders, IncomingMessage, Server, ServerResponse } from "node:http";
-import type { ApiKeyConfig } from "@ccr/core/contracts/app";
-import { ccrRemoteControlPathPrefix } from "@ccr/core/gateway/remote-control-service";
-import { coreGatewayAuthHeader, localObservabilityHeaderNames, proxyHeaderDenyList, responseHeaderDenyList, sdkCompatibleTokenHeaderNames } from "@ccr/core/gateway/internal/shared";
+import type { ApiKeyConfig } from "@agentrouter/core/contracts/app";
+import { arRemoteControlPathPrefix } from "@agentrouter/core/gateway/remote-control-service";
+import { coreGatewayAuthHeader, localObservabilityHeaderNames, proxyHeaderDenyList, responseHeaderDenyList, sdkCompatibleTokenHeaderNames } from "@agentrouter/core/gateway/internal/shared";
 
 
 export function inferGatewayClient(apiKey: ApiKeyConfig | undefined, headers: IncomingHttpHeaders): string | undefined {
@@ -73,7 +73,7 @@ export function readAuthToken(headers: IncomingHttpHeaders): string | undefined 
 
 export function readRemoteControlQueryAuthToken(request: IncomingMessage): string | undefined {
   const url = new URL(request.url || "/", "http://127.0.0.1");
-  if (url.pathname !== ccrRemoteControlPathPrefix && !url.pathname.startsWith(`${ccrRemoteControlPathPrefix}/`)) {
+  if (url.pathname !== arRemoteControlPathPrefix && !url.pathname.startsWith(`${arRemoteControlPathPrefix}/`)) {
     return undefined;
   }
   return url.searchParams.get("api_key")?.trim() || url.searchParams.get("key")?.trim() || undefined;

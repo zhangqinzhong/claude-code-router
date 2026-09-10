@@ -4,8 +4,8 @@ import {
   isGatewayProviderEnabled,
   type AppConfig,
   type GatewayProviderConfig
-} from "@ccr/core/contracts/app";
-import type { RouteModelRef } from "@ccr/core/routing/contracts";
+} from "@agentrouter/core/contracts/app";
+import type { RouteModelRef } from "@agentrouter/core/routing/contracts";
 
 export type ResolveRouteModelOptions = {
   providerName?: string;

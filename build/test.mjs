@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
-const ccrExtensionsRoot = path.resolve(process.env.AR_EXTENSIONS_DIR || path.join(projectRoot, "..", "ccr-extensions"));
+const arExtensionsRoot = path.resolve(process.env.AR_EXTENSIONS_DIR || path.join(projectRoot, "..", "ar-extensions"));
 const testsOutDir = path.join(projectRoot, ".test-dist");
 const packageRoots = {
   cli: path.join(projectRoot, "packages", "cli", "src"),
@@ -40,7 +40,7 @@ const testProjects = {
         dir: path.join(projectRoot, "packages", "core", "test")
       },
       {
-        dir: path.join(ccrExtensionsRoot, "plugins", "claude-design", "test"),
+        dir: path.join(arExtensionsRoot, "plugins", "claude-design", "test"),
         outputPrefix: "plugins/claude-design"
       }
     ]
@@ -171,8 +171,8 @@ function packageAliasPlugin() {
   return {
     name: "test-package-alias",
     setup(build) {
-      build.onResolve({ filter: /^@ccr\/(cli|core|electron|ui)\// }, (args) => {
-        const match = args.path.match(/^@ccr\/(cli|core|electron|ui)\/(.+)$/);
+      build.onResolve({ filter: /^@agentrouter\/(cli|core|electron|ui)\// }, (args) => {
+        const match = args.path.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
         if (!match) {
           return undefined;
         }

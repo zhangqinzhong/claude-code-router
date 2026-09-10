@@ -1,5 +1,5 @@
 import { nativeTheme } from "electron";
-import type { AppConfig } from "@ccr/core/contracts/app";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
 
 export function nativeThemeSource(theme: AppConfig["theme"] | undefined): "dark" | "light" | "system" {
   return theme === "light" || theme === "dark" ? theme : "system";

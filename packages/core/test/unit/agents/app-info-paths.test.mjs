@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import childProcess from "node:child_process";
 import fs from "node:fs";
 import test from "node:test";
-import { createAppInfoPathReader } from "@ccr/core/agents/app-info-paths.ts";
-import { findInstalledCodexAppExecutable } from "@ccr/core/agents/codex/app-launch.ts";
-import { findInstalledOpenCodeAppExecutable } from "@ccr/core/agents/opencode/app-launch.ts";
+import { createAppInfoPathReader } from "@agentrouter/core/agents/app-info-paths.ts";
+import { findInstalledCodexAppExecutable } from "@agentrouter/core/agents/codex/app-launch.ts";
+import { findInstalledOpenCodeAppExecutable } from "@agentrouter/core/agents/opencode/app-launch.ts";
 
 test("#1776 app info caches found and absent paths, expires, and cannot be mutated by callers", () => {
   let time = 0;

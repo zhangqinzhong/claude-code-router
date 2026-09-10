@@ -11,29 +11,29 @@ lead: 配置请求如何选择模型：内置路由识别 Claude Code 和 Codex 
 
 Claude Code 内置路由的作用是识别 Claude Code 发来的请求，并在客户端没有选择可识别模型时，把主请求路由到 Claude Code Agent 配置中的模型。
 
-Claude Code **主请求** 会优先使用客户端显式选择且 CCR 能识别的模型。Agent 配置中的模型只在客户端模型缺失或无法识别时作为默认模型；如果未设置，该内置路由不会生效。用户配置的路由规则仍可改写模型。CCR 也会自动删除 Claude Code 注入的第一条 `x-anthropic-billing-header` system 消息，避免这类计费辅助消息影响后续路由判断。Claude Code 创建的 Subagent、Task 或 Workflow 内部 Agent 可以继续用下面的标签机制自动选择不同模型。
+Claude Code **主请求** 会优先使用客户端显式选择且 AgentRouter 能识别的模型。Agent 配置中的模型只在客户端模型缺失或无法识别时作为默认模型；如果未设置，该内置路由不会生效。用户配置的路由规则仍可改写模型。AgentRouter 也会自动删除 Claude Code 注入的第一条 `x-anthropic-billing-header` system 消息，避免这类计费辅助消息影响后续路由判断。Claude Code 创建的 Subagent、Task 或 Workflow 内部 Agent 可以继续用下面的标签机制自动选择不同模型。
 
 #### Subagent / Workflow 自动路由
 
-Claude Code 的 Agent / Task / Workflow 可以派生新的模型请求。CCR 使用标签注入来让这些派生请求选择更合适的 CCR 模型：
+Claude Code 的 Agent / Task / Workflow 可以派生新的模型请求。AgentRouter 使用标签注入来让这些派生请求选择更合适的 AgentRouter 模型：
 
 ```text
-<CCR-SUBAGENT-MODEL>供应商/模型</CCR-SUBAGENT-MODEL>
+<AR-SUBAGENT-MODEL>供应商/模型</AR-SUBAGENT-MODEL>
 ```
 
 完整流程如下：
 
-1. Claude Code 主请求命中内置路由后，CCR 会检查当前工具列表。
-2. 如果至少有一个模型配置了 **Description**，CCR 会把可用模型及其说明注入到 `Agent` / `Task` 工具说明和 `prompt` 字段说明里。
-3. 如果工具列表里有 `Workflow`，CCR 会给 Workflow 工具说明追加要求：workflow 内部创建 `Agent` / `Task` 时，每个派生 Agent 的 prompt 第一行都要带同样的模型标签。
-4. Claude Code 调用 `Agent` / `Task`，或 Workflow 内部创建 Agent 时，prompt 第一行会携带 `<CCR-SUBAGENT-MODEL>供应商/模型</CCR-SUBAGENT-MODEL>`。
-5. 派生请求进入 CCR 后，CCR 从 system 或前两条 user message 中提取并删除这个标签，然后把该请求路由到标签里的模型。
+1. Claude Code 主请求命中内置路由后，AgentRouter 会检查当前工具列表。
+2. 如果至少有一个模型配置了 **Description**，AgentRouter 会把可用模型及其说明注入到 `Agent` / `Task` 工具说明和 `prompt` 字段说明里。
+3. 如果工具列表里有 `Workflow`，AgentRouter 会给 Workflow 工具说明追加要求：workflow 内部创建 `Agent` / `Task` 时，每个派生 Agent 的 prompt 第一行都要带同样的模型标签。
+4. Claude Code 调用 `Agent` / `Task`，或 Workflow 内部创建 Agent 时，prompt 第一行会携带 `<AR-SUBAGENT-MODEL>供应商/模型</AR-SUBAGENT-MODEL>`。
+5. 派生请求进入 AgentRouter 后，AgentRouter 从 system 或前两条 user message 中提取并删除这个标签，然后把该请求路由到标签里的模型。
 
 因此，Subagent / Workflow 的自动路由由 prompt 标签决定模型。`x-claude-code-agent-id` 等 Header 用于观测，模型选择以标签为准。
 
 ##### 与模型页配合
 
-模型页里的 **Description** 是这套机制的开关和选择依据。没有任何模型 Description 时，CCR 不会注入 Agent / Task / Workflow 路由提示词，避免把空模型列表写进工具说明。
+模型页里的 **Description** 是这套机制的开关和选择依据。没有任何模型 Description 时，AgentRouter 不会注入 Agent / Task / Workflow 路由提示词，避免把空模型列表写进工具说明。
 
 推荐配置步骤：
 
@@ -41,7 +41,7 @@ Claude Code 的 Agent / Task / Workflow 可以派生新的模型请求。CCR 使
 2. 打开 **模型** 页面，为希望 Subagent 自动选择的模型填写 Description。说明要写清模型适合的任务、速度、成本和限制。
 3. 在 **Agent 配置** 中启用 Claude Code 配置，并设置默认模型。Claude Code 未选择可识别模型时会使用它。
 4. 在 **路由** 页面确认 **Claude Code** 内置路由已启用。
-5. 在 Claude Code 中使用 Agent、Task 或 Workflow。需要派生 Agent 时，Claude Code 会根据模型 Description 选择一个 CCR 模型并写入标签。
+5. 在 Claude Code 中使用 Agent、Task 或 Workflow。需要派生 Agent 时，Claude Code 会根据模型 Description 选择一个 AgentRouter 模型并写入标签。
 
 Description 建议围绕模型适合的任务来写，例如：
 
@@ -51,15 +51,15 @@ Description 建议围绕模型适合的任务来写，例如：
 | 强推理模型 | 适合复杂架构分析、大规模重构计划、跨文件推理和高风险代码审查。 |
 | 长上下文模型 | 适合读取大量日志、长文档、仓库级上下文整理和 Workflow 汇总。 |
 
-保存后，CCR 会把这些 Description 组织成 “Configured CCR gateway models” 注入给 Claude Code。Claude Code 选择模型后，CCR 会在派生请求上看到 `builtin:claude-code-subagent`，并把标签里的模型作为最终 `resolved model`。
+保存后，AgentRouter 会把这些 Description 组织成 “Configured AgentRouter gateway models” 注入给 Claude Code。Claude Code 选择模型后，AgentRouter 会在派生请求上看到 `builtin:claude-code-subagent`，并把标签里的模型作为最终 `resolved model`。
 
 ### Codex
 
-CCR 会自动为第三方或非 GPT 模型适配 Codex 的 `apply_patch` 文件编辑工具，让这些模型通过 patch 工具完成文件修改。
+AgentRouter 会自动为第三方或非 GPT 模型适配 Codex 的 `apply_patch` 文件编辑工具，让这些模型通过 patch 工具完成文件修改。
 
-技术原理是做一次工具协议桥接：Codex 原生的 `apply_patch` 是 custom/freeform 工具，入参是原始 patch 文本；很多 OpenAI-compatible 三方模型更擅长普通 function tool。CCR 会在上游请求中把 `apply_patch` 转成 `virtual_apply_patch` function tool，并在工具说明里注入完整的 `apply_patch.lark` 语法，要求模型把 patch 写入 `patch` 字段。
+技术原理是做一次工具协议桥接：Codex 原生的 `apply_patch` 是 custom/freeform 工具，入参是原始 patch 文本；很多 OpenAI-compatible 三方模型更擅长普通 function tool。AgentRouter 会在上游请求中把 `apply_patch` 转成 `virtual_apply_patch` function tool，并在工具说明里注入完整的 `apply_patch.lark` 语法，要求模型把 patch 写入 `patch` 字段。
 
-模型返回 `virtual_apply_patch` 后，CCR 会把它转换回 Codex 期望的 `custom_tool_call`：`name = apply_patch`，`input = 原始 patch 文本`。CCR 不直接修改文件，真正执行 patch 的仍然是 Codex 客户端。这个适配会对非 GPT 模型自动启用，不受 **Codex** 内置路由开关影响；GPT 命名模型以及实际基模为 GPT 的 Fusion 模型继续使用 Codex 原生 freeform `apply_patch` 路径。
+模型返回 `virtual_apply_patch` 后，AgentRouter 会把它转换回 Codex 期望的 `custom_tool_call`：`name = apply_patch`，`input = 原始 patch 文本`。AgentRouter 不直接修改文件，真正执行 patch 的仍然是 Codex 客户端。这个适配会对非 GPT 模型自动启用，不受 **Codex** 内置路由开关影响；GPT 命名模型以及实际基模为 GPT 的 Fusion 模型继续使用 Codex 原生 freeform `apply_patch` 路径。
 
 ## 自定义路由
 
@@ -94,9 +94,9 @@ CCR 会自动为第三方或非 GPT 模型适配 Codex 的 `apply_patch` 文件�
 1. 新建扩展名为 `.js`、`.mjs` 或 `.cjs` 的本地文件。
 2. 在路由规则编辑器中把 **规则类型** 设为 **Node.js 脚本**。
 3. 选择脚本文件，设置 10–30000 毫秒的超时时间，然后使用 **验证** 或 **测试脚本** 检查结果。
-4. 保存规则。CCR 会在每次执行前重新读取文件，因此后续修改脚本内容不需要重新保存规则。
+4. 保存规则。AgentRouter 会在每次执行前重新读取文件，因此后续修改脚本内容不需要重新保存规则。
 
-桌面版文件选择器保存绝对路径。Web UI 不能获得浏览器所选文件的真实路径，需要手动填写 CCR 服务所在机器上的绝对路径、相对路径或 `~/...` 路径；相对路径以 CCR 进程的工作目录为基准。单个脚本文件最大 5 MiB。
+桌面版文件选择器保存绝对路径。Web UI 不能获得浏览器所选文件的真实路径，需要手动填写 AgentRouter 服务所在机器上的绝对路径、相对路径或 `~/...` 路径；相对路径以 AgentRouter 进程的工作目录为基准。单个脚本文件最大 5 MiB。
 
 脚本文件是一个 **异步函数体**。直接使用已注入的 `input`、`api` 和 `return`；不需要写 `module.exports`、`export default` 或 `import`：
 
@@ -119,14 +119,14 @@ return {
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `input.body` | `Record<string, unknown>` | 完整 JSON 请求体。 |
-| `input.headers` | `Record<string, string \| string[]>` | 完整请求 Header；可能包含鉴权、Cookie、API Key 和 CCR 内部 Header。 |
+| `input.headers` | `Record<string, string \| string[]>` | 完整请求 Header；可能包含鉴权、Cookie、API Key 和 AgentRouter 内部 Header。 |
 | `input.method` | `string` | HTTP 方法，例如 `POST`。 |
 | `input.url` | `string` | 网关内的请求 URL，例如 `/v1/messages`。 |
 | `input.model` | `string \| undefined` | `input.body.model` 为字符串时的快捷字段。 |
-| `input.tokenCount` | `number` | CCR 估算的输入 Token 数；无法估算时为 `0`。 |
-| `input.sessionId` | `string \| undefined` | CCR 能解析到的会话 ID。 |
-| `input.apiKeyId` | `string \| undefined` | `x-auth-api-key-id` Header 中的 CCR API Key 标识符，用于区分不同 Key。 |
-| `input.builtInSubagentModel` | `string \| undefined` | CCR 能识别到的内置子代理模型。 |
+| `input.tokenCount` | `number` | AgentRouter 估算的输入 Token 数；无法估算时为 `0`。 |
+| `input.sessionId` | `string \| undefined` | AgentRouter 能解析到的会话 ID。 |
+| `input.apiKeyId` | `string \| undefined` | `x-auth-api-key-id` Header 中的 AgentRouter API Key 标识符，用于区分不同 Key。 |
+| `input.builtInSubagentModel` | `string \| undefined` | AgentRouter 能识别到的内置子代理模型。 |
 | `input.summary.lastUserText` | `string` | 最后一条用户消息的文本，最多 16 KiB 字符。 |
 | `input.summary.systemText` | `string` | System 内容的文本，最多 8 KiB 字符。 |
 | `input.summary.messageCount` | `number` | `body.messages` 的元素数量。 |
@@ -208,7 +208,7 @@ const response = await api.fetch(url, {
 
 #### `api.fs`：文件系统访问
 
-路径可以是绝对路径、相对路径或 `~/...`。访问范围不受白名单限制，但仍受 CCR 进程自身的操作系统权限约束。
+路径可以是绝对路径、相对路径或 `~/...`。访问范围不受白名单限制，但仍受 AgentRouter 进程自身的操作系统权限约束。
 
 | API | 返回值 | 说明 |
 | --- | --- | --- |
@@ -226,7 +226,7 @@ const response = await api.fetch(url, {
 
 | API | 返回值 | 说明 |
 | --- | --- | --- |
-| `api.env(name)` | `string \| undefined` | 读取 CCR 进程中的任意环境变量。 |
+| `api.env(name)` | `string \| undefined` | 读取 AgentRouter 进程中的任意环境变量。 |
 | `api.hash(value)` | `number` | 根据字符串形式返回稳定的 32 位无符号哈希，适合稳定灰度分桶；仅用于分桶，不用于安全场景。 |
 
 #### 返回值
@@ -245,7 +245,7 @@ const response = await api.fetch(url, {
 | 字段 | 类型 | 说明 |
 | --- | --- | --- |
 | `match` | `boolean` | 只有 `false` 有特殊含义，表示不命中。 |
-| `model` | `string` | 目标模型选择器，必须是当前 CCR 已配置的模型。 |
+| `model` | `string` | 目标模型选择器，必须是当前 AgentRouter 已配置的模型。 |
 | `rewrites` | `Rewrite[]` | 请求改写，最多 32 条，按数组顺序执行。 |
 | `fallback` | `Fallback` | 覆盖该规则或全局默认失败处理。 |
 
@@ -374,7 +374,7 @@ return {
 };
 ```
 
-示例中的 `policy.model` 和 `policy.fallbackModels` 必须对应 CCR 中已经配置的模型，否则该规则会产生诊断并按“不命中”处理。
+示例中的 `policy.model` 和 `policy.fallbackModels` 必须对应 AgentRouter 中已经配置的模型，否则该规则会产生诊断并按“不命中”处理。
 
 #### 保存配置与运行限制
 
@@ -407,7 +407,7 @@ return {
 
 Worker 对堆内存、栈、等待队列和硬超时设有资源限制。同一规则在 60 秒内失败 3 次后会熔断 30 秒；脚本文件内容变化后会重新编译，并按新的脚本版本进行熔断计数。
 
-Worker 隔离在执行层面隔离脚本；脚本仍继承 CCR 进程可访问的网络、文件和环境变量权限，只应运行可信脚本。
+Worker 隔离在执行层面隔离脚本；脚本仍继承 AgentRouter 进程可访问的网络、文件和环境变量权限，只应运行可信脚本。
 
 旧配置中的内联 `source` 仍可继续运行；为规则选择脚本文件并保存后，会改为上述本地 `file` 结构。旧的 `readPaths`、`permissions` 和脚本规则静态 `rewrites` 不再需要，脚本需要改写请求时直接返回 `model` 或 `rewrites`。
 
@@ -437,7 +437,7 @@ Header 名不区分大小写。Body 字段按点号路径读取，数字片段�
 
 **改写请求参数** 区域默认给出一行 `request.body.model`。这也是最常用的模型路由写法：选择 **设置**，key 填 `request.body.model`，值填目标 `供应商/模型` 或 Fusion 模型。
 
-点击 **添加参数** 可以追加多行改写；垃圾桶按钮删除当前行，最后一行不能删除。规则命中后，CCR 会按列表顺序应用这些改写。
+点击 **添加参数** 可以追加多行改写；垃圾桶按钮删除当前行，最后一行不能删除。规则命中后，AgentRouter 会按列表顺序应用这些改写。
 
 | 操作 | 需要填写 | 行为 |
 | --- | --- | --- |
@@ -448,7 +448,7 @@ Header 名不区分大小写。Body 字段按点号路径读取，数字片段�
 | **从数组移除** | key、值 | 从目标数组中移除等于该值的元素。 |
 | **替换数组元素** | key、匹配值、值 | 把数组中匹配 **匹配值** 的元素替换为新值。 |
 
-改写的值也会按字面量解析，所以 `0.2` 会变成数字，`true` 会变成布尔值，`{"type":"web_search"}` 会变成对象。只有 `request.body.model` 的值会额外按 CCR 的模型选择器格式规范化。
+改写的值也会按字面量解析，所以 `0.2` 会变成数字，`true` 会变成布尔值，`{"type":"web_search"}` 会变成对象。只有 `request.body.model` 的值会额外按 AgentRouter 的模型选择器格式规范化。
 
 ### 失败时
 
@@ -492,7 +492,7 @@ Header 名不区分大小写。Body 字段按点号路径读取，数字片段�
 | 继续重试 | `408`、`409`、`429`、`5xx` |
 | 失败降级目标 | 任意 `4xx` 或 `5xx` |
 
-进入下一次尝试前，CCR 会对每个触发回退的失败进行等待，包括网络错误。上游提供正数 `Retry-After` 时会优先遵守；否则使用从 1 秒开始、单次最多 30 秒的指数退避。
+进入下一次尝试前，AgentRouter 会对每个触发回退的失败进行等待，包括网络错误。上游提供正数 `Retry-After` 时会优先遵守；否则使用从 1 秒开始、单次最多 30 秒的指数退避。
 
 **失败降级目标** 对 `4xx` 也会切换，是因为模型不存在、鉴权或供应商侧拒绝等错误可能只影响当前目标。切换后如果备用模型可用，请求仍然可以成功。
 

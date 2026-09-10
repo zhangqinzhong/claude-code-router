@@ -7,7 +7,7 @@ import moonshotProviderIconUrl from "@/assets/provider-icons/moonshot.ico";
 import {
   ROUTER_SCRIPT_API_VERSION,
   ROUTER_SCRIPT_MAX_TIMEOUT_MS
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   ApiKeyLimitConfig,
@@ -32,19 +32,19 @@ import type {
   RouterRuleRewrite,
   RouterRuleType,
   VirtualModelProfileConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   customProviderPresetId,
   defaultProviderAccountConfig,
   standardProviderAccountConfig,
   type ProviderIdentitySafetyIssue,
   type ProviderPreset
-} from "@ccr/core/providers/presets/types";
+} from "@agentrouter/core/providers/presets/types";
 import {
   primaryProviderPresetEndpoint as primaryProviderPresetEndpointFromPreset
-} from "@ccr/core/providers/presets/utils";
-import { newApiUserSelfConnectorConfig } from "@ccr/core/providers/new-api";
-import { normalizeProviderBaseUrl, providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+} from "@agentrouter/core/providers/presets/utils";
+import { newApiUserSelfConnectorConfig } from "@agentrouter/core/providers/new-api";
+import { normalizeProviderBaseUrl, providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 import {
   providerPresetIconUrls,
   providerProtocolOptions,
@@ -59,7 +59,7 @@ import { findProviderPreset, findProviderPresetByBaseUrl, findProviderPresetById
 import { fusionModelProviderName } from "./profiles";
 import { normalizeRouterFallbackConfig } from "./routing";
 import { keyValueRowsFromRecord, recordFromKeyValueRows, validateKeyValueRows, virtualModelMatchSummary } from "./virtual-models";
-import { isGatewayProviderEnabled } from "@ccr/core/contracts/app";
+import { isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
 import type { AddProviderDraft, AddRoutingRuleDraft, ModelCatalogItem, ProviderCredentialDraft, ProviderProbeCandidate, ProviderProbeCandidateResult, ProviderUsageFieldTarget, RoutingRewriteDraftRow, RoutingRuleRow, ViewId } from "./types";
 
 export const localAgentProviderIconUrls: Record<LocalAgentProviderKind, string> = {
@@ -483,13 +483,13 @@ export function uniqueRoutingRuleId(rules: RouterRule[]): string {
 }
 
 export async function probeProviderDeepLinkPayload(payload: ProviderDeepLinkPayload): Promise<GatewayProviderProbeResult | undefined> {
-  if (!window.ccr || !shouldAutoProbeProviderBaseUrl(payload.baseUrl)) {
+  if (!window.agentrouter || !shouldAutoProbeProviderBaseUrl(payload.baseUrl)) {
     return undefined;
   }
 
   const apiKey = payload.apiKey?.trim();
   try {
-    return await window.ccr.probeProvider({
+    return await window.agentrouter.probeProvider({
       apiKey: apiKey || undefined,
       baseUrl: payload.baseUrl,
       mode: apiKey ? "models" : "protocols",
@@ -561,7 +561,7 @@ export type ProviderDeepLinkCatalogModelsResolution = {
 };
 
 export async function resolveProviderDeepLinkCatalogModels(payload: ProviderDeepLinkPayload): Promise<ProviderDeepLinkCatalogModelsResolution> {
-  const ccr = window.ccr;
+  const ccr = window.agentrouter;
   if (!ccr?.getProviderCatalogModels) {
     return {
       models: []
@@ -606,7 +606,7 @@ export async function resolveProviderDeepLinkIcon(payload: ProviderDeepLinkPaylo
     };
   }
 
-  const ccr = window.ccr;
+  const ccr = window.agentrouter;
   if (!ccr?.detectProviderIcon) {
     return {};
   }
@@ -1852,7 +1852,7 @@ export async function probeProviderCandidates(
   } = {}
 ): Promise<ProviderProbeCandidateResult | undefined> {
   const mode = options.mode ?? "protocols";
-  return await window.ccr?.probeProviderCandidates({
+  return await window.agentrouter?.probeProviderCandidates({
     apiKey: apiKey || undefined,
     candidates,
     forceRefresh: options.forceRefresh,

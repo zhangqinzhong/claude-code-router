@@ -13,7 +13,7 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 
 ## 你会用到哪些字段
 
-| Discord 后台里的名字 | CCR 字段 | 是否必填 | 说明 |
+| Discord 后台里的名字 | AgentRouter 字段 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | Token | Bot Token | 必填 | Bot 页里的机器人 token |
 | Application ID | Application ID | 可选 | General Information 页里的应用 ID |
@@ -25,7 +25,7 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 
 1. 打开 [Discord Developer Portal](https://discord.com/developers/applications)。
 2. 点 `New Application`。
-3. 填名字，比如 `CCR`。
+3. 填名字，比如 `AgentRouter`。
 4. 创建后进入应用详情。
 5. 左侧打开 `Bot`。
 6. 页面还没有 Bot 的话，点 `Add Bot`。
@@ -43,7 +43,7 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 1. 在 `Bot` 页找到 `Token`。
 2. 点 `Reset Token` 或 `Copy`。
 3. 第一次创建时 `Reset Token` 会生成第一个 token，不代表你弄坏了什么。
-4. 复制生成的 token，待会儿填进 CCR 的 Bot Token。
+4. 复制生成的 token，待会儿填进 AgentRouter 的 Bot Token。
 
 > 这个 token 等同于机器人密码。不要发进 Discord，也不要贴进 Agent 的 prompt。
 
@@ -64,9 +64,9 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 2. 打开应用的 `General Information`。
 3. 复制 `Application ID` 和 `Public Key`。
 
-## 在 CCR 中接入
+## 在 AgentRouter 中接入
 
-1. 打开 CCR 的 **Bot 管理** 页面，点 **添加 Bot**。
+1. 打开 AgentRouter 的 **Bot 管理** 页面，点 **添加 Bot**。
 2. 平台选 **Discord**。
 3. 认证方式默认是 **Bot Token**，保持即可。
 4. 把 Token 填进 **Bot Token**。
@@ -75,7 +75,7 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 7. 打开 **Agent 配置**，编辑你要接 Bot 的 Agent 配置。
 8. 打开 **Bot** 开关，选刚保存的 Bot。
 9. 按需打开 **转发 Agent 消息** 或 **接力**（见下一节）。
-10. 从 CCR 重新打开 Agent。
+10. 从 AgentRouter 重新打开 Agent。
 
 ## 转发还是接力
 
@@ -86,7 +86,7 @@ Discord 适合把 Agent 消息接入服务器频道、私有协作服务器或�
 
 ## 测试
 
-1. 从 CCR 打开 Agent，触发一条消息。
+1. 从 AgentRouter 打开 Agent，触发一条消息。
 2. 到 Discord 确认 Bot 能收到并回复。
 3. 用服务器频道的话，确认 Bot 在该服务器里、有发言权限。
 

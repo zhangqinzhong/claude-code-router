@@ -4,11 +4,11 @@ import { chmodSync, existsSync, lstatSync, mkdtempSync, mkdirSync, readdirSync, 
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { loadAppConfig } from "@ccr/core/config/config.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { replacePersistedAppConfig } from "@ccr/core/config/config-repository.ts";
-import { CONFIGDIR } from "@ccr/core/config/constants.ts";
-import { applyProfileConfig, cleanupGeneratedBinBackups, resolveGrokSourceHome, resolveKimiSourceHome, restoreInactiveGlobalProfileConfigs, restoreGlobalProfileConfigsOnExit } from "@ccr/core/profiles/service.ts";
+import { loadAppConfig } from "@agentrouter/core/config/config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { replacePersistedAppConfig } from "@agentrouter/core/config/config-repository.ts";
+import { CONFIGDIR } from "@agentrouter/core/config/constants.ts";
+import { applyProfileConfig, cleanupGeneratedBinBackups, resolveGrokSourceHome, resolveKimiSourceHome, restoreInactiveGlobalProfileConfigs, restoreGlobalProfileConfigsOnExit } from "@agentrouter/core/profiles/service.ts";
 
 test("Grok profile source home follows profile and process environment overrides", () => {
   const previous = {
@@ -51,7 +51,7 @@ test("Kimi profile source home follows profile and process environment overrides
 });
 
 test("profile service cleans stale generated bin backups only", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-generated-bin-cleanup-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-generated-bin-cleanup-"));
   try {
     const binDir = path.join(configDir, "bin");
     mkdirSync(binDir, { recursive: true });
@@ -85,7 +85,7 @@ test("profile service cleans stale generated bin backups only", () => {
 });
 
 test("profile service preserves user statusLine when the active global Claude takeover marker is unchanged", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-statusline-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-statusline-"));
   const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
   try {
     rmSync(takeoverFile, { force: true });
@@ -137,11 +137,11 @@ test("profile service preserves user statusLine when the active global Claude ta
     }, null, 2)}\n`);
 
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-profile-statusline-test";
+    config.APIKEY = "ar-profile-statusline-test";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profile.id}`,
-      key: "ccr-profile-statusline-test",
+      key: "ar-profile-statusline-test",
       name: "Profile: Claude Code"
     }];
     config.Providers = [{
@@ -172,7 +172,7 @@ test("profile service preserves user statusLine when the active global Claude ta
 });
 
 test("profile service does not overwrite invalid global Claude settings JSON", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-invalid-settings-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-invalid-settings-"));
   const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
   try {
     rmSync(takeoverFile, { force: true });
@@ -194,11 +194,11 @@ test("profile service does not overwrite invalid global Claude settings JSON", {
       surface: "auto"
     };
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-profile-invalid-settings-test";
+    config.APIKEY = "ar-profile-invalid-settings-test";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profile.id}`,
-      key: "ccr-profile-invalid-settings-test",
+      key: "ar-profile-invalid-settings-test",
       name: "Profile: Invalid Claude Settings"
     }];
     config.Providers = [{
@@ -222,7 +222,7 @@ test("profile service does not overwrite invalid global Claude settings JSON", {
 });
 
 test("profile service honors the top-level profile disabled flag", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-profile-disabled-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-profile-disabled-"));
   try {
     const settingsFile = path.join(root, ".claude", "settings.json");
     mkdirSync(path.dirname(settingsFile), { recursive: true });
@@ -248,11 +248,11 @@ test("profile service honors the top-level profile disabled flag", { skip: !proc
       surface: "auto"
     };
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-profile-disabled-test";
+    config.APIKEY = "ar-profile-disabled-test";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profile.id}`,
-      key: "ccr-profile-disabled-test",
+      key: "ar-profile-disabled-test",
       name: "Profile: Top Level Disabled Claude Settings"
     }];
     config.Providers = [{
@@ -284,7 +284,7 @@ test("profile service honors the top-level profile disabled flag", { skip: !proc
 });
 
 test("profile service does not rewrite user Claude settings for stale legacy profile flags without profiles", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-stale-legacy-profile-home-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-stale-legacy-profile-home-"));
   const previousHome = process.env.HOME;
   const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
   try {
@@ -366,7 +366,7 @@ test("profile service does not rewrite user Claude settings for stale legacy pro
 });
 
 test("profile service does not rewrite Claude settings when only user-managed fields change", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-user-fields-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-user-fields-"));
   const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
   try {
     rmSync(takeoverFile, { force: true });
@@ -386,11 +386,11 @@ test("profile service does not rewrite Claude settings when only user-managed fi
       surface: "auto"
     };
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-profile-user-fields-test";
+    config.APIKEY = "ar-profile-user-fields-test";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profile.id}`,
-      key: "ccr-profile-user-fields-test",
+      key: "ar-profile-user-fields-test",
       name: "Profile: User Fields Claude Settings"
     }];
     config.Providers = [{
@@ -424,7 +424,7 @@ test("profile service does not rewrite Claude settings when only user-managed fi
 });
 
 test("profile service can exclude ZCode from automatic synchronization", async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-zcode-auto-sync-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-zcode-auto-sync-"));
   try {
     const configFile = path.join(root, ".zcode", "cli", "config.json");
     const original = `${JSON.stringify({
@@ -535,12 +535,12 @@ test("profile service overwrites generated bin files without creating backups", 
     ...config.contextArchive,
     enabled: true
   };
-  config.APIKEY = "ccr-profile-test";
+  config.APIKEY = "ar-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-profile-test",
+      key: "ar-profile-test",
       name: "Profile: Generated Bin Test"
     }
   ];
@@ -582,7 +582,7 @@ test("profile service overwrites generated bin files without creating backups", 
     assert.equal(existsSync(file), false);
   }
   const wifTokenFile = path.join(binDir, `ar-claude-code-wif-token-${profileId}${wifTokenExtension}`);
-  assert.equal(readFileSync(wifTokenFile, "utf8"), "ccr-profile-test\n");
+  assert.equal(readFileSync(wifTokenFile, "utf8"), "ar-profile-test\n");
   const wrapperContent = readFileSync(path.join(binDir, `ar-claude-code-wrapper-${profileId}${commandExtension}`), "utf8");
   assert.equal(wrapperContent.includes("profile-api-key"), false);
   assert.equal(wrapperContent.includes("profile-auth-token"), false);
@@ -599,8 +599,8 @@ test("profile service overwrites generated bin files without creating backups", 
   const toolHubMcpConfigFile = path.join(CONFIGDIR, "profiles", profileId, "claude", "toolhub-mcp.json");
   const toolHubMcpConfig = JSON.parse(readFileSync(toolHubMcpConfigFile, "utf8"));
   const toolHubMcpServerEnv = toolHubMcpConfig.mcpServers["ar-toolhub"].env;
-  const contextArchiveMcpServer = toolHubMcpConfig.mcpServers["ccr-context-archive"];
-  assert.equal(toolHubMcpServerEnv.TOOLHUB_OPENAI_API_KEY, "ccr-profile-test");
+  const contextArchiveMcpServer = toolHubMcpConfig.mcpServers["ar-context-archive"];
+  assert.equal(toolHubMcpServerEnv.TOOLHUB_OPENAI_API_KEY, "ar-profile-test");
   assert.equal(toolHubMcpServerEnv.TOOLHUB_OPENAI_BASE_URL, `http://127.0.0.1:${config.gateway.port}/v1`);
   assert.equal(toolHubMcpServerEnv.TOOLHUB_OPENAI_MODEL, "Provider/model");
   assert.equal(contextArchiveMcpServer, undefined);
@@ -636,13 +636,13 @@ test("profile service overwrites generated bin files without creating backups", 
       entry.startsWith(`ar-claude-code-wrapper-${profileId}`) ||
       entry.startsWith("ar-codex-cli-middleware.js") ||
       entry.startsWith("toolhub-mcp.js")
-    ) && entry.includes(".ccr-")
+    ) && entry.includes(".ar-")
   );
   assert.deepEqual(backupEntries, []);
 });
 
 test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-auth-mode-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-auth-mode-"));
   const profileId = "old-claude-code";
   const commandExtension = process.platform === "win32" ? ".cmd" : "";
   const wifTokenExtension = process.platform === "win32" ? ".txt" : "";
@@ -656,11 +656,11 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
     chmodSync(fakeClaude, 0o700);
 
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-old-auto-token";
+    config.APIKEY = "ar-old-auto-token";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-old-auto-token",
+      key: "ar-old-auto-token",
       name: "Profile: Old Claude Code"
     }];
     config.Providers = [{
@@ -696,12 +696,12 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
     assert.equal(settings.env.ANTHROPIC_IDENTITY_TOKEN_FILE, undefined);
     assert.equal(settings.env.ANTHROPIC_FEDERATION_RULE_ID, undefined);
     assert.equal(settings.env.AR_CLAUDE_CODE_AUTH_MODE, undefined);
-    assert.equal(readFileSync(tokenFile, "utf8"), "ccr-old-auto-token\n");
-    assert.match(readFileSync(helperFile, "utf8"), /ccr-old-auto-token/);
+    assert.equal(readFileSync(tokenFile, "utf8"), "ar-old-auto-token\n");
+    assert.match(readFileSync(helperFile, "utf8"), /ar-old-auto-token/);
     if (process.platform !== "win32") {
       const helper = spawnSync(helperFile, [], { encoding: "utf8" });
       assert.equal(helper.status, 0);
-      assert.equal(helper.stdout.trim(), "ccr-old-auto-token");
+      assert.equal(helper.stdout.trim(), "ar-old-auto-token");
     }
 
     const wrapperContent = readFileSync(path.join(binDir, `ar-claude-code-wrapper-${profileId}${commandExtension}`), "utf8");
@@ -713,7 +713,7 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
 });
 
 test("Codex profile launcher bypasses middleware for Browser and Computer Use helpers", { skip: process.platform === "win32" || !process.env.AR_INTERNAL_HOME_DIR }, async () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-browser-helper-bypass-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-browser-helper-bypass-"));
   const profileId = "browser-helper-bypass-test";
   try {
     const fakeCodex = path.join(root, "real-codex");
@@ -725,7 +725,7 @@ test("Codex profile launcher bypasses middleware for Browser and Computer Use he
     chmodSync(fakeCodex, 0o700);
 
     const config = createDefaultAppConfig();
-    config.APIKEY = "ccr-browser-helper-test";
+    config.APIKEY = "ar-browser-helper-test";
     config.APIKEYS = [{
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
@@ -825,12 +825,12 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
       }
     ]
   };
-  config.APIKEY = "ccr-codex-profile-test";
+  config.APIKEY = "ar-codex-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-codex-profile-test",
+      key: "ar-codex-profile-test",
       name: "Profile: Codex ToolHub Test"
     }
   ];
@@ -861,13 +861,13 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
 
   const configFile = path.join(CONFIGDIR, "profiles", profileId, "codex", "config.toml");
   const content = readFileSync(configFile, "utf8");
-  assert.match(content, /# BEGIN CCR managed ToolHub MCP/);
-  assert.match(content, /# CCR configured model = "Provider\/model"/);
+  assert.match(content, /# BEGIN AgentRouter managed ToolHub MCP/);
+  assert.match(content, /# AgentRouter configured model = "Provider\/model"/);
   assert.match(content, /\[mcp_servers\.ar-toolhub\]/);
   assert.equal(content.includes(`command = ${JSON.stringify(process.execPath)}`), true);
   assert.equal(content.includes(`args = [${JSON.stringify(path.join(CONFIGDIR, "bin", "toolhub-mcp.js"))}]`), true);
   assert.match(content, /\[mcp_servers\.ar-toolhub\.env\]/);
-  assert.match(content, /TOOLHUB_OPENAI_API_KEY = "ccr-codex-profile-test"/);
+  assert.match(content, /TOOLHUB_OPENAI_API_KEY = "ar-codex-profile-test"/);
   assert.match(content, new RegExp(`TOOLHUB_OPENAI_BASE_URL = "http://127\\.0\\.0\\.1:${config.gateway.port}/v1"`));
   assert.match(content, /TOOLHUB_OPENAI_MODEL = "Provider\/model"/);
 
@@ -881,7 +881,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
       'model = "User/selected-in-codex"\nmodel_reasoning_effort = "max"'
     )
     .replace(
-      "# END CCR managed ToolHub MCP",
+      "# END AgentRouter managed ToolHub MCP",
       [
         "[desktop]",
         'followUpQueueMode = "steer"',
@@ -891,7 +891,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
         "",
         "[features]",
         "js_repl = true",
-        "# END CCR managed ToolHub MCP"
+        "# END AgentRouter managed ToolHub MCP"
       ].join("\n")
     );
   writeFileSync(configFile, codexEditedConfig);
@@ -918,7 +918,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
   assert.match(preservedConfig, /\[plugins\."browser@openai-bundled"\]\nenabled = false/);
   assert.match(preservedConfig, /\[features\]\njs_repl = true/);
   assert.equal((preservedConfig.match(/\[mcp_servers\.ar-toolhub\]/g) ?? []).length, 1);
-  assert.equal((preservedConfig.match(/# BEGIN CCR managed ToolHub MCP/g) ?? []).length, 1);
+  assert.equal((preservedConfig.match(/# BEGIN AgentRouter managed ToolHub MCP/g) ?? []).length, 1);
 
   const preservedSeparateProfile = readFileSync(separateProfileFile, "utf8");
   assert.match(preservedSeparateProfile, /model = "User\/selected-in-cli"/);
@@ -954,12 +954,12 @@ test("profile service injects Context Archive MCP for managed Claude Code profil
     ...config.contextArchive,
     enabled: false
   };
-  config.APIKEY = "ccr-managed-claude-profile-test";
+  config.APIKEY = "ar-managed-claude-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-managed-claude-profile-test",
+      key: "ar-managed-claude-profile-test",
       name: "Profile: Managed Compact Claude"
     }
   ];
@@ -984,10 +984,10 @@ test("profile service injects Context Archive MCP for managed Claude Code profil
   assert.equal(result.clients[0].ok, true);
   const mcpConfigFile = path.join(CONFIGDIR, "profiles", profileId, "claude", "toolhub-mcp.json");
   const mcpConfig = JSON.parse(readFileSync(mcpConfigFile, "utf8"));
-  assert.deepEqual(Object.keys(mcpConfig.mcpServers), ["ccr-context-archive"]);
-  assert.equal(mcpConfig.mcpServers["ccr-context-archive"].type, "http");
-  assert.equal(mcpConfig.mcpServers["ccr-context-archive"].url, `http://127.0.0.1:${config.gateway.port}/__ccr/context-archive/mcp`);
-  assert.equal(mcpConfig.mcpServers["ccr-context-archive"].headers.Authorization, "Bearer ccr-managed-claude-profile-test");
+  assert.deepEqual(Object.keys(mcpConfig.mcpServers), ["ar-context-archive"]);
+  assert.equal(mcpConfig.mcpServers["ar-context-archive"].type, "http");
+  assert.equal(mcpConfig.mcpServers["ar-context-archive"].url, `http://127.0.0.1:${config.gateway.port}/__ar/context-archive/mcp`);
+  assert.equal(mcpConfig.mcpServers["ar-context-archive"].headers.Authorization, "Bearer ar-managed-claude-profile-test");
 });
 
 test("profile service injects Context Archive MCP for managed Codex profile", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
@@ -1006,12 +1006,12 @@ test("profile service injects Context Archive MCP for managed Codex profile", { 
     ...config.contextArchive,
     enabled: false
   };
-  config.APIKEY = "ccr-managed-codex-profile-test";
+  config.APIKEY = "ar-managed-codex-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-managed-codex-profile-test",
+      key: "ar-managed-codex-profile-test",
       name: "Profile: Managed Compact Codex"
     }
   ];
@@ -1043,11 +1043,11 @@ test("profile service injects Context Archive MCP for managed Codex profile", { 
 
   const configFile = path.join(CONFIGDIR, "profiles", profileId, "codex", "config.toml");
   const content = readFileSync(configFile, "utf8");
-  assert.doesNotMatch(content, /# BEGIN CCR managed ToolHub MCP/);
-  assert.match(content, /# BEGIN CCR managed Context Archive MCP/);
-  assert.match(content, /\[mcp_servers\.ccr-context-archive\]/);
-  assert.match(content, new RegExp(`url = "http://127\\.0\\.0\\.1:${config.gateway.port}/__ccr/context-archive/mcp"`));
-  assert.match(content, /http_headers = \{ Authorization = "Bearer ccr-managed-codex-profile-test" \}/);
+  assert.doesNotMatch(content, /# BEGIN AgentRouter managed ToolHub MCP/);
+  assert.match(content, /# BEGIN AgentRouter managed Context Archive MCP/);
+  assert.match(content, /\[mcp_servers\.ar-context-archive\]/);
+  assert.match(content, new RegExp(`url = "http://127\\.0\\.0\\.1:${config.gateway.port}/__ar/context-archive/mcp"`));
+  assert.match(content, /http_headers = \{ Authorization = "Bearer ar-managed-codex-profile-test" \}/);
   assert.match(content, /startup_timeout_sec = 10/);
   assert.match(content, /tool_timeout_sec = 60/);
 });
@@ -1068,12 +1068,12 @@ test("profile service injects Context Archive MCP for managed Claude Code withou
     ...config.contextArchive,
     enabled: true
   };
-  config.APIKEY = "ccr-context-archive-profile-test";
+  config.APIKEY = "ar-context-archive-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-context-archive-profile-test",
+      key: "ar-context-archive-profile-test",
       name: "Profile: Context Archive MCP Test"
     }
   ];
@@ -1098,12 +1098,12 @@ test("profile service injects Context Archive MCP for managed Claude Code withou
   assert.equal(result.clients[0].ok, true);
   const mcpConfigFile = path.join(CONFIGDIR, "profiles", profileId, "claude", "toolhub-mcp.json");
   const mcpConfig = JSON.parse(readFileSync(mcpConfigFile, "utf8"));
-  assert.deepEqual(Object.keys(mcpConfig.mcpServers), ["ccr-context-archive"]);
-  assert.equal(mcpConfig.mcpServers["ccr-context-archive"].type, "http");
-  assert.equal(mcpConfig.mcpServers["ccr-context-archive"].headers.Authorization, "Bearer ccr-context-archive-profile-test");
+  assert.deepEqual(Object.keys(mcpConfig.mcpServers), ["ar-context-archive"]);
+  assert.equal(mcpConfig.mcpServers["ar-context-archive"].type, "http");
+  assert.equal(mcpConfig.mcpServers["ar-context-archive"].headers.Authorization, "Bearer ar-context-archive-profile-test");
 });
 
-test("profile service writes a Grok CLI wrapper that points model discovery and inference to CCR", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
+test("profile service writes a Grok CLI wrapper that points model discovery and inference to AgentRouter", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const profileId = "grok-gateway-test";
   const sourceGrokHome = path.join(process.env.HOME, ".grok");
   mkdirSync(path.join(sourceGrokHome, "sessions"), { recursive: true });
@@ -1126,12 +1126,12 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
     }
   ];
   config.preferredProvider = "Provider";
-  config.APIKEY = "ccr-grok-profile-test";
+  config.APIKEY = "ar-grok-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-grok-profile-test",
+      key: "ar-grok-profile-test",
       name: "Profile: Grok Gateway Test"
     }
   ];
@@ -1163,7 +1163,7 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
   const content = readFileSync(wrapperFile, "utf8");
   assert.match(content, new RegExp(`GROK_MODELS_BASE_URL.*http://127\\.0\\.0\\.1:${config.gateway.port}/v1`));
   assert.match(content, new RegExp(`GROK_MODELS_LIST_URL.*http://127\\.0\\.0\\.1:${config.gateway.port}/v1/models`));
-  assert.match(content, /XAI_API_KEY.*ccr-grok-profile-test/);
+  assert.match(content, /XAI_API_KEY.*ar-grok-profile-test/);
   assert.match(content, /GROK_DEFAULT_MODEL.*Provider\/model/);
   assert.match(content, new RegExp(`GROK_HOME.*profiles.*${profileId}.*grok`));
   assert.match(content, /USER_VALUE.*kept/);
@@ -1180,7 +1180,7 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
   assert.equal(existsSync(path.join(profileGrokHome, "auth.json")), false);
 });
 
-test("profile service writes a multi-model Kimi CLI home that points inference to CCR", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
+test("profile service writes a multi-model Kimi CLI home that points inference to AgentRouter", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const profileId = "kimi-gateway-test";
   const sourceKimiHome = path.join(process.env.AR_INTERNAL_HOME_DIR, ".kimi-code");
   const sourceKimiConfig = path.join(sourceKimiHome, "config.toml");
@@ -1249,12 +1249,12 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
     match: { exactAliases: ["catalog-context"], prefixes: [], suffixes: [] },
     materialization: { enabled: true, includeInGatewayModels: true }
   }];
-  config.APIKEY = "ccr-kimi-profile-test";
+  config.APIKEY = "ar-kimi-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-kimi-profile-test",
+      key: "ar-kimi-profile-test",
       name: "Profile: Kimi Gateway Test"
     }
   ];
@@ -1295,7 +1295,7 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
   assert.match(profileConfigContent, /default_model = "Provider\/model"/);
   assert.match(profileConfigContent, /\[providers\."claude-code-router"\]/);
   assert.match(profileConfigContent, new RegExp(`base_url = "http://127\\.0\\.0\\.1:${config.gateway.port}/v1"`));
-  assert.match(profileConfigContent, /api_key = "ccr-kimi-profile-test"/);
+  assert.match(profileConfigContent, /api_key = "ar-kimi-profile-test"/);
   assert.match(profileConfigContent, /\[models\."Provider\/model"\]/);
   assert.match(profileConfigContent, /\[models\."Provider\/fast"\]/);
   assert.equal(profileConfigContent.includes('[models."Provider/legacy-extra"]'), false);
@@ -1327,7 +1327,7 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
   assert.match(legacyProfileConfigContent, /\[models\."Fusion\/catalog-context"\]\nprovider = "claude-code-router"\nmodel = "Fusion\/catalog-context"\nmax_context_size = 1050000\ncapabilities = \["tool_use", "image_in", "thinking"\]/);
 });
 
-test("profile service writes a Pi config and wrapper that points inference to CCR", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
+test("profile service writes a Pi config and wrapper that points inference to AgentRouter", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const profileId = "pi-gateway-test";
   const config = createDefaultAppConfig();
   config.Providers = [
@@ -1340,12 +1340,12 @@ test("profile service writes a Pi config and wrapper that points inference to CC
     }
   ];
   config.preferredProvider = "Provider";
-  config.APIKEY = "ccr-pi-profile-test";
+  config.APIKEY = "ar-pi-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-pi-profile-test",
+      key: "ar-pi-profile-test",
       name: "Profile: Pi Gateway Test"
     }
   ];
@@ -1363,7 +1363,7 @@ test("profile service writes a Pi config and wrapper that points inference to CC
       id: profileId,
       model: "Provider/model",
       name: "Pi Gateway Test",
-      providerId: "ccr-pi",
+      providerId: "ar-pi",
       scope: "ccr",
       surface: "cli"
     }
@@ -1380,7 +1380,7 @@ test("profile service writes a Pi config and wrapper that points inference to CC
   const profilePiHome = path.join(CONFIGDIR, "profiles", profileId, "pi");
   const profileConfigFile = path.join(profilePiHome, "models.json");
   const piConfig = JSON.parse(readFileSync(profileConfigFile, "utf8"));
-  const provider = piConfig.providers["ccr-pi"];
+  const provider = piConfig.providers["ar-pi"];
 
   assert.match(content, new RegExp(`PI_CODING_AGENT_DIR.*profiles.*${profileId}.*pi`));
   assert.match(content, new RegExp(`PI_CODING_AGENT_SESSION_DIR.*profiles.*${profileId}.*pi.*sessions`));
@@ -1388,12 +1388,12 @@ test("profile service writes a Pi config and wrapper that points inference to CC
   assert.match(content, /USER_VALUE.*kept/);
   assert.match(content, /NO_PROXY.*127\.0\.0\.1,localhost,::1/);
   assert.match(content, /\/custom\/bin\/pi/);
-  assert.match(content, /--provider .*ccr-pi/);
+  assert.match(content, /--provider .*ar-pi/);
   assert.match(content, /--model .*Provider\/model/);
   assert.equal(content.includes("/ignored/pi"), false);
   assert.equal(provider.api, "openai-responses");
   assert.equal(provider.baseUrl, `http://127.0.0.1:${config.gateway.port}/v1`);
-  assert.equal(provider.apiKey, "ccr-pi-profile-test");
+  assert.equal(provider.apiKey, "ar-pi-profile-test");
   assert.equal(provider.authHeader, true);
   assert.deepEqual(provider.headers, {
     "x-ar-client": "pi",
@@ -1416,12 +1416,12 @@ test("profile service writes an OpenCode CLI wrapper and shared CLI/App config",
     }
   ];
   config.preferredProvider = "Provider";
-  config.APIKEY = "ccr-opencode-profile-test";
+  config.APIKEY = "ar-opencode-profile-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-opencode-profile-test",
+      key: "ar-opencode-profile-test",
       name: "Profile: OpenCode Gateway Test"
     }
   ];
@@ -1453,7 +1453,7 @@ test("profile service writes an OpenCode CLI wrapper and shared CLI/App config",
   const openCodeConfig = JSON.parse(readFileSync(configFile, "utf8"));
   assert.equal(openCodeConfig.model, "claude-code-router/Provider/model");
   assert.equal(openCodeConfig.small_model, openCodeConfig.model);
-  assert.equal(openCodeConfig.provider["claude-code-router"].options.apiKey, "ccr-opencode-profile-test");
+  assert.equal(openCodeConfig.provider["claude-code-router"].options.apiKey, "ar-opencode-profile-test");
   assert.equal(openCodeConfig.provider["claude-code-router"].options.baseURL, `http://127.0.0.1:${config.gateway.port}/v1`);
 
   const commandExtension = process.platform === "win32" ? ".cmd" : "";
@@ -1602,9 +1602,9 @@ test("profile service clears stale Claude Code ToolHub artifacts when no gateway
   });
 });
 
-test("profile service restores managed global Claude settings when only CCR-scoped Claude profiles are active", () => {
+test("profile service restores managed global Claude settings when only AR-scoped Claude profiles are active", () => {
   const previousHome = process.env.HOME;
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-profile-home-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-profile-home-"));
   process.env.HOME = home;
   try {
     const settingsFile = path.join(home, ".claude", "settings.json");
@@ -1661,7 +1661,7 @@ test("profile service restores managed global Claude settings when only CCR-scop
 
 test("profile service keeps managed global Claude settings when a global Claude profile is active", () => {
   const previousHome = process.env.HOME;
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-profile-home-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-profile-home-"));
   process.env.HOME = home;
   try {
     const settingsFile = path.join(home, ".claude", "settings.json");
@@ -1705,7 +1705,7 @@ test("profile service keeps managed global Claude settings when a global Claude 
 });
 
 test("profile service restores global agent configs on exit", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-global-profile-exit-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-global-profile-exit-"));
   try {
     const claudeFile = path.join(root, "claude", "settings.json");
     const codexFile = path.join(root, "codex", "config.toml");
@@ -1735,7 +1735,7 @@ test("profile service restores global agent configs on exit", () => {
         CLAUDE_AGENT_API_BASE_URL: "http://127.0.0.1:3456"
       }
     })}\n`);
-    writeFileSync(codexFile, "# BEGIN CCR managed profile\nmodel = \"test\"\n# END CCR managed profile\n");
+    writeFileSync(codexFile, "# BEGIN AgentRouter managed profile\nmodel = \"test\"\n# END AgentRouter managed profile\n");
     writeFileSync(openCodeFile, `${JSON.stringify({
       model: "claude-code-router/test",
       provider: {
@@ -1774,7 +1774,7 @@ test("profile service restores global agent configs on exit", () => {
       assert.equal(readFileSync(file, "utf8"), latest);
     }
 
-    writeFileSync(codexFile, "# BEGIN CCR managed profile\nmodel = \"test\"\n# END CCR managed profile\n");
+    writeFileSync(codexFile, "# BEGIN AgentRouter managed profile\nmodel = \"test\"\n# END AgentRouter managed profile\n");
     writeFileSync(openCodeFile, `${JSON.stringify({
       provider: { "claude-code-router": { options: { headers: { "x-ar-client": "opencode" } } } }
     })}\n`);
@@ -1826,12 +1826,12 @@ test("profile service invalidates Claude gateway model discovery cache only when
     }
   ];
   config.preferredProvider = "Provider";
-  config.APIKEY = "ccr-claude-model-discovery-cache-test";
+  config.APIKEY = "ar-claude-model-discovery-cache-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-claude-model-discovery-cache-test",
+      key: "ar-claude-model-discovery-cache-test",
       name: "Profile: Claude Model Discovery Cache Test"
     }
   ];
@@ -1892,12 +1892,12 @@ test("profile service reports a failed model discovery cache invalidation withou
     }
   ];
   config.preferredProvider = "Provider";
-  config.APIKEY = "ccr-claude-model-discovery-cache-failure-test";
+  config.APIKEY = "ar-claude-model-discovery-cache-failure-test";
   config.APIKEYS = [
     {
       createdAt: "2026-01-01T00:00:00.000Z",
       id: `profile:${profileId}`,
-      key: "ccr-claude-model-discovery-cache-failure-test",
+      key: "ar-claude-model-discovery-cache-failure-test",
       name: "Profile: Claude Model Discovery Cache Failure Test"
     }
   ];

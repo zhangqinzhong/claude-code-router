@@ -15,19 +15,19 @@ test("unreadable legacy SQLite sources are preserved for a future migration retr
   const {
     APP_CONFIG_DB_FILE,
     LEGACY_API_KEYS_DB_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   mkdirSync(path.dirname(LEGACY_API_KEYS_DB_FILE), { recursive: true });
   writeFileSync(LEGACY_API_KEYS_DB_FILE, "not a SQLite database");
 
   const {
     loadPersistedApiKeys
-  } = await import("@ccr/core/config/config-repository.ts");
+  } = await import("@agentrouter/core/config/config-repository.ts");
   assert.deepEqual(await loadPersistedApiKeys(), []);
   assert.equal(existsSync(LEGACY_API_KEYS_DB_FILE), true);
 
   const {
     createBetterSqliteDatabase
-  } = await import("@ccr/core/storage/sqlite-native.ts");
+  } = await import("@agentrouter/core/storage/sqlite-native.ts");
   const database = createBetterSqliteDatabase(APP_CONFIG_DB_FILE, {
     fileMustExist: true,
     readonly: true

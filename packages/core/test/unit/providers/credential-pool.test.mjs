@@ -3,11 +3,11 @@ import test from "node:test";
 import {
   readProviderCredentialCooldown,
   recordProviderCredentialOutcome
-} from "@ccr/core/providers/credential-pool.ts";
+} from "@agentrouter/core/providers/credential-pool.ts";
 import {
   providerCredentialInternalName,
   providerCredentialRuntimeId
-} from "@ccr/core/providers/runtime-topology.ts";
+} from "@agentrouter/core/providers/runtime-topology.ts";
 
 let fixtureSequence = 0;
 

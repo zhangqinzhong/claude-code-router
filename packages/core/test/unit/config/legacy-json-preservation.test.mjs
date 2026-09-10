@@ -15,13 +15,13 @@ test("malformed legacy JSON is preserved when default config is persisted", asyn
   const {
     APP_CONFIG_DB_FILE,
     LEGACY_ACTIVE_CONFIG_FILE
-  } = await import("@ccr/core/config/constants.ts");
-  const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
+  const { createDefaultAppConfig } = await import("@agentrouter/core/config/default-config.ts");
   mkdirSync(path.dirname(LEGACY_ACTIVE_CONFIG_FILE), { recursive: true });
   const malformedConfig = "{\n  \"PORT\": 9999,\n";
   writeFileSync(LEGACY_ACTIVE_CONFIG_FILE, malformedConfig, "utf8");
 
-  const { loadAppConfig } = await import("@ccr/core/config/config.ts");
+  const { loadAppConfig } = await import("@agentrouter/core/config/config.ts");
   const config = await loadAppConfig();
 
   // The legacy JSON is unparseable, so the persisted config must fall back to

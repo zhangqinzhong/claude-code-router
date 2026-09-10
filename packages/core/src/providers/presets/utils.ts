@@ -3,8 +3,8 @@ import {
   type ProviderIdentitySafetyIssue,
   type ProviderPreset,
   type ProviderPresetEndpoint
-} from "@ccr/core/providers/presets/types";
-import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+} from "@agentrouter/core/providers/presets/types";
+import { providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 
 export function findProviderPresetInList(
   presets: ProviderPreset[],

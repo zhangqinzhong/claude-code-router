@@ -6,12 +6,18 @@
     "**/*.node",
     "dist/bundled-plugins/**"
   ],
-  "electronLanguages": ["en-US", "zh-CN", "zh-TW", "zh_CN", "zh_TW"],
+  "electronLanguages": [
+    "en-US",
+    "zh-CN",
+    "zh-TW",
+    "zh_CN",
+    "zh_TW"
+  ],
   "npmRebuild": true,
   "publish": [
     {
       "provider": "github",
-      "owner": "musistudio",
+      "owner": "zhangqinzhong",
       "repo": "claude-code-router",
       "releaseType": "release"
     }
@@ -25,7 +31,9 @@
   "protocols": [
     {
       "name": "AgentRouter Provider Import",
-      "schemes": ["agentrouter"]
+      "schemes": [
+        "agentrouter"
+      ]
     }
   ],
   "files": [
@@ -47,7 +55,10 @@
     "entitlements": "build/entitlements.mac.plist",
     "entitlementsInherit": "build/entitlements.mac.inherit.plist",
     "notarize": true,
-    "target": ["dmg", "zip"],
+    "target": [
+      "dmg",
+      "zip"
+    ],
     "artifactName": "AgentRouter_${version}.${ext}"
   },
   "afterSign": "build/verify-macos-notarization.cjs",
@@ -56,14 +67,18 @@
     "target": [
       {
         "target": "nsis",
-        "arch": ["x64"]
+        "arch": [
+          "x64"
+        ]
       }
     ],
     "artifactName": "AgentRouter_${version}.${ext}"
   },
   "linux": {
     "executableName": "agentrouter",
-    "target": ["AppImage"],
+    "target": [
+      "AppImage"
+    ],
     "artifactName": "AgentRouter_${version}.${ext}"
   },
   "nsis": {

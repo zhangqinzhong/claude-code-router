@@ -1,4 +1,4 @@
-import { defaultProviderAccountConfig, type ProviderPreset } from "@ccr/core/providers/presets/types";
+import { defaultProviderAccountConfig, type ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 export const fennoProviderPreset: ProviderPreset = {
   account: defaultProviderAccountConfig,
@@ -11,5 +11,5 @@ export const fennoProviderPreset: ProviderPreset = {
   ],
   id: "fenno",
   name: "Fenno.ai",
-  websiteUrl: "https://api.fenno.ai/register?redirect=/purchase?tab=subscription%26group=16&aff=9HHHAB5QLAES"
+  websiteUrl: "https://api.fenno.ai/register?redirect=/purchase?tab=subscription%26group=16"
 };

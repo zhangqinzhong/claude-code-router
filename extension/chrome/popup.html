@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CCR Login Import</title>
+    <title>AgentRouter Login Import</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -185,37 +185,37 @@
   </head>
   <body>
     <main>
-      <h1>CCR Login Import</h1>
-      <p>Import browser login state only into a local CCR job. The URL must point to localhost or 127.0.0.1.</p>
+      <h1>AgentRouter Login Import</h1>
+      <p>Import browser login state only into a local AgentRouter job. The URL must point to localhost or 127.0.0.1.</p>
       <ol class="steps" aria-label="Import steps">
         <li class="step">
           <span class="step-index">1</span>
           <span>
-            <span class="step-title">Paste the CCR import URL</span>
-            <span class="step-copy">Create the job in CCR, then paste the copied URL here.</span>
+            <span class="step-title">Paste the AgentRouter import URL</span>
+            <span class="step-copy">Create the job in AgentRouter, then paste the copied URL here.</span>
           </span>
         </li>
         <li class="step">
           <span class="step-index">2</span>
           <span>
             <span class="step-title">Review requested domains</span>
-            <span class="step-copy">CCR tells the extension exactly which domains it needs.</span>
+            <span class="step-copy">AgentRouter tells the extension exactly which domains it needs.</span>
           </span>
         </li>
         <li class="step">
           <span class="step-index">3</span>
           <span>
             <span class="step-title">Import cookies and localStorage</span>
-            <span class="step-copy">Only the selected domains are read and sent back to the local CCR job.</span>
+            <span class="step-copy">Only the selected domains are read and sent back to the local AgentRouter job.</span>
           </span>
         </li>
       </ol>
       <label>
         Import URL
-        <textarea id="import-url" spellcheck="false" placeholder="Paste the URL copied from CCR"></textarea>
+        <textarea id="import-url" spellcheck="false" placeholder="Paste the URL copied from AgentRouter"></textarea>
       </label>
       <section id="domain-preview" class="domains" hidden>
-        <strong class="step-title">Domains requested by CCR</strong>
+        <strong class="step-title">Domains requested by AgentRouter</strong>
         <div id="domain-list" class="domain-list"></div>
       </section>
       <p class="note">This extension rejects remote import URLs. If Chrome asks for site access, grant only the domains shown above.</p>

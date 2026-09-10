@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import type { AgentAnalysisSessionRow, AgentAnalysisTraceRun, RequestLogEntry, RequestLogPage } from "@ccr/core/contracts/app.ts";
-import { AgentAnalysisView } from "@ccr/ui/pages/home/components/dashboard.tsx";
-import { LogsView } from "@ccr/ui/pages/home/components/network-logs.tsx";
-import { AppI18nContext, appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
-import { createEmptyAgentAnalysis } from "@ccr/ui/pages/home/shared/usage.ts";
+import type { AgentAnalysisSessionRow, AgentAnalysisTraceRun, RequestLogEntry, RequestLogPage } from "@agentrouter/core/contracts/app.ts";
+import { AgentAnalysisView } from "@agentrouter/ui/pages/home/components/dashboard.tsx";
+import { LogsView } from "@agentrouter/ui/pages/home/components/network-logs.tsx";
+import { AppI18nContext, appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
+import { createEmptyAgentAnalysis } from "@agentrouter/ui/pages/home/shared/usage.ts";
 
 const emptyLogPage: RequestLogPage = {
   generatedAt: "2026-07-23T00:00:00.000Z",

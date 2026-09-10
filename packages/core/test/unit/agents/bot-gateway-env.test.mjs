@@ -3,9 +3,9 @@ import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { botGatewayProfileEnv } from "@ccr/core/agents/bot-gateway/env.ts";
-import { materializeBotGatewayStdioRunnerPath } from "@ccr/core/agents/bot-gateway/qr-login-service.ts";
-import { botGatewaySdkImportSpecifier } from "@ccr/core/agents/bot-gateway/sdk-import.ts";
+import { botGatewayProfileEnv } from "@agentrouter/core/agents/bot-gateway/env.ts";
+import { materializeBotGatewayStdioRunnerPath } from "@agentrouter/core/agents/bot-gateway/qr-login-service.ts";
+import { botGatewaySdkImportSpecifier } from "@agentrouter/core/agents/bot-gateway/sdk-import.ts";
 
 function botGateway(overrides = {}) {
   return {
@@ -147,7 +147,7 @@ test("botGatewaySdkImportSpecifier converts Windows absolute paths before URL sc
 });
 
 test("materializeBotGatewayStdioRunnerPath copies bundled runner out of app.asar paths", () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-bot-runner-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-bot-runner-"));
   const source = path.join(dir, "resources", "app.asar", "dist", "main", "bot-gateway-sdk", "bin", "bot-gateway-stdio.mjs");
   const configDir = path.join(dir, "config");
   mkdirSync(path.dirname(source), { recursive: true });

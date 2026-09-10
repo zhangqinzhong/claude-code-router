@@ -4,7 +4,7 @@ import {
   prepareCodexMultiAgentBridgeRequest,
   transformCodexMultiAgentBridgeResponseValue,
   transformCodexMultiAgentBridgeSseEvent
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 
 const config = {
   Providers: [],

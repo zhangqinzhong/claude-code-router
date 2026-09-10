@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
-import type { AppConfig } from "@ccr/core/contracts/app";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
 
-export const gatewayRuntimeConfigControlPath = "/__ccr/runtime/config";
+export const gatewayRuntimeConfigControlPath = "/__ar/runtime/config";
 
 export function gatewayRuntimeConfigRevision(config: AppConfig | undefined): string | undefined {
   if (!config) {

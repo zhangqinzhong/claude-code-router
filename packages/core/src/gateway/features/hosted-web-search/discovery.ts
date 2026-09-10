@@ -1,13 +1,13 @@
-import type { AppConfig, GatewayProviderProtocol, VirtualModelFusionWebSearchProvider } from "@ccr/core/contracts/app";
-import { isRecord, numberValue, stringListValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { normalizeCoreGatewayVirtualModelProfiles } from "@ccr/core/gateway/core-runtime/config-compiler";
-import { browserWebSearchUnavailableMessage, fusionModelNameFromSelector, readFusionWebSearchConfig, withCodexCompatibleVirtualModelProfiles, withFusionVirtualModelAliases } from "@ccr/core/mcp/fusion-config";
-import type { BrowserWebSearchMcpIntegration, BrowserWebSearchProtocolRecord, ClaudeCodeWebSearchContinuationContext, HostedWebSearchProtocolContext } from "@ccr/core/gateway/internal/shared";
-import { clampNumber, uniqueStrings } from "@ccr/core/gateway/internal/collections";
-import { defaultFusionWebSearchProvider } from "@ccr/core/gateway/internal/shared";
-import { queryMatchScore } from "@ccr/core/gateway/features/hosted-web-search/evidence";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { formatError } from "@ccr/core/gateway/http/io";
+import type { AppConfig, GatewayProviderProtocol, VirtualModelFusionWebSearchProvider } from "@agentrouter/core/contracts/app";
+import { isRecord, numberValue, stringListValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { normalizeCoreGatewayVirtualModelProfiles } from "@agentrouter/core/gateway/core-runtime/config-compiler";
+import { browserWebSearchUnavailableMessage, fusionModelNameFromSelector, readFusionWebSearchConfig, withCodexCompatibleVirtualModelProfiles, withFusionVirtualModelAliases } from "@agentrouter/core/mcp/fusion-config";
+import type { BrowserWebSearchMcpIntegration, BrowserWebSearchProtocolRecord, ClaudeCodeWebSearchContinuationContext, HostedWebSearchProtocolContext } from "@agentrouter/core/gateway/internal/shared";
+import { clampNumber, uniqueStrings } from "@agentrouter/core/gateway/internal/collections";
+import { defaultFusionWebSearchProvider } from "@agentrouter/core/gateway/internal/shared";
+import { queryMatchScore } from "@agentrouter/core/gateway/features/hosted-web-search/evidence";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { formatError } from "@agentrouter/core/gateway/http/io";
 
 type FusionWebSearchToolCandidate = {
   aliases: string[];

@@ -2,8 +2,8 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { authorize, exchangeClaudeCodeWifToken } from "@ccr/core/gateway/auth/api-key-authorizer.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { authorize, exchangeClaudeCodeWifToken } from "@agentrouter/core/gateway/auth/api-key-authorizer.ts";
 
 const authorizerSourceFile = path.join(
   process.cwd(),
@@ -14,7 +14,7 @@ const authorizerSourceFile = path.join(
   "auth",
   "api-key-authorizer.ts"
 );
-const gatewayApiKey = "ccr-3f8a1c7d9e2b4056a1c7d9e2b4056f8a";
+const gatewayApiKey = "ar-3f8a1c7d9e2b4056a1c7d9e2b4056f8a";
 
 function configWithApiKeys(apiKeys) {
   const config = createDefaultAppConfig();
@@ -50,7 +50,7 @@ test("gateway authorization accepts the configured API key on every supported ca
   for (const request of [
     { headers: { authorization: `Bearer ${gatewayApiKey}` } },
     { headers: { "x-api-key": gatewayApiKey } },
-    { url: `/__ccr/remote/status?api_key=${gatewayApiKey}` }
+    { url: `/__ar/remote/status?api_key=${gatewayApiKey}` }
   ]) {
     const { response, result } = await authorizeRequest(config, request);
 

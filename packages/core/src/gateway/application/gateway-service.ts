@@ -4,36 +4,36 @@
 import type { ChildProcess } from "node:child_process";
 import { randomUUID } from "node:crypto";
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from "node:http";
-import type { ApiKeyConfig, AppConfig, GatewayStatus, RouteScriptTestRequest, RouteScriptTestResult, RouteScriptValidationRequest, RouteScriptValidationResult, RouterRule } from "@ccr/core/contracts/app";
-import { NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, hasAvailableGatewayModels } from "@ccr/core/contracts/app";
-import { loadAppConfig } from "@ccr/core/config/config";
-import { backendService } from "@ccr/core/plugins/backend-service";
-import { getSystemProxyUrlForProtocol } from "@ccr/core/proxy/system-proxy-fetch";
-import { pluginService } from "@ccr/core/plugins/service";
-import { proxyService } from "@ccr/core/proxy/service";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler";
-import { isAddressInUseMessage, probeExistingCcrGateway, reloadExistingCcrGatewayConfig } from "@ccr/core/gateway/existing-gateway-probe";
-import { closeServer, formatError } from "@ccr/core/gateway/http/io";
-import { RawTraceSynchronizer } from "@ccr/core/observability/raw-trace-sync";
-import { GatewayBillingSynchronizer } from "@ccr/core/usage/billing-sync";
-import { assertLoopbackCoreHost, endpoint, formatCoreGatewayChildExit, gatewayNetworkEndpoints, gatewayRuntimeSupportsRouterPlugin, generateCoreGatewayAuthToken, isCoreGatewayHealthy, loopbackCoreHostError, removeManagedCoreGatewayMarker, shouldRunGatewayRuntime, shouldRunUnifiedServer, spawnGatewayProcess, stopPreviousManagedCoreGateway, waitForCoreGatewayStop, waitForManagedCoreGatewayReady, writeManagedCoreGatewayMarker } from "@ccr/core/gateway/core-runtime/supervisor";
-import { coreGatewayAuthHeader } from "@ccr/core/gateway/internal/shared";
-import type { BrowserAutomationMcpIntegration, BrowserWebSearchMcpIntegration, GatewayStopOptions } from "@ccr/core/gateway/internal/shared";
-import { ccrRuntimeConfigReloadMessageType } from "@ccr/core/gateway/core-runtime/router-plugin-contract";
-import { GatewayRequestPipeline } from "@ccr/core/gateway/request/pipeline";
-import { GatewayHttpRequestHandler } from "@ccr/core/gateway/http/request-handler";
-import { gatewayRuntimeConfigRevision } from "@ccr/core/gateway/runtime-config-control";
-import { shouldRestartGatewayForRuntimeConfigChange } from "@ccr/core/gateway/runtime-change";
-import { RouteScriptRuntime } from "@ccr/core/routing/route-script-runtime";
-import { buildRouteScriptInput } from "@ccr/core/routing/route-script-context";
-import { compileRouterConfig } from "@ccr/core/routing/config-compiler";
-import { normalizeRouteScriptResult, scriptResultPreview } from "@ccr/core/routing/route-script-result";
-import { mediaService } from "@ccr/core/media/service";
-import { mediaToolsGatewayEndpoint } from "@ccr/core/mcp/grok-media-config";
-import { browserAutomationMcpEnabled } from "@ccr/core/mcp/toolhub-config";
-import { installSocketTypeOfServiceCompat } from "@ccr/core/platform/socket-compat";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key";
+import type { ApiKeyConfig, AppConfig, GatewayStatus, RouteScriptTestRequest, RouteScriptTestResult, RouteScriptValidationRequest, RouteScriptValidationResult, RouterRule } from "@agentrouter/core/contracts/app";
+import { NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, hasAvailableGatewayModels } from "@agentrouter/core/contracts/app";
+import { loadAppConfig } from "@agentrouter/core/config/config";
+import { backendService } from "@agentrouter/core/plugins/backend-service";
+import { getSystemProxyUrlForProtocol } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { pluginService } from "@agentrouter/core/plugins/service";
+import { proxyService } from "@agentrouter/core/proxy/service";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler";
+import { isAddressInUseMessage, probeExistingArGateway, reloadExistingArGatewayConfig } from "@agentrouter/core/gateway/existing-gateway-probe";
+import { closeServer, formatError } from "@agentrouter/core/gateway/http/io";
+import { RawTraceSynchronizer } from "@agentrouter/core/observability/raw-trace-sync";
+import { GatewayBillingSynchronizer } from "@agentrouter/core/usage/billing-sync";
+import { assertLoopbackCoreHost, endpoint, formatCoreGatewayChildExit, gatewayNetworkEndpoints, gatewayRuntimeSupportsRouterPlugin, generateCoreGatewayAuthToken, isCoreGatewayHealthy, loopbackCoreHostError, removeManagedCoreGatewayMarker, shouldRunGatewayRuntime, shouldRunUnifiedServer, spawnGatewayProcess, stopPreviousManagedCoreGateway, waitForCoreGatewayStop, waitForManagedCoreGatewayReady, writeManagedCoreGatewayMarker } from "@agentrouter/core/gateway/core-runtime/supervisor";
+import { coreGatewayAuthHeader } from "@agentrouter/core/gateway/internal/shared";
+import type { BrowserAutomationMcpIntegration, BrowserWebSearchMcpIntegration, GatewayStopOptions } from "@agentrouter/core/gateway/internal/shared";
+import { arRuntimeConfigReloadMessageType } from "@agentrouter/core/gateway/core-runtime/router-plugin-contract";
+import { GatewayRequestPipeline } from "@agentrouter/core/gateway/request/pipeline";
+import { GatewayHttpRequestHandler } from "@agentrouter/core/gateway/http/request-handler";
+import { gatewayRuntimeConfigRevision } from "@agentrouter/core/gateway/runtime-config-control";
+import { shouldRestartGatewayForRuntimeConfigChange } from "@agentrouter/core/gateway/runtime-change";
+import { RouteScriptRuntime } from "@agentrouter/core/routing/route-script-runtime";
+import { buildRouteScriptInput } from "@agentrouter/core/routing/route-script-context";
+import { compileRouterConfig } from "@agentrouter/core/routing/config-compiler";
+import { normalizeRouteScriptResult, scriptResultPreview } from "@agentrouter/core/routing/route-script-result";
+import { mediaService } from "@agentrouter/core/media/service";
+import { mediaToolsGatewayEndpoint } from "@agentrouter/core/mcp/grok-media-config";
+import { browserAutomationMcpEnabled } from "@agentrouter/core/mcp/toolhub-config";
+import { installSocketTypeOfServiceCompat } from "@agentrouter/core/platform/socket-compat";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key";
 
 installSocketTypeOfServiceCompat();
 
@@ -288,7 +288,7 @@ class GatewayService {
     const currentStatus = this.getStatus();
     if (currentStatus.state === "running" && currentStatus.endpoint === desiredEndpoint) {
       if (currentStatus.gatewayManagedExternally) {
-        const existingGateway = await probeExistingCcrGateway(config);
+        const existingGateway = await probeExistingArGateway(config);
         if (existingGateway.state === "usable") {
           this.markExternalGatewayRunning(config, existingGateway.endpoint, existingGateway.apiKey);
           try {
@@ -308,7 +308,7 @@ class GatewayService {
     // A separately managed single runtime can exit without exposing its bind
     // error to this process. Reuse an authenticated gateway before spawning a
     // competing runtime instead of depending on an EADDRINUSE log message.
-    let existingGateway = await probeExistingCcrGateway(config);
+    let existingGateway = await probeExistingArGateway(config);
     if (existingGateway.state === "usable") {
       await this.stop({ nextConfig: config });
     } else {
@@ -316,7 +316,7 @@ class GatewayService {
       if (status.state !== "error" || !isAddressInUseMessage(status.lastError)) {
         return status;
       }
-      existingGateway = await probeExistingCcrGateway(config);
+      existingGateway = await probeExistingArGateway(config);
       if (existingGateway.state !== "usable") {
         return status;
       }
@@ -554,7 +554,7 @@ class GatewayService {
   private async reloadExternalGatewayConfig(config: AppConfig, forceRestart: boolean): Promise<void> {
     const currentEndpoint = this.status.endpoint || endpoint(config.gateway.host, config.gateway.port);
     try {
-      const externalGateway = await reloadExistingCcrGatewayConfig(
+      const externalGateway = await reloadExistingArGatewayConfig(
         currentEndpoint,
         config,
         this.externalGatewayApiKey,
@@ -562,7 +562,7 @@ class GatewayService {
       );
       this.markExternalGatewayRunning(config, externalGateway.endpoint, externalGateway.apiKey);
     } catch (error) {
-      const message = `Failed to update the externally managed CCR gateway: ${formatError(error)}`;
+      const message = `Failed to update the externally managed AgentRouter gateway: ${formatError(error)}`;
       this.status = {
         ...this.status,
         lastError: message,
@@ -592,7 +592,7 @@ class GatewayService {
       if (restartRequired) {
         const status = await this.start(nextConfig);
         if (status.state === "error") {
-          throw new Error(status.lastError || "CCR gateway failed to restart with the updated configuration.");
+          throw new Error(status.lastError || "AgentRouter gateway failed to restart with the updated configuration.");
         }
       } else {
         await this.updateConfig(nextConfig);
@@ -706,7 +706,7 @@ function isRuntimeConfigReloadMessage(message: unknown): message is { configRevi
     return false;
   }
   const record = message as Record<string, unknown>;
-  return record.type === ccrRuntimeConfigReloadMessageType &&
+  return record.type === arRuntimeConfigReloadMessageType &&
     record.protocolVersion === 1 &&
     typeof record.configRevision === "string" &&
     /^[a-f0-9]{64}$/i.test(record.configRevision) &&

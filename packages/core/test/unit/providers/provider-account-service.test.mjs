@@ -8,13 +8,13 @@ import {
   localCodexAccountCredentialForTest,
   setProviderAccountWebContentFetchHandler,
   testProviderAccountConnector
-} from "@ccr/core/providers/account-service.ts";
+} from "@agentrouter/core/providers/account-service.ts";
 import {
   grokDefaultBillingEndpoint,
   grokDefaultBaseUrl,
   grokDefaultSubscriptionEndpoint,
   grokProviderAccountConfig
-} from "@ccr/core/agents/local-providers/grok.ts";
+} from "@agentrouter/core/agents/local-providers/grok.ts";
 
 const localAgentProviderApiKey = "ar-local-agent-login";
 const codexDefaultBaseUrl = "https://chatgpt.com/backend-api/codex";
@@ -207,7 +207,7 @@ test("webcontent-json connector defaults browser request origin to login URL ori
   assert.equal(result.meters[0].remaining, 7);
 });
 
-test("webcontent-json connector reports unsupported outside CCR Desktop", async () => {
+test("webcontent-json connector reports unsupported outside AgentRouter Desktop", async () => {
   setProviderAccountWebContentFetchHandler(undefined);
 
   await assert.rejects(
@@ -220,13 +220,13 @@ test("webcontent-json connector reports unsupported outside CCR Desktop", async 
       },
       providerName: "Vendor"
     }),
-    /only available in CCR Desktop/
+    /only available in AgentRouter Desktop/
   );
 });
 
 test("Codex local account credential refreshes when only a refresh token is available", async (t) => {
   const previousHome = process.env.AR_INTERNAL_HOME_DIR;
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-account-refresh-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-codex-account-refresh-"));
   mkdirSync(path.join(home, ".codex"), { recursive: true });
   process.env.AR_INTERNAL_HOME_DIR = home;
   t.after(() => {
@@ -284,7 +284,7 @@ test("Codex local account credential refreshes when only a refresh token is avai
 });
 
 test("Codex local account credential matches internal provider plugin names", async (t) => {
-  useTemporaryCodexHome(t, "ccr-codex-account-internal-plugin-");
+  useTemporaryCodexHome(t, "ar-codex-account-internal-plugin-");
   const accessToken = jwt({
     "https://api.openai.com/auth": {
       chatgpt_account_id: "acct-internal"
@@ -317,7 +317,7 @@ test("Codex local account credential matches internal provider plugin names", as
 });
 
 test("Codex local account credential falls back to the live auth file when plugin is missing", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-codex-account-live-auth-");
+  const home = useTemporaryCodexHome(t, "ar-codex-account-live-auth-");
   const codexHome = path.join(home, ".codex");
   mkdirSync(codexHome, { recursive: true });
   const accessToken = jwt({
@@ -387,7 +387,7 @@ test("Claude Code local account credential prefers live macOS Keychain token", {
 });
 
 test("Kimi local account credential carries its API key and CLI identity", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-kimi-account-plugin-");
+  const home = useTemporaryCodexHome(t, "ar-kimi-account-plugin-");
   const previousVersion = process.env.KIMI_CODE_VERSION;
   process.env.KIMI_CODE_VERSION = "0.27.0-test";
   t.after(() => {
@@ -450,7 +450,7 @@ test("ZCode local account credential matches internal provider plugin names", as
 });
 
 test("ZCode local account credential falls back to the live config when plugin is missing", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-zcode-account-live-config-");
+  const home = useTemporaryCodexHome(t, "ar-zcode-account-live-config-");
   const zcodeConfigDir = path.join(home, ".zcode", "cli");
   mkdirSync(zcodeConfigDir, { recursive: true });
   writeFileSync(path.join(zcodeConfigDir, "config.json"), JSON.stringify({
@@ -552,7 +552,7 @@ function usePlatform(t, platform) {
 }
 
 function useFakeSecurityOutput(t, output) {
-  const binDir = mkdtempSync(path.join(os.tmpdir(), "ccr-security-bin-"));
+  const binDir = mkdtempSync(path.join(os.tmpdir(), "ar-security-bin-"));
   const securityPath = path.join(binDir, "security");
   const previousPath = process.env.PATH;
   writeFileSync(securityPath, `#!/bin/sh\ncat <<'AR_KEYCHAIN_JSON'\n${JSON.stringify(output)}\nAR_KEYCHAIN_JSON\n`);

@@ -10,8 +10,8 @@ const projectRoot = path.resolve(__dirname, "..", "..");
 const imageName = process.env.AR_DOCKER_TEST_IMAGE || "claude-code-router:local";
 const token = process.env.AR_DOCKER_TEST_WEB_AUTH_TOKEN || "token+/&=#?";
 const testId = randomUUID().slice(0, 8);
-const containerName = `ccr-docker-smoke-${testId}`;
-const volumeName = `ccr-docker-smoke-${testId}`;
+const containerName = `ar-docker-smoke-${testId}`;
+const volumeName = `ar-docker-smoke-${testId}`;
 const startupTimeoutMs = 45_000;
 
 let containerStarted = false;
@@ -59,7 +59,7 @@ try {
   const redirect = await fetch(baseUrl, { redirect: "manual" });
   assert.equal(redirect.status, 302);
   const redirectLocation = redirect.headers.get("location");
-  assert.equal(redirectLocation, `/pages/home/index.html?ccr_web_token=${encodeURIComponent(token)}`);
+  assert.equal(redirectLocation, `/pages/home/index.html?ar_web_token=${encodeURIComponent(token)}`);
 
   const page = await fetch(`${baseUrl}${redirectLocation}`);
   assert.equal(page.status, 200);
@@ -199,7 +199,7 @@ fs.writeFileSync(path.join(configDir, "config.json"), JSON.stringify(config, nul
 }
 
 async function rpc(baseUrl, method, authToken, args = []) {
-  return fetch(`${baseUrl}/api/ccr/rpc`, {
+  return fetch(`${baseUrl}/api/ar/rpc`, {
     body: JSON.stringify({ args, method }),
     headers: {
       "content-type": "application/json",

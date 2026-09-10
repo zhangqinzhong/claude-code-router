@@ -3,7 +3,7 @@ import path from "node:path";
 import test from "node:test";
 import {
   buildProfileLaunchPlan,
-  ccrManagedProfileDir,
+  arManagedProfileDir,
   defaultProfileOpenSurface,
   findProfileForOpen,
   profileOpenCommand,
@@ -14,7 +14,7 @@ import {
   resolveOpenCodeConfigFile,
   resolveProfileOpenSurface,
   shouldAutoStartProfileGateway
-} from "@ccr/core/profiles/launch-core.ts";
+} from "@agentrouter/core/profiles/launch-core.ts";
 
 const claudeProfile = {
   agent: "claude-code",
@@ -163,7 +163,7 @@ test("default profile command surface is CLI unless the agent is app-only", () =
   assert.equal(defaultProfileOpenSurface(claudeDesignProfile), "app");
 });
 
-test("Grok and Kimi CLI start a temporary CCR gateway when none is already running", () => {
+test("Grok and Kimi CLI start a temporary AgentRouter gateway when none is already running", () => {
   assert.equal(shouldAutoStartProfileGateway(grokProfile, "cli"), true);
   assert.equal(shouldAutoStartProfileGateway(kimiProfile, "cli"), true);
   assert.equal(shouldAutoStartProfileGateway(piProfile, "cli"), true);
@@ -174,8 +174,8 @@ test("Grok and Kimi CLI start a temporary CCR gateway when none is already runni
   assert.equal(shouldAutoStartProfileGateway(claudeDesignProfile, "app"), false);
 });
 
-test("buildProfileLaunchPlan creates CCR-managed launcher paths", () => {
-  const configDir = path.join(path.sep, "tmp", "ccr-config");
+test("buildProfileLaunchPlan creates AR-managed launcher paths", () => {
+  const configDir = path.join(path.sep, "tmp", "ar-config");
   const codexPlan = buildProfileLaunchPlan(configDir, codexProfile, "app");
   const claudePlan = buildProfileLaunchPlan(configDir, claudeProfile, "cli", ["--debug"]);
   const grokPlan = buildProfileLaunchPlan(configDir, grokProfile, "cli", ["--debug"]);
@@ -241,16 +241,16 @@ test("buildProfileLaunchPlan creates CCR-managed launcher paths", () => {
   assert.throws(() => buildProfileLaunchPlan(configDir, workbuddyProfile, "cli"), /does not support CLI/);
 
   assert.throws(() => buildProfileLaunchPlan(configDir, claudeProfile, "app"), /Claude App opening/);
-  assert.throws(() => buildProfileLaunchPlan(configDir, claudeDesignProfile, "app"), /Claude Design profiles can only be opened from CCR Desktop/);
+  assert.throws(() => buildProfileLaunchPlan(configDir, claudeDesignProfile, "app"), /Claude Design profiles can only be opened from AgentRouter Desktop/);
 });
 
-test("profile config paths honor CCR, custom, and global scopes", () => {
-  const configDir = path.join(path.sep, "tmp", "ccr-config");
+test("profile config paths honor AgentRouter, custom, and global scopes", () => {
+  const configDir = path.join(path.sep, "tmp", "ar-config");
   const customProfile = { ...codexProfile, id: "Custom Profile", scope: "custom" };
   const globalCodex = { ...codexProfile, codexHome: "~/codex-home", scope: "global" };
 
   assert.equal(
-    ccrManagedProfileDir(configDir, customProfile),
+    arManagedProfileDir(configDir, customProfile),
     path.join(configDir, "profiles", "custom-profile", "custom")
   );
   assert.equal(

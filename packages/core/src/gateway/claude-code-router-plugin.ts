@@ -2,24 +2,24 @@ import { createRequire } from "node:module";
 import { EventEmitter } from "node:events";
 import os from "node:os";
 import path from "node:path";
-import { isGatewayProviderEnabled, type AppConfig, type ProfileClientKind, type ProfileConfig, type RequestRouteTraceChange, type RouterBuiltInAgentRuleId, type RouterFallbackConfig, type RouterRule, type RouterRuleCondition } from "@ccr/core/contracts/app";
-import { CONFIGDIR } from "@ccr/core/config/constants";
-import { applyAgentRequestEnrichers } from "@ccr/core/agents/request-enricher";
-import { buildClaudeAppGatewayModelRoutes, type ClaudeAppGatewayModelRoute, resolveClaudeAppGatewayRouteModel, stripClaudeAppGatewayOneMillionContextSuffix } from "@ccr/core/agents/claude-app/gateway-routes";
-import { claudeAppGatewayModelRouteOptions } from "@ccr/core/gateway/internal/shared";
-import { compileRouterConfig, type CompiledProfileRoutingConfig, type CompiledRouterConfig, type CompiledRouterRule } from "@ccr/core/routing/config-compiler";
-import type { RouteDecision, RouteDiagnostic, RouteModelRef, RouteRequest, RouteSource } from "@ccr/core/routing/contracts";
-import { ModelRegistry, normalizeRouteSelector } from "@ccr/core/routing/model-registry";
-import { RoutePolicyEngine, type RoutePolicy } from "@ccr/core/routing/policy-engine";
-import type { RouteTraceObserver } from "@ccr/core/observability/route-trace";
-import { applyCompiledRouteRewrite, isBodyModelCompiledRewrite, type CompiledRouteRewrite } from "@ccr/core/routing/rewrite";
-import { buildRouteScriptInput } from "@ccr/core/routing/route-script-context";
-import { normalizeRouteScriptResult } from "@ccr/core/routing/route-script-result";
-import type { RouteScriptRuntime } from "@ccr/core/routing/route-script-runtime";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key";
-import { isModelAllowedForProfile } from "@ccr/core/profiles/model-allowlist";
+import { isGatewayProviderEnabled, type AppConfig, type ProfileClientKind, type ProfileConfig, type RequestRouteTraceChange, type RouterBuiltInAgentRuleId, type RouterFallbackConfig, type RouterRule, type RouterRuleCondition } from "@agentrouter/core/contracts/app";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
+import { applyAgentRequestEnrichers } from "@agentrouter/core/agents/request-enricher";
+import { buildClaudeAppGatewayModelRoutes, type ClaudeAppGatewayModelRoute, resolveClaudeAppGatewayRouteModel, stripClaudeAppGatewayOneMillionContextSuffix } from "@agentrouter/core/agents/claude-app/gateway-routes";
+import { claudeAppGatewayModelRouteOptions } from "@agentrouter/core/gateway/internal/shared";
+import { compileRouterConfig, type CompiledProfileRoutingConfig, type CompiledRouterConfig, type CompiledRouterRule } from "@agentrouter/core/routing/config-compiler";
+import type { RouteDecision, RouteDiagnostic, RouteModelRef, RouteRequest, RouteSource } from "@agentrouter/core/routing/contracts";
+import { ModelRegistry, normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
+import { RoutePolicyEngine, type RoutePolicy } from "@agentrouter/core/routing/policy-engine";
+import type { RouteTraceObserver } from "@agentrouter/core/observability/route-trace";
+import { applyCompiledRouteRewrite, isBodyModelCompiledRewrite, type CompiledRouteRewrite } from "@agentrouter/core/routing/rewrite";
+import { buildRouteScriptInput } from "@agentrouter/core/routing/route-script-context";
+import { normalizeRouteScriptResult } from "@agentrouter/core/routing/route-script-result";
+import type { RouteScriptRuntime } from "@agentrouter/core/routing/route-script-runtime";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key";
+import { isModelAllowedForProfile } from "@agentrouter/core/profiles/model-allowlist";
 
-export { normalizeRouteSelector } from "@ccr/core/routing/model-registry";
+export { normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
 
 type HeaderValue = string | string[] | undefined;
 
@@ -247,7 +247,7 @@ function resolveLocalModulePath(value: string, label: string): string {
 
   const resolved = path.resolve(CONFIGDIR, expanded);
   if (!isPathInside(resolved, CONFIGDIR)) {
-    throw new Error(`${label} relative paths must stay inside the CCR config directory.`);
+    throw new Error(`${label} relative paths must stay inside the AgentRouter config directory.`);
   }
   return resolved;
 }
@@ -753,36 +753,36 @@ function builtInAgentUserAgentNeedle(agent: RouterBuiltInAgentRuleId): string {
   return agent === "claude-code" ? "claude" : "codex";
 }
 
-const ccrSubagentModelOpenTag = "<CCR-SUBAGENT-MODEL>";
-const ccrSubagentModelCloseTag = "</CCR-SUBAGENT-MODEL>";
-const ccrSubagentModelTagExample = `${ccrSubagentModelOpenTag}Provider/model${ccrSubagentModelCloseTag}`;
-const ccrSubagentModelPlaceholder = "provider/model";
+const arSubagentModelOpenTag = "<AR-SUBAGENT-MODEL>";
+const arSubagentModelCloseTag = "</AR-SUBAGENT-MODEL>";
+const arSubagentModelTagExample = `${arSubagentModelOpenTag}Provider/model${arSubagentModelCloseTag}`;
+const arSubagentModelPlaceholder = "provider/model";
 const claudeCodeBillingSystemHeaderPrefix = "x-anthropic-billing-header";
 const claudeCodeSubagentModelEnv = "CLAUDE_CODE_SUBAGENT_MODEL";
-const ccrSubagentToolModelInstruction =
-  `CCR subagent routing is enabled. When calling this tool, the prompt parameter MUST start with ` +
-  `${ccrSubagentModelTagExample} on its own first line, replacing Provider/model with the best client model ID from the list below. ` +
+const arSubagentToolModelInstruction =
+  `AgentRouter subagent routing is enabled. When calling this tool, the prompt parameter MUST start with ` +
+  `${arSubagentModelTagExample} on its own first line, replacing Provider/model with the best client model ID from the list below. ` +
   `When the tool model field accepts exact strings, set it to the same client model ID so the client initializes the child with the correct model limits. ` +
-  `CCR consumes the tag, removes it from the prompt, and routes the spawned agent request to that model. ` +
+  `AgentRouter consumes the tag, removes it from the prompt, and routes the spawned agent request to that model. ` +
   `If the model field only permits built-in aliases, leave it unset and use the tag as the routing fallback. ` +
   `Do not omit the tag or put it in description or subagent_type. ` +
-  `中文要求：调用该工具时，prompt 参数第一行必须写入 ${ccrSubagentModelTagExample}，并将 Provider/model 替换成列表中的客户端模型 ID；若 model 字段支持任意字符串，也必须使用同一个 ID。`;
-const ccrWorkflowSubagentModelInstruction =
-  `CCR workflow subagent routing is enabled. When this workflow creates Agent/Task subagents, each spawned agent prompt MUST start with ` +
-  `${ccrSubagentModelTagExample} on its own first line, replacing Provider/model with the best client model ID from the list below. ` +
+  `中文要求：调用该工具时，prompt 参数第一行必须写入 ${arSubagentModelTagExample}，并将 Provider/model 替换成列表中的客户端模型 ID；若 model 字段支持任意字符串，也必须使用同一个 ID。`;
+const arWorkflowSubagentModelInstruction =
+  `AgentRouter workflow subagent routing is enabled. When this workflow creates Agent/Task subagents, each spawned agent prompt MUST start with ` +
+  `${arSubagentModelTagExample} on its own first line, replacing Provider/model with the best client model ID from the list below. ` +
   `Set each spawned agent's model option to that same client model ID when the agent API accepts exact strings. ` +
   `Put the tag inside the Agent/Task prompt created by the workflow, not in the workflow description or subagent_type. ` +
-  `CCR consumes the tag from the spawned agent request, removes it, and routes that request to the selected model. ` +
-  `中文要求：Workflow 中创建 Agent/Task 时，每个被创建 agent 的 prompt 第一行必须写入 ${ccrSubagentModelTagExample}，并替换成列表中的客户端模型 ID；若 agent API 支持任意模型字符串，也必须将 model 设为同一个 ID。`;
-const ccrSubagentPromptFieldInstruction =
-  `CCR subagent routing is enabled. This prompt string MUST start with ${ccrSubagentModelTagExample} on its own first line, ` +
+  `AgentRouter consumes the tag from the spawned agent request, removes it, and routes that request to the selected model. ` +
+  `中文要求：Workflow 中创建 Agent/Task 时，每个被创建 agent 的 prompt 第一行必须写入 ${arSubagentModelTagExample}，并替换成列表中的客户端模型 ID；若 agent API 支持任意模型字符串，也必须将 model 设为同一个 ID。`;
+const arSubagentPromptFieldInstruction =
+  `AgentRouter subagent routing is enabled. This prompt string MUST start with ${arSubagentModelTagExample} on its own first line, ` +
   `with Provider/model replaced by one client model ID from the list below. When the adjacent model field accepts exact strings, use the same client model ID there. ` +
-  `Put the subagent task after that line; CCR removes the tag before the subagent runs. ` +
+  `Put the subagent task after that line; AgentRouter removes the tag before the subagent runs. ` +
   `中文要求：这个 prompt 字符串第一行必须是替换后的模型标签，后面再写 subagent 任务正文。`;
 type ClaudeCodeSubagentToolKind = "subagent" | "workflow";
 const claudeCodeAgentToolNames = new Set(["agent", "task"]);
 const claudeCodeWorkflowToolNames = new Set(["workflow"]);
-const ccrToolHubSystemInstructionMarker = "CCR ToolHub tool resolution is enabled.";
+const arToolHubSystemInstructionMarker = "AgentRouter ToolHub tool resolution is enabled.";
 
 function claudeCodeToolName(tool: Record<string, unknown>): string | undefined {
   const functionSpec = isRecord(tool.function) ? tool.function : undefined;
@@ -803,7 +803,7 @@ function injectClaudeCodeToolHubInstructions(body: Record<string, unknown>, conf
   }
   const invokeName = toolNames.invoke ?? "tool_hub.invoke";
   appendSystemInstruction(body, [
-    ccrToolHubSystemInstructionMarker,
+    arToolHubSystemInstructionMarker,
     `The ToolHub search/resolution tool is ${toolNames.resolve}; call this actual tool, do not merely mention its name in text.`,
     `You MUST call the ToolHub search/resolution tool ${toolNames.resolve} before answering any request that asks about external services, installed MCP capabilities, business APIs, orders, coupons, stores, accounts, available tools, or capabilities that are not already obvious from the eager tools.`,
     `Do this even if the user did not mention ToolHub or ${toolNames.resolve}. Only skip the ToolHub search/resolution tool when the request is clearly local code/file/shell work or simple conversation that does not need an external or MCP capability.`,
@@ -843,7 +843,7 @@ function shouldUseClaudeCodeToolHubName(current: string | undefined, candidate: 
 
 function claudeCodeToolHubNameScore(name: string): number {
   const normalized = name.toLowerCase();
-  if (normalized.startsWith("mcp__ar-toolhub__") || normalized.startsWith("mcp__ccr_toolhub__")) {
+  if (normalized.startsWith("mcp__ar-toolhub__") || normalized.startsWith("mcp__ar_toolhub__")) {
     return 3;
   }
   if (normalized.startsWith("mcp__") && normalized.includes("toolhub")) {
@@ -856,7 +856,7 @@ function claudeCodeToolHubNameScore(name: string): number {
 }
 
 function appendSystemInstruction(body: Record<string, unknown>, instruction: string): void {
-  if (systemContainsInstruction(body.system, ccrToolHubSystemInstructionMarker)) {
+  if (systemContainsInstruction(body.system, arToolHubSystemInstructionMarker)) {
     return;
   }
   if (typeof body.system === "string") {
@@ -950,7 +950,7 @@ function appendPromptSchemaDescriptionInstruction(tool: Record<string, unknown>,
 
 function appendDescriptionInstruction(description: string | undefined, instruction: string): string {
   const existing = description?.trim() ?? "";
-  if (existing.includes(ccrSubagentModelOpenTag)) {
+  if (existing.includes(arSubagentModelOpenTag)) {
     return existing;
   }
   return existing ? `${existing}\n\n${instruction}` : instruction;
@@ -962,22 +962,22 @@ function claudeCodeAgentToolInstructions(config: AppConfig, profile?: ProfileCon
     return undefined;
   }
   const modelList = [
-    "Configured CCR gateway models (client model -> CCR target):",
+    "Configured AgentRouter gateway models (client model -> AgentRouter target):",
     ...modelRows
   ].join("\n");
   return {
     prompt: [
-      ccrSubagentPromptFieldInstruction,
+      arSubagentPromptFieldInstruction,
       "",
       modelList
     ].join("\n"),
     tool: [
-      ccrSubagentToolModelInstruction,
+      arSubagentToolModelInstruction,
       "",
       modelList
     ].join("\n"),
     workflow: [
-      ccrWorkflowSubagentModelInstruction,
+      arWorkflowSubagentModelInstruction,
       "",
       modelList
     ].join("\n")
@@ -1198,12 +1198,12 @@ function extractAndRemoveSubagentModelTagFromText(
   text: string,
   replace: (text: string) => void
 ): string | undefined {
-  const openIndex = text.indexOf(ccrSubagentModelOpenTag);
+  const openIndex = text.indexOf(arSubagentModelOpenTag);
   if (openIndex < 0) {
     return undefined;
   }
-  const modelStart = openIndex + ccrSubagentModelOpenTag.length;
-  const closeIndex = text.indexOf(ccrSubagentModelCloseTag, modelStart);
+  const modelStart = openIndex + arSubagentModelOpenTag.length;
+  const closeIndex = text.indexOf(arSubagentModelCloseTag, modelStart);
   if (closeIndex < 0) {
     return undefined;
   }
@@ -1211,7 +1211,7 @@ function extractAndRemoveSubagentModelTagFromText(
   if (!model) {
     return undefined;
   }
-  const nextText = `${text.slice(0, openIndex)}${text.slice(closeIndex + ccrSubagentModelCloseTag.length)}`;
+  const nextText = `${text.slice(0, openIndex)}${text.slice(closeIndex + arSubagentModelCloseTag.length)}`;
   replace(nextText);
   return model;
 }
@@ -1627,7 +1627,7 @@ function routerRuleReason(
 }
 
 function isSubagentModelPlaceholder(model: string): boolean {
-  return model.trim().toLowerCase() === ccrSubagentModelPlaceholder;
+  return model.trim().toLowerCase() === arSubagentModelPlaceholder;
 }
 
 function calculateTokenCount(messages: unknown, system: unknown, tools: unknown): number {

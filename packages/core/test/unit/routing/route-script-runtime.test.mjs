@@ -4,11 +4,11 @@ import { createServer } from "node:http";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { ROUTER_SCRIPT_MAX_SOURCE_BYTES } from "@ccr/core/contracts/app.ts";
-import { gatewayService } from "@ccr/core/gateway/application/gateway-service.ts";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin.ts";
-import { buildRouteScriptInput } from "@ccr/core/routing/route-script-context.ts";
-import { RouteScriptRuntime } from "@ccr/core/routing/route-script-runtime.ts";
+import { ROUTER_SCRIPT_MAX_SOURCE_BYTES } from "@agentrouter/core/contracts/app.ts";
+import { gatewayService } from "@agentrouter/core/gateway/application/gateway-service.ts";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin.ts";
+import { buildRouteScriptInput } from "@agentrouter/core/routing/route-script-context.ts";
+import { RouteScriptRuntime } from "@agentrouter/core/routing/route-script-runtime.ts";
 
 const workerFile = [
   path.resolve(__dirname, "../../runtime/route-script-worker.js"),
@@ -16,7 +16,7 @@ const workerFile = [
 ].find(existsSync);
 assert.ok(workerFile, "compiled route script worker is required");
 
-const routeScriptDirectory = mkdtempSync(path.join(os.tmpdir(), "ccr-route-script-files-"));
+const routeScriptDirectory = mkdtempSync(path.join(os.tmpdir(), "ar-route-script-files-"));
 let routeScriptFileIndex = 0;
 test.after(() => rmSync(routeScriptDirectory, { force: true, recursive: true }));
 
@@ -598,7 +598,7 @@ test("dynamic script model deletion overrides an earlier static model rewrite", 
 });
 
 test("route scripts expose the complete documented filesystem API", async () => {
-  const directory = mkdtempSync(path.join(os.tmpdir(), "ccr-route-script-"));
+  const directory = mkdtempSync(path.join(os.tmpdir(), "ar-route-script-"));
   const inputFile = path.join(directory, "input.json");
   const outputFile = path.join(directory, "output.txt");
   const outputJsonFile = path.join(directory, "output.json");

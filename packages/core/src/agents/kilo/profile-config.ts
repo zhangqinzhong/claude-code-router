@@ -1,11 +1,11 @@
-import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
+import { adoptLegacyArtifacts } from "@agentrouter/core/profiles/legacy-artifacts";
 import { chmodSync, copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { buildCodexModelCatalogIds } from "@ccr/core/agents/codex/model-catalog";
-import { parseJsoncRecord } from "@ccr/core/agents/local-providers/shared";
-import { isGatewayProviderEnabled, type AppConfig, type ProfileConfig } from "@ccr/core/contracts/app";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
+import { buildCodexModelCatalogIds } from "@agentrouter/core/agents/codex/model-catalog";
+import { parseJsoncRecord } from "@agentrouter/core/agents/local-providers/shared";
+import { isGatewayProviderEnabled, type AppConfig, type ProfileConfig } from "@agentrouter/core/contracts/app";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
 
 export type KiloProfileConfigWriteResult = {
   backupFile?: string;

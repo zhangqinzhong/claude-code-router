@@ -6,7 +6,7 @@ import type {
   UsageStatsRange,
   UsageStatsSnapshot,
   UsageTotals
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type { AgentFilterValue } from "./options";
 
 function positiveInteger(value: unknown): number | undefined {

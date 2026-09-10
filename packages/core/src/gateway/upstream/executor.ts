@@ -2,26 +2,26 @@
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
 import { Readable } from "node:stream";
-import type { AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProviderCredentialConfig, RequestRouteTraceChange, RouterFallbackConfig } from "@ccr/core/contracts/app";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { createRouteExecutionPlan } from "@ccr/core/routing/execution-plan";
-import { rewriteRouteModelInUrl } from "@ccr/core/routing/protocol-adapter";
-import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector, providerRuntimeId } from "@ccr/core/routing/model-registry";
-import { requestProtocolForPath } from "@ccr/core/routing/protocol-endpoints";
-import { resolveConfiguredProviderModelSelector, resolveUniqueConfiguredProviderModelSelector } from "@ccr/core/routing/model-resolution";
-import { estimateLimitUsage } from "@ccr/core/gateway/limits/window-limiter";
-import { providerCredentialLimitState, readProviderCredentialCooldown, recordProviderCredentialOutcome } from "@ccr/core/providers/credential-pool";
-import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
-import { isLocalClaudeCodeOauthProviderPlugin, mergeAnthropicBetaValues } from "@ccr/core/providers/oauth-plugin";
-import { abortSignalMessage, formatError, omitLocalObservabilityHeaders, shouldSendBody, withCoreGatewayAuthHeader } from "@ccr/core/gateway/http/io";
-import { parseJsonObjectSafe, releaseJsonObject, serializeJsonBody, serializeJsonBodyWithModel } from "@ccr/core/gateway/http/body";
-import { resolveGatewayPublicModelId } from "@ccr/core/gateway/features/model-discovery";
-import { activeProviderCredentials, findProviderByPublicOrInternalName, findProviderCredentialBySlug, normalizedProviderCapabilities, parseProviderCredentialInternalName, providerCapabilityForClientProtocol, providerCapabilityInternalName, providerCapabilityNameMatches, providerCredentialInternalName, providerCredentialPriority, providerCredentialRuntimeId, providerCredentialSlug, providerProtocolForClientProtocol, sanitizeHeaderValue } from "@ccr/core/providers/runtime-topology";
-import { delay } from "@ccr/core/gateway/internal/clock";
-import { retryDelayAfterNetworkError, retryDelayAfterStatus, shouldFallbackAfterStatus } from "@ccr/core/gateway/upstream/retry-policy";
-import { claudeCodeOauthBetaHeader, claudeCodeOauthRequiredBeta, UpstreamRequestError } from "@ccr/core/gateway/internal/shared";
-import type { ApiKeyLimitUsage, ProviderCredentialRoutingTarget, UpstreamAttempt, UpstreamFailedAttempt, UpstreamFetchResult } from "@ccr/core/gateway/internal/shared";
-import type { RouteTraceObserver } from "@ccr/core/observability/route-trace";
+import type { AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProviderCredentialConfig, RequestRouteTraceChange, RouterFallbackConfig } from "@agentrouter/core/contracts/app";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { createRouteExecutionPlan } from "@agentrouter/core/routing/execution-plan";
+import { rewriteRouteModelInUrl } from "@agentrouter/core/routing/protocol-adapter";
+import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector, providerRuntimeId } from "@agentrouter/core/routing/model-registry";
+import { requestProtocolForPath } from "@agentrouter/core/routing/protocol-endpoints";
+import { resolveConfiguredProviderModelSelector, resolveUniqueConfiguredProviderModelSelector } from "@agentrouter/core/routing/model-resolution";
+import { estimateLimitUsage } from "@agentrouter/core/gateway/limits/window-limiter";
+import { providerCredentialLimitState, readProviderCredentialCooldown, recordProviderCredentialOutcome } from "@agentrouter/core/providers/credential-pool";
+import { isRecord, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { isLocalClaudeCodeOauthProviderPlugin, mergeAnthropicBetaValues } from "@agentrouter/core/providers/oauth-plugin";
+import { abortSignalMessage, formatError, omitLocalObservabilityHeaders, shouldSendBody, withCoreGatewayAuthHeader } from "@agentrouter/core/gateway/http/io";
+import { parseJsonObjectSafe, releaseJsonObject, serializeJsonBody, serializeJsonBodyWithModel } from "@agentrouter/core/gateway/http/body";
+import { resolveGatewayPublicModelId } from "@agentrouter/core/gateway/features/model-discovery";
+import { activeProviderCredentials, findProviderByPublicOrInternalName, findProviderCredentialBySlug, normalizedProviderCapabilities, parseProviderCredentialInternalName, providerCapabilityForClientProtocol, providerCapabilityInternalName, providerCapabilityNameMatches, providerCredentialInternalName, providerCredentialPriority, providerCredentialRuntimeId, providerCredentialSlug, providerProtocolForClientProtocol, sanitizeHeaderValue } from "@agentrouter/core/providers/runtime-topology";
+import { delay } from "@agentrouter/core/gateway/internal/clock";
+import { retryDelayAfterNetworkError, retryDelayAfterStatus, shouldFallbackAfterStatus } from "@agentrouter/core/gateway/upstream/retry-policy";
+import { claudeCodeOauthBetaHeader, claudeCodeOauthRequiredBeta, UpstreamRequestError } from "@agentrouter/core/gateway/internal/shared";
+import type { ApiKeyLimitUsage, ProviderCredentialRoutingTarget, UpstreamAttempt, UpstreamFailedAttempt, UpstreamFetchResult } from "@agentrouter/core/gateway/internal/shared";
+import type { RouteTraceObserver } from "@agentrouter/core/observability/route-trace";
 
 const providerCredentialSpilloverThreshold = 0.8;
 const openRouterDiscountModelHeader = "x-ar-openrouter-discount-model";

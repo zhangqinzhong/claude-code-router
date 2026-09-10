@@ -5,12 +5,12 @@ import path from "node:path";
 import test from "node:test";
 import {
   AR_CLI_COMPANION_RUNTIME_FILE_NAMES,
-  syncCcrCliCompanionRuntimes,
-  syncCcrCliModelCatalog
-} from "@ccr/core/profiles/launch-service.ts";
+  syncArCliCompanionRuntimes,
+  syncArCliModelCatalog
+} from "@agentrouter/core/profiles/launch-service.ts";
 
-test("CCR CLI launcher copies every bundled companion runtime next to ar-cli.js", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-cli-runtime-"));
+test("AgentRouter CLI launcher copies every bundled companion runtime next to ar-cli.js", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-cli-runtime-"));
   try {
     const sourceDir = path.join(root, "dist", "main");
     const binDir = path.join(root, "bin");
@@ -23,7 +23,7 @@ test("CCR CLI launcher copies every bundled companion runtime next to ar-cli.js"
       writeFileSync(path.join(binDir, fileName), "stale\n");
     }
 
-    const synced = syncCcrCliCompanionRuntimes(runtimeSource, binDir);
+    const synced = syncArCliCompanionRuntimes(runtimeSource, binDir);
 
     assert.deepEqual(synced.map((file) => path.basename(file)), [...AR_CLI_COMPANION_RUNTIME_FILE_NAMES]);
     for (const fileName of AR_CLI_COMPANION_RUNTIME_FILE_NAMES) {
@@ -34,8 +34,8 @@ test("CCR CLI launcher copies every bundled companion runtime next to ar-cli.js"
   }
 });
 
-test("CCR CLI launcher copies the model catalog where the installed runtime can resolve it", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-cli-model-catalog-"));
+test("AgentRouter CLI launcher copies the model catalog where the installed runtime can resolve it", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-cli-model-catalog-"));
   try {
     const sourceDir = path.join(root, "dist", "main");
     const binDir = path.join(root, "config", "bin");
@@ -46,7 +46,7 @@ test("CCR CLI launcher copies the model catalog where the installed runtime can 
     writeFileSync(runtimeSource, "cli runtime\n");
     writeFileSync(catalogSource, '{"models":[{"id":"test-model"}]}\n');
 
-    const synced = syncCcrCliModelCatalog(runtimeSource, binDir);
+    const synced = syncArCliModelCatalog(runtimeSource, binDir);
 
     const destination = path.join(root, "config", "models.json");
     assert.equal(synced, destination);

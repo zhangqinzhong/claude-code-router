@@ -2,14 +2,14 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { GatewayStartupErrorBanner, groupSidebarNavigation, MainLayout, UpdateEntryButton } from "@ccr/ui/pages/home/components/layout.tsx";
-import { MediaModelConfigurationPanel, VirtualModelsView } from "@ccr/ui/pages/home/components/virtual-models.tsx";
-import { AppI18nContext, appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
-import { createVirtualModelDraft } from "@ccr/ui/pages/home/shared/virtual-models.ts";
+import { GatewayStartupErrorBanner, groupSidebarNavigation, MainLayout, UpdateEntryButton } from "@agentrouter/ui/pages/home/components/layout.tsx";
+import { MediaModelConfigurationPanel, VirtualModelsView } from "@agentrouter/ui/pages/home/components/virtual-models.tsx";
+import { AppI18nContext, appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
+import { createVirtualModelDraft } from "@agentrouter/ui/pages/home/shared/virtual-models.ts";
 import { appConfigFixture } from "../fixtures/index.ts";
-import { fallbackGatewayStatus, fallbackUpdateStatus } from "@ccr/ui/pages/home/shared/fallbacks.ts";
-import { navigation } from "@ccr/ui/pages/home/shared/options.ts";
-import { formatUpdateReleaseNotes, shouldCheckForUpdateOnOpen, UpdateDialog } from "@ccr/ui/pages/home/components/update.tsx";
+import { fallbackGatewayStatus, fallbackUpdateStatus } from "@agentrouter/ui/pages/home/shared/fallbacks.ts";
+import { navigation } from "@agentrouter/ui/pages/home/shared/options.ts";
+import { formatUpdateReleaseNotes, shouldCheckForUpdateOnOpen, UpdateDialog } from "@agentrouter/ui/pages/home/components/update.tsx";
 
 test("sidebar navigation groups pages and hides networking from the sidebar", () => {
   const groups = groupSidebarNavigation(navigation);

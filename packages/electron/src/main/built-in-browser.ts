@@ -25,10 +25,10 @@ import type {
   ChromeLoginImportRequest,
   GatewayPluginAppConfig,
   InstalledBrowserApp
-} from "@ccr/core/contracts/app";
-import { IPC_CHANNELS } from "@ccr/core/contracts/ipc-channels";
-import { APP_NAME } from "@ccr/core/config/constants";
-import { pluginService } from "@ccr/core/plugins/service";
+} from "@agentrouter/core/contracts/app";
+import { IPC_CHANNELS } from "@agentrouter/core/contracts/ipc-channels";
+import { APP_NAME } from "@agentrouter/core/config/constants";
+import { pluginService } from "@agentrouter/core/plugins/service";
 import { chromeLoginImportService } from "./chrome-login-import";
 
 type BrowserTab = BuiltInBrowserTabState & {
@@ -55,8 +55,8 @@ export type BrowserAutomationEventListener = (event: BrowserAutomationEvent) => 
 const browserChromeBaseHeight = 82;
 const browserHandoffToolbarHeight = 44;
 const browserHomeUrl = "about:blank";
-const browserPartition = "persist:ccr-built-in-browser";
-const browserAutomationWindowId = "ccr-built-in-browser";
+const browserPartition = "persist:ar-built-in-browser";
+const browserAutomationWindowId = "ar-built-in-browser";
 const maxAutomationEventHistory = 512;
 const maxAutomationEventAgeMs = 60_000;
 const titleBarHeight = 46;

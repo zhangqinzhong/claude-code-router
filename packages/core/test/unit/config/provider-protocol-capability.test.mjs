@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 test("top-level provider protocol becomes a capability when none are configured", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     {
       name: "Codex API",
@@ -19,7 +19,7 @@ test("top-level provider protocol becomes a capability when none are configured"
 });
 
 test("provider auto model refresh flag is parsed from camel and snake case config", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     {
       autoFetchKnownModels: ["model-a", "model-hidden"],
@@ -44,7 +44,7 @@ test("provider auto model refresh flag is parsed from camel and snake case confi
 });
 
 test("explicit capabilities win over the top-level protocol", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     {
       name: "Codex API",
@@ -63,7 +63,7 @@ test("explicit capabilities win over the top-level protocol", async () => {
 });
 
 test("protocol aliases are normalized", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     {
       name: "Claude Code API",
@@ -79,7 +79,7 @@ test("protocol aliases are normalized", async () => {
 });
 
 test("unknown or missing protocol yields no synthesized capability", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     { name: "DeepInfra", api_base_url: "https://api.deepinfra.com/v1/openai", models: [] },
     { name: "Mystery", protocol: "carrier_pigeon", baseUrl: "https://example.com", models: [] }
@@ -90,7 +90,7 @@ test("unknown or missing protocol yields no synthesized capability", async () =>
 });
 
 test("protocol without any base URL yields no synthesized capability", async () => {
-  const { parseProvidersForTest } = await import("@ccr/core/config/config.ts");
+  const { parseProvidersForTest } = await import("@agentrouter/core/config/config.ts");
   const providers = parseProvidersForTest([
     { name: "Codex API", protocol: "openai_responses", models: [] }
   ]);

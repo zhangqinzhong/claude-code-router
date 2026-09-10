@@ -2,12 +2,12 @@
 title: AgentClaw
 pageTitle: AgentClaw
 eyebrow: AgentClaw
-lead: "AgentClaw connects an agent running locally under CCR to your IM apps: the agent keeps working with your projects, tools, and sessions on your own computer, while an IM bot handles remote viewing, handoff, and replies. This page covers how it works, the three message modes, and when to use it."
+lead: "AgentClaw connects an agent running locally under AgentRouter to your IM apps: the agent keeps working with your projects, tools, and sessions on your own computer, while an IM bot handles remote viewing, handoff, and replies. This page covers how it works, the three message modes, and when to use it."
 ---
 
-AgentClaw is CCR's agent relay capability. A local agent managed by CCR keeps its workspace, login state, config files, model routing, and tool permissions; AgentClaw exposes a remote entry point for it through an IM bot. From Slack, Discord, Telegram, LINE, Weixin, WeCom, Feishu, or DingTalk, you can watch agent output, continue the conversation, answer permission requests, or take over after your computer locks.
+AgentClaw is AgentRouter's agent relay capability. A local agent managed by AgentRouter keeps its workspace, login state, config files, model routing, and tool permissions; AgentClaw exposes a remote entry point for it through an IM bot. From Slack, Discord, Telegram, LINE, Weixin, WeCom, Feishu, or DingTalk, you can watch agent output, continue the conversation, answer permission requests, or take over after your computer locks.
 
-Handoff means that after your screen locks and the idle threshold passes, further agent interaction moves to IM, where you can continue from your phone or another device. Keep the Agent App open while using IM relay. CLI-only agents can still route model requests through CCR, but they do not forward messages to IM.
+Handoff means that after your screen locks and the idle threshold passes, further agent interaction moves to IM, where you can continue from your phone or another device. Keep the Agent App open while using IM relay. CLI-only agents can still route model requests through AgentRouter, but they do not forward messages to IM.
 
 ## When to use it
 
@@ -22,14 +22,14 @@ Handoff means that after your screen locks and the idle threshold passes, furthe
 
 | Concept | Meaning |
 | --- | --- |
-| AgentClaw | The IM access layer CCR provides for local agents, with an interface styled after [OpenClaw](https://openclaw.ai) (an open-source personal AI assistant that runs on your own machine and interacts through IM platforms) |
-| Local agent | A Claude Code, Codex, OpenCode, ZCode, or similar agent opened through a CCR Agent Config |
-| Bot | The IM message entry; the CCR UI still calls this **Bot Management** |
+| AgentClaw | The IM access layer AgentRouter provides for local agents, with an interface styled after [OpenClaw](https://openclaw.ai) (an open-source personal AI assistant that runs on your own machine and interacts through IM platforms) |
+| Local agent | A Claude Code, Codex, OpenCode, ZCode, or similar agent opened through a AgentRouter Agent Config |
+| Bot | The IM message entry; the AgentRouter UI still calls this **Bot Management** |
 | Project | An agent-native project or working directory |
 | Session | An agent-native conversation inside a Project |
 | Companion worker | The relay process that follows the managed Agent App lifecycle and handles IM messages, Projects/Sessions, queueing, attachments, and diagnostics |
 
-AgentClaw follows the Agent App opened by CCR. Closing the App stops the Bot connection. CLI-only agents can route model requests through CCR but do not forward Bot messages.
+AgentClaw follows the Agent App opened by AgentRouter. Closing the App stops the Bot connection. CLI-only agents can route model requests through AgentRouter but do not forward Bot messages.
 
 ## Support matrix
 
@@ -40,9 +40,9 @@ AgentClaw follows the Agent App opened by CCR. Closing the App stops the Bot con
 | OpenCode App | Full Bot forwarding, handoff, and Projects/Sessions; messages run through OpenCode CLI under the same config |
 | ZCode App | Full Bot forwarding, handoff, and native Session discovery |
 | WorkBuddy App | Full Bot forwarding, handoff, and WorkBuddy companion relay |
-| Claude Code, Codex CLI | Can use CCR model routing; Bot forwarding is not active yet |
-| Grok CLI, Kimi CLI | Can use CCR model routing; these are CLI-only and do not enter AgentClaw relay |
-| Other local agents | They need a CCR-managed App entry before they can act as AgentClaw executors |
+| Claude Code, Codex CLI | Can use AgentRouter model routing; Bot forwarding is not active yet |
+| Grok CLI, Kimi CLI | Can use AgentRouter model routing; these are CLI-only and do not enter AgentClaw relay |
+| Other local agents | They need a AR-managed App entry before they can act as AgentClaw executors |
 
 ## Three modes
 
@@ -87,4 +87,4 @@ AgentClaw exposes only `/project` and `/session` as public command domains. Othe
 
 1. Read [usage and configuration](/en/agentclaw/setup/) to set up the Bot, the Agent Config binding, modes, attachments, timeout, and shell permission.
 2. Open the platform page for [Slack](/en/agentclaw/slack/), [Discord](/en/agentclaw/discord/), [Telegram](/en/agentclaw/telegram/), [LINE](/en/agentclaw/line/), [Weixin](/en/agentclaw/weixin-ilink/), [WeCom](/en/agentclaw/wecom/), [Feishu](/en/agentclaw/feishu/), or [DingTalk](/en/agentclaw/dingtalk/) and fill in the platform credentials.
-3. Reopen the target Agent App from CCR, then validate with `/project current`, `/session list`, and one plain message.
+3. Reopen the target Agent App from AgentRouter, then validate with `/project current`, `/session list`, and one plain message.

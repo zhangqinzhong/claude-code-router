@@ -22,13 +22,13 @@ Weixin is for individuals who want agent messages in their everyday chat window.
 
 ## Method 1: QR Login (recommended)
 
-1. Open CCR's **Bot Management** page and click **Add Bot**.
+1. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 2. Pick **Weixin iLink** as the platform.
 3. Choose **QR Login** (the default).
-4. CCR opens a QR code window.
+4. AgentRouter opens a QR code window.
 5. Scan the code with your phone's WeChat.
 6. Confirm the login on your phone.
-7. Wait for CCR to show login success.
+7. Wait for AgentRouter to show login success.
 8. Save the bot.
 
 > QR codes expire. If the scan page says it's expired, close the login window and start over.
@@ -40,19 +40,19 @@ Use this only if you already have a token from an external WeChat bot service, a
 1. Copy the `Bot Token` from the provider's dashboard or local plugin output.
 2. If the provider also gave an `Account ID`, copy it.
 3. If it gave a `User ID`, copy that too.
-4. Open CCR's **Bot Management** page and click **Add Bot**.
+4. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 5. Pick **Weixin iLink** and choose **Bot Token** auth.
 6. Fill in **Bot Token**, and **Account ID** / **User ID** if you have them.
 7. Save the bot.
 
-## Wire it up in CCR
+## Wire it up in AgentRouter
 
 Whichever login you used, bind the bot to an Agent Config:
 
 1. Open **Agent Config** and edit the Agent Config you want to attach it to.
 2. Turn on **Bot** and select the bot you just saved.
 3. Optionally enable **Forward agent messages** or **Handoff** (next section).
-4. Reopen the agent from CCR.
+4. Reopen the agent from AgentRouter.
 
 ## Forward or handoff
 
@@ -63,7 +63,7 @@ Whichever login you used, bind the bot to an Agent Config:
 
 ## Test it
 
-1. Open the agent from CCR and trigger a message.
+1. Open the agent from AgentRouter and trigger a message.
 2. Check WeChat to confirm the bot received it and replied.
 3. Lock the screen, wait past your idle threshold, and confirm new agent messages arrive in WeChat.
 
@@ -72,7 +72,7 @@ Whichever login you used, bind the bot to an Agent Config:
 ## Common issues
 
 - **QR code expired**: close the login window and scan again.
-- **Scan succeeded but nothing forwards**: confirm the agent was reopened from CCR after Agent Config changes and the Bot toggle is still on.
+- **Scan succeeded but nothing forwards**: confirm the agent was reopened from AgentRouter after Agent Config changes and the Bot toggle is still on.
 - **Drops shortly after scanning**: check that phone and computer networks are stable; verify WeChat didn't log in elsewhere and invalidate the session.
 - **Token mode won't connect**: re-copy the Bot Token — avoid expired values or stray spaces.
 - **Third-party service needs Account ID / User ID**: make sure these come from the same account — don't mix a token and IDs from different accounts.

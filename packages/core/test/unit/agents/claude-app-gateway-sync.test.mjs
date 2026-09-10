@@ -17,8 +17,8 @@ async function loadModules() {
     NO_CLAUDE_APP_ENTRY_PROFILE_MESSAGE,
     hasClaudeAppEntryProfile,
     syncClaudeAppGatewayConfig
-  } = await import("@ccr/core/agents/claude-app/gateway-service.ts");
-  const { CONFIGDIR } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/agents/claude-app/gateway-service.ts");
+  const { CONFIGDIR } = await import("@agentrouter/core/config/constants.ts");
   return {
     BACKUP_FILE: path.join(CONFIGDIR, "claude-app-gateway-backup.json"),
     NO_CLAUDE_APP_ENTRY_PROFILE_MESSAGE,

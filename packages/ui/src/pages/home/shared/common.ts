@@ -6,7 +6,7 @@ import {
   TRAY_SINGLETON_WIDGET_TYPES,
   TRAY_TOP_WIDGET_TYPES,
   TRAY_WINDOW_MODULE_IDS
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   OverviewAccountCardSize,
@@ -21,7 +21,7 @@ import type {
   TrayWidgetType,
   TrayWidgetVariant,
   TrayWindowModuleId
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   languagePreferenceStorageKey,
   type AppCopy

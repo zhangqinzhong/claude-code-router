@@ -19,20 +19,20 @@ lead: 将多个 MCP server 收束成一个紧凑入口，让 Agent 按任务懒�
 1. 在 **设置 → ToolHub** 中启用 ToolHub。
 2. 选择一个已配置模型作为 **检索模型**。它负责阅读 MCP 工具目录并挑选本轮任务需要的工具；建议使用 `deepseek-v4-flash`，或同等 Flash 价位、响应稳定的轻量模型。
 3. 添加或导入后端 MCP server。ToolHub 支持 `stdio`、`streamable-http` 和 `sse`。
-4. 从 CCR 打开 Claude Code 或 Codex。CCR 会在对应 Agent 配置中写入 `ar-toolhub`。
+4. 从 AgentRouter 打开 Claude Code 或 Codex。AgentRouter 会在对应 Agent 配置中写入 `ar-toolhub`。
 5. Agent 遇到外部服务、已安装 MCP 能力或业务 API 相关请求时，先调用 `tool_hub.resolve`，再用 `tool_hub.invoke` 执行选中的工具。
 
 ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中的全局 Agent MCP servers，并自动排除 `ar-toolhub` 自身，避免递归调用。
 
 ## 内置浏览器自动化
 
-在 CCR Desktop 中启用 ToolHub，并打开 **内置浏览器自动化** 开关后，Agent 可以使用桌面端内置浏览器完成网页操作。不需要在 ToolHub 页面手动添加浏览器后端，也不需要额外 API Key；CCR 会使用本地网关鉴权连接它。
+在 AgentRouter Desktop 中启用 ToolHub，并打开 **内置浏览器自动化** 开关后，Agent 可以使用桌面端内置浏览器完成网页操作。不需要在 ToolHub 页面手动添加浏览器后端，也不需要额外 API Key；AgentRouter 会使用本地网关鉴权连接它。
 
 启用步骤：
 
 1. 打开 **设置 → ToolHub**，先开启 **启用 ToolHub**。
 2. 在同一页打开 **内置浏览器自动化** 开关。该开关只会在 ToolHub 已启用时显示。
-3. 保存设置后，从 CCR 重新打开 Claude Code 或 Codex，让新的 Agent 实例加载最新配置。
+3. 保存设置后，从 AgentRouter 重新打开 Claude Code 或 Codex，让新的 Agent 实例加载最新配置。
 
 > 已经运行中的 Agent 实例通常不会立即拿到这个开关变化。要让现有会话生效，请重启该 Agent 实例，或使用 Agent 自身能力重启 ToolHub。
 
@@ -44,11 +44,11 @@ ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中�
 - 等待页面加载、跳转、弹窗或人类接管结果，再继续后续步骤。
 - 在登录、验证码、CAPTCHA、人机验证或人工确认时请求用户接管。
 
-当网页流程需要登录、验证码、CAPTCHA、人机验证或人工确认时，CCR 会显示内置浏览器窗口，并在顶部工具栏提示用户需要完成的步骤。用户点击 **Done** 或 **Hide** 后，Agent 会收到结果并继续执行。接管等待最长支持 10 分钟。
+当网页流程需要登录、验证码、CAPTCHA、人机验证或人工确认时，AgentRouter 会显示内置浏览器窗口，并在顶部工具栏提示用户需要完成的步骤。用户点击 **Done** 或 **Hide** 后，Agent 会收到结果并继续执行。接管等待最长支持 10 分钟。
 
 ### Chrome 登录态导入扩展
 
-内置浏览器自动化还支持把系统 Chrome 中指定域名的登录状态导入 CCR 内置浏览器。这样 Agent 处理网页任务时，可以复用你已经在 Chrome 中登录过的网站状态。该能力需要安装仓库里的 Chrome 解包扩展：`extension/chrome`。
+内置浏览器自动化还支持把系统 Chrome 中指定域名的登录状态导入 AgentRouter 内置浏览器。这样 Agent 处理网页任务时，可以复用你已经在 Chrome 中登录过的网站状态。该能力需要安装仓库里的 Chrome 解包扩展：`extension/chrome`。
 
 安装方式：
 
@@ -59,25 +59,25 @@ ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中�
 
 导入流程：
 
-1. 当任务需要复用 Chrome 登录状态时，Agent 会请求导入；用户也可以在 CCR 内置浏览器工具栏点击钥匙按钮主动发起。
-2. CCR 创建一次性导入任务，并打开确认页。请使用已安装扩展的 Chrome 打开确认页 URL。
-3. 如果确认页没有在 Chrome 中打开，请复制 CCR 弹窗里的 **Extension import URL**，打开 Chrome 里的 CCR Login Import 扩展弹窗，粘贴该 URL 后点击 **Import Selected Domains**。
+1. 当任务需要复用 Chrome 登录状态时，Agent 会请求导入；用户也可以在 AgentRouter 内置浏览器工具栏点击钥匙按钮主动发起。
+2. AgentRouter 创建一次性导入任务，并打开确认页。请使用已安装扩展的 Chrome 打开确认页 URL。
+3. 如果确认页没有在 Chrome 中打开，请复制 AgentRouter 弹窗里的 **Extension import URL**，打开 Chrome 里的 AgentRouter Login Import 扩展弹窗，粘贴该 URL 后点击 **Import Selected Domains**。
 4. 用户在确认页检查要导入的域名，点击 **Confirm and Import**，或在扩展弹窗中确认导入。
-5. Chrome 扩展读取这些域名的 cookies 和 localStorage，提交给 CCR；完成后 Agent 可以继续使用内置浏览器执行任务。
+5. Chrome 扩展读取这些域名的 cookies 和 localStorage，提交给 AgentRouter；完成后 Agent 可以继续使用内置浏览器执行任务。
 
-扩展只读取 CCR 导入任务列出的域名，不会枚举 Chrome 中的全部 cookies。读取 localStorage 时，扩展会临时打开对应 origin 的非激活标签页，读取后自动关闭。若确认页提示扩展没有站点访问权限，请在 Chrome 扩展设置中允许该扩展访问目标域名，然后重新加载解包扩展再重试。
+扩展只读取 AgentRouter 导入任务列出的域名，不会枚举 Chrome 中的全部 cookies。读取 localStorage 时，扩展会临时打开对应 origin 的非激活标签页，读取后自动关闭。若确认页提示扩展没有站点访问权限，请在 Chrome 扩展设置中允许该扩展访问目标域名，然后重新加载解包扩展再重试。
 
-> 注意：内置浏览器自动化依赖 CCR Desktop 的内置浏览器，只在桌面端可用。CLI、服务器部署或纯 Web 环境没有这项内置能力，请改用外部浏览器自动化 MCP server。
+> 注意：内置浏览器自动化依赖 AgentRouter Desktop 的内置浏览器，只在桌面端可用。CLI、服务器部署或纯 Web 环境没有这项内置能力，请改用外部浏览器自动化 MCP server。
 
 ## 配置项
 
 | 配置项 | 说明 |
 | --- | --- |
-| 启用 ToolHub | 开启后才会向 Agent 暴露 `ar-toolhub`。如果没有可用后端 MCP server，CCR 不会生成 ToolHub MCP 配置。 |
-| 内置浏览器自动化 | 仅在启用 ToolHub 后显示。开启后让 Agent 可以使用 CCR Desktop 的内置浏览器完成网页操作。 |
+| 启用 ToolHub | 开启后才会向 Agent 暴露 `ar-toolhub`。如果没有可用后端 MCP server，AgentRouter 不会生成 ToolHub MCP 配置。 |
+| 内置浏览器自动化 | 仅在启用 ToolHub 后显示。开启后让 Agent 可以使用 AgentRouter Desktop 的内置浏览器完成网页操作。 |
 | 检索模型 | 从已配置供应商模型中选择。建议使用 `deepseek-v4-flash`，或同等 Flash 价位、响应稳定、工具理解能力足够的轻量模型。 |
 | 最大工具数 | 单次解析最多返回的工具数量，范围 `1` 到 `20`，默认 `10`。 |
-| 超时毫秒 | ToolHub 解析和调用的基础超时时间，范围 `8000` 到 `300000`，默认 `60000`。如果后端 MCP server 需要更长 request timeout，CCR 会按后端超时自动抬高实际调用超时。 |
+| 超时毫秒 | ToolHub 解析和调用的基础超时时间，范围 `8000` 到 `300000`，默认 `60000`。如果后端 MCP server 需要更长 request timeout，AgentRouter 会按后端超时自动抬高实际调用超时。 |
 | MCP servers | 后端工具来源。每个 server 需要唯一名称，并配置 transport、命令或 URL、环境变量、headers 和超时。 |
 | Import JSON | 导入常见 MCP JSON。支持根对象、数组、`mcpServers` 或 `mcp_servers`。 |
 
@@ -155,13 +155,13 @@ ToolHub 会合并 **ToolHub 页面配置的 MCP servers** 和兼容旧配置中�
 | 使用入口 | Agent 侧的 `ar-toolhub` MCP server | 某个 Fusion 模型内部能力 |
 | 工具选择 | 每个任务动态检索并返回工具包 | 模型配置中固定选择工具 |
 | 适合场景 | MCP server 很多、工具目录经常变化、希望 Agent 自主发现能力 | 给某个模型补一组明确工具 |
-| 可见范围 | 通过 CCR 打开的 Claude Code 或 Codex 配置 | 选择该 Fusion 模型的路由或 Agent |
+| 可见范围 | 通过 AgentRouter 打开的 Claude Code 或 Codex 配置 | 选择该 Fusion 模型的路由或 Agent |
 
 ## 排查
 
-- Agent 看不到 ToolHub：确认已启用 ToolHub，并且至少配置了一个后端 MCP server 或开启了 **内置浏览器自动化**，然后从 CCR 重新打开 Claude Code 或 Codex。
+- Agent 看不到 ToolHub：确认已启用 ToolHub，并且至少配置了一个后端 MCP server 或开启了 **内置浏览器自动化**，然后从 AgentRouter 重新打开 Claude Code 或 Codex。
 - 提示缺少检索模型或 API Key：在 **检索模型** 中选择已配置模型，并确认供应商凭据可用。
-- Agent 无法使用内置浏览器自动化：确认正在使用 CCR Desktop，并且已在 **设置 → ToolHub** 中开启 **内置浏览器自动化**，然后从 CCR 重新打开 Claude Code 或 Codex。CLI、服务器部署或纯 Web 环境没有这项内置能力。
+- Agent 无法使用内置浏览器自动化：确认正在使用 AgentRouter Desktop，并且已在 **设置 → ToolHub** 中开启 **内置浏览器自动化**，然后从 AgentRouter 重新打开 Claude Code 或 Codex。CLI、服务器部署或纯 Web 环境没有这项内置能力。
 - Chrome 登录态导入确认页一直等待扩展：确认已在 Chrome 中加载 `extension/chrome` 解包扩展，并允许扩展访问要导入的目标域名。请使用 Chrome 打开确认页 URL。
 - 解析不到工具：检查 MCP server 是否能正常列出工具，工具名称和描述是否足够清楚，必要时提高 **最大工具数**。
 - 调用超时：分别检查 ToolHub 的 **超时毫秒** 和单个 MCP server 的 request/startup timeout。

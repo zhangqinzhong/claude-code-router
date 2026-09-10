@@ -37,7 +37,7 @@ import { preserveEqualPollingSnapshot, startVisiblePolling } from "./shared/poll
 import {
   AppDialogStack, LightToast, MainLayout, OnboardingLayout, shouldCheckForUpdateOnOpen
 } from "./components/index";
-import { hasAvailableGatewayModels } from "@ccr/core/contracts/app";
+import { hasAvailableGatewayModels } from "@agentrouter/core/contracts/app";
 
 type ProfileOpenDialogState = {
   busy?: "" | "cli" | "app";
@@ -144,10 +144,10 @@ function providerNameSlug(value: string): string {
 }
 
 async function loadProviderAccountSnapshots(forceRefresh = false): Promise<ProviderAccountSnapshot[]> {
-  if (!window.ccr) {
+  if (!window.agentrouter) {
     return [];
   }
-  return window.ccr.getProviderAccountSnapshots(undefined, forceRefresh ? { forceRefresh: true } : undefined);
+  return window.agentrouter.getProviderAccountSnapshots(undefined, forceRefresh ? { forceRefresh: true } : undefined);
 }
 
 function providerRefreshModelsInputKey(
@@ -178,13 +178,13 @@ function canInstallExtensionCandidate(candidate: PluginInstallCandidate): boolea
 function App() {
   const [activeView, setActiveView] = useState<ViewId>("onboarding");
   const [onboardingStep, setOnboardingStep] = useState<OnboardingStepId>(() => getDefaultOnboardingStep(fallbackConfig));
-  const [onboardingFinished, setOnboardingFinished] = useState(() => !window.ccr);
-  const [onboardingProfileConfirmed, setOnboardingProfileConfirmed] = useState(() => !window.ccr);
+  const [onboardingFinished, setOnboardingFinished] = useState(() => !window.agentrouter);
+  const [onboardingProfileConfirmed, setOnboardingProfileConfirmed] = useState(() => !window.agentrouter);
   const [appInfo, setAppInfo] = useState<AppInfo>(fallbackInfo);
   const [draftConfig, setDraftConfig] = useState<AppConfig>(fallbackConfig);
-  const [configLoaded, setConfigLoaded] = useState(() => !window.ccr);
-  const [onboardingStatusLoaded, setOnboardingStatusLoaded] = useState(() => !window.ccr);
-  const [providerPresetsLoaded, setProviderPresetsLoaded] = useState(() => !window.ccr);
+  const [configLoaded, setConfigLoaded] = useState(() => !window.agentrouter);
+  const [onboardingStatusLoaded, setOnboardingStatusLoaded] = useState(() => !window.agentrouter);
+  const [providerPresetsLoaded, setProviderPresetsLoaded] = useState(() => !window.agentrouter);
   const [gatewayStatus, setGatewayStatus] = useState<GatewayStatus>(fallbackGatewayStatus);
   const [proxyNetworkSnapshot, setProxyNetworkSnapshot] = useState<ProxyNetworkSnapshot>(fallbackProxyNetworkSnapshot);
   const [proxyStatus, setProxyStatus] = useState<ProxyStatus>(fallbackProxyStatus);
@@ -329,22 +329,22 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       return;
     }
 
-    void window.ccr.getAppInfo().then(setAppInfo);
-    void window.ccr.getProviderPresets()
+    void window.agentrouter.getAppInfo().then(setAppInfo);
+    void window.agentrouter.getProviderPresets()
       .then(setProviderPresets)
       .catch(() => setProviderPresets([]))
       .finally(() => setProviderPresetsLoaded(true));
-    void window.ccr.getConfig()
+    void window.agentrouter.getConfig()
       .then(syncConfigState)
       .catch(() => {
         // Fall back to the bundled defaults; the rest of the UI can still render.
       })
       .finally(() => setConfigLoaded(true));
-    void window.ccr.getOnboardingFinished()
+    void window.agentrouter.getOnboardingFinished()
       .then((finished) => {
         setOnboardingFinished(finished);
         setOnboardingProfileConfirmed(finished);
@@ -352,11 +352,11 @@ function App() {
       })
       .catch(() => setActiveView("onboarding"))
       .finally(() => setOnboardingStatusLoaded(true));
-    void window.ccr.getPluginMarketplace().then(setPluginMarketplace).catch(() => setPluginMarketplace([]));
-    const unsubscribeOpenSettings = window.ccr.onOpenSettingsRequest(openSettingsDialog);
-    const unsubscribeOpenUpdate = window.ccr.onOpenUpdateRequest(openUpdateDialog);
+    void window.agentrouter.getPluginMarketplace().then(setPluginMarketplace).catch(() => setPluginMarketplace([]));
+    const unsubscribeOpenSettings = window.agentrouter.onOpenSettingsRequest(openSettingsDialog);
+    const unsubscribeOpenUpdate = window.agentrouter.onOpenUpdateRequest(openUpdateDialog);
     const refreshRuntimeStatus = async () => {
-      const ccr = window.ccr;
+      const ccr = window.agentrouter;
       if (!ccr) {
         return;
       }
@@ -399,12 +399,12 @@ function App() {
   }, [defaultAvailableProfileAgent, isProfileAgentAvailable, profileAgentTab]);
 
   useEffect(() => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       return;
     }
 
     let disposed = false;
-    void window.ccr.getUpdateStatus()
+    void window.agentrouter.getUpdateStatus()
       .then((status) => {
         if (!disposed) {
           setUpdateDialogStatus(status);
@@ -416,7 +416,7 @@ function App() {
         }
       });
 
-    const unsubscribe = window.ccr.onUpdateStatusChanged((status) => {
+    const unsubscribe = window.agentrouter.onUpdateStatusChanged((status) => {
       if (!disposed) {
         setUpdateDialogStatus(status);
       }
@@ -429,7 +429,7 @@ function App() {
   }, [appInfo.version]);
 
   useEffect(() => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       return;
     }
 
@@ -451,8 +451,8 @@ function App() {
       setActiveView("providers");
     };
 
-    const unsubscribe = window.ccr.onProviderDeepLink(showProviderDeepLink);
-    void window.ccr.getPendingProviderDeepLinks()
+    const unsubscribe = window.agentrouter.onProviderDeepLink(showProviderDeepLink);
+    void window.agentrouter.getPendingProviderDeepLinks()
       .then((requests) => {
         for (const request of requests) {
           showProviderDeepLink(request);
@@ -474,7 +474,7 @@ function App() {
   }, [configLoaded, providerDeepLinkRequest?.id, providerDeepLinkRequest?.provider, providerPresetsLoaded]);
 
   useEffect(() => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setUsageStats(createEmptyUsageStats(usageRange));
       return;
     }
@@ -483,7 +483,7 @@ function App() {
     const refreshUsageStats = () => {
       const requestId = ++usageStatsRequestId.current;
       const filter = overviewUsageStatsFilter(usageRange, usageProviderFilter, usageModelFilter);
-      void window.ccr?.getUsageStats(usageRange, filter).then((snapshot) => {
+      void window.agentrouter?.getUsageStats(usageRange, filter).then((snapshot) => {
         if (!cancelled && requestId === usageStatsRequestId.current) {
           setUsageStats(snapshot);
         }
@@ -520,7 +520,7 @@ function App() {
   }, [draftConfig.Providers, usageModelFilter, usageProviderFilter]);
 
   useEffect(() => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProviderAccountSnapshots([]);
       return;
     }
@@ -579,7 +579,7 @@ function App() {
       setAgentAnalysisLoading(false);
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setAgentAnalysis(createEmptyAgentAnalysis(agentAnalysisRange));
       return;
     }
@@ -589,7 +589,7 @@ function App() {
       if (showLoading) {
         setAgentAnalysisLoading(true);
       }
-      void window.ccr?.getAgentAnalysis({
+      void window.agentrouter?.getAgentAnalysis({
         agent: agentAnalysisAgent,
         range: agentAnalysisRange,
         sessionAgent: agentAnalysisSession?.agent,
@@ -633,7 +633,7 @@ function App() {
       setRequestLogLoading(false);
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setRequestLogPage(createEmptyRequestLogPage(requestLogFilter));
       return;
     }
@@ -643,7 +643,7 @@ function App() {
       if (showLoading) {
         setRequestLogLoading(true);
       }
-      void window.ccr?.getRequestLogs(requestLogFilter)
+      void window.agentrouter?.getRequestLogs(requestLogFilter)
         .then((page) => {
           if (!cancelled) {
             setRequestLogPage(page);
@@ -674,14 +674,14 @@ function App() {
     if (activeView !== "networking" || !draftConfig.proxy.captureNetwork) {
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProxyNetworkSnapshot(fallbackProxyNetworkSnapshot);
       return;
     }
 
     let cancelled = false;
     const refreshNetworkCaptures = () => {
-      void window.ccr?.getProxyNetworkCaptures().then((snapshot) => {
+      void window.agentrouter?.getProxyNetworkCaptures().then((snapshot) => {
         if (!cancelled) {
           setProxyNetworkSnapshot(snapshot);
         }
@@ -866,7 +866,7 @@ function App() {
   }, []);
 
   useEffect(() => {
-    if (!window.ccr || !dirty) {
+    if (!window.agentrouter || !dirty) {
       return;
     }
 
@@ -878,7 +878,7 @@ function App() {
     });
     const options = deferProfileApplyOnSave ? { applyProfile: false } : undefined;
     const timer = window.setTimeout(() => {
-      void window.ccr?.saveConfig(configToSave, options)
+      void window.agentrouter?.saveConfig(configToSave, options)
         .then((saved) => {
           if (autoSaveRequestId.current === requestId) {
             syncConfigState(saved);
@@ -914,14 +914,14 @@ function App() {
   }
 
   async function resetOverviewStatistics() {
-    if (!window.ccr?.resetOverviewStatistics) {
+    if (!window.agentrouter?.resetOverviewStatistics) {
       throw new Error(t("Overview statistics reset is unavailable."));
     }
 
     usageStatsRequestId.current += 1;
-    await window.ccr.resetOverviewStatistics();
+    await window.agentrouter.resetOverviewStatistics();
     const requestId = ++usageStatsRequestId.current;
-    const snapshot = await window.ccr.getUsageStats(
+    const snapshot = await window.agentrouter.getUsageStats(
       usageRange,
       overviewUsageStatsFilter(usageRange, usageProviderFilter, usageModelFilter)
     );
@@ -949,7 +949,7 @@ function App() {
     if (updateActionBusyRef.current) {
       return;
     }
-    if (!window.ccr?.updateCheck) {
+    if (!window.agentrouter?.updateCheck) {
       setUpdateDialogStatus({
         ...fallbackUpdateStatus,
         currentVersion: appInfo.version,
@@ -963,7 +963,7 @@ function App() {
     setUpdateActionBusy("check");
     setUpdateActionError("");
     try {
-      setUpdateDialogStatus(await window.ccr.updateCheck());
+      setUpdateDialogStatus(await window.agentrouter.updateCheck());
     } catch (error) {
       setUpdateActionError(formatError(error));
     } finally {
@@ -973,7 +973,7 @@ function App() {
   }
 
   async function downloadAppUpdate() {
-    if (updateActionBusyRef.current || !window.ccr?.updateDownload) {
+    if (updateActionBusyRef.current || !window.agentrouter?.updateDownload) {
       return;
     }
 
@@ -981,7 +981,7 @@ function App() {
     setUpdateActionBusy("download");
     setUpdateActionError("");
     try {
-      setUpdateDialogStatus(await window.ccr.updateDownload());
+      setUpdateDialogStatus(await window.agentrouter.updateDownload());
     } catch (error) {
       setUpdateActionError(formatError(error));
     } finally {
@@ -991,7 +991,7 @@ function App() {
   }
 
   async function installAppUpdate() {
-    if (updateActionBusyRef.current || !window.ccr?.updateInstall) {
+    if (updateActionBusyRef.current || !window.agentrouter?.updateInstall) {
       return;
     }
 
@@ -999,7 +999,7 @@ function App() {
     setUpdateActionBusy("install");
     setUpdateActionError("");
     try {
-      await window.ccr.updateInstall();
+      await window.agentrouter.updateInstall();
     } catch (error) {
       setUpdateActionError(formatError(error));
       updateActionBusyRef.current = false;
@@ -1030,14 +1030,14 @@ function App() {
       ...config,
       theme: themePreference
     });
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       syncConfigState(configWithTheme);
       return true;
     }
 
     try {
       const saveOptions = options ?? (deferProfileApplyOnSave ? { applyProfile: false } : undefined);
-      const saved = await window.ccr.saveConfig(configWithTheme, saveOptions);
+      const saved = await window.agentrouter.saveConfig(configWithTheme, saveOptions);
       syncConfigState(saved);
       setError("");
       return true;
@@ -1048,16 +1048,16 @@ function App() {
   }
 
   async function persistApiKeys(apiKeys: ApiKeyConfig[], setError: (message: string) => void): Promise<boolean> {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setError(t("API key persistence is only available in the Electron app."));
       return false;
     }
 
     try {
-      if (!window.ccr.saveApiKeys) {
+      if (!window.agentrouter.saveApiKeys) {
         throw new Error("This app build does not expose API key persistence. Rebuild and restart the Electron app.");
       }
-      const saved = await window.ccr.saveApiKeys(apiKeys);
+      const saved = await window.agentrouter.saveApiKeys(apiKeys);
       syncConfigState(saved);
       setError("");
       return true;
@@ -1305,7 +1305,7 @@ function App() {
 
   useEffect(() => {
     const providerFormVisible = providerAddOpen || (activeView === "onboarding" && onboardingStep === "provider");
-    if (!window.ccr || !providerFormVisible) {
+    if (!window.agentrouter || !providerFormVisible) {
       return;
     }
     if (providerDraft.protocolDetectionMode === "manual") {
@@ -1320,7 +1320,7 @@ function App() {
       const inputKey = localCodexProviderDraftProbeKey(providerDraft);
 
       setProviderProbeError("");
-      if (!window.ccr.probeLocalAgentProvider) {
+      if (!window.agentrouter.probeLocalAgentProvider) {
         setProviderProbe(undefined);
         setProviderProbeLoading(false);
         return undefined;
@@ -1328,7 +1328,7 @@ function App() {
       setProviderProbeLoading(true);
 
       const timer = window.setTimeout(() => {
-        void window.ccr?.probeLocalAgentProvider?.({ id: localCodexProviderId })
+        void window.agentrouter?.probeLocalAgentProvider?.({ id: localCodexProviderId })
           .then((result) => {
             if (providerProbeRequestId.current !== requestId) {
               return;
@@ -1446,7 +1446,7 @@ function App() {
     if (providerProbeLoading) {
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProviderProbeError(t("Request failed."));
       return;
     }
@@ -1467,11 +1467,11 @@ function App() {
 
     try {
       if (isLocalCodexProviderDraft(providerDraft)) {
-        if (!window.ccr.probeLocalAgentProvider) {
+        if (!window.agentrouter.probeLocalAgentProvider) {
           setProviderProbe(undefined);
           return;
         }
-        const result = await window.ccr.probeLocalAgentProvider({ forceRefresh: true, id: localCodexProviderId });
+        const result = await window.agentrouter.probeLocalAgentProvider({ forceRefresh: true, id: localCodexProviderId });
         if (providerProbeRequestId.current !== requestId) {
           return;
         }
@@ -1556,7 +1556,7 @@ function App() {
       .filter((candidate) => isProviderProbeCandidateReady(candidate) && candidate.protocols.length > 0);
 
     setProviderProbeError("");
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProviderProbeError(t("Request failed."));
       return emptyReport;
     }
@@ -1581,7 +1581,7 @@ function App() {
 
     setProviderConnectivityLoading(true);
     try {
-      const report = await window.ccr.checkProviderConnectivity({
+      const report = await window.agentrouter.checkProviderConnectivity({
         apiKey,
         candidates,
         forceRefresh: true,
@@ -1812,10 +1812,10 @@ function App() {
     setProviderDeepLinkError("");
     try {
       if (request.manifest) {
-        if (!window.ccr?.fetchProviderManifest) {
+        if (!window.agentrouter?.fetchProviderManifest) {
           throw new Error("Request failed.");
         }
-        const result = await window.ccr.fetchProviderManifest({ url: request.manifest.url });
+        const result = await window.agentrouter.fetchProviderManifest({ url: request.manifest.url });
         setProviderDeepLinkRequest({
           ...request,
           provider: result.provider
@@ -2070,13 +2070,13 @@ function App() {
   }
 
   async function chooseLocalExtensionDirectory() {
-    if (!window.ccr?.selectPluginDirectory) {
+    if (!window.agentrouter?.selectPluginDirectory) {
       setActionError(t("Local plugin selection is available in the Electron app."));
       return;
     }
 
     try {
-      const selection = await window.ccr.selectPluginDirectory();
+      const selection = await window.agentrouter.selectPluginDirectory();
       if (!selection) {
         return;
       }
@@ -2161,7 +2161,7 @@ function App() {
       setActionError(t("Plugin app is not configured or enabled."));
       return;
     }
-    if (!window.ccr?.openPluginApp) {
+    if (!window.agentrouter?.openPluginApp) {
       setActionError(t("Plugin apps can be opened from the Electron app."));
       return;
     }
@@ -2170,7 +2170,7 @@ function App() {
       if (!await persistConfig(draftConfig, setActionError)) {
         return;
       }
-      await window.ccr.openPluginApp(plugin.id, appId);
+      await window.agentrouter.openPluginApp(plugin.id, appId);
       setActionError("");
     } catch (error) {
       setActionError(formatError(error));
@@ -2385,7 +2385,7 @@ function App() {
     const previousTheme = themePreference;
     setThemePreference(theme);
 
-    if (!window.ccr?.setThemePreference) {
+    if (!window.agentrouter?.setThemePreference) {
       updateConfig((config) => ({
         ...config,
         theme
@@ -2395,7 +2395,7 @@ function App() {
 
     const requestId = themePreferenceRequestId.current + 1;
     themePreferenceRequestId.current = requestId;
-    void window.ccr.setThemePreference(theme)
+    void window.agentrouter.setThemePreference(theme)
       .then((savedTheme) => {
         if (themePreferenceRequestId.current !== requestId) {
           return;
@@ -2537,9 +2537,9 @@ function App() {
   }
 
   async function completeOnboarding() {
-    if (window.ccr) {
+    if (window.agentrouter) {
       try {
-        await window.ccr.setOnboardingFinished();
+        await window.agentrouter.setOnboardingFinished();
       } catch (error) {
         setActionError(formatError(error));
         return;
@@ -2555,7 +2555,7 @@ function App() {
   }
 
   async function toggleGatewayService() {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setActionError(t("Service control is available in the Electron app."));
       return;
     }
@@ -2566,9 +2566,9 @@ function App() {
     setActionError("");
     setActionMessage("");
     try {
-      const status = shouldStop ? await window.ccr.stopGateway() : await window.ccr.startGateway();
+      const status = shouldStop ? await window.agentrouter.stopGateway() : await window.agentrouter.startGateway();
       setGatewayStatus(status);
-      const nextProxyStatus = await window.ccr.getProxyStatus();
+      const nextProxyStatus = await window.agentrouter.getProxyStatus();
       setProxyStatus(nextProxyStatus);
       setActionMessage(translateAppErrorMessage(copy, gatewayServiceMessage(status, shouldStop)));
     } catch (error) {
@@ -2580,11 +2580,11 @@ function App() {
   }
 
   async function refreshProxyNetworkCaptures() {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProxyNetworkSnapshot(fallbackProxyNetworkSnapshot);
       return;
     }
-    setProxyNetworkSnapshot(await window.ccr.getProxyNetworkCaptures());
+    setProxyNetworkSnapshot(await window.agentrouter.getProxyNetworkCaptures());
   }
 
   async function refreshRequestLogs() {
@@ -2594,14 +2594,14 @@ function App() {
       setRequestLogLoading(false);
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setRequestLogPage(createEmptyRequestLogPage(requestLogFilter));
       return;
     }
 
     setRequestLogLoading(true);
     try {
-      setRequestLogPage(await window.ccr.getRequestLogs(requestLogFilter));
+      setRequestLogPage(await window.agentrouter.getRequestLogs(requestLogFilter));
       setRequestLogError("");
     } catch (error) {
       setRequestLogError(formatError(error));
@@ -2617,14 +2617,14 @@ function App() {
       setAgentAnalysisLoading(false);
       return;
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setAgentAnalysis(createEmptyAgentAnalysis(agentAnalysisRange));
       return;
     }
 
     setAgentAnalysisLoading(true);
     try {
-      setAgentAnalysis(await window.ccr.getAgentAnalysis({
+      setAgentAnalysis(await window.agentrouter.getAgentAnalysis({
         agent: agentAnalysisAgent,
         range: agentAnalysisRange,
         sessionAgent: agentAnalysisSession?.agent,
@@ -2657,11 +2657,11 @@ function App() {
   }
 
   async function clearProxyNetworkCaptures() {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setProxyNetworkSnapshot(fallbackProxyNetworkSnapshot);
       return;
     }
-    setProxyNetworkSnapshot(await window.ccr.clearProxyNetworkCaptures());
+    setProxyNetworkSnapshot(await window.agentrouter.clearProxyNetworkCaptures());
   }
 
   async function setProxyNetworkCaptureEnabled(enabled: boolean) {
@@ -2670,11 +2670,11 @@ function App() {
     if (!enabled && activeView === "networking") {
       setActiveView("overview");
     }
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       return;
     }
     try {
-      setProxyNetworkSnapshot(await window.ccr.setProxyNetworkCaptureEnabled(enabled));
+      setProxyNetworkSnapshot(await window.agentrouter.setProxyNetworkCaptureEnabled(enabled));
       setActionError("");
     } catch (error) {
       setActionError(formatError(error));
@@ -2726,8 +2726,8 @@ function App() {
       }
 
       let command = profileOpenCommandFallback(profile, "cli");
-      if (window.ccr?.getProfileOpenCommand) {
-        const result = await window.ccr.getProfileOpenCommand({ profileId: profile.id, surface: "cli" });
+      if (window.agentrouter?.getProfileOpenCommand) {
+        const result = await window.agentrouter.getProfileOpenCommand({ profileId: profile.id, surface: "cli" });
         command = result.command;
       }
       await copyTextToClipboard(command);
@@ -2763,11 +2763,11 @@ function App() {
         return;
       }
 
-      if (!window.ccr?.openProfile) {
+      if (!window.agentrouter?.openProfile) {
         setProfileActionError(t("Profile opening is only available in the Electron app."));
         return;
       }
-      const result = await window.ccr.openProfile({ profileId: profile.id, surface: "app" });
+      const result = await window.agentrouter.openProfile({ profileId: profile.id, surface: "app" });
       await refreshProfileRuntimeStatus();
       showToast(translateAppErrorMessage(copy, result.message));
     } catch (error) {
@@ -2788,11 +2788,11 @@ function App() {
     setProfileActionError("");
     setProfileActionBusy({ profileId: profile.id, surface: "app" });
     try {
-      if (!window.ccr?.stopProfile) {
+      if (!window.agentrouter?.stopProfile) {
         setProfileActionError(t("Profile stopping is only available in the Electron app."));
         return;
       }
-      const result = await window.ccr.stopProfile({ profileId: profile.id, surface: "app" });
+      const result = await window.agentrouter.stopProfile({ profileId: profile.id, surface: "app" });
       removeProfileRuntimeEntry(result.profileId, result.surface);
       await refreshProfileRuntimeStatus();
       showToast(translateAppErrorMessage(copy, result.message));
@@ -2822,12 +2822,12 @@ function App() {
 
     const fallbackCommand = profileOpenCommandFallback(profile, "cli");
     setProfileOpenDialog({ busy: "cli", command: fallbackCommand, mode, profile });
-    if (!window.ccr?.getProfileOpenCommand) {
+    if (!window.agentrouter?.getProfileOpenCommand) {
       setProfileOpenDialog((current) => current?.profile.id === profile.id ? { ...current, busy: "" } : current);
       return;
     }
     try {
-      const result = await window.ccr.getProfileOpenCommand({ profileId: profile.id, surface: "cli" });
+      const result = await window.agentrouter.getProfileOpenCommand({ profileId: profile.id, surface: "cli" });
       setProfileOpenDialog((current) => current?.profile.id === profile.id
         ? { ...current, busy: "", command: result.command, error: "" }
         : current);
@@ -2848,14 +2848,14 @@ function App() {
         : current);
       return;
     }
-    if (!window.ccr?.openProfile) {
+    if (!window.agentrouter?.openProfile) {
       setProfileOpenDialog((current) => current?.profile.id === profile.id
         ? { ...current, busy: "", error: t("Profile opening is only available in the Electron app.") }
         : current);
       return;
     }
     try {
-      const result = await window.ccr.openProfile({ profileId: profile.id, surface: "app" });
+      const result = await window.agentrouter.openProfile({ profileId: profile.id, surface: "app" });
       await refreshProfileRuntimeStatus();
       setProfileOpenDialog(undefined);
       showToast(translateAppErrorMessage(copy, result.message));
@@ -2870,14 +2870,14 @@ function App() {
     setProfileOpenDialog((current) => current?.profile.id === profile.id
       ? { ...current, busy: "app", error: "" }
       : current);
-    if (!window.ccr?.stopProfile) {
+    if (!window.agentrouter?.stopProfile) {
       setProfileOpenDialog((current) => current?.profile.id === profile.id
         ? { ...current, busy: "", error: t("Profile stopping is only available in the Electron app.") }
         : current);
       return;
     }
     try {
-      const result = await window.ccr.stopProfile({ profileId: profile.id, surface: "app" });
+      const result = await window.agentrouter.stopProfile({ profileId: profile.id, surface: "app" });
       removeProfileRuntimeEntry(result.profileId, result.surface);
       await refreshProfileRuntimeStatus();
       setProfileOpenDialog(undefined);
@@ -2890,12 +2890,12 @@ function App() {
   }
 
   async function refreshProfileRuntimeStatus(): Promise<void> {
-    if (!window.ccr?.getProfileRuntimeStatus) {
+    if (!window.agentrouter?.getProfileRuntimeStatus) {
       setProfileRuntimeStatus((current) => preserveEqualPollingSnapshot(current, { profiles: [] }));
       return;
     }
     try {
-      const next = await window.ccr.getProfileRuntimeStatus();
+      const next = await window.agentrouter.getProfileRuntimeStatus();
       setProfileRuntimeStatus((current) => preserveEqualPollingSnapshot(current, next));
     } catch {
       setProfileRuntimeStatus((current) => preserveEqualPollingSnapshot(current, { profiles: [] }));

@@ -1,11 +1,11 @@
-import type { ApiKeyLimitConfig } from "@ccr/core/contracts/app";
-import { parseJsonObjectCached } from "@ccr/core/gateway/http/body";
-import { isRecord } from "@ccr/core/gateway/internal/value";
+import type { ApiKeyLimitConfig } from "@agentrouter/core/contracts/app";
+import { parseJsonObjectCached } from "@agentrouter/core/gateway/http/body";
+import { isRecord } from "@agentrouter/core/gateway/internal/value";
 import {
   type ApiKeyLimitRule,
   type ApiKeyLimitUsage,
   type ApiKeyWindowCounter
-} from "@ccr/core/gateway/internal/shared";
+} from "@agentrouter/core/gateway/internal/shared";
 
 const apiKeyLimitCounterRetentionWindows = 2;
 const apiKeyLimitCounters = new Map<string, ApiKeyWindowCounter>();

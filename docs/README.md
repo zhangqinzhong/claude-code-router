@@ -1,6 +1,6 @@
-# Claude Code Router Docs
+# AgentRouter Docs
 
-Astro-powered documentation site for Claude Code Router.
+Astro-powered documentation site for AgentRouter.
 
 ## Commands
 
@@ -18,10 +18,9 @@ The local development server runs from this `docs` directory.
 Docs are deployed from `.github/workflows/docs.yml` on pushes to `main` that change `docs/**` or the workflow itself. The default public URL is:
 
 ```text
-https://ccrdesk.top/
 ```
 
-The Astro build reads `ASTRO_SITE` and `ASTRO_BASE`, defaulting to `https://ccrdesk.top` and `/`.
+The Astro build reads `ASTRO_SITE` and `ASTRO_BASE`, defaulting to `/` and no absolute site.
 
 ## Content
 

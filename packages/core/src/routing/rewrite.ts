@@ -2,8 +2,8 @@ import type {
   RequestRouteTraceChange,
   RouterRuleRewrite,
   RouterRuleRewriteOperation
-} from "@ccr/core/contracts/app";
-import { normalizeRouteSelector } from "@ccr/core/routing/model-registry";
+} from "@agentrouter/core/contracts/app";
+import { normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
 
 type HeaderValue = string | string[] | undefined;
 

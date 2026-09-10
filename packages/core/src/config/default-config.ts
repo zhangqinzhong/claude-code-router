@@ -6,8 +6,8 @@ import {
   DEFAULT_TRAY_WINDOW_MODULES,
   type AppConfig,
   type ProxyRouteTarget
-} from "@ccr/core/contracts/app";
-import { defaultRequestLogBodyBytes } from "@ccr/core/observability/request-log-limits";
+} from "@agentrouter/core/contracts/app";
+import { defaultRequestLogBodyBytes } from "@agentrouter/core/observability/request-log-limits";
 
 export const DEFAULT_PROXY_TARGETS: ProxyRouteTarget[] = [
   { host: "api.anthropic.com", paths: ["/v1/messages", "/v1/messages/count_tokens"] },
@@ -88,7 +88,7 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
       startupTimeoutMs: 10000,
       stateDir: "",
       streamReplies: true,
-      tenantId: "ccr"
+      tenantId: "ar"
     },
     contextArchive: {
       enabled: false,
@@ -99,7 +99,7 @@ export function createDefaultAppConfig(options: DefaultAppConfigOptions = {}): A
       replayTimeoutMs: 60000,
       retentionDays: 30,
       storagePath: "",
-      toolName: "ccr_history_ask"
+      toolName: "ar_history_ask"
     },
     gateway: {
       coreHost,

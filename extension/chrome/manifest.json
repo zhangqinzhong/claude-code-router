@@ -1,11 +1,11 @@
 {
   "manifest_version": 3,
-  "name": "CCR Login Import",
-  "description": "Import selected Chrome site login cookies into CCR's in-app browser.",
+  "name": "AgentRouter Login Import",
+  "description": "Import selected Chrome site login cookies into AgentRouter's in-app browser.",
   "version": "0.1.0",
   "action": {
     "default_popup": "popup.html",
-    "default_title": "CCR Login Import"
+    "default_title": "AgentRouter Login Import"
   },
   "background": {
     "service_worker": "background.js"

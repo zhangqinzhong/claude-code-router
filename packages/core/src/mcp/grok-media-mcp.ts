@@ -4,18 +4,18 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import path from "node:path";
 import {
   MEDIA_TOOLS_MCP_SERVER_NAME
-} from "@ccr/core/contracts/app";
-import { readRequestBody, sendJson } from "@ccr/core/gateway/http/io";
-import { mediaService } from "@ccr/core/media/service";
-import type { MediaService } from "@ccr/core/media/service";
-import { mediaMcpToolDefinition } from "@ccr/core/media/tools";
+} from "@agentrouter/core/contracts/app";
+import { readRequestBody, sendJson } from "@agentrouter/core/gateway/http/io";
+import { mediaService } from "@agentrouter/core/media/service";
+import type { MediaService } from "@agentrouter/core/media/service";
+import { mediaMcpToolDefinition } from "@agentrouter/core/media/tools";
 import {
   LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX,
   MEDIA_ARTIFACT_PATH_PREFIX,
   MEDIA_TOOLS_MCP_PATH
-} from "@ccr/core/mcp/grok-media-config";
+} from "@agentrouter/core/mcp/grok-media-config";
 
-export { LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX, MEDIA_ARTIFACT_PATH_PREFIX } from "@ccr/core/mcp/grok-media-config";
+export { LEGACY_GROK_MEDIA_ARTIFACT_PATH_PREFIX, MEDIA_ARTIFACT_PATH_PREFIX } from "@agentrouter/core/mcp/grok-media-config";
 
 type JsonPrimitive = boolean | null | number | string;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -135,7 +135,7 @@ async function handleJsonRpcRequest(payload: unknown, service: MediaService): Pr
       return jsonRpcResult(id, {
         capabilities: { tools: {} },
         protocolVersion,
-        serverInfo: { name: "ccr-media-tools", title: "CCR Media Tools", version: packageJson.version }
+        serverInfo: { name: "ar-media-tools", title: "AgentRouter Media Tools", version: packageJson.version }
       });
     }
     if (request.method === "ping") return jsonRpcResult(id, {});

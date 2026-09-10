@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { APP_STORAGE_NAME, resolveRuntimeConfigDir, resolveRuntimeDataDir } from "@ccr/core/runtime/app-paths.ts";
+import { APP_STORAGE_NAME, resolveRuntimeConfigDir, resolveRuntimeDataDir } from "@agentrouter/core/runtime/app-paths.ts";
 
-test("runtime config and data dirs default to the shared CCR storage", () => {
+test("runtime config and data dirs default to the shared AgentRouter storage", () => {
   withRuntimePathEnv({
     appData: path.join(os.tmpdir(), "agentrouter-paths-app-data"),
     home: path.join(os.tmpdir(), "agentrouter-paths-home")

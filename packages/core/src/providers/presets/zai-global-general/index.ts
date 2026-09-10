@@ -1,5 +1,5 @@
-import type { ProviderAccountConfig, ProviderAccountMappingConfig } from "@ccr/core/contracts/app";
-import type { ProviderPreset } from "@ccr/core/providers/presets/types";
+import type { ProviderAccountConfig, ProviderAccountMappingConfig } from "@agentrouter/core/contracts/app";
+import type { ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 const zaiQuotaMapping: ProviderAccountMappingConfig = {
   meters: [

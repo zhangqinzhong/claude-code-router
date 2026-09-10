@@ -1,7 +1,7 @@
 import path from "node:path";
-import { APP_NAME, APP_STORAGE_NAME, LEGACY_CONFIGDIR, resolveRuntimeAppPath, resolveRuntimeConfigDir, resolveRuntimeDataDir } from "@ccr/core/runtime/app-paths";
+import { APP_NAME, APP_STORAGE_NAME, LEGACY_CONFIGDIR, resolveRuntimeAppPath, resolveRuntimeConfigDir, resolveRuntimeDataDir } from "@agentrouter/core/runtime/app-paths";
 
-export { IPC_CHANNELS } from "@ccr/core/contracts/ipc-channels";
+export { IPC_CHANNELS } from "@agentrouter/core/contracts/ipc-channels";
 export const LEGACY_CONFIG_FILE = path.join(LEGACY_CONFIGDIR, "config.json");
 
 export { APP_NAME, APP_STORAGE_NAME, LEGACY_CONFIGDIR };

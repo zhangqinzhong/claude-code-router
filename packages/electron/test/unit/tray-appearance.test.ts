@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { layeredTrayAssetName, trayUsageTitle } from "@ccr/electron/main/tray-appearance.ts";
+import { layeredTrayAssetName, trayUsageTitle } from "@agentrouter/electron/main/tray-appearance.ts";
 
 test("tray usage titles are empty by default without changing the source tooltip text", () => {
   const title = "106.8M tokens";

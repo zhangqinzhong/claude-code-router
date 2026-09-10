@@ -4,7 +4,7 @@ import {
   createGatewayPlugin,
   rewriteUpstreamProviderUrl,
   sanitizeUpstreamProviderHeaders
-} from "@ccr/core/gateway/core-runtime/upstream-header-sanitizer.ts";
+} from "@agentrouter/core/gateway/core-runtime/upstream-header-sanitizer.ts";
 
 test("#1778 native Gemini sends AI Studio keys as API keys while OpenAI compatibility keeps bearer auth", () => {
   const [hook] = createGatewayPlugin().providerHooks;
@@ -21,7 +21,7 @@ test("#1778 native Gemini sends AI Studio keys as API keys while OpenAI compatib
   }
 });
 
-test("provider boundary removes CCR-owned headers and preserves provider headers", () => {
+test("provider boundary removes AR-owned headers and preserves provider headers", () => {
   assert.deepEqual(sanitizeUpstreamProviderHeaders({
     authorization: "Bearer provider-token",
     "X-Auth-API-Key-ID": "profile:claude",
@@ -75,7 +75,7 @@ test("gateway sanitizer hook forwards client headers without overriding provider
   const result = await hook.transformRequest({
     request: {
       headers: {
-        authorization: "Bearer ccr-client-token",
+        authorization: "Bearer ar-client-token",
         connection: "keep-alive, x-hop-only",
         "content-length": "123",
         "content-type": "text/plain",

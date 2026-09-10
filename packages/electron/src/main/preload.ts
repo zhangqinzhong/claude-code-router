@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, webUtils } from "electron";
-import { browserErrorI18nLanguage, formatLocalizedErrorMessage } from "@ccr/core/contracts/i18n";
-import { IPC_CHANNELS } from "@ccr/core/contracts/ipc-channels";
+import { browserErrorI18nLanguage, formatLocalizedErrorMessage } from "@agentrouter/core/contracts/i18n";
+import { IPC_CHANNELS } from "@agentrouter/core/contracts/ipc-channels";
 import type {
   AgentAnalysisFilter,
   AgentAnalysisSnapshot,
@@ -86,8 +86,8 @@ import type {
   UsageStatsRange,
   UsageStatsResetResult,
   UsageStatsSnapshot
-} from "@ccr/core/contracts/app";
-import type { ProviderPreset } from "@ccr/core/providers/presets/types";
+} from "@agentrouter/core/contracts/app";
+import type { ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 function invoke(channel: string, ...args: unknown[]): Promise<unknown> {
   return ipcRenderer.invoke(channel, ...args).catch((error) => {
@@ -103,7 +103,7 @@ function localizedIpcError(error: unknown): Error {
   return localized;
 }
 
-contextBridge.exposeInMainWorld("ccr", {
+contextBridge.exposeInMainWorld("agentrouter", {
   applyClaudeAppGateway: (config?: AppConfig) => invoke(IPC_CHANNELS.appApplyClaudeAppGateway, config) as Promise<ClaudeAppGatewayApplyResult>,
   applyProfile: () => invoke(IPC_CHANNELS.appApplyProfile) as Promise<ProfileApplyResult>,
   cancelBotGatewayQrLogin: (request: BotGatewayQrLoginCancelRequest) => invoke(IPC_CHANNELS.appBotGatewayQrLoginCancel, request) as Promise<BotGatewayQrLoginCancelResult>,

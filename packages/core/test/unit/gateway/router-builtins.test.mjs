@@ -3,16 +3,16 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin.ts";
-import { fetchUpstreamWithFallback } from "@ccr/core/gateway/upstream/executor.ts";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.ts";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key.ts";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin.ts";
+import { fetchUpstreamWithFallback } from "@agentrouter/core/gateway/upstream/executor.ts";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace.ts";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key.ts";
 import {
   createClaudeCodeModelsResponseForTest,
   fallbackRetryDelayAfterNetworkErrorForTest,
   fallbackRetryDelayAfterStatusForTest,
   prepareGatewayUpstreamAttemptForTest
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 
 function createRouterPlugin(options = {}) {
   const agent = options.agent ?? "claude-code";
@@ -446,7 +446,7 @@ test("gateway-owned route bodies avoid cloning and built-in model rewrites stay 
 });
 
 test("customer route modules use customer-prefixed trace names", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-customer-router-trace-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-customer-router-trace-"));
   try {
     const customRouterPath = path.join(dir, "router.cjs");
     writeFileSync(customRouterPath, 'module.exports = () => "Provider/claude-opus";\n');
@@ -1110,7 +1110,7 @@ test("built-in Claude Code route injects ToolHub resolver instructions when Tool
     url: "/v1/messages"
   });
 
-  assert.match(result.body.system.at(-1).text, /CCR ToolHub tool resolution is enabled/);
+  assert.match(result.body.system.at(-1).text, /AgentRouter ToolHub tool resolution is enabled/);
   assert.match(result.body.system.at(-1).text, /ToolHub search\/resolution tool is mcp__ar-toolhub__tool_hub_resolve/);
   assert.match(result.body.system.at(-1).text, /call this actual tool, do not merely mention its name in text/);
   assert.match(result.body.system.at(-1).text, /MUST call the ToolHub search\/resolution tool mcp__ar-toolhub__tool_hub_resolve before answering/);
@@ -1626,7 +1626,7 @@ test("issue 1480 raw user config ignores an unreplaced Provider/model subagent p
     body: {
       messages: [],
       model: "claude-sonnet-4-6",
-      system: "Use <CCR-SUBAGENT-MODEL>provider/model</CCR-SUBAGENT-MODEL> for this subagent.",
+      system: "Use <AR-SUBAGENT-MODEL>provider/model</AR-SUBAGENT-MODEL> for this subagent.",
       tools: []
     },
     headers,
@@ -1901,7 +1901,7 @@ test("explicit virtual gateway models override the built-in Claude Code profile 
 test("Claude Code encoded model selections override the built-in profile route", async () => {
   const plugin = createRouterPlugin({ profileModel: "Provider/claude-sonnet" });
   const selectedModel = "Provider/claude-opus";
-  const encodedModel = `anthropic/claude-ccr-h${Buffer.from(selectedModel, "utf8").toString("hex")}`;
+  const encodedModel = `anthropic/claude-ar-h${Buffer.from(selectedModel, "utf8").toString("hex")}`;
   const result = await plugin.routeRequest({
     body: {
       messages: [],
@@ -2083,11 +2083,11 @@ test("built-in Claude Code route injects subagent model instructions into Agent 
   });
 
   for (const tool of result.body.tools) {
-    assert.match(tool.description, /<CCR-SUBAGENT-MODEL>Provider\/model<\/CCR-SUBAGENT-MODEL>/);
+    assert.match(tool.description, /<AR-SUBAGENT-MODEL>Provider\/model<\/AR-SUBAGENT-MODEL>/);
     assert.match(tool.description, /MUST start/);
     assert.match(tool.description, /Provider\/claude-sonnet \(Claude Sonnet\): Balanced coding model/);
     assert.match(tool.description, /Provider\/gpt-5-codex: Use for long refactors/);
-    assert.match(tool.input_schema.properties.prompt.description, /MUST start with <CCR-SUBAGENT-MODEL>Provider\/model<\/CCR-SUBAGENT-MODEL>/);
+    assert.match(tool.input_schema.properties.prompt.description, /MUST start with <AR-SUBAGENT-MODEL>Provider\/model<\/AR-SUBAGENT-MODEL>/);
     assert.match(tool.input_schema.properties.prompt.description, /Provider\/claude-sonnet \(Claude Sonnet\): Balanced coding model/);
     assert.match(tool.input_schema.properties.prompt.description, /Provider\/gpt-5-codex: Use for long refactors/);
     assert.doesNotMatch(tool.input_schema.properties.prompt.description, /optionally include/);
@@ -2127,17 +2127,17 @@ test("built-in Claude Code route publishes and accepts client-visible subagent m
   });
 
   const description = described.body.tools[0].description;
-  const routeMatch = /- (anthropic\/claude-ccr-h[0-9a-f]+) -> Provider\/gpt-5-codex: Use for long refactors/.exec(description);
+  const routeMatch = /- (anthropic\/claude-ar-h[0-9a-f]+) -> Provider\/gpt-5-codex: Use for long refactors/.exec(description);
   assert.ok(routeMatch);
   const clientModel = routeMatch[1];
-  assert.match(description, /client model -> CCR target/);
+  assert.match(description, /client model -> AgentRouter target/);
   assert.match(description, /tool model field accepts exact strings, set it to the same client model ID/i);
 
   const routed = await plugin.routeRequest({
     body: {
       messages: [],
       model: clientModel,
-      system: `Use <CCR-SUBAGENT-MODEL>${clientModel}</CCR-SUBAGENT-MODEL> for this subagent.`
+      system: `Use <AR-SUBAGENT-MODEL>${clientModel}</AR-SUBAGENT-MODEL> for this subagent.`
     },
     headers: {
       "user-agent": "Claude Code"
@@ -2261,9 +2261,9 @@ test("built-in Claude Code route injects workflow subagent model instructions in
   });
 
   const tool = result.body.tools[0];
-  assert.match(tool.description, /CCR workflow subagent routing is enabled/);
+  assert.match(tool.description, /AgentRouter workflow subagent routing is enabled/);
   assert.match(tool.description, /Agent\/Task subagents/);
-  assert.match(tool.description, /each spawned agent prompt MUST start with <CCR-SUBAGENT-MODEL>Provider\/model<\/CCR-SUBAGENT-MODEL>/);
+  assert.match(tool.description, /each spawned agent prompt MUST start with <AR-SUBAGENT-MODEL>Provider\/model<\/AR-SUBAGENT-MODEL>/);
   assert.match(tool.description, /Provider\/claude-sonnet: Balanced coding model/);
   assert.match(tool.description, /Provider\/gpt-5-codex: Use for long refactors/);
   assert.equal(tool.input_schema.properties.script.description, "Workflow script.");
@@ -2304,8 +2304,8 @@ test("built-in Claude Code route injects subagent model instructions into functi
   });
 
   const tool = result.body.tools[0];
-  assert.match(tool.function.description, /<CCR-SUBAGENT-MODEL>Provider\/model<\/CCR-SUBAGENT-MODEL>/);
-  assert.match(tool.function.parameters.properties.prompt.description, /MUST start with <CCR-SUBAGENT-MODEL>Provider\/model<\/CCR-SUBAGENT-MODEL>/);
+  assert.match(tool.function.description, /<AR-SUBAGENT-MODEL>Provider\/model<\/AR-SUBAGENT-MODEL>/);
+  assert.match(tool.function.parameters.properties.prompt.description, /MUST start with <AR-SUBAGENT-MODEL>Provider\/model<\/AR-SUBAGENT-MODEL>/);
 });
 
 test("built-in Claude Code route skips subagent instruction injection when no model has a description", async () => {
@@ -2598,7 +2598,7 @@ test("built-in Claude Code subagent model tag stays ahead of the profile subagen
       system: [
         ...claudeCodeBillingSystem(),
         {
-          text: "<CCR-SUBAGENT-MODEL>DeepSeek/deepseek-v4-pro</CCR-SUBAGENT-MODEL>",
+          text: "<AR-SUBAGENT-MODEL>DeepSeek/deepseek-v4-pro</AR-SUBAGENT-MODEL>",
           type: "text"
         }
       ]
@@ -2783,7 +2783,7 @@ test("built-in Claude Code subagent env route accepts legacy JSON billing metada
 test("built-in Claude Code subagent env route accepts client-visible discovery model IDs", async () => {
   const plugin = createClaudeCodeSubagentEnvPlugin();
   const encodedModel = Buffer.from("DeepSeek/deepseek-v4-flash", "utf8").toString("hex");
-  const clientModel = `anthropic/claude-ccr-h${encodedModel}`;
+  const clientModel = `anthropic/claude-ar-h${encodedModel}`;
   const result = await plugin.routeRequest({
     body: {
       messages: [],
@@ -2848,7 +2848,7 @@ test("built-in Claude Code subagent env route ignores billing metadata outside t
 });
 
 test("custom router stays ahead of the Claude Code profile subagent env", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-subagent-env-custom-router-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-subagent-env-custom-router-"));
   try {
     const customRouterPath = path.join(dir, "router.cjs");
     writeFileSync(customRouterPath, 'module.exports = () => "DeepSeek/deepseek-v4-pro";\n');
@@ -2879,7 +2879,7 @@ test("built-in Claude Code subagent route uses model tag from system", async () 
     body: {
       messages: [],
       model: "claude-default",
-      system: "Use <CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL> for this subagent."
+      system: "Use <AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL> for this subagent."
     },
     headers: {
       "user-agent": "Claude Code"
@@ -2900,7 +2900,7 @@ test("built-in Claude Code subagent route ignores the Provider/model placeholder
     body: {
       messages: [],
       model: "claude-default",
-      system: "Use <CCR-SUBAGENT-MODEL>Provider/model</CCR-SUBAGENT-MODEL> for this subagent."
+      system: "Use <AR-SUBAGENT-MODEL>Provider/model</AR-SUBAGENT-MODEL> for this subagent."
     },
     headers: {
       "user-agent": "Claude Code"
@@ -2927,7 +2927,7 @@ test("built-in Claude Code route removes the first billing system block before s
           type: "text"
         },
         {
-          text: "Use <CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL> for this subagent.",
+          text: "Use <AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL> for this subagent.",
           type: "text"
         }
       ]
@@ -3023,13 +3023,13 @@ test("built-in Claude Code subagent route scans only the first two messages for 
         {
           content: [
             {
-              text: "second <CCR-SUBAGENT-MODEL>Provider/claude-haiku</CCR-SUBAGENT-MODEL>",
+              text: "second <AR-SUBAGENT-MODEL>Provider/claude-haiku</AR-SUBAGENT-MODEL>",
               type: "text"
             }
           ],
           role: "user"
         },
-        { content: "third <CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL>", role: "user" }
+        { content: "third <AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL>", role: "user" }
       ],
       model: "claude-default"
     },
@@ -3053,7 +3053,7 @@ test("built-in Claude Code subagent route ignores tags outside the first two mes
       messages: [
         { content: "first", role: "user" },
         { content: "assistant response", role: "assistant" },
-        { content: "third <CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL>", role: "user" }
+        { content: "third <AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL>", role: "user" }
       ],
       model: "claude-default"
     },

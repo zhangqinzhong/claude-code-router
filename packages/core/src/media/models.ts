@@ -3,8 +3,8 @@ import {
   GROK_API_DEFAULT_VIDEO_MODEL,
   GROK_CLI_MEDIA_MODEL_SELECTOR,
   isGatewayProviderEnabled
-} from "@ccr/core/contracts/app";
-import type { GatewayMediaProtocol, GatewayProviderConfig } from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
+import type { GatewayMediaProtocol, GatewayProviderConfig } from "@agentrouter/core/contracts/app";
 
 const localAgentProviderApiKey = "ar-local-agent-login";
 

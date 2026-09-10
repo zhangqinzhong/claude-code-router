@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   finalizeOpenRouterDiscountProviderRouterSelection,
   openRouterDiscountProviderRouterTransform
-} from "@ccr/core/plugins/built-ins/openrouter-discount-provider-router.ts";
+} from "@agentrouter/core/plugins/built-ins/openrouter-discount-provider-router.ts";
 
 test("OpenRouter discount router does not run unless the model opt-in is enabled", async () => {
   const originalFetch = globalThis.fetch;
@@ -626,7 +626,7 @@ test("OpenRouter discount router commits session baselines only after confirmed 
     finalizeOpenRouterDiscountProviderRouterSelection("session-confirm-1", {
       ok: true,
       routedModel: "OpenRouter/z-ai/glm-session-confirm",
-      usedCcrFallback: false
+      usedArFallback: false
     });
 
     const afterConfirm = await openRouterDiscountProviderRouterTransform(

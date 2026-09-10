@@ -10,14 +10,14 @@ import {
   findInstalledWorkbuddyAppExecutable,
   removeLegacyCodexVirtualAuthMarker,
   writeCodexCompatibleAppModelCatalog
-} from "@ccr/core/agents/codex/app-launch.ts";
+} from "@agentrouter/core/agents/codex/app-launch.ts";
 
 test("ChatGPT app launch shares explicit or default Codex login when available", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-chatgpt-shared-auth-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-chatgpt-shared-auth-"));
   const defaultAuthDir = path.join(root, ".codex");
   const defaultAuthFile = path.join(defaultAuthDir, "auth.json");
   const authFile = path.join(root, "auth.json");
-  const previousCcr = process.env.AR_CODEX_CHATGPT_AUTH_FILE;
+  const previousAr = process.env.AR_CODEX_CHATGPT_AUTH_FILE;
   const previousCodexl = process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE;
   try {
     writeFileSync(authFile, JSON.stringify({ auth_mode: "chatgpt", tokens: { access_token: "token" } }));
@@ -36,8 +36,8 @@ test("ChatGPT app launch shares explicit or default Codex login when available",
       CODEXL_CODEX_CHATGPT_AUTH_FILE: authFile
     });
   } finally {
-    if (previousCcr === undefined) delete process.env.AR_CODEX_CHATGPT_AUTH_FILE;
-    else process.env.AR_CODEX_CHATGPT_AUTH_FILE = previousCcr;
+    if (previousAr === undefined) delete process.env.AR_CODEX_CHATGPT_AUTH_FILE;
+    else process.env.AR_CODEX_CHATGPT_AUTH_FILE = previousAr;
     if (previousCodexl === undefined) delete process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE;
     else process.env.CODEXL_CODEX_CHATGPT_AUTH_FILE = previousCodexl;
     rmSync(root, { force: true, recursive: true });
@@ -45,7 +45,7 @@ test("ChatGPT app launch shares explicit or default Codex login when available",
 });
 
 test("ChatGPT model catalog write includes patch bridge capabilities", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-app-catalog-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-codex-app-catalog-"));
   try {
     const config = {
       Providers: [
@@ -73,7 +73,7 @@ test("ChatGPT model catalog write includes patch bridge capabilities", () => {
 
     const result = writeCodexCompatibleAppModelCatalog(configDir, profile, config);
     assert.equal(result.changed, true);
-    assert.equal(path.basename(result.file), "ccr-codex-model-catalog.json");
+    assert.equal(path.basename(result.file), "ar-codex-model-catalog.json");
     assert.equal(
       result.userDataDir,
       path.join(configDir, "profiles", "codex-main", "codex", ".claude-code-router", "codex-app-user-data", "codex-main")
@@ -93,7 +93,7 @@ test("ChatGPT model catalog write includes patch bridge capabilities", () => {
 });
 
 test("ChatGPT model catalog write includes latest reasoning effort aliases", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-app-catalog-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-codex-app-catalog-"));
   try {
     const config = {
       Providers: [
@@ -141,7 +141,7 @@ test("ChatGPT model catalog write includes latest reasoning effort aliases", () 
 });
 
 test("ChatGPT model catalog write gives gateway GPT models reasoning effort fallbacks", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-app-catalog-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-codex-app-catalog-"));
   try {
     const config = {
       Providers: [
@@ -182,7 +182,7 @@ test("ChatGPT model catalog write gives gateway GPT models reasoning effort fall
 });
 
 test("ZCode app model catalog uses the public model context window", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-zcode-app-catalog-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-zcode-app-catalog-"));
   try {
     const config = {
       Providers: [{
@@ -221,7 +221,7 @@ test("ZCode app model catalog uses the public model context window", () => {
     const fusionModel = catalog.models.find((item) => item.slug === "Fusion/catalog-context");
     const model = catalog.models.find((item) => item.slug === "Codex API/gpt-5.6-sol");
 
-    assert.equal(path.basename(result.file), "ccr-zcode-model-catalog.json");
+    assert.equal(path.basename(result.file), "ar-zcode-model-catalog.json");
     assert.equal(fusionModel.context_window, 1_050_000);
     assert.equal(fusionModel.max_context_window, 1_050_000);
     assert.equal(model.context_window, 1_050_000);
@@ -232,7 +232,7 @@ test("ZCode app model catalog uses the public model context window", () => {
 });
 
 test("ChatGPT desktop app path override discovers the renamed executable", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-chatgpt-app-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-chatgpt-app-"));
   const previous = process.env.CHATGPT_APP_PATH;
   try {
     let configuredPath;
@@ -269,7 +269,7 @@ test("ChatGPT desktop app path override discovers the renamed executable", () =>
 });
 
 test("ChatGPT profile appPath overrides process env discovery", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-chatgpt-profile-app-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-chatgpt-profile-app-"));
   const previous = process.env.CHATGPT_APP_PATH;
   try {
     const envExecutable = path.join(root, "env", "ChatGPT");
@@ -297,7 +297,7 @@ test("ChatGPT profile appPath overrides process env discovery", () => {
 });
 
 test("WorkBuddy AI app path override discovers the Electron executable", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-workbuddy-app-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-workbuddy-app-"));
   try {
     let configuredPath;
     let expectedExecutable;
@@ -326,7 +326,7 @@ test("WorkBuddy AI app path override discovers the Electron executable", () => {
 });
 
 test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-workbuddy-app-auth-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-workbuddy-app-auth-"));
   try {
     const profile = {
       agent: "workbuddy",
@@ -365,7 +365,7 @@ test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
     };
     const result = writeCodexCompatibleAppModelCatalog(configDir, profile, workbuddyConfig);
 
-    assert.equal(path.basename(result.file), "ccr-workbuddy-model-catalog.json");
+    assert.equal(path.basename(result.file), "ar-workbuddy-model-catalog.json");
     assert.ok(result.workbuddyModelsConfig);
     assert.equal(path.basename(result.workbuddyModelsConfig.file), "models.json");
     assert.equal(result.workbuddyModelsConfig.model, "Codex API/gpt-5-codex");
@@ -405,7 +405,7 @@ test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
 });
 
 test("WorkBuddy AI app profile writes every allowed model to models.json", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-workbuddy-app-models-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-workbuddy-app-models-"));
   try {
     const profile = {
       agent: "workbuddy",
@@ -438,7 +438,7 @@ test("WorkBuddy AI app profile writes every allowed model to models.json", () =>
 });
 
 test("WorkBuddy AI app profile writes every catalog model when the allowlist is unrestricted", () => {
-  const configDir = mkdtempSync(path.join(os.tmpdir(), "ccr-workbuddy-app-unrestricted-models-"));
+  const configDir = mkdtempSync(path.join(os.tmpdir(), "ar-workbuddy-app-unrestricted-models-"));
   try {
     const profile = {
       agent: "workbuddy",
@@ -480,8 +480,8 @@ function withPlatform(platform, callback) {
   }
 }
 
-test("ChatGPT migration removes only the exact legacy CCR auth marker", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-chatgpt-auth-migration-"));
+test("ChatGPT migration removes only the exact legacy AgentRouter auth marker", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-chatgpt-auth-migration-"));
   const authFile = path.join(root, "auth.json");
   try {
     writeFileSync(authFile, JSON.stringify({

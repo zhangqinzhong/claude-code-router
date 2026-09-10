@@ -9,8 +9,8 @@ import type {
   ProviderModelCapabilities,
   ProviderModelMetadata,
   ProviderModelPricing
-} from "@ccr/core/contracts/app";
-import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
+} from "@agentrouter/core/contracts/app";
+import { providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
 
 export const appDeepLinkProtocol = "agentrouter";
 export const providerDeepLinkHost = "provider";
@@ -81,7 +81,7 @@ export function parseProviderManifestDeepLinkPayload(rawUrl: string): ProviderMa
   const host = url.hostname.toLowerCase();
   const firstPathSegment = url.pathname.split("/").filter(Boolean)[0]?.toLowerCase();
   if (host !== providerDeepLinkHost && firstPathSegment !== providerDeepLinkHost) {
-    throw new Error("Unsupported CCR link target.");
+    throw new Error("Unsupported AgentRouter link target.");
   }
 
   const payload = readPayloadRecord(url.searchParams);
@@ -114,7 +114,7 @@ export function parseProviderDeepLinkPayload(rawUrl: string): ProviderDeepLinkPa
   const host = url.hostname.toLowerCase();
   const firstPathSegment = url.pathname.split("/").filter(Boolean)[0]?.toLowerCase();
   if (host !== providerDeepLinkHost && firstPathSegment !== providerDeepLinkHost) {
-    throw new Error("Unsupported CCR link target.");
+    throw new Error("Unsupported AgentRouter link target.");
   }
 
   const params = url.searchParams;
@@ -183,8 +183,8 @@ export function parseProviderManifestPayload(value: unknown, sourceUrl?: string)
   }
   const providerValue = isRecord(value.provider)
     ? value.provider
-    : isRecord(value.ccrProvider)
-      ? value.ccrProvider
+    : isRecord(value.arProvider)
+      ? value.arProvider
       : value;
   return parseProviderPayloadFields(new URLSearchParams(), providerValue, sourceUrl);
 }

@@ -1,13 +1,13 @@
 import type { IncomingHttpHeaders } from "node:http";
 import { Readable, Transform } from "node:stream";
 import { StringDecoder } from "node:string_decoder";
-import type { AppConfig } from "@ccr/core/contracts/app";
-import { normalizeRouteSelector } from "@ccr/core/routing/model-registry";
-import { isRecord, rawStringValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { readHeader } from "@ccr/core/gateway/http/io";
-import { parseJsonObjectSafe, serializeJsonBody } from "@ccr/core/gateway/http/body";
-import { requestProtocolForPath } from "@ccr/core/routing/protocol-endpoints";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
+import { normalizeRouteSelector } from "@agentrouter/core/routing/model-registry";
+import { isRecord, rawStringValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { readHeader } from "@agentrouter/core/gateway/http/io";
+import { parseJsonObjectSafe, serializeJsonBody } from "@agentrouter/core/gateway/http/body";
+import { requestProtocolForPath } from "@agentrouter/core/routing/protocol-endpoints";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 
 const multiAgentNamespaceName = "multi_agent_v1";
 const multiAgentFunctionPrefix = `${multiAgentNamespaceName}_`;
@@ -347,35 +347,35 @@ function transformMultiAgentFunctionCall(item: Record<string, unknown>): { value
 }
 
 type CodexMultiAgentBridgeSseTransform = Transform & {
-  __ccrCodexMultiAgentBridgeSseDecoder?: StringDecoder;
-  __ccrCodexMultiAgentBridgeSsePending?: string;
+  __arCodexMultiAgentBridgeSseDecoder?: StringDecoder;
+  __arCodexMultiAgentBridgeSsePending?: string;
 };
 
 function transformSseChunk(stream: Transform, chunk: Buffer | string): void {
   const state = stream as CodexMultiAgentBridgeSseTransform;
-  const decoder = state.__ccrCodexMultiAgentBridgeSseDecoder ?? new StringDecoder("utf8");
-  state.__ccrCodexMultiAgentBridgeSseDecoder = decoder;
-  state.__ccrCodexMultiAgentBridgeSsePending = (state.__ccrCodexMultiAgentBridgeSsePending ?? "") +
+  const decoder = state.__arCodexMultiAgentBridgeSseDecoder ?? new StringDecoder("utf8");
+  state.__arCodexMultiAgentBridgeSseDecoder = decoder;
+  state.__arCodexMultiAgentBridgeSsePending = (state.__arCodexMultiAgentBridgeSsePending ?? "") +
     decoder.write(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
-  while (state.__ccrCodexMultiAgentBridgeSsePending) {
-    const match = /\r?\n\r?\n/.exec(state.__ccrCodexMultiAgentBridgeSsePending);
+  while (state.__arCodexMultiAgentBridgeSsePending) {
+    const match = /\r?\n\r?\n/.exec(state.__arCodexMultiAgentBridgeSsePending);
     if (!match || match.index === undefined) {
       break;
     }
-    const block = state.__ccrCodexMultiAgentBridgeSsePending.slice(0, match.index);
+    const block = state.__arCodexMultiAgentBridgeSsePending.slice(0, match.index);
     const delimiter = match[0];
-    state.__ccrCodexMultiAgentBridgeSsePending = state.__ccrCodexMultiAgentBridgeSsePending.slice(match.index + delimiter.length);
+    state.__arCodexMultiAgentBridgeSsePending = state.__arCodexMultiAgentBridgeSsePending.slice(match.index + delimiter.length);
     stream.push(transformCodexMultiAgentBridgeSseEvent(block) + delimiter);
   }
 }
 
 function flushSseTransform(stream: Transform): void {
   const state = stream as CodexMultiAgentBridgeSseTransform;
-  state.__ccrCodexMultiAgentBridgeSsePending = (state.__ccrCodexMultiAgentBridgeSsePending ?? "") +
-    (state.__ccrCodexMultiAgentBridgeSseDecoder?.end() ?? "");
-  if (state.__ccrCodexMultiAgentBridgeSsePending) {
-    stream.push(transformCodexMultiAgentBridgeSseEvent(state.__ccrCodexMultiAgentBridgeSsePending));
-    state.__ccrCodexMultiAgentBridgeSsePending = "";
+  state.__arCodexMultiAgentBridgeSsePending = (state.__arCodexMultiAgentBridgeSsePending ?? "") +
+    (state.__arCodexMultiAgentBridgeSseDecoder?.end() ?? "");
+  if (state.__arCodexMultiAgentBridgeSsePending) {
+    stream.push(transformCodexMultiAgentBridgeSseEvent(state.__arCodexMultiAgentBridgeSsePending));
+    state.__arCodexMultiAgentBridgeSsePending = "";
   }
 }
 

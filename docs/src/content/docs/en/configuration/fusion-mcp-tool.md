@@ -34,11 +34,11 @@ To configure media:
 3. Select a model below each tool and save the Fusion model.
 4. Use that Fusion model as an agent model or routing target.
 
-CCR calls providers through ai-gateway's generic media protocol: `images/generations` and `images/edits` for images, and `videos/generations` plus `videos/{id}` for videos. The selectors show provider models with a declared or detected matching media capability; Grok API is one supported implementation.
+AgentRouter calls providers through ai-gateway's generic media protocol: `images/generations` and `images/edits` for images, and `videos/generations` plus `videos/{id}` for videos. The selectors show provider models with a declared or detected matching media capability; Grok API is one supported implementation.
 
 ## Runtime tools
 
-CCR creates profile-specific runtime tool names when the Fusion model is saved. This prevents model bindings from colliding across Fusion profiles.
+AgentRouter creates profile-specific runtime tool names when the Fusion model is saved. This prevents model bindings from colliding across Fusion profiles.
 
 | Fusion tool | Runtime capabilities |
 | --- | --- |
@@ -51,18 +51,18 @@ The API backend supports image generation, image editing, text-to-video, image-t
 
 ## Artifacts and Safety
 
-Artifacts are stored in CCR's private data directory and include a local path, MIME type, size, SHA-256, and expiring URL. Video URLs support HTTP Range. Retention, concurrency, and timeout are internal CCR safety policies and are not requested in the Fusion UI.
+Artifacts are stored in AgentRouter's private data directory and include a local path, MIME type, size, SHA-256, and expiring URL. Video URLs support HTTP Range. Retention, concurrency, and timeout are internal AgentRouter safety policies and are not requested in the Fusion UI.
 
-Local image inputs still undergo canonical-path, file-signature, and size checks. A scoped current working directory, the system temporary directory, and the CCR config directory are allowed by default. Filesystem roots, the user home directory, and directories above the user home are never trusted implicitly; add an explicit `allowedInputRoots` entry when broader access is intentional. The UI does not expose an “Allowed image roots” field.
+Local image inputs still undergo canonical-path, file-signature, and size checks. A scoped current working directory, the system temporary directory, and the AgentRouter config directory are allowed by default. Filesystem roots, the user home directory, and directories above the user home are never trusted implicitly; add an explicit `allowedInputRoots` entry when broader access is intentional. The UI does not expose an “Allowed image roots” field.
 
 To connect an MCP client directly:
 
 ```text
 http://127.0.0.1:3456/__ccr/media/mcp
-Authorization: Bearer <CCR API Key>
+Authorization: Bearer <AgentRouter API Key>
 ```
 
-The endpoint uses a CCR API key, while artifact URLs use separate expiring tokens. Legacy `/__ccr/grok-media/*` routes remain available for migration.
+The endpoint uses a AgentRouter API key, while artifact URLs use separate expiring tokens. Legacy `/__ccr/grok-media/*` routes remain available for migration.
 Internally, Fusion registers these tools through a `stdio` MCP proxy generated with the Core configuration. The proxy returns the profile's deterministic tool catalog directly and forwards actual calls to the private endpoint above, avoiding missing tools caused by HTTP MCP discovery or startup ordering.
 
 Internal policy example (normally no manual changes are needed):

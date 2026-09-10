@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildClaudeAppGatewayModelRoutes } from "@ccr/core/agents/claude-app/gateway-routes.ts";
-import { prepareClaudeAppDiscoveredModelRequest } from "@ccr/core/gateway/features/model-discovery.ts";
-import { fetchUpstreamWithFallback, prepareGatewayUpstreamAttemptForTest } from "@ccr/core/gateway/upstream/executor.ts";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.ts";
+import { buildClaudeAppGatewayModelRoutes } from "@agentrouter/core/agents/claude-app/gateway-routes.ts";
+import { prepareClaudeAppDiscoveredModelRequest } from "@agentrouter/core/gateway/features/model-discovery.ts";
+import { fetchUpstreamWithFallback, prepareGatewayUpstreamAttemptForTest } from "@agentrouter/core/gateway/upstream/executor.ts";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace.ts";
 
 const retryConfig = {
   Providers: [],

@@ -11,7 +11,7 @@ const previousRuntimeEnv = {
   home: process.env.AR_INTERNAL_HOME_DIR,
   userData: process.env.AR_INTERNAL_USER_DATA_DIR
 };
-const runtimeRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-web-management-test-"));
+const runtimeRoot = mkdtempSync(path.join(os.tmpdir(), "ar-web-management-test-"));
 process.env.AR_INTERNAL_APP_DATA_DIR = path.join(runtimeRoot, "app-data");
 process.env.AR_INTERNAL_HOME_DIR = path.join(runtimeRoot, "home");
 process.env.AR_INTERNAL_USER_DATA_DIR = path.join(runtimeRoot, "user-data");
@@ -23,20 +23,20 @@ after(() => {
   rmSync(runtimeRoot, { force: true, recursive: true });
 });
 
-test("normalizeExternalHttpTarget accepts absolute http, https, and CCR plugin URLs only", async () => {
-  const { normalizeExternalHttpTarget } = await import("@ccr/core/web/management-server.ts");
+test("normalizeExternalHttpTarget accepts absolute http, https, and AgentRouter plugin URLs only", async () => {
+  const { normalizeExternalHttpTarget } = await import("@agentrouter/core/web/management-server.ts");
   assert.equal(normalizeExternalHttpTarget(""), undefined);
   assert.equal(normalizeExternalHttpTarget(undefined), undefined);
   assert.equal(normalizeExternalHttpTarget("about:blank"), undefined);
   assert.equal(normalizeExternalHttpTarget(" https://example.com/path?q=1 "), "https://example.com/path?q=1");
   assert.equal(normalizeExternalHttpTarget("http://localhost:3458/"), "http://localhost:3458/");
-  assert.throws(() => normalizeExternalHttpTarget("file:///etc/passwd"), /Only http, https, and CCR plugin URLs/);
-  assert.throws(() => normalizeExternalHttpTarget("javascript:alert(1)"), /Only http, https, and CCR plugin URLs/);
+  assert.throws(() => normalizeExternalHttpTarget("file:///etc/passwd"), /Only http, https, and AgentRouter plugin URLs/);
+  assert.throws(() => normalizeExternalHttpTarget("javascript:alert(1)"), /Only http, https, and AgentRouter plugin URLs/);
   assert.throws(() => normalizeExternalHttpTarget("example.com"), /valid absolute URL/);
 });
 
 test("web RPC ignores Origin and Referer when the auth token is valid", async () => {
-  const { startWebManagementServer } = await import("@ccr/core/web/management-server.ts");
+  const { startWebManagementServer } = await import("@agentrouter/core/web/management-server.ts");
   const authToken = "test-web-auth-token";
   const runtime = await startWebManagementServer({
     authToken,
@@ -45,7 +45,7 @@ test("web RPC ignores Origin and Referer when the auth token is valid", async ()
     startGateway: false
   });
   try {
-    const endpoint = new URL("/api/ccr/rpc", runtime.url);
+    const endpoint = new URL("/api/ar/rpc", runtime.url);
     const response = await fetch(endpoint, {
       body: JSON.stringify({ args: [], method: "getAppInfo" }),
       headers: {
@@ -66,12 +66,12 @@ test("web RPC ignores Origin and Referer when the auth token is valid", async ()
   }
 });
 
-test("startGateway reuses an already healthy CCR gateway on the configured port", async () => {
-  const { saveAppConfig } = await import("@ccr/core/config/config.ts");
-  const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
-  const { gatewayRuntimeConfigRevision } = await import("@ccr/core/gateway/runtime-config-control.ts");
-  const { gatewayService } = await import("@ccr/core/gateway/service.ts");
-  const { startWebManagementServer } = await import("@ccr/core/web/management-server.ts");
+test("startGateway reuses an already healthy AgentRouter gateway on the configured port", async () => {
+  const { saveAppConfig } = await import("@agentrouter/core/config/config.ts");
+  const { createDefaultAppConfig } = await import("@agentrouter/core/config/default-config.ts");
+  const { gatewayRuntimeConfigRevision } = await import("@agentrouter/core/gateway/runtime-config-control.ts");
+  const { gatewayService } = await import("@agentrouter/core/gateway/service.ts");
+  const { startWebManagementServer } = await import("@agentrouter/core/web/management-server.ts");
   await gatewayService.stop();
   const gatewayPort = await findAvailablePort();
   const webAuthToken = "test-web-auth-token";
@@ -91,7 +91,7 @@ test("startGateway reuses an already healthy CCR gateway on the configured port"
     reloadRequests: [],
     revision: gatewayRuntimeConfigRevision(savedConfig)
   };
-  const externalGateway = createHealthyCcrGateway(savedConfig.APIKEY, externalGatewayState);
+  const externalGateway = createHealthyArGateway(savedConfig.APIKEY, externalGatewayState);
   await listen(externalGateway, gatewayPort);
   const runtime = await startWebManagementServer({
     authToken: webAuthToken,
@@ -132,7 +132,7 @@ test("startGateway reuses an already healthy CCR gateway on the configured port"
 });
 
 async function rpc(baseUrl, authToken, method, args = []) {
-  const response = await fetch(new URL("/api/ccr/rpc", baseUrl), {
+  const response = await fetch(new URL("/api/ar/rpc", baseUrl), {
     body: JSON.stringify({ args, method }),
     headers: {
       "content-type": "application/json",
@@ -144,7 +144,7 @@ async function rpc(baseUrl, authToken, method, args = []) {
   return response.json();
 }
 
-function createHealthyCcrGateway(apiKey, state) {
+function createHealthyArGateway(apiKey, state) {
   return createServer((request, response) => {
     const url = new URL(request.url || "/", "http://127.0.0.1");
     if (url.pathname === "/health") {
@@ -172,7 +172,7 @@ function createHealthyCcrGateway(apiKey, state) {
       sendJson(response, 200, { data: [{ id: "test-model", object: "model" }], object: "list" });
       return;
     }
-    if (url.pathname === "/__ccr/runtime/config") {
+    if (url.pathname === "/__ar/runtime/config") {
       if (request.headers.authorization !== `Bearer ${apiKey}`) {
         sendJson(response, 401, { error: { message: "Invalid API key." } });
         return;

@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatUpstreamErrorForLog } from "@ccr/core/gateway/http/io.ts";
+import { formatUpstreamErrorForLog } from "@agentrouter/core/gateway/http/io.ts";
 
 test("upstream fetch diagnostics expose timeout phase and fallback counts without secrets", () => {
   const cause = Object.assign(

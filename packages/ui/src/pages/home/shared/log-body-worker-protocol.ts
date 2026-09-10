@@ -1,4 +1,4 @@
-import type { RequestLogBody } from "@ccr/core/contracts/app";
+import type { RequestLogBody } from "@agentrouter/core/contracts/app";
 import { formatLogBodyView, type FormattedLogBody } from "./logs";
 
 export const logBodyLargeTextThreshold = 256 * 1024;

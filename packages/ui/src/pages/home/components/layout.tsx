@@ -1,5 +1,5 @@
 import type { ComponentProps } from "react";
-import { MorphIcon } from "@musistudio/lucide-morph-react";
+import { MorphIcon } from "@/vendor/lucide-morph";
 import { collapseSidebarToExpandInspectorMorph } from "@/lib/morph-icon";
 import {
   AnimatePresence, AppConfig, AppCopy, Button, Check, CircleAlert, cn, EndpointTitleBar,

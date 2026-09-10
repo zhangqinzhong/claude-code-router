@@ -6,8 +6,8 @@ import {
   claudeCodeMcpConfigEnv,
   claudeCodeUtcTimezoneEnvOverride,
   isChinaTimeZone
-} from "@ccr/core/agents/claude-code/environment.ts";
-import { toolHubClaudeCodeMcpConfig } from "@ccr/core/mcp/toolhub-config.ts";
+} from "@agentrouter/core/agents/claude-code/environment.ts";
+import { toolHubClaudeCodeMcpConfig } from "@agentrouter/core/mcp/toolhub-config.ts";
 
 test("detects China time zones used by Claude Code", () => {
   assert.equal(isChinaTimeZone("Asia/Shanghai"), true);
@@ -55,14 +55,14 @@ test("builds Claude Code ToolHub MCP config when ToolHub has backend MCP servers
       requestTimeoutMs: 60000
     }
   }, {
-    command: "/Applications/CCR.app/Contents/MacOS/CCR",
-    entryPath: "/Applications/CCR.app/Contents/Resources/app/dist/main/toolhub-mcp.js"
+    command: "/Applications/AgentRouter.app/Contents/MacOS/AgentRouter",
+    entryPath: "/Applications/AgentRouter.app/Contents/Resources/app/dist/main/toolhub-mcp.js"
   });
 
   assert.equal(Object.keys(config.mcpServers).length, 1);
   const server = config.mcpServers["ar-toolhub"];
-  assert.equal(server.command, "/Applications/CCR.app/Contents/MacOS/CCR");
-  assert.deepEqual(server.args, ["/Applications/CCR.app/Contents/Resources/app/dist/main/toolhub-mcp.js"]);
+  assert.equal(server.command, "/Applications/AgentRouter.app/Contents/MacOS/AgentRouter");
+  assert.deepEqual(server.args, ["/Applications/AgentRouter.app/Contents/Resources/app/dist/main/toolhub-mcp.js"]);
   assert.equal(server.env.ELECTRON_RUN_AS_NODE, "1");
   assert.equal(server.env.TOOLHUB_OPENAI_MODEL, "resolver-model");
   assert.equal(server.env.TOOLHUB_MAX_TOOLS, "10");

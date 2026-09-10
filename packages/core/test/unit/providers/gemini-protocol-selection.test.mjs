@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { providerCapabilityForClientProtocol, toCoreGatewayProviders } from "@ccr/core/providers/runtime-topology.ts";
-import { prepareGatewayUpstreamAttemptForTest } from "@ccr/core/gateway/upstream/executor.ts";
+import { providerCapabilityForClientProtocol, toCoreGatewayProviders } from "@agentrouter/core/providers/runtime-topology.ts";
+import { prepareGatewayUpstreamAttemptForTest } from "@agentrouter/core/gateway/upstream/executor.ts";
 
 test("#1778 Gemini OpenAI endpoint keeps selected protocol through compilation and request routing", () => {
   const baseUrl = "https://generativelanguage.googleapis.com/v1beta/openai";

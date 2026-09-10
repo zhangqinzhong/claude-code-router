@@ -22,7 +22,7 @@ export type CliWebRuntime = {
 
 export async function startCliWebServer(authToken: string): Promise<CliWebRuntime> {
   const port = await findAvailablePort();
-  const testHome = mkdtempSync(path.join(os.tmpdir(), "ccr-playwright-home-"));
+  const testHome = mkdtempSync(path.join(os.tmpdir(), "ar-playwright-home-"));
   const child = spawn(process.execPath, [
     cliPath,
     "serve",
@@ -58,7 +58,7 @@ export async function startCliWebServer(authToken: string): Promise<CliWebRuntim
 
   const service = await new Promise<{ baseUrl: string; token: string }>((resolve, reject) => {
     const timer = setTimeout(() => {
-      reject(new Error(`CCR web service did not start within ${startupTimeoutMs}ms.\nstdout:\n${stdout}\nstderr:\n${stderr}`));
+      reject(new Error(`AgentRouter web service did not start within ${startupTimeoutMs}ms.\nstdout:\n${stdout}\nstderr:\n${stderr}`));
     }, startupTimeoutMs);
 
     const cleanup = () => {
@@ -68,10 +68,10 @@ export async function startCliWebServer(authToken: string): Promise<CliWebRuntim
     };
     const onExit = (code: number | null, signal: NodeJS.Signals | null) => {
       cleanup();
-      reject(new Error(`CCR web service exited during startup code=${code ?? "null"} signal=${signal ?? "null"}.\nstdout:\n${stdout}\nstderr:\n${stderr}`));
+      reject(new Error(`AgentRouter web service exited during startup code=${code ?? "null"} signal=${signal ?? "null"}.\nstdout:\n${stdout}\nstderr:\n${stderr}`));
     };
     const onStdout = () => {
-      const match = stdout.match(/CCR web management is running at (http:\/\/[^\s]+)/);
+      const match = stdout.match(/AgentRouter web management is running at (http:\/\/[^\s]+)/);
       if (!match) {
         return;
       }
@@ -79,7 +79,7 @@ export async function startCliWebServer(authToken: string): Promise<CliWebRuntim
       const url = new URL(match[1]);
       resolve({
         baseUrl: `${url.protocol}//${url.host}`,
-        token: url.searchParams.get("ccr_web_token") ?? ""
+        token: url.searchParams.get("ar_web_token") ?? ""
       });
     };
 
@@ -90,7 +90,7 @@ export async function startCliWebServer(authToken: string): Promise<CliWebRuntim
   if (!service.token) {
     await stopCliWebServer(child);
     rmSync(testHome, { force: true, recursive: true });
-    throw new Error("CCR web service started without a web auth token.");
+    throw new Error("AgentRouter web service started without a web auth token.");
   }
 
   return {

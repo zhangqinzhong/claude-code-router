@@ -1,10 +1,10 @@
 import path from "node:path";
-import type { AppConfig, ProfileConfig, ProfileOpenSurface } from "@ccr/core/contracts/app";
-import { claudeCodeModelEnv as claudeCodeProfileModelEnv, claudeCodeUtcTimezoneEnvOverride } from "@ccr/core/agents/claude-code/environment";
-import { resolveKiloConfigFile as resolveKiloProfileConfigFile } from "@ccr/core/agents/kilo/profile-config";
-import { resolveOpenCodeConfigFile as resolveOpenCodeProfileConfigFile } from "@ccr/core/agents/opencode/profile-config";
-import { piWrapperFilename, resolvePiAgentDir, resolvePiSessionDir } from "@ccr/core/agents/pi/profile-config";
-import { resolveZcodeConfigFile } from "@ccr/core/agents/zcode/profile-config";
+import type { AppConfig, ProfileConfig, ProfileOpenSurface } from "@agentrouter/core/contracts/app";
+import { claudeCodeModelEnv as claudeCodeProfileModelEnv, claudeCodeUtcTimezoneEnvOverride } from "@agentrouter/core/agents/claude-code/environment";
+import { resolveKiloConfigFile as resolveKiloProfileConfigFile } from "@agentrouter/core/agents/kilo/profile-config";
+import { resolveOpenCodeConfigFile as resolveOpenCodeProfileConfigFile } from "@agentrouter/core/agents/opencode/profile-config";
+import { piWrapperFilename, resolvePiAgentDir, resolvePiSessionDir } from "@agentrouter/core/agents/pi/profile-config";
+import { resolveZcodeConfigFile } from "@agentrouter/core/agents/zcode/profile-config";
 
 export type ProfileLaunchPlan = {
   args: string[];
@@ -109,7 +109,7 @@ export function buildProfileLaunchPlan(
 ): ProfileLaunchPlan {
   const resolvedSurface = resolveProfileOpenSurface(profile, surface);
   if (profile.agent === "claude-design") {
-    throw new Error("Claude Design profiles can only be opened from CCR Desktop.");
+    throw new Error("Claude Design profiles can only be opened from AgentRouter Desktop.");
   }
   if (profile.agent === "grok") {
     return buildGrokLaunchPlan(configDir, profile, resolvedSurface, extraArgs);
@@ -139,7 +139,7 @@ function buildOpenCodeLaunchPlan(
   extraArgs: string[]
 ): ProfileLaunchPlan {
   if (surface !== "cli") {
-    throw new Error("OpenCode App profiles must be opened through CCR Desktop.");
+    throw new Error("OpenCode App profiles must be opened through AgentRouter Desktop.");
   }
   return {
     args: extraArgs,
@@ -254,7 +254,7 @@ export function profileLaunchSpawnCommand(plan: Pick<ProfileLaunchPlan, "args" |
   };
 }
 
-export function ccrManagedProfileDir(configDir: string, profile: ProfileConfig): string {
+export function arManagedProfileDir(configDir: string, profile: ProfileConfig): string {
   const slug = sanitizePathSegment(profile.id || profile.name || profile.agent);
   const baseDir = path.join(configDir, "profiles", slug || "profile");
   return profile.scope === "custom" ? path.join(baseDir, "custom") : baseDir;
@@ -262,7 +262,7 @@ export function ccrManagedProfileDir(configDir: string, profile: ProfileConfig):
 
 export function resolveClaudeCodeSettingsFile(configDir: string, profile: ProfileConfig): string {
   if (isGeneratedProfileScope(profile.scope)) {
-    return path.join(ccrManagedProfileDir(configDir, profile), "claude", "settings.json");
+    return path.join(arManagedProfileDir(configDir, profile), "claude", "settings.json");
   }
   return resolveUserPath(profile.settingsFile || "~/.claude/settings.json");
 }
@@ -272,7 +272,7 @@ export function resolveCodexConfigFile(configDir: string, profile: ProfileConfig
     return resolveZcodeConfigFile(profile);
   }
   if (isGeneratedProfileScope(profile.scope)) {
-    return path.join(ccrManagedProfileDir(configDir, profile), codexConfigSubdir(profile.agent), "config.toml");
+    return path.join(arManagedProfileDir(configDir, profile), codexConfigSubdir(profile.agent), "config.toml");
   }
   const codexHome = profile.codexHome?.trim();
   if (codexHome) {
@@ -315,7 +315,7 @@ function buildClaudeCodeLaunchPlan(
   extraArgs: string[]
 ): ProfileLaunchPlan {
   if (surface === "app") {
-    throw new Error("Claude App opening is available from the CCR desktop app.");
+    throw new Error("Claude App opening is available from the AgentRouter desktop app.");
   }
   const settingsFile = resolveClaudeCodeSettingsFile(configDir, profile);
   const launcher = path.join(configDir, "bin", claudeCodeWrapperFilename(profile));

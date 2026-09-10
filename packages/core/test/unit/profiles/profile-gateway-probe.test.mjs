@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { CLAUDE_CODE_AUTH_MODE_ENV } from "@ccr/core/agents/claude-code/auth-mode.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { ensureProfileGateway } from "@ccr/core/profiles/launch-service.ts";
+import { CLAUDE_CODE_AUTH_MODE_ENV } from "@agentrouter/core/agents/claude-code/auth-mode.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { ensureProfileGateway } from "@agentrouter/core/profiles/launch-service.ts";
 
 function claudeProfileConfig(authMode = "api-key-helper") {
   const profile = {

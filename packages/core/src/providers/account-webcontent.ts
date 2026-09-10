@@ -1,7 +1,7 @@
 import type {
   GatewayProviderConfig,
   ProviderAccountBrowserCredentialsMode
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 export type ProviderAccountWebContentFetchRequest = {
   body?: unknown;
@@ -32,7 +32,7 @@ export function setProviderAccountWebContentFetchHandler(handler: ProviderAccoun
 
 export async function fetchProviderAccountWebContentJson(request: ProviderAccountWebContentFetchRequest): Promise<unknown> {
   if (!providerAccountWebContentFetchHandler) {
-    throw new Error("Browser session account requests are only available in CCR Desktop. Use HTTP JSON in CLI or Docker.");
+    throw new Error("Browser session account requests are only available in AgentRouter Desktop. Use HTTP JSON in CLI or Docker.");
   }
 
   const endpoint = parseHttpUrl(request.endpoint, "Browser session account endpoint");

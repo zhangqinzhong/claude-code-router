@@ -5,7 +5,7 @@ import type {
   UsageStatsRange,
   UsageStatsSnapshot,
   UsageTotals
-} from "@ccr/core/contracts/app.ts";
+} from "@agentrouter/core/contracts/app.ts";
 
 export function appConfigFixture(): AppConfig {
   return {
@@ -51,7 +51,7 @@ export function installBrowserGlobals() {
   const windowMock = {
     addEventListener: () => undefined,
     cancelAnimationFrame: () => undefined,
-    ccr: {
+    agentrouter: {
       closeTray: () => undefined,
       quitApp: () => undefined,
       setTrayDetailOpen: () => undefined,

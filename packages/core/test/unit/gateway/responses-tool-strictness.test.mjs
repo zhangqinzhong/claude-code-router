@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { applyResponsesToolStrictness } from "@ccr/core/gateway/core-runtime/responses-tool-strictness.ts";
-import { createGatewayPlugin } from "@ccr/core/gateway/core-runtime/upstream-header-sanitizer.ts";
+import { applyResponsesToolStrictness } from "@agentrouter/core/gateway/core-runtime/responses-tool-strictness.ts";
+import { createGatewayPlugin } from "@agentrouter/core/gateway/core-runtime/upstream-header-sanitizer.ts";
 
 function monitorTool(overrides = {}) {
   return {
@@ -194,9 +194,9 @@ test("Chat Completions conversions leave omitted strict unchanged", () => {
 
 test("gateway boundary plugin registers the tool strictness hook", async () => {
   const hooks = createGatewayPlugin().providerHooks;
-  assert.equal(hooks[0].key, "ccr-upstream-header-sanitizer");
-  assert.ok(hooks.some((hook) => hook.key === "ccr-responses-session-affinity"));
-  const strictnessHook = hooks.find((hook) => hook.key === "ccr-responses-tool-strictness");
+  assert.equal(hooks[0].key, "ar-upstream-header-sanitizer");
+  assert.ok(hooks.some((hook) => hook.key === "ar-responses-session-affinity"));
+  const strictnessHook = hooks.find((hook) => hook.key === "ar-responses-tool-strictness");
   assert.ok(strictnessHook);
 
   const input = responsesInput();

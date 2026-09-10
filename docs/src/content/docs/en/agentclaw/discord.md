@@ -13,7 +13,7 @@ Discord is for routing agent messages into a server channel, a private collab se
 
 ## The fields you'll use
 
-| Name in the Discord dashboard | CCR field | Required | Notes |
+| Name in the Discord dashboard | AgentRouter field | Required | Notes |
 | --- | --- | --- | --- |
 | Token | Bot Token | Required | The bot token from the Bot page |
 | Application ID | Application ID | Optional | App ID from General Information |
@@ -25,7 +25,7 @@ A Bot Token is usually enough. Only choose OAuth 2.0 if your flow explicitly req
 
 1. Open the [Discord Developer Portal](https://discord.com/developers/applications).
 2. Click `New Application`.
-3. Name it, e.g. `CCR`.
+3. Name it, e.g. `AgentRouter`.
 4. Open the app after it's created.
 5. Open `Bot` on the left.
 6. If there's no bot yet, click `Add Bot`.
@@ -43,7 +43,7 @@ A Bot Token is usually enough. Only choose OAuth 2.0 if your flow explicitly req
 1. On the `Bot` page, find `Token`.
 2. Click `Reset Token` or `Copy`.
 3. On first creation, `Reset Token` generates the first token — it doesn't mean you broke anything.
-4. Copy the token for CCR's Bot Token.
+4. Copy the token for AgentRouter's Bot Token.
 
 > This token is effectively the bot's password. Don't post it in Discord or paste it into an agent prompt.
 
@@ -64,9 +64,9 @@ If something asks for Application ID or Public Key:
 2. Open the app's `General Information`.
 3. Copy `Application ID` and `Public Key`.
 
-## Wire it up in CCR
+## Wire it up in AgentRouter
 
-1. Open CCR's **Bot Management** page and click **Add Bot**.
+1. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 2. Pick **Discord** as the platform.
 3. Keep the default **Bot Token** auth.
 4. Paste the token into **Bot Token**.
@@ -75,7 +75,7 @@ If something asks for Application ID or Public Key:
 7. Open **Agent Profiles** and edit the Agent Profiles you want to attach it to.
 8. Turn on **Bot** and select the bot.
 9. Optionally enable **Forward agent messages** or **Handoff** (next section).
-10. Reopen the agent from CCR.
+10. Reopen the agent from AgentRouter.
 
 ## Forward or handoff
 
@@ -86,7 +86,7 @@ If something asks for Application ID or Public Key:
 
 ## Test it
 
-1. Open the agent from CCR and trigger a message.
+1. Open the agent from AgentRouter and trigger a message.
 2. Check Discord to confirm the bot received it and replied.
 3. For server channels, confirm the bot is in the server and can post.
 

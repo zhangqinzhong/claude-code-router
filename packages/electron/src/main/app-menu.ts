@@ -1,5 +1,5 @@
 import { app, dialog, Menu, type BrowserWindow, type MenuItemConstructorOptions } from "electron";
-import { APP_NAME, IPC_CHANNELS } from "@ccr/core/config/constants";
+import { APP_NAME, IPC_CHANNELS } from "@agentrouter/core/config/constants";
 import windowsManager from "./windows";
 
 export function setupApplicationMenu(): void {

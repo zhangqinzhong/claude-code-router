@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.ts";
-import { isSensitiveRequestLogHeaderName } from "@ccr/core/observability/sensitive-headers.ts";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace.ts";
+import { isSensitiveRequestLogHeaderName } from "@agentrouter/core/observability/sensitive-headers.ts";
 
 test("request log header redaction fails closed for custom authentication headers", () => {
   for (const name of [

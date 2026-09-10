@@ -5,10 +5,10 @@ import os from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
-import { codexCliMiddlewareRuntimeScript } from "@ccr/core/agents/codex/cli-middleware-runtime.ts";
+import { codexCliMiddlewareRuntimeScript } from "@agentrouter/core/agents/codex/cli-middleware-runtime.ts";
 
 test("generated Codex CLI middleware runtime is valid JavaScript", () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-check-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-check-"));
   const file = path.join(dir, "ar-codex-cli-middleware.js");
   writeFileSync(file, codexCliMiddlewareRuntimeScript());
   execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });
@@ -27,7 +27,7 @@ test("generated Codex CLI middleware converts Windows SDK paths before URL schem
 });
 
 test("generated Codex CLI middleware materializes bundled Bot Gateway stdio runner", () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-bot-runner-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-bot-runner-"));
   const source = path.join(dir, "resources", "app.asar", "dist", "main", "bot-gateway-sdk", "bin", "bot-gateway-stdio.mjs");
   const configDir = path.join(dir, "config");
   mkdirSync(path.dirname(source), { recursive: true });
@@ -49,7 +49,7 @@ test("generated Codex CLI middleware materializes bundled Bot Gateway stdio runn
 });
 
 test("Codex app-server uses ChatGPT's bundled Node as a signed supervisor", { skip: process.platform !== "darwin" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-signed-supervisor-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-signed-supervisor-"));
   const runtimeFile = writeRuntimeScript(dir);
   const resourcesDir = path.join(dir, "ChatGPT.app", "Contents", "Resources");
   const fakeCodex = path.join(resourcesDir, "codex");
@@ -93,7 +93,7 @@ test("Codex app-server uses ChatGPT's bundled Node as a signed supervisor", { sk
 });
 
 test("Codex runtime ignores middleware recursion and uses the bundled real CLI fallback", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-real-cli-fallback-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-real-cli-fallback-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "real-codex");
   writeFileSync(fakeCodex, "#!/bin/sh\nprintf 'real-codex\\n'\n");
@@ -116,7 +116,7 @@ test("Codex runtime ignores middleware recursion and uses the bundled real CLI f
 });
 
 test("Codex CLI middleware launches Windows cmd shims", { skip: process.platform !== "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-windows-cmd-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-windows-cmd-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCliScript = path.join(dir, "fake-codex.js");
   const fakeCli = path.join(dir, "fake-codex.cmd");
@@ -145,7 +145,7 @@ test("Codex CLI middleware launches Windows cmd shims", { skip: process.platform
 });
 
 test("Windows direct profile dispatch strips the profile command arguments", { skip: process.platform !== "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-windows-dispatch-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-windows-dispatch-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCliScript = path.join(dir, "fake-claude.js");
   const fakeCli = path.join(dir, "fake-claude.cmd");
@@ -173,7 +173,7 @@ test("Windows direct profile dispatch strips the profile command arguments", { s
 });
 
 test("Codex app-server uses a local non-OpenAI identity without credentials", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-virtual-auth-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-virtual-auth-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const codexHome = path.join(dir, "codex-home");
@@ -208,7 +208,7 @@ test("Codex app-server uses a local non-OpenAI identity without credentials", { 
       AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: "",
-      CODEXL_CODEX_WORKSPACE_NAME: "CCR Workspace"
+      CODEXL_CODEX_WORKSPACE_NAME: "AgentRouter Workspace"
     },
     input: [
       JSON.stringify({ id: 0, method: "probe/auth-bootstrap", params: {} }),
@@ -240,7 +240,7 @@ test("Codex app-server uses a local non-OpenAI identity without credentials", { 
 });
 
 test("Codex app-server reads but never overwrites an existing ChatGPT auth file", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-preserve-auth-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-preserve-auth-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const codexHome = path.join(dir, "codex-home");
@@ -298,7 +298,7 @@ test("Codex app-server reads but never overwrites an existing ChatGPT auth file"
 });
 
 test("Codex app-server bridges shared ChatGPT auth into an isolated profile without copying it", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-shared-auth-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-shared-auth-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const codexHome = path.join(dir, "codex-home");
@@ -356,7 +356,7 @@ test("Codex app-server bridges shared ChatGPT auth into an isolated profile with
 });
 
 test("Codex app-server delegates public Git marketplaces and leaves account-private marketplaces empty", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-official-plugins-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-official-plugins-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const codexHome = path.join(dir, "codex-home");
@@ -401,8 +401,8 @@ test("Codex app-server delegates public Git marketplaces and leaves account-priv
   });
 });
 
-test("Codex app-server merges CCR Fast Mode catalog metadata without spoofing auth", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-native-models-"));
+test("Codex app-server merges AgentRouter Fast Mode catalog metadata without spoofing auth", { skip: process.platform === "win32" }, () => {
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-native-models-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const codexHome = path.join(dir, "codex-home");
@@ -473,7 +473,7 @@ test("Codex app-server merges CCR Fast Mode catalog metadata without spoofing au
 });
 
 test("Claude Code wrapper leaves the scoped profile model as an environment default", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-wrapper-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-wrapper-"));
   const runtimeFile = writeRuntimeScript(dir);
   const { fakeCli, outputFile } = writeFakeClaudeCli(dir);
 
@@ -497,7 +497,7 @@ test("Claude Code wrapper leaves the scoped profile model as an environment defa
 });
 
 test("Claude Code wrapper preserves an explicit model argument", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-wrapper-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-wrapper-"));
   const runtimeFile = writeRuntimeScript(dir);
   const { fakeCli, outputFile } = writeFakeClaudeCli(dir);
 
@@ -519,7 +519,7 @@ test("Claude Code wrapper preserves an explicit model argument", { skip: process
 });
 
 test("Claude Code wrapper injects the ToolHub MCP config into real CLI args", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-wrapper-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-wrapper-"));
   const runtimeFile = writeRuntimeScript(dir);
   const { fakeCli, outputFile } = writeFakeClaudeCli(dir);
   const mcpConfigFile = path.join(dir, "toolhub-mcp.json");
@@ -542,7 +542,7 @@ test("Claude Code wrapper injects the ToolHub MCP config into real CLI args", { 
 });
 
 test("Claude Code wrapper does not duplicate an explicit MCP config argument", { skip: process.platform === "win32" }, () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-wrapper-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-wrapper-"));
   const runtimeFile = writeRuntimeScript(dir);
   const { fakeCli, outputFile } = writeFakeClaudeCli(dir);
   const envMcpConfigFile = path.join(dir, "toolhub-mcp.json");
@@ -565,7 +565,7 @@ test("Claude Code wrapper does not duplicate an explicit MCP config argument", {
 });
 
 test("OpenCode bot worker keeps commands responsive while preserving per-conversation turn order", { skip: process.platform === "win32" }, async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-opencode-bot-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-opencode-bot-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeOpenCode = path.join(dir, "fake-opencode");
   const fakeSdk = path.join(dir, "fake-bot-gateway-sdk.mjs");
@@ -579,7 +579,7 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
   writeFileSync(path.join(stateDir, "opencode-bot-sessions.json"), JSON.stringify({
     version: 1,
     conversations: {
-      "ccr:bot-test:conversation-1:": {
+      "ar:bot-test:conversation-1:": {
         sessionId: "ses_stale_directory",
         directory: "/stale/project",
         title: "Stale session"
@@ -688,9 +688,9 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
     const calls = await waitForJsonLines(callsFile, 5, 2000, () => stderr);
     const replyTexts = replies.map((reply) => reply.intent.text);
     assert.ok(replyTexts.includes("Unknown Bot command. Send /project or /session to see available commands."));
-    assert.ok(replyTexts.some((text) => /^CCR App project commands \(OpenCode\):/.test(text)));
+    assert.ok(replyTexts.some((text) => /^AgentRouter App project commands \(OpenCode\):/.test(text)));
     assert.ok(replyTexts.some((text) => /^OpenCode projects:/.test(text)));
-    assert.ok(replyTexts.some((text) => /^CCR App session commands \(OpenCode\):/.test(text)));
+    assert.ok(replyTexts.some((text) => /^AgentRouter App session commands \(OpenCode\):/.test(text)));
     assert.ok(replyTexts.some((text) => /^OpenCode sessions in /.test(text)));
     assert.ok(replyTexts.some((text) => text.includes(otherProject)));
     assert.ok(!replyTexts.some((text) => text.includes("Other session")));
@@ -720,7 +720,7 @@ test("OpenCode bot worker keeps commands responsive while preserving per-convers
 });
 
 test("OpenCode bot worker streams without duplicate final text replies or implicit auto approval", { skip: process.platform === "win32" }, async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-opencode-bot-stream-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-opencode-bot-stream-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeOpenCode = path.join(dir, "fake-opencode");
   const fakeSdk = path.join(dir, "fake-bot-gateway-sdk.mjs");
@@ -798,7 +798,7 @@ test("OpenCode bot worker streams without duplicate final text replies or implic
 });
 
 test("Codex App bot worker uses native projects and sessions without enabling shell tools", { skip: process.platform === "win32" }, async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-codex-bot-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-codex-bot-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const fakeSdk = path.join(dir, "fake-bot-gateway-sdk.mjs");
@@ -910,7 +910,7 @@ test("Codex App bot worker uses native projects and sessions without enabling sh
 });
 
 test("Codex App bot worker passes image attachments to exec and avoids duplicate stream replies", { skip: process.platform === "win32" }, async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-codex-bot-image-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-codex-bot-image-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeCodex = path.join(dir, "fake-codex");
   const fakeSdk = path.join(dir, "fake-bot-gateway-sdk.mjs");
@@ -997,7 +997,7 @@ test("Codex App bot worker passes image attachments to exec and avoids duplicate
 });
 
 test("Claude App bot worker keeps project and session selection as separate levels", { skip: process.platform === "win32" }, async () => {
-  const dir = mkdtempSync(path.join(os.tmpdir(), "ccr-runtime-claude-bot-projects-"));
+  const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-claude-bot-projects-"));
   const runtimeFile = writeRuntimeScript(dir);
   const fakeSdk = path.join(dir, "fake-bot-gateway-sdk.mjs");
   const repliesFile = path.join(dir, "bot-replies.jsonl");

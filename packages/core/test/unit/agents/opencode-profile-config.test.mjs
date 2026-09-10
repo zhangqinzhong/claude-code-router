@@ -3,18 +3,18 @@ import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, st
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import {
   isManagedOpenCodeConfigContent,
   resolveOpenCodeConfigFile,
   writeOpenCodeGatewayConfig
-} from "@ccr/core/agents/opencode/profile-config.ts";
+} from "@agentrouter/core/agents/opencode/profile-config.ts";
 import {
   findInstalledOpenCodeAppExecutable,
   openCodeAppLaunchSignature,
   openCodeAppLaunchArgs,
   openCodeDesktopCommandNames
-} from "@ccr/core/agents/opencode/app-launch.ts";
+} from "@agentrouter/core/agents/opencode/app-launch.ts";
 
 function testConfig(root) {
   const config = createDefaultAppConfig();
@@ -59,11 +59,11 @@ function testProfile(overrides = {}) {
   };
 }
 
-test("OpenCode profile config routes primary and small models through CCR", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-profile-"));
+test("OpenCode profile config routes primary and small models through AgentRouter", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-opencode-profile-"));
   try {
     const profile = testProfile();
-    const result = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ccr-profile-key");
+    const result = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ar-profile-key");
     const config = JSON.parse(readFileSync(result.file, "utf8"));
 
     assert.equal(result.file, path.join(root, "profiles", "opencode-main", "opencode", "opencode.jsonc"));
@@ -71,7 +71,7 @@ test("OpenCode profile config routes primary and small models through CCR", () =
     assert.equal(config.small_model, config.model);
     assert.equal(config.provider["claude-code-router"].npm, "@ai-sdk/openai-compatible");
     assert.equal(config.provider["claude-code-router"].options.baseURL, "http://127.0.0.1:4567/v1");
-    assert.equal(config.provider["claude-code-router"].options.apiKey, "ccr-profile-key");
+    assert.equal(config.provider["claude-code-router"].options.apiKey, "ar-profile-key");
     assert.equal(config.provider["claude-code-router"].options.headers["x-ar-client"], "opencode");
     assert.ok(config.provider["claude-code-router"].models["Provider/model-a"]);
     assert.deepEqual(config.provider["claude-code-router"].models["Provider/model-a"].modalities, {
@@ -98,7 +98,7 @@ test("OpenCode profile config routes primary and small models through CCR", () =
 });
 
 test("OpenCode profile config writes Fusion vision model metadata and resolved context", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-fusion-profile-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-opencode-fusion-profile-"));
   try {
     const config = createDefaultAppConfig();
     config.Providers = [{
@@ -129,7 +129,7 @@ test("OpenCode profile config writes Fusion vision model metadata and resolved c
       root,
       config,
       testProfile({ model: "Fusion/fusion-basic-vision" }),
-      "ccr-profile-key",
+      "ar-profile-key",
       { backup: false }
     );
     const written = JSON.parse(readFileSync(result.file, "utf8"));
@@ -158,7 +158,7 @@ test("OpenCode profile config writes Fusion vision model metadata and resolved c
 });
 
 test("OpenCode global config keeps user settings and snapshots the original JSONC", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-global-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-opencode-global-"));
   try {
     const configFile = path.join(root, "opencode.jsonc");
     const original = `{
@@ -171,7 +171,7 @@ test("OpenCode global config keeps user settings and snapshots the original JSON
       chmodSync(configFile, 0o644);
     }
     const profile = testProfile({ configFile, scope: "global" });
-    const result = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ccr-profile-key");
+    const result = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ar-profile-key");
     const managed = JSON.parse(readFileSync(configFile, "utf8"));
 
     assert.equal(resolveOpenCodeConfigFile(root, profile), configFile);
@@ -183,7 +183,7 @@ test("OpenCode global config keeps user settings and snapshots the original JSON
       chmodSync(configFile, 0o644);
       chmodSync(`${configFile}.ar-original`, 0o644);
       chmodSync(result.backupFile, 0o644);
-      const unchanged = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ccr-profile-key");
+      const unchanged = writeOpenCodeGatewayConfig(root, testConfig(root), profile, "ar-profile-key");
       assert.equal(unchanged.changed, false);
       assert.equal(statSync(configFile).mode & 0o777, 0o600);
       assert.equal(statSync(`${configFile}.ar-original`).mode & 0o777, 0o600);
@@ -221,7 +221,7 @@ test("OpenCode App discovery includes the official Linux executable name", () =>
 });
 
 test("OpenCode App discovery accepts an explicit macOS bundle or executable", { skip: process.platform !== "darwin" }, () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-opencode-app-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-opencode-app-"));
   try {
     const app = path.join(root, "OpenCode.app");
     const executable = path.join(app, "Contents", "MacOS", "OpenCode");

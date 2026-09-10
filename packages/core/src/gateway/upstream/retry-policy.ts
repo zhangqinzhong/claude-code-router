@@ -1,6 +1,6 @@
-import type { RouterFallbackMode } from "@ccr/core/contracts/app";
-import { classifyRouteFailure } from "@ccr/core/routing/failure-classifier";
-import { clampNumber } from "@ccr/core/gateway/internal/collections";
+import type { RouterFallbackMode } from "@agentrouter/core/contracts/app";
+import { classifyRouteFailure } from "@agentrouter/core/routing/failure-classifier";
+import { clampNumber } from "@agentrouter/core/gateway/internal/collections";
 
 const upstreamRetryBackoffBaseMs = 1_000;
 const upstreamRetryBackoffMaxMs = 30_000;

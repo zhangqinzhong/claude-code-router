@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { compactBase64ImagePayloads } from "@ccr/core/observability/request-log-body.ts";
+import { compactBase64ImagePayloads } from "@agentrouter/core/observability/request-log-body.ts";
 
 const largeBase64 = "A".repeat(64 * 1024);
 

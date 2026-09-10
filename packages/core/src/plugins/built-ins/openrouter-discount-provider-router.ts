@@ -1,9 +1,9 @@
-import type { AppConfig, GatewayProviderConfig, ProviderModelOpenRouterDiscountRoutingConfig } from "@ccr/core/contracts/app";
+import type { AppConfig, GatewayProviderConfig, ProviderModelOpenRouterDiscountRoutingConfig } from "@agentrouter/core/contracts/app";
 import type {
   GatewayPluginRequestTransformHandler,
   GatewayPluginRequestTransformInput,
   GatewayPluginRequestTransformResult
-} from "@ccr/core/plugins/service";
+} from "@agentrouter/core/plugins/service";
 
 const DEFAULT_SETTINGS = {
   allowFallbacks: true,
@@ -1068,12 +1068,12 @@ export function finalizeOpenRouterDiscountProviderRouterSelection(
   input: {
     ok: boolean;
     routedModel?: string;
-    usedCcrFallback?: boolean;
+    usedArFallback?: boolean;
   }
 ): void {
   const pending = pendingSelections.get(requestId);
   pendingSelections.delete(requestId);
-  if (!pending || !input.ok || input.usedCcrFallback || pending.allowFallbacks) {
+  if (!pending || !input.ok || input.usedArFallback || pending.allowFallbacks) {
     return;
   }
   if (input.routedModel && !selectorMatchesOpenRouterModel(input.routedModel, pending.model)) {

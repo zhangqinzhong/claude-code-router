@@ -1,17 +1,17 @@
 import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { buildCodexModelCatalogIds } from "@ccr/core/agents/codex/model-catalog";
-import type { AppConfig, GatewayProviderConfig, ProfileConfig, ProviderModelMetadata } from "@ccr/core/contracts/app";
+import { buildCodexModelCatalogIds } from "@agentrouter/core/agents/codex/model-catalog";
+import type { AppConfig, GatewayProviderConfig, ProfileConfig, ProviderModelMetadata } from "@agentrouter/core/contracts/app";
 import {
   findModelCatalogEntry,
   findProviderModelCatalogEntry,
   modelCatalogMaxInputTokens,
   type ModelCatalogEntry
-} from "@ccr/core/gateway/model-catalog";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
-import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+} from "@agentrouter/core/gateway/model-catalog";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
+import { modelRegistryForConfig } from "@agentrouter/core/routing/model-registry";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 
 export type PiProfileConfigWriteResult = {
   changed: boolean;

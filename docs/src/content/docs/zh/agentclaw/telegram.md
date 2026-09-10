@@ -13,7 +13,7 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 
 ## 你会用到哪些字段
 
-| Telegram 里的名字 | CCR 字段 | 是否必填 | 说明 |
+| Telegram 里的名字 | AgentRouter 字段 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | HTTP API token | Bot Token | 必填 | `@BotFather` 创建机器人后返回的 token |
 
@@ -22,10 +22,10 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 1. 打开 Telegram。
 2. 搜索 `@BotFather`，确认用户名完全一致（官方机器人）。
 3. 进会话后发 `/newbot`。
-4. 按提示输入机器人显示名，比如 `CCR Assistant`。
+4. 按提示输入机器人显示名，比如 `AgentRouter Assistant`。
 5. 再输入机器人用户名——必须以 `bot` 结尾，比如 `ccr_demo_bot`。
 6. 创建成功后，`@BotFather` 会返回一段 HTTP API token。
-7. 复制这段 token，待会儿填进 CCR 的 Bot Token。
+7. 复制这段 token，待会儿填进 AgentRouter 的 Bot Token。
 
 > **别把 token 发给任何人。** 拿到 token 的人就能完全控制你的 Telegram Bot。
 
@@ -45,9 +45,9 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 
 > Telegram 隐私模式打开时，Bot 通常只能看到命令、@ 它的消息和部分服务消息。关掉隐私模式后，建议把 Bot 移出群再重新加，让设置立刻生效。
 
-## 在 CCR 中接入
+## 在 AgentRouter 中接入
 
-1. 打开 CCR 的 **Bot 管理** 页面，点 **添加 Bot**。
+1. 打开 AgentRouter 的 **Bot 管理** 页面，点 **添加 Bot**。
 2. 平台选 **Telegram**。
 3. 认证方式是 **Bot Token**。
 4. 把 token 填进 **Bot Token**。
@@ -55,7 +55,7 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 6. 打开 **Agent 配置**，编辑你要接 Bot 的 Agent 配置。
 7. 打开 **Bot** 开关，选刚保存的 Bot。
 8. 按需打开 **转发 Agent 消息** 或 **接力**（见下一节）。
-9. 从 CCR 重新打开 Agent。
+9. 从 AgentRouter 重新打开 Agent。
 
 ## 转发还是接力
 
@@ -66,7 +66,7 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 
 ## 测试
 
-1. 从 CCR 打开 Agent，触发一条消息。
+1. 从 AgentRouter 打开 Agent，触发一条消息。
 2. 到 Telegram 确认机器人能收到并回复。
 3. 群里用的话，先确认机器人已经进群、能读写消息。
 
@@ -77,5 +77,5 @@ Telegram 适合个人或小团队快速接收 Agent 消息。字段最少，只�
 - **认证失败**：重新复制 Bot Token。
 - **私聊可用、群不可用**：检查机器人进群了没、群权限允不允许它读消息。
 - **群里只有 `/command` 能触发**：检查 `@BotFather` 的 `/setprivacy`，或把 Bot 设为群管理员。
-- **重置过 token**：旧 token 立刻失效，要回 CCR 更新并重启。
+- **重置过 token**：旧 token 立刻失效，要回 AgentRouter 更新并重启。
 - **消息太多**：关掉 **转发 Agent 消息**，只保留 **接力**。

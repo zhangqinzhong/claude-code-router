@@ -3,14 +3,14 @@ import { randomUUID } from "node:crypto";
 import { existsSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { deflateSync, inflateSync } from "node:zlib";
-import { loadOnboardingFinished, markOnboardingFinished } from "@ccr/core/config/onboarding-state";
+import { loadOnboardingFinished, markOnboardingFinished } from "@agentrouter/core/config/onboarding-state";
 import { builtInBrowserService } from "./built-in-browser";
-import { scanBotHandoffBluetoothTargets, scanBotHandoffWifiTargets } from "@ccr/core/agents/bot-gateway/handoff-scan-service";
-import { cancelBotGatewayQrLogin, startBotGatewayQrLogin, waitBotGatewayQrLogin } from "@ccr/core/agents/bot-gateway/qr-login-service";
+import { scanBotHandoffBluetoothTargets, scanBotHandoffWifiTargets } from "@agentrouter/core/agents/bot-gateway/handoff-scan-service";
+import { cancelBotGatewayQrLogin, startBotGatewayQrLogin, waitBotGatewayQrLogin } from "@agentrouter/core/agents/bot-gateway/qr-login-service";
 import { closeBotGatewayQrWindow, openBotGatewayQrWindow } from "./bot-gateway-qr-window-service";
-import { syncClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service";
-import { getAppInfoPaths } from "@ccr/core/agents/app-info-paths";
-import { loadAppConfig, saveApiKeysConfig, saveAppConfig, saveAppThemePreference, withClaudeDesignRuntimePluginConfig } from "@ccr/core/config/config";
+import { syncClaudeAppGatewayConfig } from "@agentrouter/core/agents/claude-app/gateway-service";
+import { getAppInfoPaths } from "@agentrouter/core/agents/app-info-paths";
+import { loadAppConfig, saveApiKeysConfig, saveAppConfig, saveAppThemePreference, withClaudeDesignRuntimePluginConfig } from "@agentrouter/core/config/config";
 import {
   APP_CONFIG_DB_FILE,
   APP_NAME,
@@ -25,36 +25,36 @@ import {
   PROXY_CA_CERT_FILE,
   REQUEST_LOGS_DB_FILE,
   USAGE_DB_FILE
-} from "@ccr/core/config/constants";
+} from "@agentrouter/core/config/constants";
 import { deepLinkService } from "./deep-link";
 import { chromeLoginImportService } from "./chrome-login-import";
-import { gatewayService } from "@ccr/core/gateway/service";
-import { shouldRestartGatewayForRuntimeConfigChange } from "@ccr/core/gateway/runtime-change";
-import { getProviderAccountSnapshots, invalidateProviderAccountSnapshotCache, resetCodexRateLimitCredit, testProviderAccountConnector } from "@ccr/core/providers/account-service";
-import { detectProviderIcon } from "@ccr/core/providers/icons";
-import { fetchProviderManifest } from "@ccr/core/providers/manifest-service";
-import { getLocalAgentProviderCandidates, importLocalAgentProvider, probeLocalAgentProvider } from "@ccr/core/agents/local-providers/service";
+import { gatewayService } from "@agentrouter/core/gateway/service";
+import { shouldRestartGatewayForRuntimeConfigChange } from "@agentrouter/core/gateway/runtime-change";
+import { getProviderAccountSnapshots, invalidateProviderAccountSnapshotCache, resetCodexRateLimitCredit, testProviderAccountConnector } from "@agentrouter/core/providers/account-service";
+import { detectProviderIcon } from "@agentrouter/core/providers/icons";
+import { fetchProviderManifest } from "@agentrouter/core/providers/manifest-service";
+import { getLocalAgentProviderCandidates, importLocalAgentProvider, probeLocalAgentProvider } from "@agentrouter/core/agents/local-providers/service";
 import { isLaunchAtLoginSupported, syncLaunchAtLogin } from "./launch-at-login";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
-import { getOpenRouterProviderCatalog } from "@ccr/core/providers/openrouter-provider-catalog";
-import { getProviderPresets } from "@ccr/core/providers/presets/index";
-import { checkGatewayProviderConnectivity, probeGatewayProvider, probeGatewayProviderCandidates } from "@ccr/core/providers/probe";
-import { syncProviderModelAutoRefreshService } from "@ccr/core/providers/model-auto-refresh";
-import { applyProfileConfig } from "@ccr/core/profiles/service";
-import { desktopCliCommandName, getProfileOpenCommand, getProfileRuntimeStatus, openProfileFromCcr, stopProfileFromCcr } from "@ccr/core/profiles/launch-service";
-import { findProfileForOpen, resolveProfileOpenSurface } from "@ccr/core/profiles/launch-core";
-import { getPluginMarketplace } from "@ccr/core/plugins/marketplace";
-import { ensureProxyCertificateAuthority } from "@ccr/core/proxy/certificates";
-import { proxyService } from "@ccr/core/proxy/service";
-import { listMcpServerTools } from "@ccr/core/mcp/tool-discovery";
-import { getAgentAnalysis, getAgentTracePayload, getRequestLogBodyChunk, getRequestLogDetail, getRequestLogs } from "@ccr/core/observability/request-log-store";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
+import { getOpenRouterProviderCatalog } from "@agentrouter/core/providers/openrouter-provider-catalog";
+import { getProviderPresets } from "@agentrouter/core/providers/presets/index";
+import { checkGatewayProviderConnectivity, probeGatewayProvider, probeGatewayProviderCandidates } from "@agentrouter/core/providers/probe";
+import { syncProviderModelAutoRefreshService } from "@agentrouter/core/providers/model-auto-refresh";
+import { applyProfileConfig } from "@agentrouter/core/profiles/service";
+import { desktopCliCommandName, getProfileOpenCommand, getProfileRuntimeStatus, openProfileFromAr, stopProfileFromAr } from "@agentrouter/core/profiles/launch-service";
+import { findProfileForOpen, resolveProfileOpenSurface } from "@agentrouter/core/profiles/launch-core";
+import { getPluginMarketplace } from "@agentrouter/core/plugins/marketplace";
+import { ensureProxyCertificateAuthority } from "@agentrouter/core/proxy/certificates";
+import { proxyService } from "@agentrouter/core/proxy/service";
+import { listMcpServerTools } from "@agentrouter/core/mcp/tool-discovery";
+import { getAgentAnalysis, getAgentTracePayload, getRequestLogBodyChunk, getRequestLogDetail, getRequestLogs } from "@agentrouter/core/observability/request-log-store";
 import trayController from "./tray-controller";
 import { appUpdateService } from "./update-service";
-import { getUsageStats, resetOverviewStatistics } from "@ccr/core/usage/store";
+import { getUsageStats, resetOverviewStatistics } from "@agentrouter/core/usage/store";
 import { applyNativeThemePreference } from "./native-theme";
 import { registerProviderAccountWebContentFetchHandler } from "./provider-account-webcontent";
 import windowsManager from "./windows";
-import { CLAUDE_DESIGN_PLUGIN_ID, GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, type AgentAnalysisFilter, type AgentAnalysisTracePayloadRequest, type ApiKeyConfig, type AppCaptureElementPngRequest, type AppCaptureElementPngResult, type AppConfig, type AppDataExportResult, type AppImageExportTargetRequest, type AppImageExportTargetResult, type AppInfo, type AppRenderHtmlPngRequest, type AppRenderHtmlPngResult, type AppSaveConfigOptions, type BotGatewayQrLoginCancelRequest, type BotGatewayQrLoginStartRequest, type BotGatewayQrLoginWaitRequest, type BotGatewayQrWindowCloseRequest, type BotGatewayQrWindowOpenRequest, type ChromeLoginImportRequest, type GatewayPluginAppConfig, type GatewayPluginPermission, type GatewayPluginSurface, type GatewayProviderConnectivityCheckRequest, type GatewayProviderProbeCandidatesRequest, type GatewayProviderProbeRequest, type GatewayStatus, type LocalAgentProviderImportRequest, type OpenRouterProviderCatalogRequest, type PluginDependency, type PluginDirectorySelection, type ProfileApplyResult, type ProfileOpenRequest, type ProfileOpenResult, type ProviderAccountResetRequest, type ProviderAccountSnapshotRequestOptions, type ProviderAccountTestRequest, type ProviderCatalogModelsRequest, type ProviderIconDetectionRequest, type ProviderManifestFetchRequest, type RequestLogListFilter, type RouteScriptTestRequest, type RouteScriptValidationRequest, type UsageStatsFilter, type UsageStatsRange } from "@ccr/core/contracts/app";
+import { CLAUDE_DESIGN_PLUGIN_ID, GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS, type AgentAnalysisFilter, type AgentAnalysisTracePayloadRequest, type ApiKeyConfig, type AppCaptureElementPngRequest, type AppCaptureElementPngResult, type AppConfig, type AppDataExportResult, type AppImageExportTargetRequest, type AppImageExportTargetResult, type AppInfo, type AppRenderHtmlPngRequest, type AppRenderHtmlPngResult, type AppSaveConfigOptions, type BotGatewayQrLoginCancelRequest, type BotGatewayQrLoginStartRequest, type BotGatewayQrLoginWaitRequest, type BotGatewayQrWindowCloseRequest, type BotGatewayQrWindowOpenRequest, type ChromeLoginImportRequest, type GatewayPluginAppConfig, type GatewayPluginPermission, type GatewayPluginSurface, type GatewayProviderConnectivityCheckRequest, type GatewayProviderProbeCandidatesRequest, type GatewayProviderProbeRequest, type GatewayStatus, type LocalAgentProviderImportRequest, type OpenRouterProviderCatalogRequest, type PluginDependency, type PluginDirectorySelection, type ProfileApplyResult, type ProfileOpenRequest, type ProfileOpenResult, type ProviderAccountResetRequest, type ProviderAccountSnapshotRequestOptions, type ProviderAccountTestRequest, type ProviderCatalogModelsRequest, type ProviderIconDetectionRequest, type ProviderManifestFetchRequest, type RequestLogListFilter, type RouteScriptTestRequest, type RouteScriptValidationRequest, type UsageStatsFilter, type UsageStatsRange } from "@agentrouter/core/contracts/app";
 const imageExportTargets = new Map<string, string>();
 const gatewayPluginPermissionIdSet = new Set<string>(GATEWAY_PLUGIN_PERMISSION_IDS);
 const gatewayPluginSurfaceIdSet = new Set<string>(GATEWAY_PLUGIN_SURFACE_IDS);
@@ -200,7 +200,7 @@ ipcMain.handle(IPC_CHANNELS.appOpenProfile, async (_event, request: ProfileOpenR
   if (profile.agent === CLAUDE_DESIGN_PLUGIN_ID) {
     const status = await gatewayService.ensureStarted(config);
     if (status.state !== "running") {
-      throw new Error(status.lastError || "CCR gateway did not start.");
+      throw new Error(status.lastError || "AgentRouter gateway did not start.");
     }
     logProfileApplyResult(await applyProfileConfig(config));
     await deepLinkService.openPluginApp(CLAUDE_DESIGN_PLUGIN_ID);
@@ -211,7 +211,7 @@ ipcMain.handle(IPC_CHANNELS.appOpenProfile, async (_event, request: ProfileOpenR
       surface
     } satisfies ProfileOpenResult;
   }
-  return openProfileFromCcr(config, request);
+  return openProfileFromAr(config, request);
 });
 ipcMain.handle(IPC_CHANNELS.appApplyClaudeAppGateway, async (_event, config?: AppConfig) => {
   const previousConfig = await loadAppConfig();
@@ -244,9 +244,9 @@ ipcMain.handle(IPC_CHANNELS.appApplyClaudeAppGateway, async (_event, config?: Ap
   }
 
   const gatewayDetail = runtimeStatus.state === "running"
-    ? "CCR gateway is running."
-    : `CCR gateway did not start: ${runtimeStatus.lastError || "unknown error"}`;
-  const apiKeyDetail = synced.result.apiKeyGenerated ? "Generated a Claude App API key." : "Reused an existing CCR API key.";
+    ? "AgentRouter gateway is running."
+    : `AgentRouter gateway did not start: ${runtimeStatus.lastError || "unknown error"}`;
+  const apiKeyDetail = synced.result.apiKeyGenerated ? "Generated a Claude App API key." : "Reused an existing AgentRouter API key.";
   return {
     ...synced.result,
     message: `${synced.result.message}\n${gatewayDetail}\n${apiKeyDetail}`
@@ -401,7 +401,7 @@ ipcMain.handle(IPC_CHANNELS.appStopGateway, async () => {
   return status;
 });
 ipcMain.handle(IPC_CHANNELS.appStopProfile, async (_event, request: ProfileOpenRequest) => {
-  return stopProfileFromCcr(await loadAppConfig(), request);
+  return stopProfileFromAr(await loadAppConfig(), request);
 });
 ipcMain.handle(IPC_CHANNELS.appSetTrayDetailOpen, (_event, open: boolean, provider?: string) => {
   trayController.setDetailOpen(Boolean(open), provider);
@@ -532,7 +532,7 @@ async function renderHtmlPng(window: BrowserWindow | null, request: AppRenderHtm
     width: size.width
   });
 
-  const tempDir = mkdtempSync(path.join(app.getPath("temp"), "ccr-export-"));
+  const tempDir = mkdtempSync(path.join(app.getPath("temp"), "ar-export-"));
   const tempHtmlFile = path.join(tempDir, "export.html");
   writeFileSync(tempHtmlFile, html, { encoding: "utf8", mode: 0o600 });
 
@@ -587,9 +587,9 @@ function dataExportSaveDialogOptions(exportedAt: string): SaveDialogOptions {
     buttonLabel: "Export",
     defaultPath: path.join(app.getPath("downloads"), `claude-code-router-data-${fileSafeTimestamp(exportedAt)}.json`),
     filters: [
-      { extensions: ["json"], name: "CCR data export" }
+      { extensions: ["json"], name: "AgentRouter data export" }
     ],
-    title: "Export CCR data"
+    title: "Export AgentRouter data"
   };
 }
 
@@ -652,7 +652,7 @@ function finiteNumber(value: unknown, label: string): number {
 
 function safePngFileName(value: string): string {
   const raw = typeof value === "string" ? value : "";
-  const safe = path.basename(raw).replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").trim() || "ccr-share-card.png";
+  const safe = path.basename(raw).replace(/[<>:"/\\|?*\x00-\x1f]/g, "-").trim() || "ar-share-card.png";
   return safe.toLowerCase().endsWith(".png") ? safe : `${safe}.png`;
 }
 
@@ -1006,7 +1006,7 @@ function assertExportTargetIsNotInternalDataFile(file: string): void {
     ...dataExportCandidateFiles()
   ].map((item) => path.resolve(item)));
   if (reserved.has(target)) {
-    throw new Error("Choose a different export path. Internal CCR data files cannot be overwritten.");
+    throw new Error("Choose a different export path. Internal AgentRouter data files cannot be overwritten.");
   }
 }
 
@@ -1030,8 +1030,8 @@ function uniqueStrings(values: string[]): string[] {
 function inspectPluginDirectory(directory: string): PluginDirectorySelection {
   const manifest = readFirstJson([
     path.join(directory, "plugin.json"),
-    path.join(directory, "ccr-plugin.json"),
-    path.join(directory, ".ccr-plugin", "plugin.json"),
+    path.join(directory, "ar-plugin.json"),
+    path.join(directory, ".ar-plugin", "plugin.json"),
     path.join(directory, ".codex-plugin", "plugin.json")
   ]);
   const packageJson = readFirstJson([path.join(directory, "package.json")]);
@@ -1039,8 +1039,8 @@ function inspectPluginDirectory(directory: string): PluginDirectorySelection {
     readString(manifest?.module) ||
     readString(manifest?.main) ||
     readString(manifest?.path) ||
-    readString(readRecord(packageJson?.ccr)?.module) ||
-    readString(readRecord(packageJson?.ccrPlugin)?.module) ||
+    readString(readRecord(packageJson?.ar)?.module) ||
+    readString(readRecord(packageJson?.arPlugin)?.module) ||
     readString(packageJson?.main);
   const id =
     pluginIdValue(readString(manifest?.id) || readString(manifest?.key) || readString(packageJson?.name)) ||
@@ -1068,10 +1068,10 @@ function readPluginApps(
 ): GatewayPluginAppConfig[] {
   const values = [
     manifest?.apps,
-    readRecord(manifest?.ccr)?.apps,
-    readRecord(manifest?.ccrPlugin)?.apps,
-    readRecord(packageJson?.ccr)?.apps,
-    readRecord(packageJson?.ccrPlugin)?.apps
+    readRecord(manifest?.ar)?.apps,
+    readRecord(manifest?.arPlugin)?.apps,
+    readRecord(packageJson?.ar)?.apps,
+    readRecord(packageJson?.arPlugin)?.apps
   ];
   const apps = values.flatMap(parsePluginApps);
   const byId = new Map<string, GatewayPluginAppConfig>();
@@ -1127,7 +1127,7 @@ function normalizePluginAppUrl(value: string | undefined): string {
     throw new Error("Plugin app URL cannot be protocol-relative.");
   }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
-    throw new Error("Plugin app URL must be an http(s) URL or a CCR gateway path.");
+    throw new Error("Plugin app URL must be an http(s) URL or a AgentRouter gateway path.");
   }
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }
@@ -1138,10 +1138,10 @@ function readPluginPermissions(
 ): GatewayPluginPermission[] | undefined {
   const values = [
     manifest?.permissions,
-    readRecord(manifest?.ccr)?.permissions,
-    readRecord(manifest?.ccrPlugin)?.permissions,
-    readRecord(packageJson?.ccr)?.permissions,
-    readRecord(packageJson?.ccrPlugin)?.permissions
+    readRecord(manifest?.ar)?.permissions,
+    readRecord(manifest?.arPlugin)?.permissions,
+    readRecord(packageJson?.ar)?.permissions,
+    readRecord(packageJson?.arPlugin)?.permissions
   ];
   const parsedValues = values.map(parsePluginPermissions).filter((value): value is GatewayPluginPermission[] => Boolean(value));
   return parsedValues.length > 0 ? uniquePluginPermissions(parsedValues.flat()) : undefined;
@@ -1194,14 +1194,14 @@ function readPluginSurfaces(
   const values = [
     manifest?.surfaces,
     manifest?.surface,
-    readRecord(manifest?.ccr)?.surfaces,
-    readRecord(manifest?.ccr)?.surface,
-    readRecord(manifest?.ccrPlugin)?.surfaces,
-    readRecord(manifest?.ccrPlugin)?.surface,
-    readRecord(packageJson?.ccr)?.surfaces,
-    readRecord(packageJson?.ccr)?.surface,
-    readRecord(packageJson?.ccrPlugin)?.surfaces,
-    readRecord(packageJson?.ccrPlugin)?.surface
+    readRecord(manifest?.ar)?.surfaces,
+    readRecord(manifest?.ar)?.surface,
+    readRecord(manifest?.arPlugin)?.surfaces,
+    readRecord(manifest?.arPlugin)?.surface,
+    readRecord(packageJson?.ar)?.surfaces,
+    readRecord(packageJson?.ar)?.surface,
+    readRecord(packageJson?.arPlugin)?.surfaces,
+    readRecord(packageJson?.arPlugin)?.surface
   ];
   const parsedValues = values.map(parsePluginSurfaces).filter((value): value is PluginDirectorySelection["surfaces"] => Boolean(value));
   return parsedValues.length > 0 ? Object.assign({}, ...parsedValues) as PluginDirectorySelection["surfaces"] : undefined;
@@ -1409,10 +1409,10 @@ function readPluginDependencies(
   const values = [
     manifest?.dependencies,
     manifest?.pluginDependencies,
-    readRecord(manifest?.ccr)?.dependencies,
-    readRecord(manifest?.ccrPlugin)?.dependencies,
-    readRecord(packageJson?.ccr)?.dependencies,
-    readRecord(packageJson?.ccrPlugin)?.dependencies
+    readRecord(manifest?.ar)?.dependencies,
+    readRecord(manifest?.arPlugin)?.dependencies,
+    readRecord(packageJson?.ar)?.dependencies,
+    readRecord(packageJson?.arPlugin)?.dependencies
   ];
   const dependencies = values.flatMap((value) => parsePluginDependencies(value, directory));
   const byId = new Map<string, PluginDependency>();

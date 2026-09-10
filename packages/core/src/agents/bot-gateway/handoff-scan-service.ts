@@ -1,7 +1,7 @@
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
-import type { BotHandoffScanTarget } from "@ccr/core/contracts/app";
-import { windowsSystemCommand } from "@ccr/core/platform/windows-system";
+import type { BotHandoffScanTarget } from "@agentrouter/core/contracts/app";
+import { windowsSystemCommand } from "@agentrouter/core/platform/windows-system";
 
 const execFileAsync = promisify(execFile);
 

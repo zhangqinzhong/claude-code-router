@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 import test from "node:test";
-import { codexCompactResponseStream } from "@ccr/core/gateway/context-archive.ts";
+import { codexCompactResponseStream } from "@agentrouter/core/gateway/context-archive.ts";
 import {
   prepareCodexApplyPatchBridgeRequest,
   prepareCodexCompactCompatRequest,
   transformCodexApplyPatchBridgeResponseValue,
   transformCodexApplyPatchBridgeSseEvent
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 
 const config = {
   Providers: [],
@@ -126,7 +126,7 @@ test("Codex compact compat rewrites compact endpoint without context archive", a
   const compact = JSON.parse(transformed);
   assert.equal(compact.output[0].type, "compaction");
   assert.equal(compact.output[0].encrypted_content, "Compat summary");
-  assert.doesNotMatch(compact.output[0].encrypted_content, /CCR ARCHIVED HISTORY ACCESS/);
+  assert.doesNotMatch(compact.output[0].encrypted_content, /AgentRouter ARCHIVED HISTORY ACCESS/);
 });
 
 test("Codex compact compat rewrites compaction trigger without context archive", async () => {
@@ -171,7 +171,7 @@ test("Codex compact compat rewrites compaction trigger without context archive",
   assert.match(transformed, /event: response.output_item.done/);
   assert.match(transformed, /"type":"compaction"/);
   assert.match(transformed, /Trigger summary/);
-  assert.doesNotMatch(transformed, /CCR ARCHIVED HISTORY ACCESS/);
+  assert.doesNotMatch(transformed, /AgentRouter ARCHIVED HISTORY ACCESS/);
 });
 
 test("Codex patch bridge rewrites non-GPT models with legacy global Codex route disabled", () => {

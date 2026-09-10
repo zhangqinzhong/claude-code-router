@@ -2,12 +2,12 @@
 title: One-click provider import
 pageTitle: One-click provider import
 eyebrow: Import
-lead: "Import a model provider into CCR with a preset button or a agentrouter://provider deeplink: CCR previews the config before anything is saved. Providers can also embed a button or publish a manifest so users can import from a webpage."
+lead: "Import a model provider into AgentRouter with a preset button or a agentrouter://provider deeplink: AgentRouter previews the config before anything is saved. Providers can also embed a button or publish a manifest so users can import from a webpage."
 ---
 
 ## One-click import
 
-Choose a provider below to get started. CCR shows what will be added before saving it; when using a custom entry point, make sure the source is one you trust.
+Choose a provider below to get started. AgentRouter shows what will be added before saving it; when using a custom entry point, make sure the source is one you trust.
 
 <div class="provider-import-grid" aria-label="Preset provider import buttons">
   <a class="provider-import-button provider-openai" href="agentrouter://provider?name=OpenAI&amp;base_url=https%3A%2F%2Fapi.openai.com%2Fv1&amp;protocol=openai_responses&amp;models=gpt-5.5%2Cgpt-5.5-pro%2Cgpt-5.5-instant%2Cgpt-5.4-mini" aria-label="Import OpenAI provider">
@@ -98,11 +98,11 @@ Choose a provider below to get started. CCR shows what will be added before savi
     <span class="provider-import-icon-shell"><img src="../../../provider-icons/qiniu-ai.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Qiniu Cloud AI</span><span class="provider-import-meta">Chat / Responses / Anthropic / Gemini Generate</span></span>
   </a>
-  <a class="provider-import-button provider-fenno" href="agentrouter://provider?name=Fenno.ai&amp;base_url=https%3A%2F%2Fapi.fenno.ai&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fapi.fenno.ai%2Fregister%3Fredirect%3D%2Fpurchase%3Ftab%3Dsubscription%2526group%3D16%26aff%3D9HHHAB5QLAES" aria-label="Import Fenno.ai provider">
+  <a class="provider-import-button provider-fenno" href="agentrouter://provider?name=Fenno.ai&amp;base_url=https%3A%2F%2Fapi.fenno.ai&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fapi.fenno.ai%2Fregister%3Fredirect%3D%2Fpurchase%3Ftab%3Dsubscription%2526group%3D16" aria-label="Import Fenno.ai provider">
     <span class="provider-import-icon-shell"><img src="../../../provider-icons/fenno.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Fenno.ai</span><span class="provider-import-meta">Chat / Responses / Anthropic</span></span>
   </a>
-  <a class="provider-import-button provider-infistar-ai" href="agentrouter://provider?name=%E6%97%A0%E9%99%90%E6%98%9F%E6%B2%B3&amp;base_url=https%3A%2F%2Finfistar.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=gpt-4o&amp;source=https%3A%2F%2Finfistar.ai%2Fregister%3Faff%3DCCRCCR%26ref_source%3Dlink" aria-label="Import 无限星河 provider">
+  <a class="provider-import-button provider-infistar-ai" href="agentrouter://provider?name=%E6%97%A0%E9%99%90%E6%98%9F%E6%B2%B3&amp;base_url=https%3A%2F%2Finfistar.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=gpt-4o&amp;source=https%3A%2F%2Finfistar.ai%2Fregister" aria-label="Import 无限星河 provider">
     <span class="provider-import-icon-shell"><img src="../../../provider-icons/infistar-ai.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">无限星河</span><span class="provider-import-meta">OpenAI compatible gateway</span></span>
   </a>
@@ -116,85 +116,9 @@ Choose a provider below to get started. CCR shows what will be added before savi
   </a>
 </div>
 
-## Embeddable button component
-
-CCR also ships a framework-free button script that providers can embed on their own webpages so users can import that provider into CCR with one click. The script registers Web Components automatically.
-
-### HTML
-
-```html
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js" defer></script>
-
-<ccr-provider-button
-  name="Example AI"
-  base_url="https://api.example.com/v1"
-  protocol="openai_chat_completions"
-  models="example-chat,example-coder"
-  icon="https://example.com/icon.png"
-  source="https://example.com"
-></ccr-provider-button>
-```
-
-For larger configs, pass a manifest:
-
-```html
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js" defer></script>
-
-<ccr-provider-button
-  name="Example AI"
-  manifest="https://example.com/.well-known/ccr-provider.json"
-></ccr-provider-button>
-```
-
-### JavaScript
-
-```html
-<div id="ccr-buttons"></div>
-<script src="https://cdn.ccrdesk.top/ccr-provider-buttons.js"></script>
-<script>
-  CCRProviderButtons.render("#ccr-buttons", {
-    name: "Example AI",
-    base_url: "https://api.example.com/v1",
-    api_key: "sk-user-key",
-    protocol: "openai_chat_completions",
-    models: ["example-chat", "example-coder"],
-    icon: "https://example.com/icon.png",
-    source: "https://example.com"
-  });
-</script>
-```
-
-### Render parameters
-
-`CCRProviderButtons.render(target, options)` and `<ccr-provider-button>` support the same parameter set. Parameter names match the `agentrouter://provider` protocol:
-
-| Parameter | Description |
-| --- | --- |
-| `name` | Provider display name |
-| `base_url` | Provider API Base URL, required for direct imports |
-| `api_key` | Optional provider API key |
-| `protocol` | Protocol, one of `openai_chat_completions`, `openai_responses`, `anthropic_messages`, `gemini_generate_content`, `gemini_interactions` |
-| `models` | Model list. Use comma/newline-separated text in HTML, or a string/array in JavaScript |
-| `icon` | Provider icon URL |
-| `source` | Provider website or config source |
-| `manifest` | Remote manifest URL. When present, the button creates a manifest import link |
-| `payload` | JSON or base64url JSON config. JavaScript may pass an object |
-| `usage_url` | Optional account usage endpoint |
-| `fetch_usage` | Whether account usage fetching is enabled |
-| `usage_method` | Usage request method, `GET` or `POST` |
-| `usage_headers` | Usage request headers. JavaScript may pass an object; HTML must pass a JSON string |
-| `usage_body` | Usage request body. JavaScript may pass an object; HTML must pass a JSON string |
-| `balance` | Balance field path |
-| `balance_unit` | Balance unit |
-| `subscription` | Subscription remaining field path |
-| `subscription_limit` | Subscription limit field path |
-| `subscription_reset` | Subscription reset time field path |
-| `subscription_unit` | Subscription unit |
-| `subscription_window` | Subscription window, such as `monthly` |
-
 ## URL Format
 
-CCR supports two URL shapes. The host form is recommended:
+AgentRouter supports two URL shapes. The host form is recommended:
 
 ```text
 agentrouter://provider?name=Example%20AI&base_url=https%3A%2F%2Fapi.example.com%2Fv1&protocol=openai_chat_completions&models=example-chat%2Cexample-coder
@@ -217,10 +141,10 @@ agentrouter://provider?payload=%7B%22name%22%3A%22Example%20AI%22%2C%22base_url%
 Providers can also pass a manifest URL:
 
 ```text
-agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Fccr-provider.json
+agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Far-provider.json
 ```
 
-The manifest must use HTTPS, return JSON, avoid local or private network hosts, and stay under 128 KB. CCR fetches the manifest inside the app, shows a confirmation dialog, and writes config only after user approval.
+The manifest must use HTTPS, return JSON, avoid local or private network hosts, and stay under 128 KB. AgentRouter fetches the manifest inside the app, shows a confirmation dialog, and writes config only after user approval.
 
 The manifest can put provider information in a top-level `provider` object:
 

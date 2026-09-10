@@ -1,4 +1,4 @@
-import { routeModelFromPath } from "@ccr/core/routing/protocol-adapter";
+import { routeModelFromPath } from "@agentrouter/core/routing/protocol-adapter";
 
 type JsonRecord = Record<string, unknown>;
 

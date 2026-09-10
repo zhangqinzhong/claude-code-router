@@ -65,7 +65,7 @@ function renamedLegacyEntry(entry: string, basename: string): string | undefined
 /**
  * Adopt generated launcher and runtime files in `<configDir>/bin` that were
  * written before the AgentRouter rename. The desktop launcher moved to the CLI
- * command name, everything else just moved from the `ccr-` prefix to `ar-`.
+ * command name, everything else just moved from the `ar-` prefix to `ar-`.
  */
 export function adoptLegacyBinArtifacts(configDir: string): void {
   const binDir = path.join(configDir, "bin");
@@ -100,8 +100,8 @@ function renamedLegacyBinEntry(entry: string): string | undefined {
   if (entry === "ccr-app.cmd") {
     return "agentrouter.cmd";
   }
-  if (entry.startsWith("ccr-")) {
-    return `ar-${entry.slice("ccr-".length)}`;
+  if (entry.startsWith("ar-")) {
+    return `ar-${entry.slice("ar-".length)}`;
   }
   // Bin artifacts carry the same backup suffixes as config files.
   for (let index = 0; index < legacyOriginalSuffixes.length; index += 1) {

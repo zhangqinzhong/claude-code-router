@@ -1,4 +1,4 @@
-import { defaultProviderAccountConfig, type ProviderPreset } from "@ccr/core/providers/presets/types";
+import { defaultProviderAccountConfig, type ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 const xiaomiMimoDefaultModels = ["mimo-v2.5-pro", "mimo-v2.5"];
 const xiaomiMimoWebsiteUrl = "https://platform.xiaomimimo.com/";

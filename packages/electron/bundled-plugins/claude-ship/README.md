@@ -1,6 +1,6 @@
 # Claude Ship Plugin
 
-This directory is installable through CCR Desktop's local extension picker.
+This directory is installable through AgentRouter Desktop's local extension picker.
 
 1. Open **Extensions**.
 2. Click **Install**.
@@ -10,7 +10,7 @@ This directory is installable through CCR Desktop's local extension picker.
 
 Claude Ship and Claude Design are separate plugins. Install `plugins/claude-design` when you also need the Design app.
 
-By default the Claude Ship window opens `https://claude.ai/claude-ship` so relative runtime requests land on the CCR wrapper backend. The frontend shell and static assets still come from the Cloudflare Pages asset origin embedded in the plugin code. CCR intercepts Ship API paths such as `/v1/code`, `/v1/sessions`, bootstrap, billing promotion, and privacy consent probes. Ship static bundle paths such as `/ship/assets/*` are also proxied through CCR so the local runtime patch can be applied before the browser executes them.
+By default the Claude Ship window opens `https://claude.ai/claude-ship` so relative runtime requests land on the AgentRouter wrapper backend. The frontend shell and static assets still come from the Cloudflare Pages asset origin embedded in the plugin code. AgentRouter intercepts Ship API paths such as `/v1/code`, `/v1/sessions`, bootstrap, billing promotion, and privacy consent probes. Ship static bundle paths such as `/ship/assets/*` are also proxied through AgentRouter so the local runtime patch can be applied before the browser executes them.
 
 Claude Ship no longer loads from Claude Desktop's local `ion-dist` assets. Keep the Cloudflare Pages frontend available, or use an explicit `assetDir` only for local development fixtures.
 

@@ -2,7 +2,7 @@ import { spawnSync } from "node:child_process";
 import { readdirSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { windowsSystemCommand } from "@ccr/core/platform/windows-system";
+import { windowsSystemCommand } from "@agentrouter/core/platform/windows-system";
 
 export type WindowsDesktopAppDiscoveryOptions = {
   appDirs: string[];

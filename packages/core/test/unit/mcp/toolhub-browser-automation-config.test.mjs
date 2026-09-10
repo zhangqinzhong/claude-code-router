@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import {
   BROWSER_AUTOMATION_HANDOFF_TIMEOUT_MS,
   BROWSER_AUTOMATION_MCP_PATH,
@@ -9,11 +9,11 @@ import {
   browserAutomationMcpEnabled,
   bundledToolHubMcpEntryPathCandidates,
   toolHubMcpRuntimeConfig
-} from "@ccr/core/mcp/toolhub-config.ts";
-import { MEDIA_TOOLS_MCP_PATH, mediaToolsMcpServer } from "@ccr/core/mcp/grok-media-config.ts";
-import { GROK_MEDIA_FUSION_TOOL_NAMES, MEDIA_TOOLS_MCP_SERVER_NAME } from "@ccr/core/contracts/app.ts";
-import { fusionFallbackToolDefinitions, fusionToolNamesBackedByMcpServers } from "@ccr/core/mcp/fusion-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
+} from "@agentrouter/core/mcp/toolhub-config.ts";
+import { MEDIA_TOOLS_MCP_PATH, mediaToolsMcpServer } from "@agentrouter/core/mcp/grok-media-config.ts";
+import { GROK_MEDIA_FUSION_TOOL_NAMES, MEDIA_TOOLS_MCP_SERVER_NAME } from "@agentrouter/core/contracts/app.ts";
+import { fusionFallbackToolDefinitions, fusionToolNamesBackedByMcpServers } from "@agentrouter/core/mcp/fusion-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
 
 test("ToolHub runtime candidates include the clean Core test build", () => {
   assert.ok(bundledToolHubMcpEntryPathCandidates().includes(
@@ -43,12 +43,12 @@ test("Media tools are a Fusion MCP backend independent from ToolHub", () => {
     tools: []
   }];
 
-  const media = mediaToolsMcpServer(config, { apiKey: "ccr-profile-test" });
+  const media = mediaToolsMcpServer(config, { apiKey: "ar-profile-test" });
   assert.ok(media);
   assert.equal(media.transport, "stdio");
   assert.equal(media.command, process.execPath);
   assert.ok(media.args[0].endsWith("media-tools-proxy-mcp.js"));
-  assert.equal(media.env.AR_MEDIA_MCP_API_KEY, "ccr-profile-test");
+  assert.equal(media.env.AR_MEDIA_MCP_API_KEY, "ar-profile-test");
   assert.equal(media.env.AR_MEDIA_MCP_URL, `http://127.0.0.1:${config.gateway.port}${MEDIA_TOOLS_MCP_PATH}`);
   assert.deepEqual(JSON.parse(media.env.AR_MEDIA_MCP_TOOLS_JSON).map((tool) => tool.name), [
     "image_generate_profile_one",
@@ -136,7 +136,7 @@ test("ToolHub runtime includes the built-in browser automation backend", () => {
 
   const runtime = toolHubMcpRuntimeConfig(config, undefined, {
     resolver: {
-      apiKey: "ccr-profile-test",
+      apiKey: "ar-profile-test",
       baseUrl: "http://127.0.0.1:3456/v1",
       model: "Provider/model"
     }
@@ -146,7 +146,7 @@ test("ToolHub runtime includes the built-in browser automation backend", () => {
   const servers = JSON.parse(runtime.env.TOOLHUB_MCP_SERVERS_JSON);
   const browserAutomation = servers.find((server) => server.name === BROWSER_AUTOMATION_MCP_SERVER_NAME);
   assert.ok(browserAutomation);
-  assert.equal(browserAutomation.apiKey, "ccr-profile-test");
+  assert.equal(browserAutomation.apiKey, "ar-profile-test");
   assert.equal(browserAutomation.requestTimeoutMs, BROWSER_AUTOMATION_HANDOFF_TIMEOUT_MS);
   assert.equal(browserAutomation.transport, "streamable-http");
   assert.equal(browserAutomation.url, `http://127.0.0.1:${config.gateway.port}${BROWSER_AUTOMATION_MCP_PATH}`);
@@ -164,7 +164,7 @@ test("ToolHub browser automation backend uses a connectable loopback host", () =
 
   const runtime = toolHubMcpRuntimeConfig(config, undefined, {
     resolver: {
-      apiKey: "ccr-profile-test",
+      apiKey: "ar-profile-test",
       baseUrl: "http://127.0.0.1:3456/v1",
       model: "Provider/model"
     }

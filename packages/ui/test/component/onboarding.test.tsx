@@ -2,13 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { OnboardingView } from "@ccr/ui/pages/home/components/onboarding.tsx";
-import { AppI18nContext, appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
+import { OnboardingView } from "@agentrouter/ui/pages/home/components/onboarding.tsx";
+import { AppI18nContext, appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
 import {
   createProfileDraft,
   createProviderDraft,
   fallbackGatewayStatus
-} from "@ccr/ui/pages/home/shared/index.tsx";
+} from "@agentrouter/ui/pages/home/shared/index.tsx";
 import { appConfigFixture } from "../fixtures/index.ts";
 
 test("Onboarding provider step renders only the active provider setup section", () => {

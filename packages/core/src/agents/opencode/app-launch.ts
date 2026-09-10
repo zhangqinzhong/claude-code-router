@@ -3,9 +3,9 @@ import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { normalizeWindowsDesktopAppCandidate, windowsDesktopAppCandidates } from "@ccr/core/platform/windows-app-discovery";
-import { windowsSystemCommand } from "@ccr/core/platform/windows-system";
-import type { ProfileConfig } from "@ccr/core/contracts/app";
+import { normalizeWindowsDesktopAppCandidate, windowsDesktopAppCandidates } from "@agentrouter/core/platform/windows-app-discovery";
+import { windowsSystemCommand } from "@agentrouter/core/platform/windows-system";
+import type { ProfileConfig } from "@agentrouter/core/contracts/app";
 
 export type OpenCodeAppLookupResult = {
   checked: string[];
@@ -119,7 +119,7 @@ export function openCodeAppLaunchSignature(
 
 export function openCodeAppLaunchArgs(): string[] {
   // OpenCode Desktop resets Electron's userData path before acquiring its
-  // single-instance lock, so --user-data-dir is ignored. CCR treats the app as
+  // single-instance lock, so --user-data-dir is ignored. AgentRouter treats the app as
   // single-instance and switches managed profiles in launch-service instead.
   return [
     "--remote-debugging-port=0",

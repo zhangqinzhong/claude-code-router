@@ -1,13 +1,13 @@
 import { BrowserWindow, WebContentsView, app, session, type WebContents } from "electron";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { join as pathJoin } from "node:path";
-import { backendService } from "@ccr/core/plugins/backend-service";
-import type { GatewayMcpServerConfig } from "@ccr/core/contracts/app";
+import { backendService } from "@agentrouter/core/plugins/backend-service";
+import type { GatewayMcpServerConfig } from "@agentrouter/core/contracts/app";
 import type {
   BrowserWebSearchMcpIntegration,
   BrowserWebSearchMcpRegistration,
   BrowserWebSearchProtocolRecord
-} from "@ccr/core/gateway/service";
+} from "@agentrouter/core/gateway/service";
 
 type JsonPrimitive = boolean | null | number | string;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -99,13 +99,13 @@ type BrowserSearchQueueEntry = {
   resolve: () => void;
 };
 
-const ownerId = "ccr-browser-web-search-mcp";
+const ownerId = "ar-browser-web-search-mcp";
 const protocolVersion = "2024-11-05";
 const maxMcpRequestBytes = 2 * 1024 * 1024;
 const defaultResultCount = 5;
 const defaultTimeoutMs = 30_000;
 const maxSearchResultCount = 20;
-const searchPartition = "persist:ccr-browser-web-search-mcp";
+const searchPartition = "persist:ar-browser-web-search-mcp";
 const defaultEngine: BrowserSearchEngine = "bing";
 const desktopUserAgent =
   "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
@@ -290,8 +290,8 @@ class BrowserWebSearchToolServer {
             },
             protocolVersion,
             serverInfo: {
-              name: "ccr-browser-web-search",
-              title: "CCR In-app Browser Web Search",
+              name: "ar-browser-web-search",
+              title: "AgentRouter In-app Browser Web Search",
               version: "1.0.0"
             }
           });
@@ -512,7 +512,7 @@ class HiddenBrowserSearchPool {
       paintWhenInitiallyHidden: true,
       show: false,
       skipTaskbar: true,
-      title: "CCR In-app Browser Web Search",
+      title: "AgentRouter In-app Browser Web Search",
       webPreferences: {
         backgroundThrottling: false,
         contextIsolation: true,

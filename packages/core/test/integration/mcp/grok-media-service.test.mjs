@@ -4,26 +4,26 @@ import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "no
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { normalizeGrokProviderMediaCapabilities } from "@ccr/core/agents/local-providers/grok.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { GatewayMediaExecutor } from "@ccr/core/media/executors.ts";
-import { MediaService, mediaServiceForTest, resolveProviderMediaTarget } from "@ccr/core/media/service.ts";
-import { mediaMcpToolDefinition } from "@ccr/core/media/tools.ts";
-import { MEDIA_ARTIFACT_PATH_PREFIX, handleMediaArtifactRequest, handleMediaToolsMcpRequest } from "@ccr/core/mcp/grok-media-mcp.ts";
+import { normalizeGrokProviderMediaCapabilities } from "@agentrouter/core/agents/local-providers/grok.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { GatewayMediaExecutor } from "@agentrouter/core/media/executors.ts";
+import { MediaService, mediaServiceForTest, resolveProviderMediaTarget } from "@agentrouter/core/media/service.ts";
+import { mediaMcpToolDefinition } from "@agentrouter/core/media/tools.ts";
+import { MEDIA_ARTIFACT_PATH_PREFIX, handleMediaArtifactRequest, handleMediaToolsMcpRequest } from "@agentrouter/core/mcp/grok-media-mcp.ts";
 import { waitForTcpListener } from "../../support/loopback-listener.mjs";
 
 const png = Buffer.concat([
   Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]),
-  Buffer.from("ccr-grok-media-test")
+  Buffer.from("ar-grok-media-test")
 ]);
 const mp4 = Buffer.concat([
   Buffer.from([0x00, 0x00, 0x00, 0x18]),
   Buffer.from("ftyp"),
-  Buffer.from("mp42ccr-grok-media-test")
+  Buffer.from("mp42ar-grok-media-test")
 ]);
 
 test("media tools bind profile-specific runtime names to gateway media models", async (t) => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-media-bindings-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-media-bindings-"));
   const config = mediaConfig("https://media.example");
   const service = new MediaService(root);
   service.start(config, "http://127.0.0.1:3456");
@@ -49,7 +49,7 @@ test("media tools bind profile-specific runtime names to gateway media models", 
 });
 
 test("media tools bind fallback and retry settings to generation tools", async (t) => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-media-fallback-bindings-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-media-fallback-bindings-"));
   const config = mediaConfig("https://media.example");
   config.Providers[0].models.push("grok-imagine-image-backup", "grok-imagine-video-backup");
   config.virtualModelProfiles[0].metadata.fusionMedia.imageFallbackModelSelectors = ["Media Provider/grok-imagine-image-backup"];
@@ -92,7 +92,7 @@ test("media tools bind fallback and retry settings to generation tools", async (
 });
 
 test("video fallback models must use the same media protocol as the primary model", async (t) => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-media-video-protocol-fallback-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-media-video-protocol-fallback-"));
   const config = mediaConfig("https://media.example");
   config.Providers.push({
     apikey: "openai-video-key",
@@ -256,7 +256,7 @@ test("OpenAI video bindings expose the exact cross-protocol parameter subset", (
 });
 
 test("an imported Grok Agent supplies OAuth-backed Grok API media models without an API key", async (t) => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-agent-media-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-grok-agent-media-"));
   const config = createDefaultAppConfig();
   config.mediaTools.enabled = true;
   config.Providers = [normalizeGrokProviderMediaCapabilities({
@@ -341,7 +341,7 @@ test("provider image jobs use the internal media gateway, persist artifacts, and
   await waitForTcpListener(server);
   t.after(() => server.close());
 
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-media-image-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-grok-media-image-"));
   service = new MediaService(root);
   t.after(async () => {
     await service.stop();
@@ -478,7 +478,7 @@ test("provider media jobs retry and fall back between configured generation mode
   await waitForTcpListener(server);
   t.after(() => server.close());
 
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-media-fallback-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-grok-media-fallback-"));
   service = new MediaService(root);
   t.after(async () => {
     await service.stop();
@@ -564,7 +564,7 @@ test("provider video jobs return immediately and finish through asynchronous pol
   await waitForTcpListener(server);
   t.after(() => server.close());
 
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-media-video-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-grok-media-video-"));
   const service = new MediaService(root);
   t.after(async () => {
     await service.stop();

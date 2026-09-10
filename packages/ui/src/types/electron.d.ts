@@ -85,12 +85,12 @@ import type {
   UsageStatsRange,
   UsageStatsResetResult,
   UsageStatsSnapshot
-} from "@ccr/core/contracts/app";
-import type { ProviderPreset } from "@ccr/core/providers/presets/types";
+} from "@agentrouter/core/contracts/app";
+import type { ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 declare global {
   interface Window {
-    ccr?: {
+    agentrouter?: {
       applyClaudeAppGateway: (config?: AppConfig) => Promise<ClaudeAppGatewayApplyResult>;
       applyProfile: () => Promise<ProfileApplyResult>;
       cancelBotGatewayQrLogin: (request: BotGatewayQrLoginCancelRequest) => Promise<BotGatewayQrLoginCancelResult>;

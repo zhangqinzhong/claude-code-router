@@ -3,18 +3,18 @@ import { existsSync, realpathSync, rmSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
-import { CONFIGDIR } from "@ccr/core/config/constants";
-import { ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@ccr/core/contracts/app";
-import type { AppConfig, GatewayMediaProtocol, MediaToolsConfig } from "@ccr/core/contracts/app";
-import type { ImageEditRequest, ImageGenerateRequest, MediaArtifact, MediaExecutionContext, MediaExecutionResult, MediaJob, MediaJobError, MediaOperation, MediaRequest, PublicMediaArtifact, PublicMediaJob, VideoGenerateRequest } from "@ccr/core/media/contracts";
-import { GatewayMediaExecutor, mediaError } from "@ccr/core/media/executors";
-import type { GatewayMediaTarget, GatewayMediaTransport } from "@ccr/core/media/executors";
-import { grokMediaModelKind, isImportedGrokAgentProvider, migrateLegacyGrokMediaModelSelector, providerSupportsMediaKind, videoGenerationConstraints } from "@ccr/core/media/models";
-import { detectMediaType, MediaArtifactStore, MediaJobStore } from "@ccr/core/media/storage";
-import { mediaToolBindingsForConfig } from "@ccr/core/media/tools";
-import type { MediaToolBinding } from "@ccr/core/media/tools";
-import { activeProviderCredentials, inferProtocol, providerCapabilityInternalName, providerCredentialInternalName, sortProviderCredentialsForConfig } from "@ccr/core/providers/runtime-topology";
-import { modelRegistryForConfig, parseProviderModelSelector, providerRuntimeId } from "@ccr/core/routing/model-registry";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
+import { ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@agentrouter/core/contracts/app";
+import type { AppConfig, GatewayMediaProtocol, MediaToolsConfig } from "@agentrouter/core/contracts/app";
+import type { ImageEditRequest, ImageGenerateRequest, MediaArtifact, MediaExecutionContext, MediaExecutionResult, MediaJob, MediaJobError, MediaOperation, MediaRequest, PublicMediaArtifact, PublicMediaJob, VideoGenerateRequest } from "@agentrouter/core/media/contracts";
+import { GatewayMediaExecutor, mediaError } from "@agentrouter/core/media/executors";
+import type { GatewayMediaTarget, GatewayMediaTransport } from "@agentrouter/core/media/executors";
+import { grokMediaModelKind, isImportedGrokAgentProvider, migrateLegacyGrokMediaModelSelector, providerSupportsMediaKind, videoGenerationConstraints } from "@agentrouter/core/media/models";
+import { detectMediaType, MediaArtifactStore, MediaJobStore } from "@agentrouter/core/media/storage";
+import { mediaToolBindingsForConfig } from "@agentrouter/core/media/tools";
+import type { MediaToolBinding } from "@agentrouter/core/media/tools";
+import { activeProviderCredentials, inferProtocol, providerCapabilityInternalName, providerCredentialInternalName, sortProviderCredentialsForConfig } from "@agentrouter/core/providers/runtime-topology";
+import { modelRegistryForConfig, parseProviderModelSelector, providerRuntimeId } from "@agentrouter/core/routing/model-registry";
 
 type QueueItem = {
   jobId: string;
@@ -45,7 +45,7 @@ const mediaRoot = path.join(CONFIGDIR, "grok-media");
 const maxInputBytes = 25 * 1024 * 1024;
 const jobRetentionDays = 30;
 
-export type { MediaToolBinding } from "@ccr/core/media/tools";
+export type { MediaToolBinding } from "@agentrouter/core/media/tools";
 
 export class MediaService {
   private readonly active = new Map<string, AbortController>();
@@ -117,7 +117,7 @@ export class MediaService {
         this.completions.get(job.id)?.resolve(next);
         this.completions.delete(job.id);
       } else if (job.status === "queued") {
-        this.finishCanceled(job, "CCR stopped before the media job started.");
+        this.finishCanceled(job, "AgentRouter stopped before the media job started.");
       }
     }
     this.queue = [];
@@ -389,7 +389,7 @@ export class MediaService {
         job = this.jobStore.update(job.id, { status: "running" });
       } else if (this.stopping) {
         job = this.jobStore.update(job.id, {
-          error: { code: "interrupted", message: "CCR stopped before the media request completed. The request was not automatically resubmitted.", retryable: true },
+          error: { code: "interrupted", message: "AgentRouter stopped before the media request completed. The request was not automatically resubmitted.", retryable: true },
           finishedAt: new Date().toISOString(),
           status: "failed"
         });
@@ -491,7 +491,7 @@ export class MediaService {
         if (!this.queue.some((item) => item.jobId === job.id)) this.queue.push({ jobId: job.id, resumeRemoteRequestId: job.remoteRequestId });
       } else {
         this.jobStore.update(job.id, {
-          error: { code: "interrupted", message: "CCR restarted before the media request completed. The request was not automatically resubmitted.", retryable: true },
+          error: { code: "interrupted", message: "AgentRouter restarted before the media request completed. The request was not automatically resubmitted.", retryable: true },
           finishedAt: new Date().toISOString(),
           status: "failed"
         });
@@ -552,7 +552,7 @@ export class MediaService {
 
   private publicArtifact(artifact: NonNullable<MediaJob["artifact"]>): PublicMediaArtifact {
     const { accessToken, ...rest } = artifact;
-    const url = `${this.endpoint}/__ccr/media/artifacts/${encodeURIComponent(artifact.id)}?token=${encodeURIComponent(accessToken)}`;
+    const url = `${this.endpoint}/__ar/media/artifacts/${encodeURIComponent(artifact.id)}?token=${encodeURIComponent(accessToken)}`;
     return {
       ...rest,
       url

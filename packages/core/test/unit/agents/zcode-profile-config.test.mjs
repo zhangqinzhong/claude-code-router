@@ -3,9 +3,9 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { buildZcodeModelCatalog } from "@ccr/core/agents/zcode/model-catalog.ts";
-import { writeZcodeGatewayConfig } from "@ccr/core/agents/zcode/profile-config.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { buildZcodeModelCatalog } from "@agentrouter/core/agents/zcode/model-catalog.ts";
+import { writeZcodeGatewayConfig } from "@agentrouter/core/agents/zcode/profile-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 
 const fusionModel = "Fusion/catalog-context";
 const knownModel = "Codex API/gpt-5.6-sol";
@@ -54,12 +54,12 @@ function testProfile(root) {
 }
 
 test("ZCode profile config writes resolved model limits instead of fixed defaults", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-zcode-profile-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-zcode-profile-"));
   try {
     const result = writeZcodeGatewayConfig(
       testConfig(root),
       testProfile(root),
-      "ccr-profile-key",
+      "ar-profile-key",
       { backup: false }
     );
     const cliConfig = JSON.parse(readFileSync(result.file, "utf8"));
@@ -90,7 +90,7 @@ test("ZCode profile config writes resolved model limits instead of fixed default
 });
 
 test("ZCode model catalog resolves physical models for materialized Fusion selectors", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-zcode-catalog-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-zcode-catalog-"));
   try {
     const config = testConfig(root);
     config.Providers.push({

@@ -2,7 +2,7 @@ import { app, BrowserWindow, screen, shell } from "electron";
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { APP_NAME, IPC_CHANNELS } from "@ccr/core/config/constants";
+import { APP_NAME, IPC_CHANNELS } from "@agentrouter/core/config/constants";
 import { configureClaudeDesignWindowCdp, type ClaudeDesignWindowCdpOptions } from "./claude-design-window";
 
 type WindowName = "main" | string;
@@ -349,7 +349,7 @@ function pluginAppSessionPartition(id: string): string {
     .replace(/[^a-z0-9._-]+/gi, "-")
     .replace(/^-+|-+$/g, "")
     .slice(0, 120) || "default";
-  return `persist:ccr-plugin-app-${safeId}`;
+  return `persist:ar-plugin-app-${safeId}`;
 }
 
 function applyPluginAppMacWindowControls(window: BrowserWindow): void {
@@ -406,7 +406,7 @@ function handlePluginChildWindowControl(window: BrowserWindow, targetUrl: string
   } catch {
     return false;
   }
-  if (url.protocol !== "ccr-plugin-window:") {
+  if (url.protocol !== "ar-plugin-window:") {
     return false;
   }
 
@@ -704,7 +704,7 @@ function pluginAppLoadFailurePageUrl(options: {
 <body>
   <main>
     <h1>${escapeHtml(options.title)} could not load</h1>
-    <p>CCR could not reach the plugin page. Check that CCR is running and the plugin is enabled, then retry.</p>
+    <p>AgentRouter could not reach the plugin page. Check that AgentRouter is running and the plugin is enabled, then retry.</p>
     <code>${escapeHtml(options.errorDescription || `Load failed with code ${options.errorCode}`)}<br>${escapeHtml(options.url)}</code>
     <a href="${escapeHtml(options.url)}">Retry</a>
   </main>

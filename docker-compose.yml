@@ -1,5 +1,5 @@
 services:
-  ccr:
+  agentrouter:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,8 +8,8 @@ services:
       # Publish only Nginx. Internal web/gateway listeners stay inside the container.
       - "3458:8080"
     volumes:
-      - ccr-data:/data
+      - ar-data:/data
     restart: unless-stopped
 
 volumes:
-  ccr-data:
+  ar-data:

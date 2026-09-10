@@ -25,15 +25,15 @@ RUN npm ci --omit=dev --workspace=@agentrouter/core --include-workspace-root=fal
 
 FROM ${RUNTIME_NODE_IMAGE} AS runtime
 ENV NODE_ENV=production \
-    CCR_DATA_DIR=/data \
-    CCR_WEB_HOST=127.0.0.1 \
-    CCR_WEB_PORT=3459 \
-    CCR_NGINX_PORT=8080 \
-    CCR_GATEWAY_HOST=127.0.0.1 \
-    CCR_GATEWAY_PORT=3456 \
-    CCR_GATEWAY_CORE_PORT=3457 \
-    CCR_PUBLIC_HOST=127.0.0.1 \
-    CCR_PUBLIC_PORT=3458
+    AR_DATA_DIR=/data \
+    AR_WEB_HOST=127.0.0.1 \
+    AR_WEB_PORT=3459 \
+    AR_NGINX_PORT=8080 \
+    AR_GATEWAY_HOST=127.0.0.1 \
+    AR_GATEWAY_PORT=3456 \
+    AR_GATEWAY_CORE_PORT=3457 \
+    AR_PUBLIC_HOST=127.0.0.1 \
+    AR_PUBLIC_PORT=3458
 
 WORKDIR /app
 
@@ -60,16 +60,16 @@ COPY --from=production-deps /app/node_modules node_modules
 
 COPY --from=build /app/packages/core/dist packages/core/dist
 COPY --from=build /app/packages/ui/dist/renderer /usr/share/nginx/html
-COPY docker/entrypoint.sh /usr/local/bin/ccr-docker-entrypoint
+COPY docker/entrypoint.sh /usr/local/bin/ar-docker-entrypoint
 COPY docker/pm2.config.cjs docker/pm2.config.cjs
 
-RUN chmod +x /usr/local/bin/ccr-docker-entrypoint \
+RUN chmod +x /usr/local/bin/ar-docker-entrypoint \
   && mkdir -p /data /run/nginx /var/lib/nginx /var/log/nginx
 
 VOLUME ["/data"]
 EXPOSE 8080
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:' + (process.env.CCR_NGINX_PORT || '8080') + '/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
+  CMD node -e "fetch('http://127.0.0.1:' + (process.env.AR_NGINX_PORT || '8080') + '/').then((r) => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 
-ENTRYPOINT ["ccr-docker-entrypoint"]
+ENTRYPOINT ["ar-docker-entrypoint"]

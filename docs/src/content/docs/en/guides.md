@@ -1,13 +1,13 @@
 ---
-title: Claude Code Router quick start
+title: AgentRouter quick start
 pageTitle: Quick start
 eyebrow: Getting started
-lead: "The first-run path for CCR: install and start the service, connect a provider, point an agent at the CCR gateway, then confirm requests in logs and on the Observability page."
+lead: "The first-run path for AgentRouter: install and start the service, connect a provider, point an agent at the AgentRouter gateway, then confirm requests in logs and on the Observability page."
 ---
 
-## Install and start CCR
+## Install and start AgentRouter
 
-CCR is available as a desktop app, a Node.js 22+ npm CLI, and a single-entrypoint Docker deployment.
+AgentRouter is available as a desktop app, a Node.js 22+ npm CLI, and a single-entrypoint Docker deployment.
 
 | Distribution | Start entry | Default management | Default model gateway |
 | --- | --- | --- | --- |
@@ -19,7 +19,7 @@ Use the [installation page](install/) to choose a distribution. See the [CLI ref
 
 ## Add a provider
 
-A provider is the upstream model service CCR forwards requests to, such as OpenRouter, DeepSeek, Z.AI, or any service compatible with the OpenAI, Anthropic, or Gemini protocols.
+A provider is the upstream model service AgentRouter forwards requests to, such as OpenRouter, DeepSeek, Z.AI, or any service compatible with the OpenAI, Anthropic, or Gemini protocols.
 
 ### Add the provider
 
@@ -28,7 +28,7 @@ A provider is the upstream model service CCR forwards requests to, such as OpenR
 3. If the service is not listed, choose **Other / custom API endpoint** and enter a **Name** and **API endpoint**.
 4. In the **Add credentials** step, enter the **API key**.
 
-After you enter the API endpoint and key, CCR automatically detects the protocols and models the endpoint supports.
+After you enter the API endpoint and key, AgentRouter automatically detects the protocols and models the endpoint supports.
 
 ### Protocols
 
@@ -59,17 +59,17 @@ For the full walkthrough and field reference, see [Add a provider](provider/).
 
 ## Connect Agent Config
 
-Agent Config lets Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI, ZCode, and other agents use CCR's providers, routing, and model selection.
+Agent Config lets Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI, ZCode, and other agents use AgentRouter's providers, routing, and model selection.
 
 General guidance:
 
-- During trial, prefer **Only opened from CCR** so only agents launched from CCR are affected.
+- During trial, prefer **Only opened from AgentRouter** so only agents launched from AgentRouter are affected.
 - After it is stable, consider **System default** if you want the agent's default config changed.
-- After applying, launch the agent from CCR's **Open Agent** action when possible.
+- After applying, launch the agent from AgentRouter's **Open Agent** action when possible.
 
 ### Claude Code
 
-In **Agent Config**, choose Claude Code, set the model, small fast model, and settings file, then click Apply. Open Claude Code from CCR and send one request to verify it in request logs.
+In **Agent Config**, choose Claude Code, set the model, small fast model, and settings file, then click Apply. Open Claude Code from AgentRouter and send one request to verify it in request logs.
 
 ### Codex
 
@@ -77,7 +77,7 @@ In **Agent Config**, choose Codex and confirm Provider ID, Provider Name, model,
 
 ### Grok CLI
 
-Choose Grok CLI and select a default model, then run the copied `agentrouter <profile-name>` command. The command starts a shared temporary gateway service when CCR Desktop is not already serving one; concurrent Grok sessions keep it alive until the last session exits. CCR points Grok model discovery and inference at the local gateway; use `/model` inside Grok to switch CCR models.
+Choose Grok CLI and select a default model, then run the copied `agentrouter <profile-name>` command. The command starts a shared temporary gateway service when AgentRouter Desktop is not already serving one; concurrent Grok sessions keep it alive until the last session exits. AgentRouter points Grok model discovery and inference at the local gateway; use `/model` inside Grok to switch AgentRouter models.
 
 ### ZCode
 

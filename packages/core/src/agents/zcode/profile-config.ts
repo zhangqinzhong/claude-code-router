@@ -1,11 +1,11 @@
-import { adoptLegacyArtifacts } from "@ccr/core/profiles/legacy-artifacts";
+import { adoptLegacyArtifacts } from "@agentrouter/core/profiles/legacy-artifacts";
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import { isGatewayProviderEnabled, type AppConfig, type ProfileConfig } from "@ccr/core/contracts/app";
-import { normalizeRouteSelector } from "@ccr/core/gateway/claude-code-router-plugin";
-import { buildZcodeModelCatalog } from "@ccr/core/agents/zcode/model-catalog";
-import { profileAllowedModels } from "@ccr/core/profiles/model-allowlist";
+import { isGatewayProviderEnabled, type AppConfig, type ProfileConfig } from "@agentrouter/core/contracts/app";
+import { normalizeRouteSelector } from "@agentrouter/core/gateway/claude-code-router-plugin";
+import { buildZcodeModelCatalog } from "@agentrouter/core/agents/zcode/model-catalog";
+import { profileAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
 
 export type ZcodeProfileConfigWriteResult = {
   backupFile?: string;

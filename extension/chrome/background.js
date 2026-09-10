@@ -1,5 +1,5 @@
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (!message || message.type !== "ccr-login-import-confirm") {
+  if (!message || message.type !== "ar-login-import-confirm") {
     return false;
   }
 
@@ -12,13 +12,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 async function runImport(importUrl) {
   const normalizedImportUrl = normalizeImportUrl(importUrl);
   if (!normalizedImportUrl) {
-    throw new Error("Invalid CCR import URL.");
+    throw new Error("Invalid AgentRouter import URL.");
   }
 
   const job = await fetchImportJob(normalizedImportUrl);
   const domains = Array.isArray(job.domains) ? job.domains.map(normalizeDomain).filter(Boolean) : [];
   if (domains.length === 0) {
-    throw new Error("CCR import job does not include any domains.");
+    throw new Error("AgentRouter import job does not include any domains.");
   }
 
   await ensureHostPermissions(domains);
@@ -35,15 +35,15 @@ async function runImport(importUrl) {
 async function fetchImportJob(importUrl) {
   const response = await fetch(importUrl, {
     headers: {
-      "x-ccr-login-import": "chrome-extension"
+      "x-ar-login-import": "chrome-extension"
     }
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body?.error?.message || `CCR import job request failed (${response.status}).`);
+    throw new Error(body?.error?.message || `AgentRouter import job request failed (${response.status}).`);
   }
   if (!body.job || body.job.status !== "pending") {
-    throw new Error(`CCR import job is ${body.job?.status || "unavailable"}.`);
+    throw new Error(`AgentRouter import job is ${body.job?.status || "unavailable"}.`);
   }
   return body.job;
 }
@@ -61,13 +61,13 @@ async function submitLoginState(importUrl, cookies, localStorage, domains) {
     }),
     headers: {
       "content-type": "application/json",
-      "x-ccr-login-import": "chrome-extension"
+      "x-ar-login-import": "chrome-extension"
     },
     method: "POST"
   });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
-    throw new Error(body?.error?.message || `CCR login import failed (${response.status}).`);
+    throw new Error(body?.error?.message || `AgentRouter login import failed (${response.status}).`);
   }
   return body.result || {};
 }
@@ -211,7 +211,7 @@ async function ensureHostPermissions(domains) {
   }
   throw new Error(
     [
-      `CCR Login Import does not have Chrome site access for ${domains.join(", ")}.`,
+      `AgentRouter Login Import does not have Chrome site access for ${domains.join(", ")}.`,
       "Reload the unpacked extension after updating it, then grant the extension site access for the requested domains in Chrome extensions settings."
     ].join(" ")
   );

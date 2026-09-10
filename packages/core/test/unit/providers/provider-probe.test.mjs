@@ -7,14 +7,14 @@ import {
   newApiKeyUsageFallbackMessageForTest,
   newApiKeyUsageMetersForTest,
   newApiUserSelfMetersForTest
-} from "@ccr/core/providers/account-service.ts";
-import { detectedProviderFromHeaders, newApiKeyUsageAccountConfig, newApiUserSelfConnectorConfig } from "@ccr/core/providers/new-api.ts";
+} from "@agentrouter/core/providers/account-service.ts";
+import { detectedProviderFromHeaders, newApiKeyUsageAccountConfig, newApiUserSelfConnectorConfig } from "@agentrouter/core/providers/new-api.ts";
 import {
   checkGatewayProviderConnectivity,
   isProviderProtocolEndpointSupportedForProbe,
   probeGatewayProvider,
   probeGatewayProviderCandidates
-} from "@ccr/core/providers/probe.ts";
+} from "@agentrouter/core/providers/probe.ts";
 
 test("#1778 Gemini probe does not present an AI Studio API key as an OAuth bearer token", async (t) => {
   const previousFetch = globalThis.fetch;
@@ -587,7 +587,7 @@ test("connectivity probe applies Codex request defaults for OAuth plugins", asyn
 });
 
 test("connectivity probe prefers live Codex auth over saved OAuth plugin tokens", async (t) => {
-  useTemporaryCodexHome(t, "ccr-codex-probe-live-over-plugin-");
+  useTemporaryCodexHome(t, "ar-codex-probe-live-over-plugin-");
   const previousFetch = globalThis.fetch;
   const savedToken = jwt({
     "https://api.openai.com/auth": {
@@ -749,7 +749,7 @@ test("connectivity probe shares concurrent Codex OAuth refreshes", async (t) => 
 });
 
 test("connectivity probe recovers Codex OAuth auth when saved plugin is missing", async (t) => {
-  useTemporaryCodexHome(t, "ccr-codex-probe-live-auth-");
+  useTemporaryCodexHome(t, "ar-codex-probe-live-auth-");
   const previousFetch = globalThis.fetch;
   const accessToken = jwt({
     "https://api.openai.com/auth": {

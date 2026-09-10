@@ -3,13 +3,13 @@ import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync 
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
 import {
   createGatewayPlugin,
   isLocalAgentOauthProviderPlugin
-} from "@ccr/core/gateway/core-runtime/local-agent-auth-provider-hook.ts";
-import { virtualApplyPatchToolName } from "@ccr/core/gateway/internal/shared.ts";
+} from "@agentrouter/core/gateway/core-runtime/local-agent-auth-provider-hook.ts";
+import { virtualApplyPatchToolName } from "@agentrouter/core/gateway/internal/shared.ts";
 
 test("Grok local agent auth hook refreshes live login state before authenticating upstream requests", async (t) => {
   await withGrokHome(t, async (grokHome) => {
@@ -337,7 +337,7 @@ async function withFakeSecurityScript(body, run) {
   writeFileSync(securityPath, `#!/bin/sh\n${body}`);
   chmodSync(securityPath, 0o755);
   process.env.PATH = `${binDir}${path.delimiter}${previousPath ?? ""}`;
-  process.env.USER = "ccr-test-user";
+  process.env.USER = "ar-test-user";
   try {
     await run();
   } finally {
@@ -359,7 +359,7 @@ async function withGrokHome(t, run) {
   const previousGrokHome = process.env.GROK_HOME;
   const previousGrokAuthFile = process.env.GROK_AUTH_FILE;
   const previousGrokCliVersion = process.env.GROK_CLI_VERSION;
-  const grokHome = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-hook-test-"));
+  const grokHome = mkdtempSync(path.join(os.tmpdir(), "ar-grok-hook-test-"));
   process.env.GROK_HOME = grokHome;
   process.env.GROK_CLI_VERSION = "0.2.93";
   delete process.env.GROK_AUTH_FILE;

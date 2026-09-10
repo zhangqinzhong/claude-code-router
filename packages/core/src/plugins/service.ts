@@ -22,12 +22,12 @@ import {
   GATEWAY_PLUGIN_PERMISSION_IDS,
   knownGatewayPluginDefaultPermissions,
   knownGatewayPluginDefaultSurfaces
-} from "@ccr/core/contracts/app";
-import { backendService, type RegisteredHttpBackend, type SqliteStore, type SqliteStoreOptions } from "@ccr/core/plugins/backend-service";
-import { openRouterDiscountProviderRouterTransform } from "@ccr/core/plugins/built-ins/openrouter-discount-provider-router";
-import { CONFIGDIR, DATADIR } from "@ccr/core/config/constants";
-import { isDesktopAppRuntime } from "@ccr/core/runtime/desktop-app";
-import type { ProviderAccountWebContentFetchRequest } from "@ccr/core/providers/account-webcontent";
+} from "@agentrouter/core/contracts/app";
+import { backendService, type RegisteredHttpBackend, type SqliteStore, type SqliteStoreOptions } from "@agentrouter/core/plugins/backend-service";
+import { openRouterDiscountProviderRouterTransform } from "@agentrouter/core/plugins/built-ins/openrouter-discount-provider-router";
+import { CONFIGDIR, DATADIR } from "@agentrouter/core/config/constants";
+import { isDesktopAppRuntime } from "@agentrouter/core/runtime/desktop-app";
+import type { ProviderAccountWebContentFetchRequest } from "@agentrouter/core/providers/account-webcontent";
 
 type MaybePromise<T> = T | Promise<T>;
 type PluginLogger = {
@@ -1011,7 +1011,7 @@ function resolveLocalModulePath(value: string, label: string): string {
 
   const resolved = path.resolve(CONFIGDIR, expanded);
   if (!isPathInside(resolved, CONFIGDIR)) {
-    throw new Error(`${label} relative paths must stay inside the CCR config directory.`);
+    throw new Error(`${label} relative paths must stay inside the AgentRouter config directory.`);
   }
   return resolved;
 }
@@ -1129,7 +1129,7 @@ function normalizePluginAppUrl(value: string | undefined): string {
     throw new Error("Plugin app URL cannot be protocol-relative.");
   }
   if (isProtocolSpecifier(trimmed)) {
-    throw new Error("Plugin app URL must be an http(s) URL or a CCR gateway path.");
+    throw new Error("Plugin app URL must be an http(s) URL or a AgentRouter gateway path.");
   }
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }

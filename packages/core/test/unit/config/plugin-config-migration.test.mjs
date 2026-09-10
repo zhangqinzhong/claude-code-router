@@ -3,11 +3,11 @@ import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { claudeDesignRuntimePluginConfig, claudeShipRuntimePluginConfig, migrateKnownGatewayPluginConfigsForTest, withClaudeDesignRuntimePluginConfig } from "@ccr/core/config/config.ts";
-import { AR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
+import { claudeDesignRuntimePluginConfig, claudeShipRuntimePluginConfig, migrateKnownGatewayPluginConfigsForTest, withClaudeDesignRuntimePluginConfig } from "@agentrouter/core/config/config.ts";
+import { AR_DESKTOP_APP_ENV } from "@agentrouter/core/runtime/desktop-app.ts";
 
 test("legacy combined Claude Design plugin config migrates to split Design and Ship plugins", () => {
-  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-extensions-migration-"));
+  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ar-extensions-migration-"));
   const previousExtensionsDir = process.env.AR_EXTENSIONS_DIR;
   const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
@@ -19,14 +19,14 @@ test("legacy combined Claude Design plugin config migrates to split Design and S
     const result = migrateKnownGatewayPluginConfigsForTest([{
       apps: [
         {
-          description: "Open Claude Design in a dedicated CCR Electron window.",
+          description: "Open Claude Design in a dedicated AgentRouter Electron window.",
           icon: "palette",
           id: "claude-design",
           name: "Claude Design",
           url: "https://claude.ai/design"
         },
         {
-          description: "Open Claude Ship in a dedicated CCR Electron window.",
+          description: "Open Claude Ship in a dedicated AgentRouter Electron window.",
           icon: "rocket",
           id: "claude-ship",
           name: "Claude Ship",
@@ -40,7 +40,7 @@ test("legacy combined Claude Design plugin config migrates to split Design and S
       },
       enabled: true,
       id: "claude-design",
-      module: "/Users/example/products/CCR/claude-code-router/examples/plugins/claude-design/index.cjs",
+      module: "/Users/example/products/AgentRouter/claude-code-router/examples/plugins/claude-design/index.cjs",
       permissions: ["trusted-code", "apps", "gateway-routes", "proxy-routes", "http-backends", "sqlite-store"],
       surfaces: { apps: true, gateway: true, provider: false }
     }]);
@@ -68,7 +68,7 @@ test("legacy combined Claude Design plugin config migrates to split Design and S
 });
 
 test("legacy Claude Design migration does not duplicate an existing Claude Ship plugin", () => {
-  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-extensions-migration-"));
+  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ar-extensions-migration-"));
   const previousExtensionsDir = process.env.AR_EXTENSIONS_DIR;
   try {
     writePluginModule(extensionsRoot, "claude-design");
@@ -80,7 +80,7 @@ test("legacy Claude Design migration does not duplicate an existing Claude Ship 
         apps: [{ id: "claude-ship", name: "Claude Ship", url: "https://claude.ai/claude-ship" }],
         enabled: true,
         id: "claude-design",
-        module: "/Users/example/products/CCR/claude-code-router/examples/plugins/claude-design/index.cjs"
+        module: "/Users/example/products/AgentRouter/claude-code-router/examples/plugins/claude-design/index.cjs"
       },
       {
         enabled: true,
@@ -97,7 +97,7 @@ test("legacy Claude Design migration does not duplicate an existing Claude Ship 
   }
 });
 
-test("Claude Design runtime plugin config resolves from the bundled plugin in CCR Desktop without persisting", () => {
+test("Claude Design runtime plugin config resolves from the bundled plugin in AgentRouter Desktop without persisting", () => {
   const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
     process.env[AR_DESKTOP_APP_ENV] = "1";
@@ -130,7 +130,7 @@ test("Claude Design runtime plugin config resolves from the bundled plugin in CC
   }
 });
 
-test("Claude Design runtime plugin config is unavailable outside CCR Desktop", () => {
+test("Claude Design runtime plugin config is unavailable outside AgentRouter Desktop", () => {
   const previousDesktopApp = process.env[AR_DESKTOP_APP_ENV];
   try {
     delete process.env[AR_DESKTOP_APP_ENV];
@@ -138,7 +138,7 @@ test("Claude Design runtime plugin config is unavailable outside CCR Desktop", (
     assert.equal(claudeDesignRuntimePluginConfig(), undefined);
     assert.throws(
       () => withClaudeDesignRuntimePluginConfig({ plugins: [] }),
-      /Claude Design is only available in CCR Desktop/
+      /Claude Design is only available in AgentRouter Desktop/
     );
   } finally {
     restoreEnv(AR_DESKTOP_APP_ENV, previousDesktopApp);
@@ -207,8 +207,8 @@ test("Claude Ship plugin config drops deprecated local frontend settings while p
   });
 });
 
-test("externalized plugin modules migrate from the old marketplace path to ccr-extensions", () => {
-  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-extensions-migration-"));
+test("externalized plugin modules migrate from the old marketplace path to ar-extensions", () => {
+  const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ar-extensions-migration-"));
   const previousExtensionsDir = process.env.AR_EXTENSIONS_DIR;
   try {
     writePluginModule(extensionsRoot, "cursor-proxy");
@@ -217,7 +217,7 @@ test("externalized plugin modules migrate from the old marketplace path to ccr-e
     const result = migrateKnownGatewayPluginConfigsForTest([{
       enabled: true,
       id: "cursor-proxy",
-      module: "/Users/example/products/CCR/claude-code-router/marketplace/plugins/cursor-proxy/index.cjs"
+      module: "/Users/example/products/AgentRouter/claude-code-router/marketplace/plugins/cursor-proxy/index.cjs"
     }]);
 
     assert.equal(result.changed, true);

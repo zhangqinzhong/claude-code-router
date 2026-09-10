@@ -1,4 +1,4 @@
-import type { AppConfig } from "@ccr/core/contracts/app";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
 
 export function shouldRestartGatewayForRuntimeConfigChange(previousConfig: AppConfig, nextConfig: AppConfig): boolean {
   return runtimeGatewayConfigSignature(previousConfig) !== runtimeGatewayConfigSignature(nextConfig);

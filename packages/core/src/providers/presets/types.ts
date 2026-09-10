@@ -1,4 +1,4 @@
-import type { GatewayProviderProtocol, ProviderAccountConfig } from "@ccr/core/contracts/app";
+import type { GatewayProviderProtocol, ProviderAccountConfig } from "@agentrouter/core/contracts/app";
 
 export type ProviderPresetEndpoint = {
   baseUrl: string;

@@ -21,7 +21,7 @@ if (previousTestExports === undefined) {
 }
 
 test("Claude Design local asset discovery supports public, design, and assets roots", () => {
-  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-claude-design-assets-"));
+  const fixtureRoot = mkdtempSync(path.join(os.tmpdir(), "ar-claude-design-assets-"));
   try {
     const publicRoot = path.join(fixtureRoot, "public");
     const designRoot = path.join(publicRoot, "design");

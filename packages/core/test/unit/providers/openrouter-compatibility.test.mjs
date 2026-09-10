@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog.ts";
-import { providerCapabilityForClientProtocol } from "@ccr/core/providers/runtime-topology.ts";
-import { createClaudeCliAutoCompactWindows } from "@ccr/core/gateway/features/model-discovery.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog.ts";
+import { providerCapabilityForClientProtocol } from "@agentrouter/core/providers/runtime-topology.ts";
+import { createClaudeCliAutoCompactWindows } from "@agentrouter/core/gateway/features/model-discovery.ts";
 
 const baseUrl = "https://openrouter.ai/api/v1";
 const provider = {

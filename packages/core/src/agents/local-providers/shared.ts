@@ -6,7 +6,7 @@ import type {
   ProviderAccountConfig,
   ProviderDeepLinkPayload,
   ProviderModelMetadata
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 export type OAuthTokenSet = {
   accountId?: string;

@@ -18,10 +18,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./packages/ui/src/*"],
-      "@ccr/cli/*": ["./packages/cli/src/*"],
-      "@ccr/core/*": ["./packages/core/src/*"],
-      "@ccr/electron/*": ["./packages/electron/src/*"],
-      "@ccr/ui/*": ["./packages/ui/src/*"]
+      "@agentrouter/cli/*": ["./packages/cli/src/*"],
+      "@agentrouter/core/*": ["./packages/core/src/*"],
+      "@agentrouter/electron/*": ["./packages/electron/src/*"],
+      "@agentrouter/ui/*": ["./packages/ui/src/*"]
     }
   },
   "include": [

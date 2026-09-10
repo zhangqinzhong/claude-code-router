@@ -1,5 +1,5 @@
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { isGatewayProviderEnabled, type AppConfig, type ProviderModelPricing } from "@ccr/core/contracts/app";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { isGatewayProviderEnabled, type AppConfig, type ProviderModelPricing } from "@agentrouter/core/contracts/app";
 
 type ModelPricingSource = "litellm" | "models.dev" | "openrouter";
 type UsagePricingSource = ModelPricingSource | "custom";

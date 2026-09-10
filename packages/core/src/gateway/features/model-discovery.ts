@@ -2,22 +2,22 @@
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
 import type { IncomingHttpHeaders } from "node:http";
-import { BUILTIN_FUSION_VISION_TOOL_NAME, effectiveContextWindowPercentFor, isGatewayProviderEnabled } from "@ccr/core/contracts/app";
-import type { ApiKeyConfig, AppConfig, ProfileConfig, ProviderModelMetadata, VirtualModelProfileConfig } from "@ccr/core/contracts/app";
-import { buildClaudeAppGatewayModelRoutes, resolveClaudeAppGatewayRouteModel } from "@ccr/core/agents/claude-app/gateway-routes";
-import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector } from "@ccr/core/routing/model-registry";
-import { findModelCatalogEntry, findProviderModelCatalogEntry, modelCatalogMaxInputTokens, modelCatalogMaxOutputTokens, readCatalogCapability, type ModelCatalogEntry } from "@ccr/core/gateway/model-catalog";
-import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
-import { fusionModelSelector } from "@ccr/core/mcp/fusion-config";
-import { readHeader } from "@ccr/core/gateway/http/io";
-import { claudeAppGatewayModelRouteOptions, claudeCodeOneMillionContextSuffix } from "@ccr/core/gateway/internal/shared";
-import type { ClaudeCodeDiscoverableModel } from "@ccr/core/gateway/internal/shared";
-import { parseJsonObjectSafe, serializeJsonBodyWithModel } from "@ccr/core/gateway/http/body";
-import { uniqueStrings } from "@ccr/core/gateway/internal/collections";
-import { contextArchiveConfigForApiKey, contextArchiveMcpEnabled } from "@ccr/core/gateway/context-archive";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
-import { filterModelIdsForProfile, isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
+import { BUILTIN_FUSION_VISION_TOOL_NAME, effectiveContextWindowPercentFor, isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
+import type { ApiKeyConfig, AppConfig, ProfileConfig, ProviderModelMetadata, VirtualModelProfileConfig } from "@agentrouter/core/contracts/app";
+import { buildClaudeAppGatewayModelRoutes, resolveClaudeAppGatewayRouteModel } from "@agentrouter/core/agents/claude-app/gateway-routes";
+import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector } from "@agentrouter/core/routing/model-registry";
+import { findModelCatalogEntry, findProviderModelCatalogEntry, modelCatalogMaxInputTokens, modelCatalogMaxOutputTokens, readCatalogCapability, type ModelCatalogEntry } from "@agentrouter/core/gateway/model-catalog";
+import { isRecord, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { fusionModelSelector } from "@agentrouter/core/mcp/fusion-config";
+import { readHeader } from "@agentrouter/core/gateway/http/io";
+import { claudeAppGatewayModelRouteOptions, claudeCodeOneMillionContextSuffix } from "@agentrouter/core/gateway/internal/shared";
+import type { ClaudeCodeDiscoverableModel } from "@agentrouter/core/gateway/internal/shared";
+import { parseJsonObjectSafe, serializeJsonBodyWithModel } from "@agentrouter/core/gateway/http/body";
+import { uniqueStrings } from "@agentrouter/core/gateway/internal/collections";
+import { contextArchiveConfigForApiKey, contextArchiveMcpEnabled } from "@agentrouter/core/gateway/context-archive";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
+import { filterModelIdsForProfile, isModelAllowedForProfile, profileForApiKey } from "@agentrouter/core/profiles/model-allowlist";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
 
 
 export function shouldServeGatewayModelsResponse(method: string, path: string): boolean {
@@ -208,7 +208,7 @@ function createClaudeCliAdditionalModelOptions(config: AppConfig, profile?: Prof
 function formatClaudeCliAdditionalModelDescription(maxInputTokens: number): string {
   const tokens = positiveInteger(maxInputTokens);
   if (!tokens) {
-    return "CCR gateway model";
+    return "AgentRouter gateway model";
   }
   return `${formatCompactTokenCount(tokens)} context window`;
 }

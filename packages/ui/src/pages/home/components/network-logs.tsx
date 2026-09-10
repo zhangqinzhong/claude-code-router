@@ -1,6 +1,6 @@
 import { memo } from "react";
 import { Maximize2, Route, X } from "lucide-react";
-import type { RequestRouteTrace, RequestRouteTraceChange, RequestRouteTraceHop } from "@ccr/core/contracts/app";
+import type { RequestRouteTrace, RequestRouteTraceChange, RequestRouteTraceHop } from "@agentrouter/core/contracts/app";
 import {
   AnimatedIconSwap, Check, ChevronDown, ChevronLeft,
   ChevronRight, clampNumber, clientInitial, cn, Copy, copyTextToClipboard,
@@ -393,12 +393,12 @@ export function LogsView({
   );
   const hasActiveFilters = logFilterHasActiveValues(filter);
   const loadLogDetail = useCallback((id: number) => {
-    if (detailById[id] || detailLoadingId === id || !window.ccr?.getRequestLogDetail) {
+    if (detailById[id] || detailLoadingId === id || !window.agentrouter?.getRequestLogDetail) {
       return;
     }
     setDetailLoadingId(id);
     setDetailErrorById((current) => ({ ...current, [id]: "" }));
-    void window.ccr.getRequestLogDetail({ id })
+    void window.agentrouter.getRequestLogDetail({ id })
       .then((detail) => {
         if (detail) {
           setDetailById((current) => ({ ...current, [id]: detail }));
@@ -622,7 +622,7 @@ export function LogsView({
                     <div className="max-w-[360px] px-4 text-[11px] leading-4 text-muted-foreground">
                       {t(hasActiveFilters
                         ? "Clear filters or broaden the search to find more request logs."
-                        : "Send a request through CCR, then refresh this page to inspect it.")}
+                        : "Send a request through AgentRouter, then refresh this page to inspect it.")}
                     </div>
                   ) : null}
                   {!loading && hasActiveFilters ? (
@@ -1854,7 +1854,7 @@ function LogJsonPanel({
   }
 
   async function loadBodyChunk(offset: number) {
-    if (!effectiveBody?.bodyRef || !window.ccr?.getRequestLogBodyChunk) {
+    if (!effectiveBody?.bodyRef || !window.agentrouter?.getRequestLogBodyChunk) {
       setBodyMode("full");
       return;
     }
@@ -1869,7 +1869,7 @@ function LogJsonPanel({
       previousOffsets: nextChunkPreviousOffsets(current, sourceBodyKey, offset)
     }));
     try {
-      const chunk = await window.ccr.getRequestLogBodyChunk({
+      const chunk = await window.agentrouter.getRequestLogBodyChunk({
         id: requestLogId,
         length: 1024 * 1024,
         offset,
@@ -1902,7 +1902,7 @@ function LogJsonPanel({
   }
 
   async function loadInlineFullBody() {
-    if (!effectiveBody?.bodyRef || !window.ccr?.getRequestLogBodyChunk) {
+    if (!effectiveBody?.bodyRef || !window.agentrouter?.getRequestLogBodyChunk) {
       return;
     }
     const loadId = fullBodyLoadIdRef.current + 1;
@@ -1914,7 +1914,7 @@ function LogJsonPanel({
       let offset = 0;
       let lastChunk: RequestLogBodyChunk | undefined;
       while (true) {
-        const chunk = await window.ccr.getRequestLogBodyChunk({
+        const chunk = await window.agentrouter.getRequestLogBodyChunk({
           id: requestLogId,
           length: 1024 * 1024,
           offset,

@@ -3,12 +3,12 @@ import { EventEmitter } from "node:events";
 import { randomBytes } from "node:crypto";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { decodeClaudeAppGatewayRouteId } from "@ccr/core/agents/claude-app/gateway-routes";
-import { REQUEST_LOGS_DB_FILE, USAGE_DB_FILE } from "@ccr/core/config/constants";
-import { estimateUsageCostUsd, providerModelPricingForUsage } from "@ccr/core/models/pricing-service";
-import { createBetterSqliteDatabase, type BetterSqliteDatabase } from "@ccr/core/storage/sqlite-native";
-import { normalizeUsageInputTokens } from "@ccr/core/usage/normalization";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+import { decodeClaudeAppGatewayRouteId } from "@agentrouter/core/agents/claude-app/gateway-routes";
+import { REQUEST_LOGS_DB_FILE, USAGE_DB_FILE } from "@agentrouter/core/config/constants";
+import { estimateUsageCostUsd, providerModelPricingForUsage } from "@agentrouter/core/models/pricing-service";
+import { createBetterSqliteDatabase, type BetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native";
+import { normalizeUsageInputTokens } from "@agentrouter/core/usage/normalization";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 import type {
   AppConfig,
   GatewayProviderProtocol,
@@ -20,7 +20,7 @@ import type {
   UsageStatsResetResult,
   UsageStatsSnapshot,
   UsageTotals
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type SqlDatabase = BetterSqliteDatabase;
 type SqlValue = bigint | Buffer | number | string | null;
@@ -668,7 +668,7 @@ function sqlString(value: string): string {
 }
 
 function copySqliteDatabaseToTemp(file: string): string {
-  const target = join(tmpdir(), `ccr-request-logs-${process.pid}-${Date.now()}-${randomBytes(4).toString("hex")}.sqlite`);
+  const target = join(tmpdir(), `ar-request-logs-${process.pid}-${Date.now()}-${randomBytes(4).toString("hex")}.sqlite`);
   copyFileSync(file, target);
   for (const suffix of ["-wal", "-shm"]) {
     const source = `${file}${suffix}`;

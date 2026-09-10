@@ -11,7 +11,7 @@ import { setTimeout as delay } from "node:timers/promises";
 const model = "meta/muse-spark-1.3-contributor";
 
 test("#1781 actual gateway preserves parallel Anthropic tool IDs in Chat and Responses", { timeout: 30000 }, async () => {
-  const root = mkdtempSync(path.join(tmpdir(), "ccr-tool-ids-"));
+  const root = mkdtempSync(path.join(tmpdir(), "ar-tool-ids-"));
   const captured = [];
   const upstream = createServer(async (request, response) => {
     const chunks = [];
@@ -54,7 +54,7 @@ test("#1781 actual gateway preserves parallel Anthropic tool IDs in Chat and Res
         name: type, type, baseurl: "https://openrouter.ai/api/v1", apikey: "test-only", models: [model]
       })),
       plugins: [
-        { key: "ccr-test-boundary", modulePath: path.resolve(".test-dist/core/runtime/upstream-header-sanitizer.js") },
+        { key: "ar-test-boundary", modulePath: path.resolve(".test-dist/core/runtime/upstream-header-sanitizer.js") },
         { key: "test-transport", modulePath: redirectFile }
       ]
     }));

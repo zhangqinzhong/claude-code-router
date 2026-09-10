@@ -165,7 +165,7 @@ const toPageNavLink = (page?: { label: Record<Locale, string>; path: Record<Loca
 const prevPage = toPageNavLink(prevPageDef);
 const nextPage = toPageNavLink(nextPageDef);
 const editSource = (currentPage?.source ?? sectionIndexSource(section))[locale];
-const editUrl = `https://github.com/musistudio/claude-code-router/edit/main/docs/src/content/docs/${locale}/${editSource}`;
+const editUrl = `https://github.com/zhangqinzhong/claude-code-router/edit/main/docs/src/content/docs/${locale}/${editSource}`;
 const isHome = pageKey === "documentation" && isSectionDoc;
 const pageMarkdown = doc.rawContent();
 ---

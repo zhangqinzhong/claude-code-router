@@ -17,10 +17,10 @@ import {
   TrayStatusStrip,
   UsageDetailPanel,
   UsageOverviewPanel
-} from "@ccr/ui/pages/tray/components/index.ts";
-import { TrayApp } from "@ccr/ui/pages/tray/TrayApp.tsx";
-import { TrayDetailApp } from "@ccr/ui/pages/tray/TrayDetailApp.tsx";
-import { applyTrayThemePreference, createSourceTabs } from "@ccr/ui/pages/tray/shared.tsx";
+} from "@agentrouter/ui/pages/tray/components/index.ts";
+import { TrayApp } from "@agentrouter/ui/pages/tray/TrayApp.tsx";
+import { TrayDetailApp } from "@agentrouter/ui/pages/tray/TrayDetailApp.tsx";
+import { applyTrayThemePreference, createSourceTabs } from "@agentrouter/ui/pages/tray/shared.tsx";
 import { accountSnapshots, installBrowserGlobals, usageStats, usageTotals } from "../fixtures/index.ts";
 
 installBrowserGlobals();
@@ -117,10 +117,10 @@ test("UsageDetailPanel renders configured detail widgets and empty state", () =>
 test("TrayStatusStrip renders open and quit actions", () => {
   const html = renderToStaticMarkup(<TrayStatusStrip totalTokens={12500} />);
 
-  assert.match(html, /aria-label="Open CCR"/);
-  assert.match(html, /title="Open CCR"/);
+  assert.match(html, /aria-label="Open AgentRouter"/);
+  assert.match(html, /title="Open AgentRouter"/);
   assert.match(html, /12\.5K tokens/);
-  assert.match(html, /CCR/);
+  assert.match(html, /AgentRouter/);
   assert.match(html, /aria-label="Quit"/);
 });
 
@@ -356,7 +356,7 @@ test("TrayApp and TrayDetailApp render their shell components without browser ru
   const detailHtml = renderToStaticMarkup(<TrayDetailApp provider="openai" />);
 
   assert.match(trayHtml, /Usage Overview/);
-  assert.match(trayHtml, /Open CCR/);
+  assert.match(trayHtml, /Open AgentRouter/);
   assert.match(detailHtml, /Usage Detail/);
   assert.match(detailHtml, /OpenAI/);
 });

@@ -2,7 +2,7 @@
 title: Overview dashboard
 pageTitle: Overview dashboard
 eyebrow: Detailed configuration
-lead: Customize the CCR home dashboard to inspect system status, account balance, requests, tokens, cost, and model distribution.
+lead: Customize the AgentRouter home dashboard to inspect system status, account balance, requests, tokens, cost, and model distribution.
 ---
 
 ## When to use it
@@ -13,7 +13,7 @@ lead: Customize the CCR home dashboard to inspect system status, account balance
 | Estimate recent spend | Requests, input / output / cache tokens, estimated cost |
 | Compare upstream usage | Provider analysis, model distribution, client analysis |
 | Watch account quota | Balance, subscription quota, remaining quota, account status |
-| Report or share usage | AI Usage Wrapped, CCR Route Map, Model Leaderboard, Spend Receipt, and other share cards |
+| Report or share usage | AI Usage Wrapped, AgentRouter Route Map, Model Leaderboard, Spend Receipt, and other share cards |
 
 ## Time range
 
@@ -63,7 +63,7 @@ Sizes are written as `width:height`, with both dimensions from `1` to `4`. The o
 | Activity component | Token activity | `4:2` | Heatmap | Heatmap |
 | Breakdown component | Token distribution / Model distribution | Token distribution: `1:2`; Model distribution: `2:2` | Token distribution: Bars; Model distribution: Pie | Bars, Stacked, Donut, Pie |
 | Analysis component | Client Analysis / Provider Analysis | `2:2` | Table | Table, Compact |
-| Share card | AI Usage Wrapped, CCR Route Map, Model Leaderboard, AI Fuel Cockpit, Token Calendar Poster, Spend Receipt | `1:4` | Card | Card |
+| Share card | AI Usage Wrapped, AgentRouter Route Map, Model Leaderboard, AI Fuel Cockpit, Token Calendar Poster, Spend Receipt | `1:4` | Card | Card |
 
 Size constraints:
 
@@ -113,7 +113,7 @@ Share card widgets can export PNGs through the download button in the card heade
 | Card | `type` | Content |
 | --- | --- | --- |
 | AI Usage Wrapped | `share-usage-wrapped` | Total tokens, requests, estimated cost, cache ratio, longest activity streak, top model, top provider, peak day. |
-| CCR Route Map | `share-route-map` | Main client-to-provider/model route relationships, plus client, provider, and model counts. |
+| AgentRouter Route Map | `share-route-map` | Main client-to-provider/model route relationships, plus client, provider, and model counts. |
 | Model Leaderboard | `share-model-leaderboard` | Models ranked by tokens. |
 | AI Fuel Cockpit | `share-fuel-cockpit` | Up to 3 account quota gauges. Requires account / usage connectors. |
 | Token Calendar Poster | `share-token-calendar` | Contribution-calendar style token activity poster. |
@@ -123,9 +123,9 @@ Share card widgets can export PNGs through the download button in the card heade
 
 | Symptom | Likely cause | What to do |
 | --- | --- | --- |
-| Requests, tokens, or cost are 0 | No requests went through CCR in the selected range, or usage capture has not recorded data yet. | Try `24h` / `7d`, and confirm the client is actually using CCR. |
+| Requests, tokens, or cost are 0 | No requests went through AgentRouter in the selected range, or usage capture has not recorded data yet. | Try `24h` / `7d`, and confirm the client is actually using AgentRouter. |
 | Cost shows `$0.00` | The model has no pricing data, or usage is very small. | Check model catalog matching and provider model names; values under 0.01 USD are shown with extra decimals. |
-| Success rate or errors look unexpected | The overview only aggregates request results captured by CCR. | Compare with records on the Logs page. |
+| Success rate or errors look unexpected | The overview only aggregates request results captured by AgentRouter. | Compare with records on the Logs page. |
 | Account balance is empty | No account connector exists, or `Fetch usage` failed. | Test account / usage field mapping in provider configuration. |
-| Distribution charts have no data | Request logs lack model, provider, or token information. | Confirm requests go through CCR and upstream responses include token usage. |
+| Distribution charts have no data | Request logs lack model, provider, or token information. | Confirm requests go through AgentRouter and upstream responses include token usage. |
 | PNG export fails | Canvas export is unavailable, the element has no size, or the save dialog was canceled. | Retry in the desktop app, and make sure the card is visible and not resized too small. |

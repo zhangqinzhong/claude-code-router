@@ -24,13 +24,13 @@ lead: 在 Fusion 模型中加入图片生成和图片编辑能力，让文本模
 4. 在工具配置里选择图片模型，例如 `供应商/模型`。
 5. 保存 Fusion 模型，并把它选为 Agent 模型或路由目标。
 
-导入 Grok Agent 后，CCR 会自动提供 `grok-imagine-image-quality`。ai-gateway 会复用已有 OAuth 登录态访问 `api.x.ai`，不会额外启动 Grok CLI。
+导入 Grok Agent 后，AgentRouter 会自动提供 `grok-imagine-image-quality`。ai-gateway 会复用已有 OAuth 登录态访问 `api.x.ai`，不会额外启动 Grok CLI。
 
-图片生成有自己的重试次数和备用图片模型。如果所选图片模型遇到可重试的媒体供应商错误，CCR 会先重试这个图片模型，再尝试配置的备用图片模型。基础文本模型保持不变。
+图片生成有自己的重试次数和备用图片模型。如果所选图片模型遇到可重试的媒体供应商错误，AgentRouter 会先重试这个图片模型，再尝试配置的备用图片模型。基础文本模型保持不变。
 
 ## 支持的请求
 
-CCR 通过 ai-gateway 的通用媒体协议调用供应商：
+AgentRouter 通过 ai-gateway 的通用媒体协议调用供应商：
 
 | 请求 | 说明 |
 | --- | --- |
@@ -41,13 +41,13 @@ CCR 通过 ai-gateway 的通用媒体协议调用供应商：
 
 ## 本地图片输入
 
-图片编辑会校验本地输入的真实路径、文件头和大小。CCR 默认允许范围明确的当前工作目录、系统临时目录和 CCR 配置目录。
+图片编辑会校验本地输入的真实路径、文件头和大小。AgentRouter 默认允许范围明确的当前工作目录、系统临时目录和 AgentRouter 配置目录。
 
 不要把文件系统根目录、用户主目录或其上级目录隐式放开。确实需要扩大读取范围时，再显式配置 `allowedInputRoots`。
 
 ## 产物
 
-生成图片保存在 CCR 私有数据目录。返回结果包含：
+生成图片保存在 AgentRouter 私有数据目录。返回结果包含：
 
 - 本地文件路径
 - MIME 类型
@@ -55,7 +55,7 @@ CCR 通过 ai-gateway 的通用媒体协议调用供应商：
 - SHA-256
 - 限时访问 URL
 
-限时 URL 用独立 token 保护，不直接复用 CCR API Key。
+限时 URL 用独立 token 保护，不直接复用 AgentRouter API Key。
 
 ## 排查要点
 

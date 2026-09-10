@@ -1,8 +1,8 @@
-import type { ApiKeyConfig, AppConfig } from "@ccr/core/contracts/app";
-import { endpoint as gatewayEndpoint } from "@ccr/core/gateway/core-runtime/supervisor";
-import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@ccr/core/gateway/runtime-config-control";
+import type { ApiKeyConfig, AppConfig } from "@agentrouter/core/contracts/app";
+import { endpoint as gatewayEndpoint } from "@agentrouter/core/gateway/core-runtime/supervisor";
+import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@agentrouter/core/gateway/runtime-config-control";
 
-export type ExistingCcrGatewayProbe =
+export type ExistingArGatewayProbe =
   | { endpoint: string; reason?: string; state: "unavailable" }
   | { endpoint: string; status?: number; state: "not-ccr" }
   | { endpoint: string; message?: string; status: number; state: "unauthorized" }
@@ -18,19 +18,19 @@ type ExistingGatewayHttpProbe = {
 const existingGatewayFetchAttempts = 3;
 const runtimeConfigReloadTimeoutMs = 20_000;
 
-export async function probeExistingCcrGateway(
+export async function probeExistingArGateway(
   config: Pick<AppConfig, "APIKEY" | "APIKEYS" | "gateway">
-): Promise<ExistingCcrGatewayProbe> {
+): Promise<ExistingArGatewayProbe> {
   const endpoint = publicGatewayEndpoint(config);
   const health = await fetchExistingGateway(endpoint, "/health");
-  let ccrGateway = isCcrGatewayHealth(health.payload);
+  let arGateway = isArGatewayHealth(health.payload);
   let root: ExistingGatewayHttpProbe | undefined;
 
-  if (!ccrGateway) {
+  if (!arGateway) {
     root = await fetchExistingGateway(endpoint, "/");
-    ccrGateway = isCcrGatewayRoot(root.payload);
+    arGateway = isArGatewayRoot(root.payload);
   }
-  if (!ccrGateway) {
+  if (!arGateway) {
     if (health.status === undefined && root?.status === undefined) {
       return { endpoint, reason: health.reason || root?.reason, state: "unavailable" };
     }
@@ -39,7 +39,7 @@ export async function probeExistingCcrGateway(
 
   const candidates = existingGatewayApiKeyCandidates(config);
   if (candidates.length === 0) {
-    return { endpoint, message: "No configured CCR API key is available.", status: 401, state: "unauthorized" };
+    return { endpoint, message: "No configured AgentRouter API key is available.", status: 401, state: "unauthorized" };
   }
 
   let lastUnauthorized: ExistingGatewayHttpProbe | undefined;
@@ -77,7 +77,7 @@ export function publicGatewayEndpoint(config: Pick<AppConfig, "gateway">): strin
   return gatewayEndpoint(host, config.gateway.port);
 }
 
-export async function reloadExistingCcrGatewayConfig(
+export async function reloadExistingArGatewayConfig(
   currentEndpoint: string,
   config: AppConfig,
   currentApiKey: string | undefined,
@@ -85,11 +85,11 @@ export async function reloadExistingCcrGatewayConfig(
 ): Promise<{ apiKey: string; endpoint: string }> {
   const configRevision = gatewayRuntimeConfigRevision(config);
   if (!configRevision) {
-    throw new Error("Cannot determine the saved CCR configuration revision.");
+    throw new Error("Cannot determine the saved AgentRouter configuration revision.");
   }
   const currentKey = currentApiKey?.trim();
   if (!currentKey) {
-    throw new Error("The API key accepted by the externally managed CCR gateway is unavailable.");
+    throw new Error("The API key accepted by the externally managed AgentRouter gateway is unavailable.");
   }
 
   if (options.forceRestart !== true) {
@@ -114,12 +114,12 @@ export async function reloadExistingCcrGatewayConfig(
     method: "POST"
   });
   if (submission.status === 404) {
-    throw new Error("The running CCR gateway does not support runtime configuration reloads. Restart that gateway process once, then try again.");
+    throw new Error("The running AgentRouter gateway does not support runtime configuration reloads. Restart that gateway process once, then try again.");
   }
   if (submission.status !== 200 && submission.status !== 202) {
     const detail = readGatewayErrorMessage(submission.payload) || submission.reason ||
       `HTTP ${submission.status ?? 0}`;
-    throw new Error(`The running CCR gateway rejected the configuration reload request: ${detail}`);
+    throw new Error(`The running AgentRouter gateway rejected the configuration reload request: ${detail}`);
   }
 
   const expectedEndpoint = publicGatewayEndpoint(config);
@@ -136,7 +136,7 @@ export async function reloadExistingCcrGatewayConfig(
           return { apiKey, endpoint: expectedEndpoint };
         }
         if (typeof status.payload.lastError === "string" && status.payload.lastError.trim()) {
-          throw new Error(`The running CCR gateway could not apply the saved configuration: ${status.payload.lastError}`);
+          throw new Error(`The running AgentRouter gateway could not apply the saved configuration: ${status.payload.lastError}`);
         }
       }
       if (status.status !== 401 && status.status !== 403) {
@@ -145,7 +145,7 @@ export async function reloadExistingCcrGatewayConfig(
     }
     await wait(100);
   }
-  throw new Error(`Timed out waiting for the running CCR gateway to load configuration revision ${configRevision}${lastReason ? ` (${lastReason})` : ""}.`);
+  throw new Error(`Timed out waiting for the running AgentRouter gateway to load configuration revision ${configRevision}${lastReason ? ` (${lastReason})` : ""}.`);
 }
 
 export function isAddressInUseMessage(message: string | undefined): boolean {
@@ -210,13 +210,13 @@ function existingGatewayApiKeyCandidates(config: Pick<AppConfig, "APIKEY" | "API
   return result;
 }
 
-function isCcrGatewayHealth(value: unknown): boolean {
+function isArGatewayHealth(value: unknown): boolean {
   return isRecord(value) &&
     typeof value.status === "string" &&
     typeof value.core === "string";
 }
 
-function isCcrGatewayRoot(value: unknown): boolean {
+function isArGatewayRoot(value: unknown): boolean {
   return isRecord(value) &&
     (value.name === "claude-code-router" ||
       value.plugin === "claude-code-router" ||

@@ -1,4 +1,4 @@
-import type { RouteScriptInput } from "@ccr/core/routing/route-script-context";
+import type { RouteScriptInput } from "@agentrouter/core/routing/route-script-context";
 
 export type ResolvedRouteScript = {
   source: string;

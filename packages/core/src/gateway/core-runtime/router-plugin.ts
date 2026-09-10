@@ -1,76 +1,76 @@
 import { timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
-import type { ApiKeyConfig, AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProfileConfig, RouterRule } from "@ccr/core/contracts/app";
+import type { ApiKeyConfig, AppConfig, GatewayProviderConfig, GatewayProviderProtocol, ProfileConfig, RouterRule } from "@agentrouter/core/contracts/app";
 import {
   claudeCodeWifTokenPath,
   exchangeClaudeCodeWifToken,
   resolveApiKeyFromHeaders
-} from "@ccr/core/gateway/auth/api-key-authorizer";
-import { ccrRemoteControlPathPrefix, ccrRemoteControlService } from "@ccr/core/gateway/remote-control-service";
+} from "@agentrouter/core/gateway/auth/api-key-authorizer";
+import { arRemoteControlPathPrefix, arRemoteControlService } from "@agentrouter/core/gateway/remote-control-service";
 import {
   ClaudeCodeRouterPlugin,
   type ClaudeCodeRouteDecision
-} from "@ccr/core/gateway/claude-code-router-plugin";
+} from "@agentrouter/core/gateway/claude-code-router-plugin";
 import {
-  ccrCodexApplyPatchBridgeHeader,
-  ccrCodexBridgeRequestTransformKey,
-  ccrCodexBridgeResponseHookKey,
-  ccrCodexBridgeStreamHookKey,
-  ccrCodexMultiAgentBridgeHeader,
-  ccrOpenRouterDiscountFinalizeResponseHookKey,
-  ccrOpenRouterDiscountFinalizeStreamHookKey,
-  ccrOpenRouterDiscountRequestIdHeader,
-  ccrRouteDiagnosticsHeader,
-  ccrRouteFallbackHeader,
-  ccrRouteHeaderNames,
-  ccrRouteReasonHeader,
-  ccrRouteSessionIdHeader,
-  ccrRouteSourceHeader,
-  ccrRouteStageHeader,
-  ccrRouteTokenCountHeader,
-  ccrRawTraceSyncAckRouteKey,
-  ccrRuntimeConfigReloadMessageType,
-  ccrRoutedModelHeader,
-  ccrRouterHttpRouteKey,
-  ccrRouterHttpRoutePath,
-  ccrRouterRouteResolverKey,
-  ccrRouterRequestTransformKey,
-  encodeCcrRouteFallbackHeader,
-  type CcrRouterPluginRouteRequest
-} from "@ccr/core/gateway/core-runtime/router-plugin-contract";
-import { coreGatewayAuthHeader, rawTraceSyncHeader, rawTraceSyncPath, sdkCompatibleTokenHeaderNames } from "@ccr/core/gateway/internal/shared";
-import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@ccr/core/gateway/runtime-config-control";
+  arCodexApplyPatchBridgeHeader,
+  arCodexBridgeRequestTransformKey,
+  arCodexBridgeResponseHookKey,
+  arCodexBridgeStreamHookKey,
+  arCodexMultiAgentBridgeHeader,
+  arOpenRouterDiscountFinalizeResponseHookKey,
+  arOpenRouterDiscountFinalizeStreamHookKey,
+  arOpenRouterDiscountRequestIdHeader,
+  arRouteDiagnosticsHeader,
+  arRouteFallbackHeader,
+  arRouteHeaderNames,
+  arRouteReasonHeader,
+  arRouteSessionIdHeader,
+  arRouteSourceHeader,
+  arRouteStageHeader,
+  arRouteTokenCountHeader,
+  arRawTraceSyncAckRouteKey,
+  arRuntimeConfigReloadMessageType,
+  arRoutedModelHeader,
+  arRouterHttpRouteKey,
+  arRouterHttpRoutePath,
+  arRouterRouteResolverKey,
+  arRouterRequestTransformKey,
+  encodeArRouteFallbackHeader,
+  type ArRouterPluginRouteRequest
+} from "@agentrouter/core/gateway/core-runtime/router-plugin-contract";
+import { coreGatewayAuthHeader, rawTraceSyncHeader, rawTraceSyncPath, sdkCompatibleTokenHeaderNames } from "@agentrouter/core/gateway/internal/shared";
+import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@agentrouter/core/gateway/runtime-config-control";
 import {
   createClaudeCliBootstrapResponse,
   createGatewayModelsResponse,
   resolveGatewayPublicModelId
-} from "@ccr/core/gateway/features/model-discovery";
+} from "@agentrouter/core/gateway/features/model-discovery";
 import {
   codexApplyPatchBridgeResponseStream,
   prepareCodexApplyPatchBridgeRequest,
   transformCodexApplyPatchBridgeResponseValue
-} from "@ccr/core/gateway/features/codex-patch-bridge";
+} from "@agentrouter/core/gateway/features/codex-patch-bridge";
 import {
   codexMultiAgentBridgeResponseStream,
   prepareCodexMultiAgentBridgeRequest,
   transformCodexMultiAgentBridgeResponseValue
-} from "@ccr/core/gateway/features/codex-multi-agent-bridge";
-import { requestLogRequestedModel } from "@ccr/core/observability/request-log-model";
+} from "@agentrouter/core/gateway/features/codex-multi-agent-bridge";
+import { requestLogRequestedModel } from "@agentrouter/core/observability/request-log-model";
 import {
   finalizeOpenRouterDiscountProviderRouterSelection,
   openRouterDiscountProviderRouterTransform
-} from "@ccr/core/plugins/built-ins/openrouter-discount-provider-router";
+} from "@agentrouter/core/plugins/built-ins/openrouter-discount-provider-router";
 import type {
   GatewayPluginRequestTransformContext,
-  GatewayPluginRequestTransformInput as CcrGatewayPluginRequestTransformInput
-} from "@ccr/core/plugins/service";
-import { isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key";
-import { adaptRouteRequestBody, restoreRouteRequestBody } from "@ccr/core/routing/protocol-adapter";
-import { requestProtocolForPath, shouldApplyGatewayRouting } from "@ccr/core/routing/protocol-endpoints";
-import { RouteScriptRuntime } from "@ccr/core/routing/route-script-runtime";
-import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector, providerRuntimeId } from "@ccr/core/routing/model-registry";
+  GatewayPluginRequestTransformInput as ArGatewayPluginRequestTransformInput
+} from "@agentrouter/core/plugins/service";
+import { isModelAllowedForProfile, profileForApiKey } from "@agentrouter/core/profiles/model-allowlist";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key";
+import { adaptRouteRequestBody, restoreRouteRequestBody } from "@agentrouter/core/routing/protocol-adapter";
+import { requestProtocolForPath, shouldApplyGatewayRouting } from "@agentrouter/core/routing/protocol-endpoints";
+import { RouteScriptRuntime } from "@agentrouter/core/routing/route-script-runtime";
+import { modelRegistryForConfig, normalizeRouteSelector, parseProviderModelSelector, providerRuntimeId } from "@agentrouter/core/routing/model-registry";
 import {
   activeProviderCredentials,
   normalizedProviderCapabilities,
@@ -81,7 +81,7 @@ import {
   providerProtocolForClientProtocol,
   sanitizeHeaderValue,
   sortProviderCredentialsForConfig
-} from "@ccr/core/providers/runtime-topology";
+} from "@agentrouter/core/providers/runtime-topology";
 
 type GatewayPluginFactoryInput = {
   plugin?: {
@@ -185,7 +185,7 @@ type GatewayRouteResolution = {
 export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {}) {
   const config = readAppConfig(input.plugin?.config);
   if (!config) {
-    throw new Error("CCR router plugin requires plugin.config.appConfig.");
+    throw new Error("AgentRouter router plugin requires plugin.config.appConfig.");
   }
   const publicGatewayMode = readPublicGatewayMode(input.plugin?.config);
   const coreAuthToken = readCoreAuthToken(input.plugin?.config);
@@ -206,18 +206,18 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
   return {
     httpRoutes: [{
       auth: "none",
-      key: ccrRouterHttpRouteKey,
+      key: arRouterHttpRouteKey,
       method: "POST",
-      path: ccrRouterHttpRoutePath,
+      path: arRouterHttpRoutePath,
       handler: async ({ request, reply }: { request: GatewayPluginHttpRequest; reply: GatewayPluginHttpReply }) => {
         if (!isCoreGatewayRequest(request.headers, coreAuthToken)) {
-          return reply.code(401).send({ error: { message: "Unauthorized CCR router route." } });
+          return reply.code(401).send({ error: { message: "Unauthorized AgentRouter router route." } });
         }
         const payload = readRouteRequestPayload(request.body);
         if (!payload) {
           return reply.code(400).send({
             error: {
-              message: "CCR router plugin route requires a JSON body with body, method, and url."
+              message: "AgentRouter router plugin route requires a JSON body with body, method, and url."
             }
           });
         }
@@ -226,7 +226,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }, {
       auth: "none",
-      key: "ccr-runtime-config-control",
+      key: "ar-runtime-config-control",
       method: "ALL",
       path: gatewayRuntimeConfigControlPath,
       priority: "pre",
@@ -234,7 +234,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         handleRuntimeConfigControlRoute(config, request, reply, coreAuthToken, publicAuthKeys)
     }, {
       auth: "none",
-      key: ccrRawTraceSyncAckRouteKey,
+      key: arRawTraceSyncAckRouteKey,
       method: "POST",
       path: rawTraceSyncPath,
       priority: "pre",
@@ -260,7 +260,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }, {
       auth: "none",
-      key: "ccr-public-root",
+      key: "ar-public-root",
       method: "GET",
       path: "/",
       priority: "pre",
@@ -280,23 +280,23 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       })
     }, {
       auth: "none",
-      key: "ccr-public-remote-control-root",
+      key: "ar-public-remote-control-root",
       method: "ALL",
-      path: ccrRemoteControlPathPrefix,
+      path: arRemoteControlPathPrefix,
       priority: "pre",
       handler: async ({ request, reply }: { request: GatewayPluginHttpRequest; reply: GatewayPluginHttpReply }) =>
         handleRemoteControlRoute(config, request, reply, coreAuthToken, publicAuthKeys)
     }, {
       auth: "none",
-      key: "ccr-public-remote-control",
+      key: "ar-public-remote-control",
       method: "ALL",
-      path: `${ccrRemoteControlPathPrefix}/*`,
+      path: `${arRemoteControlPathPrefix}/*`,
       priority: "pre",
       handler: async ({ request, reply }: { request: GatewayPluginHttpRequest; reply: GatewayPluginHttpReply }) =>
         handleRemoteControlRoute(config, request, reply, coreAuthToken, publicAuthKeys)
     }, {
       auth: "none",
-      key: "ccr-public-wif-token",
+      key: "ar-public-wif-token",
       method: "POST",
       path: claudeCodeWifTokenPath,
       priority: "pre",
@@ -306,7 +306,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }, {
       auth: "gateway",
-      key: "ccr-public-models-v1",
+      key: "ar-public-models-v1",
       method: "GET",
       path: "/v1/models",
       priority: "pre",
@@ -314,7 +314,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         createGatewayModelsResponse(config, request.headers ?? {}, await resolveApiKey(config, request.headers))
     }, {
       auth: "gateway",
-      key: "ccr-public-models",
+      key: "ar-public-models",
       method: "GET",
       path: "/models",
       priority: "pre",
@@ -322,7 +322,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         createGatewayModelsResponse(config, request.headers ?? {}, await resolveApiKey(config, request.headers))
     }, {
       auth: "gateway",
-      key: "ccr-public-claude-cli-bootstrap",
+      key: "ar-public-claude-cli-bootstrap",
       method: "GET",
       path: "/api/claude_cli/bootstrap",
       priority: "pre",
@@ -330,7 +330,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         createClaudeCliBootstrapResponse(config, await resolveApiKey(config, request.headers))
     }, {
       auth: "gateway",
-      key: "ccr-public-count-tokens",
+      key: "ar-public-count-tokens",
       method: "POST",
       path: "/v1/messages/count_tokens",
       priority: "pre",
@@ -346,10 +346,10 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }],
     requestHooks: [{
-      key: "ccr-public-auth-context",
+      key: "ar-public-auth-context",
       beforeAuth: async (requestInput: GatewayRequestHookInput) => {
         if (publicGatewayMode) {
-          stripUntrustedCcrRouteHeaders(requestInput.request?.headers);
+          stripUntrustedArRouteHeaders(requestInput.request?.headers);
           const authorization = await resolvePublicGatewayAuth(config, requestInput.request?.headers, {
             coreAuthToken,
             publicAuthKeys,
@@ -371,10 +371,10 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }],
     requestTransforms: [{
-      key: ccrRouterRequestTransformKey,
+      key: arRouterRequestTransformKey,
       stage: "beforeRouting",
       transform: async (requestInput: GatewayRequestTransformInput) => {
-        if (readHeader(requestInput.request?.headers, ccrRoutedModelHeader)) {
+        if (readHeader(requestInput.request?.headers, arRoutedModelHeader)) {
           return undefined;
         }
 
@@ -431,37 +431,37 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         };
       }
     }, {
-      key: ccrCodexBridgeRequestTransformKey,
+      key: arCodexBridgeRequestTransformKey,
       stage: "beforeUpstream",
       transform: (requestInput: GatewayRequestTransformInput) =>
         applyCodexBridgeRequestTransform(config, requestInput)
     }],
     responseHooks: [{
-      key: ccrCodexBridgeResponseHookKey,
+      key: arCodexBridgeResponseHookKey,
       transformResponse: (responseInput: GatewayResponseHookInput) =>
         applyCodexBridgeResponseTransform(responseInput)
     }, {
-      key: ccrOpenRouterDiscountFinalizeResponseHookKey,
+      key: arOpenRouterDiscountFinalizeResponseHookKey,
       transformResponse: (responseInput: GatewayResponseHookInput) => {
         finalizeOpenRouterDiscountSelection(responseInput);
         return undefined;
       }
     }],
     streamHooks: [{
-      key: ccrCodexBridgeStreamHookKey,
+      key: arCodexBridgeStreamHookKey,
       transformResponse: (streamInput: GatewayStreamHookInput) =>
         applyCodexBridgeStreamTransform(streamInput)
     }, {
-      key: ccrOpenRouterDiscountFinalizeStreamHookKey,
+      key: arOpenRouterDiscountFinalizeStreamHookKey,
       transformResponse: (streamInput: GatewayStreamHookInput) => {
         finalizeOpenRouterDiscountSelection(streamInput);
         return undefined;
       }
     }],
     routeResolvers: [{
-      key: ccrRouterRouteResolverKey,
+      key: arRouterRouteResolverKey,
       resolve: (requestInput: GatewayRequestTransformInput): GatewayRouteResolution | undefined =>
-        resolveCcrGatewayRoute(config, requestInput)
+        resolveArGatewayRoute(config, requestInput)
     }]
   };
 }
@@ -483,7 +483,7 @@ async function handleRuntimeConfigControlRoute(
     return reply.code(authorization.status).send({ error: { message: authorization.error } });
   }
   if (!config.APIKEY || authorization.apiKey?.key !== config.APIKEY) {
-    return reply.code(403).send({ error: { message: "The primary CCR API key is required for runtime configuration control." } });
+    return reply.code(403).send({ error: { message: "The primary AgentRouter API key is required for runtime configuration control." } });
   }
 
   const method = (request.method ?? "GET").toUpperCase();
@@ -532,13 +532,13 @@ async function handleRemoteControlRoute(
     return reply.code(authorization.status).send({ error: { message: authorization.error } });
   }
   if (!request.raw || !reply.raw || typeof reply.hijack !== "function") {
-    return reply.code(500).send({ error: { message: "CCR remote control route requires raw HTTP access." } });
+    return reply.code(500).send({ error: { message: "AgentRouter remote control route requires raw HTTP access." } });
   }
 
   reply.hijack();
-  await ccrRemoteControlService.handleRequest({
+  await arRemoteControlService.handleRequest({
     endpoint: pluginPublicEndpoint(config),
-    path: requestPath(request.url ?? ccrRemoteControlPathPrefix),
+    path: requestPath(request.url ?? arRemoteControlPathPrefix),
     readBody: async () => httpRequestBodyBuffer(request.body),
     request: request.raw,
     response: reply.raw,
@@ -566,7 +566,7 @@ function applyCodexBridgeRequestTransform(
     return undefined;
   }
   const routedModel = requestInput.model ??
-    readHeader(headers, ccrRoutedModelHeader) ??
+    readHeader(headers, arRoutedModelHeader) ??
     requestedModelFromBody(requestInput.requestBody, path, undefined);
   let bodyBuffer = httpRequestBodyBuffer(requestInput.requestBody);
   let requestBody = requestInput.requestBody;
@@ -583,7 +583,7 @@ function applyCodexBridgeRequestTransform(
   if (applyPatchBridge) {
     bodyBuffer = applyPatchBridge.body;
     requestBody = readJsonObjectBody(bodyBuffer);
-    nextHeaders[ccrCodexApplyPatchBridgeHeader] = sanitizeHeaderValue(applyPatchBridge.diagnostic) || "1";
+    nextHeaders[arCodexApplyPatchBridgeHeader] = sanitizeHeaderValue(applyPatchBridge.diagnostic) || "1";
   }
 
   const multiAgentBridge = prepareCodexMultiAgentBridgeRequest({
@@ -597,7 +597,7 @@ function applyCodexBridgeRequestTransform(
   if (multiAgentBridge) {
     bodyBuffer = multiAgentBridge.body;
     requestBody = readJsonObjectBody(bodyBuffer);
-    nextHeaders[ccrCodexMultiAgentBridgeHeader] = sanitizeHeaderValue(multiAgentBridge.diagnostic) || "1";
+    nextHeaders[arCodexMultiAgentBridgeHeader] = sanitizeHeaderValue(multiAgentBridge.diagnostic) || "1";
   }
 
   if (Object.keys(nextHeaders).length === 0) {
@@ -688,10 +688,10 @@ function codexBridgeState(input: {
   upstreamRequest?: { headers?: Record<string, string> };
 }): { applyPatch: boolean; multiAgent: boolean } {
   return {
-    applyPatch: hasTruthyHeader(input.request?.headers, ccrCodexApplyPatchBridgeHeader) ||
-      hasTruthyHeader(input.upstreamRequest?.headers, ccrCodexApplyPatchBridgeHeader),
-    multiAgent: hasTruthyHeader(input.request?.headers, ccrCodexMultiAgentBridgeHeader) ||
-      hasTruthyHeader(input.upstreamRequest?.headers, ccrCodexMultiAgentBridgeHeader)
+    applyPatch: hasTruthyHeader(input.request?.headers, arCodexApplyPatchBridgeHeader) ||
+      hasTruthyHeader(input.upstreamRequest?.headers, arCodexApplyPatchBridgeHeader),
+    multiAgent: hasTruthyHeader(input.request?.headers, arCodexMultiAgentBridgeHeader) ||
+      hasTruthyHeader(input.upstreamRequest?.headers, arCodexMultiAgentBridgeHeader)
   };
 }
 
@@ -702,8 +702,8 @@ function finalizeOpenRouterDiscountSelection(input: GatewayResponseHookInput | G
   }
   finalizeOpenRouterDiscountProviderRouterSelection(requestId, {
     ok: upstreamResponseSuccessful(input.upstreamResponse, "statusCode" in input ? input.statusCode : undefined),
-    routedModel: readHeader(input.request?.headers, ccrRoutedModelHeader) ?? input.model,
-    usedCcrFallback: false
+    routedModel: readHeader(input.request?.headers, arRoutedModelHeader) ?? input.model,
+    usedArFallback: false
   });
 }
 
@@ -712,10 +712,10 @@ function readGatewayRequestId(input: {
   upstreamRequest?: { headers?: Record<string, string> };
 }): string | undefined {
   return stringValue(input.request?.id) ??
-    readHeader(input.request?.headers, ccrOpenRouterDiscountRequestIdHeader) ??
+    readHeader(input.request?.headers, arOpenRouterDiscountRequestIdHeader) ??
     readHeader(input.request?.headers, "x-request-id") ??
     readHeader(input.request?.headers, "x-client-request-id") ??
-    readHeader(input.upstreamRequest?.headers, ccrOpenRouterDiscountRequestIdHeader) ??
+    readHeader(input.upstreamRequest?.headers, arOpenRouterDiscountRequestIdHeader) ??
     readHeader(input.upstreamRequest?.headers, "x-request-id") ??
     readHeader(input.upstreamRequest?.headers, "x-client-request-id");
 }
@@ -749,14 +749,14 @@ async function applyOpenRouterDiscountTransform(
     ...(routeResponse.decision.sessionId ? { sessionId: routeResponse.decision.sessionId } : {}),
     tokenCount: routeResponse.decision.tokenCount,
     url
-  } satisfies CcrGatewayPluginRequestTransformInput, context);
+  } satisfies ArGatewayPluginRequestTransformInput, context);
   if (!result) {
     return undefined;
   }
   return {
     ...(result.body ? { body: result.body } : {}),
     headers: {
-      ...(requestId ? { [ccrOpenRouterDiscountRequestIdHeader]: requestId } : {}),
+      ...(requestId ? { [arOpenRouterDiscountRequestIdHeader]: requestId } : {}),
       ...(cleanStringHeaders(result.headers) ?? {})
     },
     responseHeaders: cleanStringHeaders(result.responseHeaders),
@@ -825,7 +825,7 @@ async function resolveApiKey(
 
 async function routeWithRouter(
   router: ClaudeCodeRouterPlugin,
-  payload: CcrRouterPluginRouteRequest
+  payload: ArRouterPluginRouteRequest
 ): Promise<{ body: Record<string, unknown>; decision: ClaudeCodeRouteDecision }> {
   const path = payload.path ?? requestPath(payload.url ?? "/");
   const adaptation = adaptRouteRequestBody(path, { ...payload.body });
@@ -844,18 +844,18 @@ async function routeWithRouter(
 
 function decisionHeaders(decision: ClaudeCodeRouteDecision): Record<string, string> {
   return {
-    [ccrRouteStageHeader]: "core-gateway-plugin",
-    [ccrRouteReasonHeader]: sanitizeHeaderValue(decision.reason),
-    [ccrRouteSourceHeader]: decision.source,
-    ...(decision.diagnostics.length > 0 ? { [ccrRouteDiagnosticsHeader]: String(decision.diagnostics.length) } : {}),
-    ...(decision.model ? { [ccrRoutedModelHeader]: sanitizeHeaderValue(decision.model) } : {}),
-    [ccrRouteFallbackHeader]: encodeCcrRouteFallbackHeader(decision.fallback),
-    ...(decision.sessionId ? { [ccrRouteSessionIdHeader]: sanitizeHeaderValue(decision.sessionId) } : {}),
-    [ccrRouteTokenCountHeader]: String(decision.tokenCount)
+    [arRouteStageHeader]: "core-gateway-plugin",
+    [arRouteReasonHeader]: sanitizeHeaderValue(decision.reason),
+    [arRouteSourceHeader]: decision.source,
+    ...(decision.diagnostics.length > 0 ? { [arRouteDiagnosticsHeader]: String(decision.diagnostics.length) } : {}),
+    ...(decision.model ? { [arRoutedModelHeader]: sanitizeHeaderValue(decision.model) } : {}),
+    [arRouteFallbackHeader]: encodeArRouteFallbackHeader(decision.fallback),
+    ...(decision.sessionId ? { [arRouteSessionIdHeader]: sanitizeHeaderValue(decision.sessionId) } : {}),
+    [arRouteTokenCountHeader]: String(decision.tokenCount)
   };
 }
 
-function readRouteRequestPayload(value: unknown): CcrRouterPluginRouteRequest | undefined {
+function readRouteRequestPayload(value: unknown): ArRouterPluginRouteRequest | undefined {
   if (!isRecord(value) || !isRecord(value.body)) {
     return undefined;
   }
@@ -897,7 +897,7 @@ function profileModelNotAllowedError(model: string): Record<string, unknown> {
   };
 }
 
-function resolveCcrGatewayRoute(
+function resolveArGatewayRoute(
   config: AppConfig,
   requestInput: GatewayRequestTransformInput
 ): GatewayRouteResolution | undefined {
@@ -910,7 +910,7 @@ function resolveCcrGatewayRoute(
   }
 
   const routedModel = normalizeRouteSelector(
-    readHeader(requestInput.request?.headers, ccrRoutedModelHeader) ??
+    readHeader(requestInput.request?.headers, arRoutedModelHeader) ??
       requestedModelFromBody(requestInput.requestBody, path, requestInput.model)
   );
   if (!routedModel) {
@@ -941,7 +941,7 @@ function resolveCcrGatewayRoute(
 
   return {
     model: resolved.model,
-    reason: readHeader(requestInput.request?.headers, ccrRouteReasonHeader),
+    reason: readHeader(requestInput.request?.headers, arRouteReasonHeader),
     requestBody,
     targetProviderName
   };
@@ -1037,11 +1037,11 @@ function isCoreGatewayRuntimeProviderName(
   return normalized === capabilityName || normalized.startsWith(`${capabilityName}::cred:`);
 }
 
-function stripUntrustedCcrRouteHeaders(headers: Record<string, HeaderValue> | undefined): void {
+function stripUntrustedArRouteHeaders(headers: Record<string, HeaderValue> | undefined): void {
   if (!headers) {
     return;
   }
-  for (const header of ccrRouteHeaderNames) {
+  for (const header of arRouteHeaderNames) {
     delete headers[header];
   }
 }
@@ -1150,7 +1150,7 @@ function readRemoteControlQueryAuthToken(url: string | undefined): string | unde
   }
   try {
     const parsed = new URL(url, "http://ccr.local");
-    if (parsed.pathname !== ccrRemoteControlPathPrefix && !parsed.pathname.startsWith(`${ccrRemoteControlPathPrefix}/`)) {
+    if (parsed.pathname !== arRemoteControlPathPrefix && !parsed.pathname.startsWith(`${arRemoteControlPathPrefix}/`)) {
       return undefined;
     }
     return parsed.searchParams.get("api_key")?.trim() || parsed.searchParams.get("key")?.trim() || undefined;
@@ -1221,7 +1221,7 @@ async function requestParentRuntimeConfigReload(
   if (typeof send !== "function") {
     return {
       ok: false,
-      error: "CCR runtime configuration reload requires the managed CCR parent process."
+      error: "AgentRouter runtime configuration reload requires the managed AgentRouter parent process."
     };
   }
   return new Promise((resolve) => {
@@ -1229,10 +1229,10 @@ async function requestParentRuntimeConfigReload(
       configRevision,
       forceRestart,
       protocolVersion: 1,
-      type: ccrRuntimeConfigReloadMessageType
+      type: arRuntimeConfigReloadMessageType
     }, (error: Error | null) => {
       if (error) {
-        resolve({ ok: false, error: `Failed to notify the CCR parent process: ${error.message}` });
+        resolve({ ok: false, error: `Failed to notify the AgentRouter parent process: ${error.message}` });
       } else {
         resolve({ ok: true });
       }

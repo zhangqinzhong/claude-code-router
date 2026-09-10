@@ -5,12 +5,12 @@
   "description": "Local Claude Code Router gateway with CLI and web management UI.",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/musistudio/claude-code-router.git"
+    "url": "git+ssh://git@github.com/zhangqinzhong/claude-code-router.git"
   },
   "bugs": {
-    "url": "https://github.com/musistudio/claude-code-router/issues"
+    "url": "https://github.com/zhangqinzhong/claude-code-router/issues"
   },
-  "homepage": "https://github.com/musistudio/claude-code-router#readme",
+  "homepage": "https://github.com/zhangqinzhong/claude-code-router#readme",
   "keywords": [
     "claude-code",
     "codex",

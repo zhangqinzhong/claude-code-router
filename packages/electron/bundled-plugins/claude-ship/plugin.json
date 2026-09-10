@@ -1,7 +1,7 @@
 {
   "id": "claude-ship",
   "name": "Claude Ship",
-  "description": "Opens Claude Ship in a dedicated Electron window and routes its local traffic through the CCR wrapper backend with configurable model routing.",
+  "description": "Opens Claude Ship in a dedicated Electron window and routes its local traffic through the AgentRouter wrapper backend with configurable model routing.",
   "module": "index.cjs",
   "surfaces": {
     "apps": true,
@@ -20,7 +20,7 @@
     {
       "id": "claude-ship",
       "name": "Claude Ship",
-      "description": "Open Claude Ship in a dedicated CCR Electron window.",
+      "description": "Open Claude Ship in a dedicated AgentRouter Electron window.",
       "icon": "rocket",
       "url": "https://claude.ai/claude-ship"
     }

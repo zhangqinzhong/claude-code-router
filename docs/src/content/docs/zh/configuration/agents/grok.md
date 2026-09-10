@@ -2,20 +2,20 @@
 title: Grok CLI 接入与配置
 pageTitle: Grok CLI
 eyebrow: 详细配置
-lead: "把 Grok CLI 接入 CCR。Grok CLI 仅支持 CLI，且始终限定为从 CCR 打开的会话。"
+lead: "把 Grok CLI 接入 AgentRouter。Grok CLI 仅支持 CLI，且始终限定为从 AgentRouter 打开的会话。"
 ---
 
 ## 适用场景
 
-Grok CLI 是 xAI 的编码 Agent。在 CCR 中它 **仅支持 CLI**，且始终使用 **仅从 CCR 打开时生效**。
+Grok CLI 是 xAI 的编码 Agent。在 AgentRouter 中它 **仅支持 CLI**，且始终使用 **仅从 AgentRouter 打开时生效**。
 
-当你想让 Grok CLI 走任意 CCR 供应商或 Fusion 模型，或运行多个独立的 Grok CLI 会话时，使用本页。
+当你想让 Grok CLI 走任意 AgentRouter 供应商或 Fusion 模型，或运行多个独立的 Grok CLI 会话时，使用本页。
 
-> 第一次使用 CCR？请先接入供应商和模型。参见[接入供应商](/guides/provider/)与 [Agent 配置总览](/configuration/profiles/)。
+> 第一次使用 AgentRouter？请先接入供应商和模型。参见[接入供应商](/guides/provider/)与 [Agent 配置总览](/configuration/profiles/)。
 
 ## 前置条件
 
-1. CCR Desktop 正在运行，且已配置至少一个供应商与模型。
+1. AgentRouter Desktop 正在运行，且已配置至少一个供应商与模型。
 2. 已安装 Grok CLI（`PATH` 中可用 `grok`）。
 3. 进入 **Agent 配置**，点击 **添加配置**。
 
@@ -29,11 +29,11 @@ Grok CLI 是 xAI 的编码 Agent。在 CCR 中它 **仅支持 CLI**，且始终�
 
 ## 配置项详解
 
-Grok CLI 固定为 **仅从 CCR 打开时生效** 和 **仅 CLI**，这两项不可编辑。可配置的字段为：
+Grok CLI 固定为 **仅从 AgentRouter 打开时生效** 和 **仅 CLI**，这两项不可编辑。可配置的字段为：
 
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
-| Agent | 选择 **Grok CLI** | 在 CCR 中创建 Grok CLI 启动入口。 |
+| Agent | 选择 **Grok CLI** | 在 AgentRouter 中创建 Grok CLI 启动入口。 |
 | 配置名称 | 自由文本，例如 `Grok - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | 模型 | 供应商模型或 Fusion 模型 | Grok CLI 启动时使用的模型。 |
@@ -53,7 +53,7 @@ CLI请执行：
 ccr "Grok - Work"
 ```
 
-进入 Grok CLI 后，使用 `/model` 在 CCR 返回的供应商与 Fusion 模型之间切换；切换后的请求仍经过 CCR。
+进入 Grok CLI 后，使用 `/model` 在 AgentRouter 返回的供应商与 Fusion 模型之间切换；切换后的请求仍经过 AgentRouter。
 
 ## 多实例
 
@@ -63,11 +63,11 @@ ccr "Grok - Work"
 
 1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `ccr` 命令。
 2. 在 Grok CLI 中发送一条消息，确认能正常回复。
-3. 打开 CCR 的 **请求日志**，确认请求经过了网关。
-4. 运行 `/model`，确认 CCR 暴露的模型出现。
+3. 打开 AgentRouter 的 **请求日志**，确认请求经过了网关。
+4. 运行 `/model`，确认 AgentRouter 暴露的模型出现。
 
 ## 常见问题
 
-- **Grok 用了 xAI 账号而非 CCR**：确认你是从 CCR 配置卡片打开 Grok。
-- **找不到 `grok`**：确认 Grok CLI 已安装，并且启动 CCR Desktop 的同一 shell 环境可以找到它。
-- **`/model` 看不到 CCR 模型**：确认 CCR 中已配置供应商与模型。
+- **Grok 用了 xAI 账号而非 AgentRouter**：确认你是从 AgentRouter 配置卡片打开 Grok。
+- **找不到 `grok`**：确认 Grok CLI 已安装，并且启动 AgentRouter Desktop 的同一 shell 环境可以找到它。
+- **`/model` 看不到 AgentRouter 模型**：确认 AgentRouter 中已配置供应商与模型。

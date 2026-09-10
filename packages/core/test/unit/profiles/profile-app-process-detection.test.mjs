@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   isProfileAppMainProcessCommandForTest,
   isProfileAppRunningWithProbeForTest
-} from "@ccr/core/profiles/launch-service.ts";
+} from "@agentrouter/core/profiles/launch-service.ts";
 
 const userDataDir = "/Users/example/.claude-code-router/profiles/codex/codex/.claude-code-router/codex-app-user-data/codex";
 

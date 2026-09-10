@@ -1,4 +1,4 @@
-import type { GatewayProviderProtocol } from "@ccr/core/contracts/app";
+import type { GatewayProviderProtocol } from "@agentrouter/core/contracts/app";
 
 export type UsageTokenAccounting = {
   cacheReadTokens?: number;

@@ -1,4 +1,4 @@
-import { defaultProviderAccountConfig, type ProviderPreset } from "@ccr/core/providers/presets/types";
+import { defaultProviderAccountConfig, type ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 export const infistarAiProviderPreset: ProviderPreset = {
   account: defaultProviderAccountConfig,
@@ -12,5 +12,5 @@ export const infistarAiProviderPreset: ProviderPreset = {
   ],
   id: "infistar-ai",
   name: "无限星河",
-  websiteUrl: "https://www.infistar.cc/register?aff=CCRCCR&ref_source=link"
+  websiteUrl: "https://www.infistar.cc/register"
 };

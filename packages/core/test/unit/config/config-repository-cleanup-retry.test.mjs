@@ -15,13 +15,13 @@ test("legacy SQLite cleanup retries even when an old completion marker exists", 
   const {
     APP_CONFIG_DB_FILE,
     LEGACY_API_KEYS_DB_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   const {
     ConfigRepository
-  } = await import("@ccr/core/config/config-repository.ts");
+  } = await import("@agentrouter/core/config/config-repository.ts");
   const {
     createBetterSqliteDatabase
-  } = await import("@ccr/core/storage/sqlite-native.ts");
+  } = await import("@agentrouter/core/storage/sqlite-native.ts");
 
   createTargetDatabaseWithOldCompletionMarker(createBetterSqliteDatabase, APP_CONFIG_DB_FILE);
   createApiKeyDatabase(createBetterSqliteDatabase, LEGACY_API_KEYS_DB_FILE);

@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
-import { loadAppConfig } from "@ccr/core/config/config";
-import { attachCodexRateLimitResetCreditDetails } from "@ccr/core/agents/local-providers/codex";
+import { loadAppConfig } from "@agentrouter/core/config/config";
+import { attachCodexRateLimitResetCreditDetails } from "@agentrouter/core/agents/local-providers/codex";
 import {
   codexDefaultBaseUrl,
   localAgentProviderApiKey,
@@ -14,15 +14,15 @@ import {
   resolveKimiAuth,
   readZcodeLocalProviderCredential,
   zcodeDefaultBaseUrl
-} from "@ccr/core/agents/local-providers/service";
-import { grokAccessTokenExpired } from "@ccr/core/agents/local-providers/grok";
-import { pluginService } from "@ccr/core/plugins/service";
-import { getUsageTotalsSince } from "@ccr/core/usage/store";
-import { findProviderPresetByBaseUrl, providerEndpointCanReceiveProviderApiKey } from "@ccr/core/providers/presets/index";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { normalizeProviderBaseUrl, providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
-import { fetchProviderAccountWebContentJson } from "@ccr/core/providers/account-webcontent";
-import { isGatewayProviderEnabled } from "@ccr/core/contracts/app";
+} from "@agentrouter/core/agents/local-providers/service";
+import { grokAccessTokenExpired } from "@agentrouter/core/agents/local-providers/grok";
+import { pluginService } from "@agentrouter/core/plugins/service";
+import { getUsageTotalsSince } from "@agentrouter/core/usage/store";
+import { findProviderPresetByBaseUrl, providerEndpointCanReceiveProviderApiKey } from "@agentrouter/core/providers/presets/index";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { normalizeProviderBaseUrl, providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
+import { fetchProviderAccountWebContentJson } from "@agentrouter/core/providers/account-webcontent";
+import { isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   GatewayProviderConfig,
@@ -54,13 +54,13 @@ import type {
   ProviderAccountWebContentJsonConnectorConfig,
   ProviderCredentialConfig,
   ProviderAccountStatus
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 export {
   setProviderAccountWebContentFetchHandler,
   type ProviderAccountWebContentFetchHandler,
   type ProviderAccountWebContentFetchRequest
-} from "@ccr/core/providers/account-webcontent";
+} from "@agentrouter/core/providers/account-webcontent";
 
 type CacheEntry = {
   expiresAt: number;
@@ -107,7 +107,7 @@ const minRefreshIntervalMs = 30 * 1000;
 const maxErrorRefreshIntervalMs = 60 * 1000;
 const maxStaleAccountSnapshotMs = 2 * 60 * 1000;
 const maxCacheEntries = 500;
-const standardAccountPaths = ["/.well-known/ccr/account", "/v1/account/limits"];
+const standardAccountPaths = ["/.well-known/ar/account", "/v1/account/limits"];
 const codexRateLimitResetCreditConsumeEndpoint = "https://chatgpt.com/backend-api/wham/rate-limit-reset-credits/consume";
 const codexOauthTokenEndpoint = "https://auth.openai.com/oauth/token";
 const codexOauthClientId = "app_EMoamEEZ73f0CkXaXp7hrann";
@@ -855,7 +855,7 @@ async function resolveLocalEstimateConnector(
   return {
     errors: [],
     meters: meters.filter((meter): meter is ProviderAccountMeter => Boolean(meter)),
-    message: "Local estimate from CCR usage history.",
+    message: "Local estimate from AgentRouter usage history.",
     source: "local-estimate"
   };
 }

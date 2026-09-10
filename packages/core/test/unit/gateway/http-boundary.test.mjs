@@ -14,7 +14,7 @@ import {
   shouldSendBody,
   stripLocalGatewayAuthHeaders,
   withCoreGatewayAuthHeader
-} from "@ccr/core/gateway/http/io.ts";
+} from "@agentrouter/core/gateway/http/io.ts";
 import {
   parseJsonObjectCached,
   parseJsonObjectSafe,
@@ -22,7 +22,7 @@ import {
   serializeJsonBody,
   serializeJsonBodyWithModel,
   takeJsonObject
-} from "@ccr/core/gateway/http/body.ts";
+} from "@agentrouter/core/gateway/http/body.ts";
 
 test("gateway client inference honors explicit, proxy, API-key, and user-agent identity", () => {
   assert.equal(inferGatewayClient(undefined, { "x-ar-client": "  Desktop App  " }), "Desktop App");
@@ -49,11 +49,11 @@ test("gateway authentication accepts supported headers and scopes query tokens t
   assert.equal(readHeader([" first ", "second"]), "first");
 
   assert.equal(
-    readRemoteControlQueryAuthToken({ url: "/__ccr/remote/status?api_key=query-token" }),
+    readRemoteControlQueryAuthToken({ url: "/__ar/remote/status?api_key=query-token" }),
     "query-token"
   );
   assert.equal(
-    readRemoteControlQueryAuthToken({ url: "/__ccr/remote/session?key=fallback-token" }),
+    readRemoteControlQueryAuthToken({ url: "/__ar/remote/session?key=fallback-token" }),
     "fallback-token"
   );
   assert.equal(readRemoteControlQueryAuthToken({ url: "/v1/messages?api_key=must-not-leak" }), undefined);

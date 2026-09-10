@@ -1,10 +1,10 @@
 import { timingSafeEqual } from "node:crypto";
 import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "node:http";
-import type { ApiKeyConfig, AppConfig } from "@ccr/core/contracts/app";
-import { loadPersistedApiKeys } from "@ccr/core/config/config-repository";
-import { formatError, readAuthToken, readRemoteControlQueryAuthToken, readRequestBody, sendJson } from "@ccr/core/gateway/http/io";
-import { estimateLimitUsage, limitRules, readWindowCounter } from "@ccr/core/gateway/limits/window-limiter";
-import type { ApiKeyAuthorizationResult, ApiKeyLimitRule, ApiKeyLimitUsage } from "@ccr/core/gateway/internal/shared";
+import type { ApiKeyConfig, AppConfig } from "@agentrouter/core/contracts/app";
+import { loadPersistedApiKeys } from "@agentrouter/core/config/config-repository";
+import { formatError, readAuthToken, readRemoteControlQueryAuthToken, readRequestBody, sendJson } from "@agentrouter/core/gateway/http/io";
+import { estimateLimitUsage, limitRules, readWindowCounter } from "@agentrouter/core/gateway/limits/window-limiter";
+import type { ApiKeyAuthorizationResult, ApiKeyLimitRule, ApiKeyLimitUsage } from "@agentrouter/core/gateway/internal/shared";
 
 export const claudeCodeWifTokenPath = "/v1/oauth/token";
 const claudeCodeWifGrantType = "urn:ietf:params:oauth:grant-type:jwt-bearer";
@@ -26,7 +26,7 @@ export async function authorize(
   if (apiKeys.length === 0) {
     sendJson(response, 403, {
       error: {
-        message: "CCR API key is not initialized. Save a gateway API key or restart CCR to generate one."
+        message: "AgentRouter API key is not initialized. Save a gateway API key or restart AgentRouter to generate one."
       }
     });
     return { ok: false };

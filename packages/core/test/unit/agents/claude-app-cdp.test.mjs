@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { shouldEnableClaudeAppDesignCdp } from "@ccr/core/agents/claude-app/cdp.ts";
+import { shouldEnableClaudeAppDesignCdp } from "@agentrouter/core/agents/claude-app/cdp.ts";
 
 test("Claude App Design CDP is opt-in even when Claude Design is configured", (t) => {
   const previous = process.env.AR_CLAUDE_APP_DESIGN_CDP;

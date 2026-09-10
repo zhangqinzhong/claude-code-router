@@ -2,9 +2,9 @@ import { execFile } from "node:child_process";
 import { Buffer } from "node:buffer";
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import type { ProxyRuntimeConfig, ProxySystemStatus } from "@ccr/core/contracts/app";
-import { DATADIR } from "@ccr/core/config/constants";
-import { windowsSystemCommand } from "@ccr/core/platform/windows-system";
+import type { ProxyRuntimeConfig, ProxySystemStatus } from "@agentrouter/core/contracts/app";
+import { DATADIR } from "@agentrouter/core/config/constants";
+import { windowsSystemCommand } from "@agentrouter/core/platform/windows-system";
 
 export type UpstreamProxyServer = {
   host: string;

@@ -111,8 +111,8 @@ function packageAliasPlugin() {
   return {
     name: "request-log-benchmark-alias",
     setup(build) {
-      build.onResolve({ filter: /^@ccr\/(cli|core|electron|ui)\// }, (resolveArgs) => {
-        const match = resolveArgs.path.match(/^@ccr\/(cli|core|electron|ui)\/(.+)$/);
+      build.onResolve({ filter: /^@agentrouter\/(cli|core|electron|ui)\// }, (resolveArgs) => {
+        const match = resolveArgs.path.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
         if (!match) return undefined;
         return { path: resolvePackageImport(roots[match[1]], match[2]) };
       });

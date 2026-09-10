@@ -4,8 +4,8 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { gatewayService } from "@ccr/core/gateway/service.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { gatewayService } from "@agentrouter/core/gateway/service.ts";
 import { waitForTcpListener } from "../../support/loopback-listener.mjs";
 
 test("gateway treats downstream client aborts as expected stream cleanup", async (t) => {

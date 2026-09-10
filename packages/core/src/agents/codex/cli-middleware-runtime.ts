@@ -160,7 +160,7 @@ async function runClaudeCodeCliWrapper(args) {
       return;
     }
     if (boolEnv("AR_REMOTE_SYNC_NOTIFY_INBOUND") || !process.env.AR_REMOTE_SYNC_NOTIFY_INBOUND) {
-      process.stdout.write("\n[CCR remote] " + text + "\n");
+      process.stdout.write("\n[AgentRouter remote] " + text + "\n");
     }
   });
   child.on("error", (error) => {
@@ -702,7 +702,7 @@ function cliThreadStartParams(params) {
   copyPermissionFields(source, output);
   copyCollaborationModelFields(source, output);
   if (output.threadSource === undefined) output.threadSource = "user";
-  if (output.serviceName === undefined) output.serviceName = "ccr_codex_cli_middleware";
+  if (output.serviceName === undefined) output.serviceName = "ar_codex_cli_middleware";
   if (output.ephemeral === undefined) output.ephemeral = false;
   if (output.personality === undefined) output.personality = "pragmatic";
   return output;
@@ -1019,7 +1019,7 @@ function customAppServerLineResponse(line) {
       requestId: value.requestId || value.id || uuid(),
       status: 501,
       ok: false,
-      body: JSON.stringify({ error: "Transcribe is not available in CCR middleware." }),
+      body: JSON.stringify({ error: "Transcribe is not available in AgentRouter middleware." }),
       headers: { "content-type": "application/json" }
     };
   }
@@ -1159,14 +1159,14 @@ class OpenCodeBotWorker {
     if (commandReply && typeof commandReply === "object" && commandReply.forwardText) {
       text = commandReply.forwardText;
     } else if (commandReply !== null) {
-      await bridge.sendReplyToEvent(event, commandReply, "ccr:opencode:command:" + eventId);
+      await bridge.sendReplyToEvent(event, commandReply, "ar:opencode:command:" + eventId);
       log("bot_gateway_command_replied", { eventId, agent: "opencode", textLen: commandReply.length });
       return;
     }
 
     const position = this.enqueueTurn(event, eventId, bridge, text);
     if (position > 0) {
-      await bridge.sendReplyToEvent(event, "Queued behind the active turn (position " + position + "). Use /session status or /session cancel.", "ccr:opencode:queued:" + eventId);
+      await bridge.sendReplyToEvent(event, "Queued behind the active turn (position " + position + "). Use /session status or /session cancel.", "ar:opencode:queued:" + eventId);
     }
   }
 
@@ -1194,7 +1194,7 @@ class OpenCodeBotWorker {
           await this.runTurn(job.event, job.eventId, job.bridge, job.text, key, state.active);
         } catch (error) {
           try {
-            await job.bridge.sendReplyToEvent(job.event, "Agent turn failed: " + conciseError(error), "ccr:opencode:error:" + job.eventId);
+            await job.bridge.sendReplyToEvent(job.event, "Agent turn failed: " + conciseError(error), "ar:opencode:error:" + job.eventId);
           } catch (replyError) {
             log("opencode_bot_turn_error_reply_failed", { eventId: job.eventId, error: formatError(error), replyError: formatError(replyError) });
           }
@@ -1248,7 +1248,7 @@ class OpenCodeBotWorker {
         streamedText = parsedEvent.text;
         if (Date.now() - lastStreamAt < 700) return;
         lastStreamAt = Date.now();
-        void bridge.sendStreamToEvent(event, streamId, streamedText, false, "ccr:opencode:stream:" + eventId).catch((error) => bridge.logError("stream_failed", error));
+        void bridge.sendStreamToEvent(event, streamId, streamedText, false, "ar:opencode:stream:" + eventId).catch((error) => bridge.logError("stream_failed", error));
       }
     });
     const parsed = parseOpenCodeRunOutput(result.stdout);
@@ -1269,11 +1269,11 @@ class OpenCodeBotWorker {
       ? "Agent turn failed: " + errorText
       : parsed.text || parsed.fallbackText || "OpenCode completed the turn without a text response.";
     if (bridge.config.streamReplies && !errorText) {
-      await bridge.sendStreamToEvent(event, streamId, responseText, true, "ccr:opencode:stream:" + eventId).catch(() => undefined);
+      await bridge.sendStreamToEvent(event, streamId, responseText, true, "ar:opencode:stream:" + eventId).catch(() => undefined);
     } else {
-      await bridge.sendReplyToEvent(event, responseText, "ccr:opencode:" + eventId + ":" + (sessionId || uuid()));
+      await bridge.sendReplyToEvent(event, responseText, "ar:opencode:" + eventId + ":" + (sessionId || uuid()));
     }
-    await sendBotTextArtifacts(event, bridge, responseText, cwd, "ccr:opencode:artifact:" + eventId);
+    await sendBotTextArtifacts(event, bridge, responseText, cwd, "ar:opencode:artifact:" + eventId);
     log("bot_gateway_inbound_replied", {
       eventId,
       agent: "opencode",
@@ -1700,7 +1700,7 @@ class CodexBotWorker extends OpenCodeBotWorker {
         const streamedText = Array.from(streamParts.values()).join("\n").trim();
         if (!streamedText || Date.now() - lastStreamAt < 700) return;
         lastStreamAt = Date.now();
-        void bridge.sendStreamToEvent(event, streamId, streamedText, false, "ccr:" + this.agent + ":stream:" + eventId).catch((error) => bridge.logError("stream_failed", error));
+        void bridge.sendStreamToEvent(event, streamId, streamedText, false, "ar:" + this.agent + ":stream:" + eventId).catch((error) => bridge.logError("stream_failed", error));
       }
     });
     const parsed = parseCodexBotOutput(result.stdout);
@@ -1719,11 +1719,11 @@ class CodexBotWorker extends OpenCodeBotWorker {
       ? "Agent turn failed: " + errorText
       : parsed.text || parsed.fallbackText || this.agentLabel + " completed the turn without a text response.";
     if (bridge.config.streamReplies && !errorText) {
-      await bridge.sendStreamToEvent(event, streamId, responseText, true, "ccr:" + this.agent + ":stream:" + eventId).catch(() => undefined);
+      await bridge.sendStreamToEvent(event, streamId, responseText, true, "ar:" + this.agent + ":stream:" + eventId).catch(() => undefined);
     } else {
-      await bridge.sendReplyToEvent(event, responseText, "ccr:" + this.agent + ":" + eventId + ":" + (sessionId || uuid()));
+      await bridge.sendReplyToEvent(event, responseText, "ar:" + this.agent + ":" + eventId + ":" + (sessionId || uuid()));
     }
-    await sendBotTextArtifacts(event, bridge, responseText, cwd, "ccr:" + this.agent + ":artifact:" + eventId);
+    await sendBotTextArtifacts(event, bridge, responseText, cwd, "ar:" + this.agent + ":artifact:" + eventId);
     log("bot_gateway_inbound_replied", { eventId, agent: this.agent, sessionId, exitCode: result.exitCode, textLen: responseText.length });
   }
 
@@ -2821,13 +2821,13 @@ class ClaudeCodeAppServer {
     if (commandReply && typeof commandReply === "object" && commandReply.forwardText) {
       text = commandReply.forwardText;
     } else if (commandReply !== null) {
-      await bridge.sendReplyToEvent(event, commandReply, "ccr:claude-code:command:" + eventId);
+      await bridge.sendReplyToEvent(event, commandReply, "ar:claude-code:command:" + eventId);
       log("bot_gateway_command_replied", { eventId, textLen: commandReply.length });
       return;
     }
     const position = this.enqueueBotTurn(event, eventId, bridge, text);
     if (position > 0) {
-      await bridge.sendReplyToEvent(event, "Queued behind the active turn (position " + position + "). Use /session status or /session cancel.", "ccr:claude-code:queued:" + eventId);
+      await bridge.sendReplyToEvent(event, "Queued behind the active turn (position " + position + "). Use /session status or /session cancel.", "ar:claude-code:queued:" + eventId);
     }
   }
 
@@ -2854,7 +2854,7 @@ class ClaudeCodeAppServer {
           await this.runBotTurn(job, state.active);
         } catch (error) {
           try {
-            await job.bridge.sendReplyToEvent(job.event, "Agent turn failed: " + conciseError(error), "ccr:claude-code:error:" + job.eventId);
+            await job.bridge.sendReplyToEvent(job.event, "Agent turn failed: " + conciseError(error), "ar:claude-code:error:" + job.eventId);
           } catch (replyError) {
             log("claude_bot_turn_error_reply_failed", { eventId: job.eventId, error: formatError(error), replyError: formatError(replyError) });
           }
@@ -2874,7 +2874,7 @@ class ClaudeCodeAppServer {
     this.expireIdleBotSession(key, bridge.config.sessionIdleMinutes);
     const thread = this.botThreadForEvent(event, text);
     const entry = this.loadBotSessionStore().conversations[key];
-    let input = await botInputForEvent(event, text, bridge.config, thread.claudeAppSessionFile ? path.join(path.dirname(thread.claudeAppSessionFile), thread.claudeAppSessionId || "", "uploads") : path.join(thread.cwd, ".ccr-bot-uploads"));
+    let input = await botInputForEvent(event, text, bridge.config, thread.claudeAppSessionFile ? path.join(path.dirname(thread.claudeAppSessionFile), thread.claudeAppSessionId || "", "uploads") : path.join(thread.cwd, ".ar-bot-uploads"));
     if (entry && Array.isArray(entry.memory) && entry.memory.length) {
       input = [{ type: "text", text: "Persistent session context:\n" + entry.memory.map((item) => "- " + item).join("\n") }, ...input];
     }
@@ -2901,11 +2901,11 @@ class ClaudeCodeAppServer {
       ? "Agent turn failed: " + completed.error
       : (completed.agentText || "").trim() || "Claude Code completed the turn without a text response.";
     if (bridge.config.streamReplies && !completed.error) {
-      await bridge.sendStreamToEvent(event, "claude-" + prepared.turn.id, responseText, true, "ccr:claude-code:stream:" + eventId).catch(() => undefined);
+      await bridge.sendStreamToEvent(event, "claude-" + prepared.turn.id, responseText, true, "ar:claude-code:stream:" + eventId).catch(() => undefined);
     } else {
-      await bridge.sendReplyToEvent(event, responseText, "ccr:claude-code:" + eventId + ":" + prepared.turn.id);
+      await bridge.sendReplyToEvent(event, responseText, "ar:claude-code:" + eventId + ":" + prepared.turn.id);
     }
-    await sendBotTurnArtifacts(event, bridge, completed, thread.cwd, "ccr:claude-code:artifact:" + eventId);
+    await sendBotTurnArtifacts(event, bridge, completed, thread.cwd, "ar:claude-code:artifact:" + eventId);
     log("bot_gateway_inbound_replied", { eventId, threadId: thread.id, turnId: prepared.turn.id, textLen: responseText.length });
   }
 
@@ -3911,7 +3911,7 @@ class ClaudeCodeAppServer {
         { label: "Session", value: shortSessionId(work.threadId) }
       ],
       actions
-    }, fallbackText, "ccr:claude-code:control:" + requestId);
+    }, fallbackText, "ar:claude-code:control:" + requestId);
     return promise;
   }
 }
@@ -4045,7 +4045,7 @@ function queueBotStreamUpdate(work, text) {
       work.botStream.id,
       value,
       false,
-      "ccr:claude-code:stream:" + work.botContext.eventId
+      "ar:claude-code:stream:" + work.botContext.eventId
     ).catch((error) => work.botContext.bridge.logError("stream_failed", error));
   };
   const delay = Math.max(0, 700 - (Date.now() - work.botStream.lastSentAt));
@@ -4561,7 +4561,7 @@ function codexModelItem(model, selectedModel) {
     providerName: provider,
     modelProvider: provider,
     displayName,
-    description: "CCR model",
+    description: "AgentRouter model",
     hidden: false,
     isDefault: model === selectedModel,
     contextWindow: 0,
@@ -4658,7 +4658,7 @@ function modelCatalogConfigItem(model, priority) {
   return {
     slug: model,
     display_name: model,
-    description: "CCR gateway model " + model,
+    description: "AgentRouter gateway model " + model,
     default_reasoning_level: null,
     supported_reasoning_levels: [],
     shell_type: "shell_command",
@@ -4952,7 +4952,7 @@ function createRemoteSyncClient(options) {
     cwd: options.cwd || process.cwd(),
     endpoint,
     mode: options.mode || "agent",
-    title: options.title || "CCR Remote",
+    title: options.title || "AgentRouter Remote",
     profileId: nonEmptyEnv("AR_REMOTE_SYNC_PROFILE_ID"),
     profileName: nonEmptyEnv("AR_REMOTE_SYNC_PROFILE_NAME")
   });
@@ -5019,7 +5019,7 @@ class RemoteSyncClient {
         return this.request("POST", "/sessions/" + encodeURIComponent(this.sessionId) + "/events", {
           direction: eventOptions.direction || "local",
           payload: payload || {},
-          source: "ccr-claude-wrapper",
+          source: "ar-claude-wrapper",
           text: eventOptions.text,
           type
         });
@@ -5075,7 +5075,7 @@ class RemoteSyncClient {
         signal: controller.signal
       });
       if (!response.ok) {
-        throw new Error("HTTP " + response.status + " from CCR remote sync");
+        throw new Error("HTTP " + response.status + " from AgentRouter remote sync");
       }
       return await response.json();
     } finally {
@@ -5189,7 +5189,7 @@ function readBotGatewayBridgeConfig() {
     platform,
     pollIntervalMs: numberEnv("AR_BOT_GATEWAY_POLL_INTERVAL_MS", 2000),
     profileId: nonEmptyEnv("AR_BOT_PROFILE_ID") || agentEnv(codexRuntimeAgent(), "PROFILE") || "default",
-    profileName: nonEmptyEnv("AR_BOT_PROFILE_NAME") || agentEnv(codexRuntimeAgent(), "WORKSPACE_NAME") || "CCR",
+    profileName: nonEmptyEnv("AR_BOT_PROFILE_NAME") || agentEnv(codexRuntimeAgent(), "WORKSPACE_NAME") || "AgentRouter",
     requestTimeoutMs: numberEnv("AR_BOT_GATEWAY_REQUEST_TIMEOUT_MS", 600000),
     sessionIdleMinutes: numberEnv("AR_BOT_GATEWAY_SESSION_IDLE_MINUTES", 0),
     shellEnabled: boolEnv("AR_BOT_GATEWAY_SHELL_ENABLED"),
@@ -5197,7 +5197,7 @@ function readBotGatewayBridgeConfig() {
     startupTimeoutMs: numberEnv("AR_BOT_GATEWAY_STARTUP_TIMEOUT_MS", 10000),
     stateDir: nonEmptyEnv("AR_BOT_GATEWAY_STATE_DIR") || nonEmptyEnv("CODEXL_BOT_GATEWAY_STATE_DIR") || nonEmptyEnv("BOT_GATEWAY_STATE_DIR") || "",
     streamReplies: boolEnv("AR_BOT_GATEWAY_STREAM_REPLIES"),
-    tenantId: nonEmptyEnv("AR_BOT_GATEWAY_TENANT_ID") || nonEmptyEnv("CODEXL_BOT_GATEWAY_TENANT_ID") || "ccr"
+    tenantId: nonEmptyEnv("AR_BOT_GATEWAY_TENANT_ID") || nonEmptyEnv("CODEXL_BOT_GATEWAY_TENANT_ID") || "ar"
   };
 }
 
@@ -5492,7 +5492,7 @@ class BotGatewayBridge {
         type: "text",
         text
       },
-      idempotencyKey: "ccr:handoff:" + this.config.profileId + ":" + stableBotKey(key)
+      idempotencyKey: "ar:handoff:" + this.config.profileId + ":" + stableBotKey(key)
     };
     await this.sendDurable(outbound, { kind: "handoff", sourceKey: key });
     this.rememberForwarded(key);
@@ -5559,7 +5559,7 @@ class BotGatewayBridge {
 
   outboundForEvent(event, conversationRef, intent, key) {
     return {
-      tenantId: eventString(event, "tenantId") || this.config.tenantId || "ccr",
+      tenantId: eventString(event, "tenantId") || this.config.tenantId || "ar",
       integrationId: eventString(event, "integrationId") || this.config.integrationId,
       conversationRef,
       intent,
@@ -5623,7 +5623,7 @@ class BotGatewayBridge {
   }
 
   resolveTenantId() {
-    return eventString(this.latestEvent, "tenantId") || this.config.tenantId || "ccr";
+    return eventString(this.latestEvent, "tenantId") || this.config.tenantId || "ar";
   }
 
   resolveIntegrationId() {
@@ -5992,7 +5992,7 @@ function evaluateHandoffPresence(config) {
     }
   }
   if (config.phoneWifiTargets.length || config.phoneBluetoothTargets.length) {
-    evidence.push("phone target checks are configured but not available in CCR middleware");
+    evidence.push("phone target checks are configured but not available in AgentRouter middleware");
   }
   return { away: reasons.length > 0, reasons, evidence };
 }
@@ -6114,7 +6114,7 @@ function writeJsonAtomic(file, value) {
 }
 
 function stableBotKey(value) {
-  return "ccr:" + crypto.createHash("sha256").update(String(value || "")).digest("hex").slice(0, 32);
+  return "ar:" + crypto.createHash("sha256").update(String(value || "")).digest("hex").slice(0, 32);
 }
 
 function splitBotMessage(value, maxChars) {
@@ -6153,10 +6153,10 @@ function localizeBotReply(text, language) {
   if (language !== "zh-CN") return text;
   const replacements = [
     ["Unknown Bot command. Send /project or /session to see available commands.", "未知的 Bot 命令。发送 /project 或 /session 查看可用命令。"],
-    ["CCR App project commands", "CCR App 项目命令"],
-    ["CCR App session commands", "CCR App 会话命令"],
-    ["Projects are managed separately with /project. The relay is available only while this App is opened through CCR.", "项目通过 /project 单独管理。只有通过 CCR 打开此 App 时，消息接力才在线。"],
-    ["Sessions are managed separately with /session. The relay is available only while this App is opened through CCR.", "会话通过 /session 单独管理。只有通过 CCR 打开此 App 时，消息接力才在线。"],
+    ["AgentRouter App project commands", "AgentRouter App 项目命令"],
+    ["AgentRouter App session commands", "AgentRouter App 会话命令"],
+    ["Projects are managed separately with /project. The relay is available only while this App is opened through AgentRouter.", "项目通过 /project 单独管理。只有通过 AgentRouter 打开此 App 时，消息接力才在线。"],
+    ["Sessions are managed separately with /session. The relay is available only while this App is opened through AgentRouter.", "会话通过 /session 单独管理。只有通过 AgentRouter 打开此 App 时，消息接力才在线。"],
     [" - list Agent projects", " - 列出 Agent 项目"],
     [" - search Agent projects", " - 搜索 Agent 项目"],
     [" - show the selected project", " - 显示当前项目"],
@@ -6278,20 +6278,20 @@ function parseBotCommand(text) {
 
 function projectCommandHelpText(agentName) {
   return [
-    "CCR App project commands (" + agentName + "):",
+    "AgentRouter App project commands (" + agentName + "):",
     "/project list - list Agent projects",
     "/project find <text> - search Agent projects",
     "/project current - show the selected project",
     "/project use <n> - select a listed project",
     "/project name <label> - set a Bot display label for the current project",
     "",
-    "Sessions are managed separately with /session. The relay is available only while this App is opened through CCR."
+    "Sessions are managed separately with /session. The relay is available only while this App is opened through AgentRouter."
   ].join("\n");
 }
 
 function sessionCommandHelpText(agentName) {
   return [
-    "CCR App session commands (" + agentName + "):",
+    "AgentRouter App session commands (" + agentName + "):",
     "/session list - list sessions in the current project",
     "/session find <text> - search sessions in the current project",
     "/session current - show the selected session",
@@ -6317,7 +6317,7 @@ function sessionCommandHelpText(agentName) {
     "/session doctor - show Bot connection and delivery diagnostics",
     "/session deliveries - show recent outbound delivery results",
     "",
-    "Projects are managed separately with /project. The relay is available only while this App is opened through CCR."
+    "Projects are managed separately with /project. The relay is available only while this App is opened through AgentRouter."
   ].join("\n");
 }
 
@@ -6515,7 +6515,7 @@ function createClaudeAppLocalAgentSession(text, projectDirectory) {
   const metadata = {
     ...claudeAppSessionTemplateFields(template && template.metadata),
     sessionId,
-    processName: "ccr-bot-" + sessionId.slice(6, 14),
+    processName: "ar-bot-" + sessionId.slice(6, 14),
     cliSessionId: "",
     cwd,
     userSelectedFolders: [cwd],
@@ -6524,7 +6524,7 @@ function createClaudeAppLocalAgentSession(text, projectDirectory) {
     model: nonEmptyEnv("AR_CLAUDE_CODE_MODEL") || nonEmptyEnv("CODEXL_CLAUDE_CODE_MODEL") || agentEnv(codexRuntimeAgent(), "MODEL") || DEFAULT_MODEL,
     isArchived: false,
     title,
-    vmProcessName: "ccr-bot-" + sessionId.slice(6, 14),
+    vmProcessName: "ar-bot-" + sessionId.slice(6, 14),
     hostLoopMode: true,
     initialMessage: text
   };

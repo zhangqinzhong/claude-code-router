@@ -2,7 +2,7 @@ import packageJson from "../../package.json";
 import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import type { IncomingHttpHeaders, IncomingMessage, ServerResponse } from "node:http";
 import { Readable, Transform } from "node:stream";
-import { CONTEXT_ARCHIVE_DB_FILE } from "@ccr/core/config/constants";
+import { CONTEXT_ARCHIVE_DB_FILE } from "@agentrouter/core/config/constants";
 import type {
   ApiKeyConfig,
   AppConfig,
@@ -10,7 +10,7 @@ import type {
   GatewayMcpServerConfig,
   GatewayProviderProtocol,
   ProfileConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   appendArchiveTask,
   appendCompactHandoffTask,
@@ -28,12 +28,12 @@ import {
   renderCodexCompactArchiveResponse,
   replayableArchiveProtocols,
   type ContextArchiveResponseMode
-} from "@ccr/core/gateway/context-archive/protocol";
+} from "@agentrouter/core/gateway/context-archive/protocol";
 import {
   ContextArchiveStore,
   type ArchiveRoute,
   type ArchiveSnapshot
-} from "@ccr/core/gateway/context-archive/store";
+} from "@agentrouter/core/gateway/context-archive/store";
 
 type JsonPrimitive = boolean | null | number | string;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -100,12 +100,12 @@ export type ContextArchiveAskOutput = {
 
 const protocolVersion = "2024-11-05";
 const maxMcpRequestBytes = 2 * 1024 * 1024;
-const defaultToolName = "ccr_history_ask";
+const defaultToolName = "ar_history_ask";
 const maxUpstreamErrorCharacters = 4000;
 const maxLineageReplayDepth = 32;
 
-export const CONTEXT_ARCHIVE_MCP_SERVER_NAME = "ccr-context-archive";
-export const CONTEXT_ARCHIVE_MCP_PATH = "/__ccr/context-archive/mcp";
+export const CONTEXT_ARCHIVE_MCP_SERVER_NAME = "ar-context-archive";
+export const CONTEXT_ARCHIVE_MCP_PATH = "/__ar/context-archive/mcp";
 
 export class ContextArchiveService {
   private readonly stores = new Map<string, ContextArchiveStore>();
@@ -604,7 +604,7 @@ export async function handleContextArchiveMcpRequest(
   executor?: ContextArchiveReplayExecutor
 ): Promise<void> {
   if (!contextArchiveMcpEnabled(config)) {
-    sendJson(response, 404, { error: { message: "CCR context archive MCP is disabled." } });
+    sendJson(response, 404, { error: { message: "AgentRouter context archive MCP is disabled." } });
     return;
   }
   if ((request.method || "GET").toUpperCase() !== "POST") {
@@ -694,8 +694,8 @@ function historyAskTool(config: ContextArchiveConfig): McpTool {
   return {
     description: [
       "Ask the archived pre-compaction agent lineage a natural-language history task.",
-      "CCR starts with the provided archive and automatically searches parent compact generations when the latest snapshot lacks the answer.",
-      "CCR loads immutable original requests and appends only this task before replaying the original model route.",
+      "AgentRouter starts with the provided archive and automatically searches parent compact generations when the latest snapshot lacks the answer.",
+      "AgentRouter loads immutable original requests and appends only this task before replaying the original model route.",
       "Use archive_id and session_token exactly as provided by the latest compact handoff."
     ].join(" "),
     inputSchema: {

@@ -93,14 +93,14 @@ jobs:
             --config build/electron-builder.local.cjs \
             --mac ${{ matrix.arch_flag }} \
             --publish never \
-            -c.mac.artifactName='Claude-Code-Router_${version}-mac-${{ matrix.release_label }}-${arch}.${ext}'
+            -c.mac.artifactName='AgentRouter_${version}-mac-${{ matrix.release_label }}-${arch}.${ext}'
 
       - name: Upload macOS release files
         uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact_name }}
           path: |
-            release-local/Claude-Code-Router_*-mac-${{ matrix.release_label }}-${{ matrix.arch }}.*
+            release-local/AgentRouter_*-mac-${{ matrix.release_label }}-${{ matrix.arch }}.*
             release-local/latest-mac.yml
           if-no-files-found: error
 
@@ -143,7 +143,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           shopt -s nullglob
-          assets=(macos-release-artifacts/*/Claude-Code-Router_*-mac-*.*)
+          assets=(macos-release-artifacts/*/AgentRouter_*-mac-*.*)
           if (( ${#assets[@]} == 0 )); then
             echo "No macOS release assets were found."
             exit 1

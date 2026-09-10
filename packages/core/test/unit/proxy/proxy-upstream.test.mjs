@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { Buffer } from "node:buffer";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import {
   customUpstreamProxyFromConfig,
   upstreamProxyAuthorizationHeader,
   upstreamProxyUrl
-} from "@ccr/core/proxy/system-proxy.ts";
+} from "@agentrouter/core/proxy/system-proxy.ts";
 
 test("custom upstream proxy config creates authenticated proxy URLs", () => {
   const config = createDefaultAppConfig();

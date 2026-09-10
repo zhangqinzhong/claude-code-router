@@ -12,7 +12,7 @@ import {
   CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV,
   enforceSingleEnabledGlobalProfilePerAgent,
   normalizeProfileScopeValue
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   BotGatewayRuntimeConfig,
@@ -25,7 +25,7 @@ import type {
   ProfileScope,
   ProfileSurface,
   VirtualModelProfileConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   fallbackConfig
 } from "./fallbacks";
@@ -35,7 +35,7 @@ import { virtualModelProfileModelNames } from "./providers";
 import { normalizeRouterRules } from "./routing";
 import { endpointFromHostPort } from "./services";
 import { keyValueRowsFromRecord, recordFromKeyValueRows, stringRecordValue, validateProfileEnvRows } from "./virtual-models";
-import { isGatewayProviderEnabled } from "@ccr/core/contracts/app";
+import { isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
 import type { AddProfileDraft, BotGatewayConfigDraft } from "./types";
 
 export function gatewayEndpointFromConfig(config: AppConfig): string {
@@ -1216,7 +1216,7 @@ export function profileSummaryItems(
   const managedCompactItems = profile.agent === "zcode"
     ? []
     : profile.managedCompact
-      ? [{ label: t("CCR managed compact"), value: t("Enabled") }]
+      ? [{ label: t("AgentRouter managed compact"), value: t("Enabled") }]
       : [];
   const routing = normalizeProfileRoutingConfig(profile.routing);
   const routingParts = [
@@ -1503,10 +1503,10 @@ export function normalizeUnknownProfileItem(value: Record<string, unknown>, inde
       ? value.managedCompact
       : typeof value.managed_compact === "boolean"
         ? value.managed_compact
-        : typeof value.ccrManagedCompact === "boolean"
-          ? value.ccrManagedCompact
-          : typeof value.ccr_managed_compact === "boolean"
-            ? value.ccr_managed_compact
+        : typeof value.arManagedCompact === "boolean"
+          ? value.arManagedCompact
+          : typeof value.ar_managed_compact === "boolean"
+            ? value.ar_managed_compact
             : typeof value.contextArchiveCompact === "boolean"
               ? value.contextArchiveCompact
               : typeof value.context_archive_compact === "boolean"
@@ -1622,7 +1622,7 @@ export function profileScopeLabel(scope: ProfileScope): string {
   if (scope === "custom") {
     return "Custom config path";
   }
-  return "Only opened from CCR";
+  return "Only opened from AgentRouter";
 }
 
 export function profileSurfaceLabel(surface: ProfileSurface): string {

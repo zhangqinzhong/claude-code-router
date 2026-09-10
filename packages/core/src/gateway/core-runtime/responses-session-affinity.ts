@@ -1,4 +1,4 @@
-import { isRecord, stringValue } from "@ccr/core/gateway/internal/value";
+import { isRecord, stringValue } from "@agentrouter/core/gateway/internal/value";
 
 type HeaderValue = string | string[] | undefined;
 

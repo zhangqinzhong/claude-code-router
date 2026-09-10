@@ -1,6 +1,6 @@
 # New API Account Plugin
 
-This CCR Desktop plugin registers a provider account connector for New API user subscription quota.
+This AgentRouter Desktop plugin registers a provider account connector for New API user subscription quota.
 
 It uses the built-in browser session so the refresh request can include the user's New API cookies:
 
@@ -47,4 +47,4 @@ Optional connector settings:
 ]
 ```
 
-The account must already be signed in inside CCR Desktop's built-in browser for the refresh endpoint to receive cookies.
+The account must already be signed in inside AgentRouter Desktop's built-in browser for the refresh endpoint to receive cookies.

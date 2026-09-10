@@ -1,7 +1,7 @@
 import packageJson from "../../package.json";
 import type { IncomingMessage, ServerResponse } from "node:http";
-import type { ProxyNetworkExchange } from "@ccr/core/contracts/app";
-import { proxyService } from "@ccr/core/proxy/service";
+import type { ProxyNetworkExchange } from "@agentrouter/core/contracts/app";
+import { proxyService } from "@agentrouter/core/proxy/service";
 
 type JsonPrimitive = boolean | null | number | string;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -45,7 +45,7 @@ const maxMcpRequestBytes = 2 * 1024 * 1024;
 
 const networkCaptureTools: McpTool[] = [
   {
-    description: "Return CCR proxy capture status, proxy status, capture limits, and current capture count.",
+    description: "Return AgentRouter proxy capture status, proxy status, capture limits, and current capture count.",
     inputSchema: objectSchema({}),
     name: "network_capture_status"
   },
@@ -93,7 +93,7 @@ export async function handleNetworkCaptureMcpRequest(request: IncomingMessage, r
 
   if (request.method === "GET") {
     sendJson(response, 200, {
-      name: "ccr-network-capture",
+      name: "ar-network-capture",
       protocol: "mcp",
       transport: "streamable-http",
       endpoint: "/mcp"
@@ -149,8 +149,8 @@ async function handleJsonRpcRequest(payload: unknown): Promise<JsonRpcResponse |
           },
           protocolVersion,
           serverInfo: {
-            name: "ccr-network-capture",
-            title: "CCR Network Capture",
+            name: "ar-network-capture",
+            title: "AgentRouter Network Capture",
             version: appVersion()
           }
         });

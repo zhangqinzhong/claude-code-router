@@ -1,4 +1,4 @@
-import { parseJsonObject } from "@ccr/core/gateway/http/io";
+import { parseJsonObject } from "@agentrouter/core/gateway/http/io";
 
 type ParsedJsonObjectCacheEntry =
   | { error: unknown }

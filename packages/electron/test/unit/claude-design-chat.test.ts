@@ -100,7 +100,7 @@ test("Claude Design keeps a clarification-friendly fallback for simple requests"
   const { forwarded } = await chat(t, { messages, system: "", tools: [] });
   assert.equal(forwarded.messages.length, 2);
   assert.equal(forwarded.messages[0].role, "system");
-  assert.match(forwarded.messages[0].content, /local CCR project workspace/);
+  assert.match(forwarded.messages[0].content, /local AgentRouter project workspace/);
   assert.match(forwarded.messages[0].content, /ask the user before creating files/i);
   assert.doesNotMatch(forwarded.messages[0].content, /Do not only ask clarifying questions/);
   assert.deepEqual(forwarded.messages[1], messages[0]);

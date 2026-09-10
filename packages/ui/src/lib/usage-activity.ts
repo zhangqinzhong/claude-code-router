@@ -1,4 +1,4 @@
-import type { UsageSeriesPoint, UsageStatsRange } from "@ccr/core/contracts/app";
+import type { UsageSeriesPoint, UsageStatsRange } from "@agentrouter/core/contracts/app";
 
 export type TokenActivityCell = {
   date: Date;

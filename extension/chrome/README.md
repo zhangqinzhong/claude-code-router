@@ -1,6 +1,6 @@
-# CCR Login Import Chrome Extension
+# AgentRouter Login Import Chrome Extension
 
-This unpacked Chrome extension imports cookies and localStorage for explicitly selected domains into CCR's in-app browser.
+This unpacked Chrome extension imports cookies and localStorage for explicitly selected domains into AgentRouter's in-app browser.
 
 ## Development install
 
@@ -14,11 +14,11 @@ The confirmation-page flow uses the site access declared in `manifest.json`; it 
 
 ## Flow
 
-1. An agent calls CCR's Chrome login import browser tool, or the user clicks the key button in CCR's in-app browser.
-2. CCR opens a one-time confirmation page in the system browser.
+1. An agent calls AgentRouter's Chrome login import browser tool, or the user clicks the key button in AgentRouter's in-app browser.
+2. AgentRouter opens a one-time confirmation page in the system browser.
 3. If the confirmation page opens in Chrome with this extension installed, review the requested domains and click **Confirm and Import**.
-4. If the confirmation page opens in another browser, copy the **Extension import URL** from CCR, open the CCR Login Import extension popup in Chrome, paste that URL, and click **Import Selected Domains**.
+4. If the confirmation page opens in another browser, copy the **Extension import URL** from AgentRouter, open the AgentRouter Login Import extension popup in Chrome, paste that URL, and click **Import Selected Domains**.
 
-The extension reads only the domains listed in the CCR job. It does not enumerate all Chrome cookies.
+The extension reads only the domains listed in the AgentRouter job. It does not enumerate all Chrome cookies.
 
 For localStorage, the extension temporarily opens non-active tabs for the selected origins, reads `localStorage`, then closes those tabs.

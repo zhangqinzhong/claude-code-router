@@ -4,7 +4,7 @@ import type {
   BotGatewayQrWindowCloseResult,
   BotGatewayQrWindowOpenRequest,
   BotGatewayQrWindowOpenResult
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 const qrWindows = new Map<string, BrowserWindow>();
 

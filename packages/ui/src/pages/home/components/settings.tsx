@@ -1138,7 +1138,7 @@ function DataSettingsSection({
     if (exporting) {
       return;
     }
-    if (!window.ccr?.exportData) {
+    if (!window.agentrouter?.exportData) {
       setError(t("Data export is only available in the Electron app."));
       return;
     }
@@ -1146,7 +1146,7 @@ function DataSettingsSection({
     setError("");
     setExportedFile("");
     try {
-      const result = await window.ccr.exportData();
+      const result = await window.agentrouter.exportData();
       if (!result.canceled) {
         setExportedFile(result.file || "");
       }
@@ -1537,7 +1537,7 @@ function BotConfigDialog({
     }
     qrSessionRef.current = "";
     await closeQrWindow(normalized);
-    await window.ccr?.cancelBotGatewayQrLogin?.({ sessionId: normalized }).catch(() => undefined);
+    await window.agentrouter?.cancelBotGatewayQrLogin?.({ sessionId: normalized }).catch(() => undefined);
   }
 
   async function discardQrSession(sessionId: string) {
@@ -1545,8 +1545,8 @@ function BotConfigDialog({
     if (!normalized) {
       return;
     }
-    await window.ccr?.closeBotGatewayQrWindow?.({ sessionId: normalized }).catch(() => undefined);
-    await window.ccr?.cancelBotGatewayQrLogin?.({ sessionId: normalized }).catch(() => undefined);
+    await window.agentrouter?.closeBotGatewayQrWindow?.({ sessionId: normalized }).catch(() => undefined);
+    await window.agentrouter?.cancelBotGatewayQrLogin?.({ sessionId: normalized }).catch(() => undefined);
   }
 
   async function closeQrWindow(sessionId = qrSessionRef.current) {
@@ -1554,7 +1554,7 @@ function BotConfigDialog({
     if (!normalized) {
       return;
     }
-    await window.ccr?.closeBotGatewayQrWindow?.({ sessionId: normalized }).catch(() => undefined);
+    await window.agentrouter?.closeBotGatewayQrWindow?.({ sessionId: normalized }).catch(() => undefined);
   }
 
   async function openQrWindow(
@@ -1565,10 +1565,10 @@ function BotConfigDialog({
     if (display.kind !== "window") {
       return undefined;
     }
-    if (!window.ccr?.openBotGatewayQrWindow) {
+    if (!window.agentrouter?.openBotGatewayQrWindow) {
       throw new Error(t("QR window is available in the Electron app."));
     }
-    return window.ccr.openBotGatewayQrWindow({
+    return window.agentrouter.openBotGatewayQrWindow({
       scanTimeoutMs: 5 * 60 * 1000,
       sessionId: start.sessionId,
       title: `${t("Weixin Login")} - ${draft.name.trim() || t("Bot")}`,
@@ -1639,7 +1639,7 @@ function BotConfigDialog({
     force: boolean,
     generation: number
   ): Promise<BotGatewayQrLoginStartResult> {
-    if (!window.ccr?.startBotGatewayQrLogin) {
+    if (!window.agentrouter?.startBotGatewayQrLogin) {
       throw new Error(t("QR login is available in the Electron app."));
     }
 
@@ -1655,7 +1655,7 @@ function BotConfigDialog({
     if (!qrMountedRef.current || generation !== qrStartGenerationRef.current) {
       throw new Error(t("QR login canceled."));
     }
-    const start = await window.ccr.startBotGatewayQrLogin({ config: savedConfig, force });
+    const start = await window.agentrouter.startBotGatewayQrLogin({ config: savedConfig, force });
     if (!qrMountedRef.current || generation !== qrStartGenerationRef.current) {
       if (qrSessionRef.current !== start.sessionId) {
         await discardQrSession(start.sessionId);
@@ -1680,11 +1680,11 @@ function BotConfigDialog({
     sessionId: string,
     generation: number
   ): Promise<BotGatewayQrLoginWaitResult> {
-    if (!window.ccr?.waitBotGatewayQrLogin) {
+    if (!window.agentrouter?.waitBotGatewayQrLogin) {
       throw new Error(t("QR login is available in the Electron app."));
     }
     while (qrMountedRef.current && generation === qrStartGenerationRef.current) {
-      const wait = await window.ccr.waitBotGatewayQrLogin({ sessionId, timeoutMs: 5000 });
+      const wait = await window.agentrouter.waitBotGatewayQrLogin({ sessionId, timeoutMs: 5000 });
       if (!qrMountedRef.current || generation !== qrStartGenerationRef.current) {
         throw new Error(t("QR login canceled."));
       }
@@ -1715,8 +1715,8 @@ function BotConfigDialog({
       qrStartGenerationRef.current += 1;
       const sessionId = qrSessionRef.current;
       if (sessionId) {
-        void window.ccr?.closeBotGatewayQrWindow?.({ sessionId }).catch(() => undefined);
-        void window.ccr?.cancelBotGatewayQrLogin?.({ sessionId }).catch(() => undefined);
+        void window.agentrouter?.closeBotGatewayQrWindow?.({ sessionId }).catch(() => undefined);
+        void window.agentrouter?.cancelBotGatewayQrLogin?.({ sessionId }).catch(() => undefined);
       }
     };
   }, []);
@@ -2686,7 +2686,7 @@ function TrayWindowPreview({
           <TrayWindowHeaderIcon />
           <div className="min-w-0">
             <div className="truncate text-[12px] font-semibold text-slate-50">88.4k {trayPreviewText(copy, "tokens", "tokens")}</div>
-            <div className="truncate text-[10px] font-medium text-slate-400">CCR</div>
+            <div className="truncate text-[10px] font-medium text-slate-400">AgentRouter</div>
           </div>
         </div>
         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-white/10 bg-white/[.04] text-slate-300" aria-hidden="true">

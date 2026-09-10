@@ -1,11 +1,11 @@
 import { gunzipSync } from "node:zlib";
 import type { Event as ElectronEvent, Session, WebContents } from "electron";
-import { loadPersistedApiKeys } from "@ccr/core/config/config-repository";
+import { loadPersistedApiKeys } from "@agentrouter/core/config/config-repository";
 import {
   CLAUDE_DESIGN_PLUGIN_ID,
   CLAUDE_SHIP_PLUGIN_ID,
   type AppConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 export type ClaudeDesignWindowCdpOptions = {
   backendUrl: string;

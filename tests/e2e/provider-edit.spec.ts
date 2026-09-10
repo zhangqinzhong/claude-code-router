@@ -39,13 +39,13 @@ test.afterAll(async () => {
 test("keeps config-only provider fields when the provider is saved from the dialog", async ({ page }) => {
   const current = requireRuntime();
 
-  await page.goto(`${current.baseUrl}/?ccr_web_token=${current.token}`);
+  await page.goto(`${current.baseUrl}/?ar_web_token=${current.token}`);
   await waitForBridge(page);
   await page.evaluate(async (provider) => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     config.Providers = [provider];
-    await window.ccr!.saveConfig(config);
-    await window.ccr!.setOnboardingFinished?.();
+    await window.agentrouter!.saveConfig(config);
+    await window.agentrouter!.setOnboardingFinished?.();
   }, configOnlyProvider);
 
   await page.reload();
@@ -61,7 +61,7 @@ test("keeps config-only provider fields when the provider is saved from the dial
   await expect(saveButton).toBeHidden();
 
   await expect.poll(async () => page.evaluate(async () => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     const provider = config.Providers[0];
     return {
       extraBody: provider?.extraBody,
@@ -78,13 +78,13 @@ test("keeps config-only provider fields when the provider is saved from the dial
 test("edits extraBody from the advanced settings section", async ({ page }) => {
   const current = requireRuntime();
 
-  await page.goto(`${current.baseUrl}/?ccr_web_token=${current.token}`);
+  await page.goto(`${current.baseUrl}/?ar_web_token=${current.token}`);
   await waitForBridge(page);
   await page.evaluate(async (provider) => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     config.Providers = [provider];
-    await window.ccr!.saveConfig(config);
-    await window.ccr!.setOnboardingFinished?.();
+    await window.agentrouter!.saveConfig(config);
+    await window.agentrouter!.setOnboardingFinished?.();
   }, configOnlyProvider);
 
   await page.reload();
@@ -104,7 +104,7 @@ test("edits extraBody from the advanced settings section", async ({ page }) => {
   await expect(saveButton).toBeHidden();
 
   await expect.poll(async () => page.evaluate(async () => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     return config.Providers[0]?.extraBody;
   })).toEqual({ default: { reasoning_effort: "max" } });
 });
@@ -112,13 +112,13 @@ test("edits extraBody from the advanced settings section", async ({ page }) => {
 test("refuses to save a malformed advanced JSON box", async ({ page }) => {
   const current = requireRuntime();
 
-  await page.goto(`${current.baseUrl}/?ccr_web_token=${current.token}`);
+  await page.goto(`${current.baseUrl}/?ar_web_token=${current.token}`);
   await waitForBridge(page);
   await page.evaluate(async (provider) => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     config.Providers = [provider];
-    await window.ccr!.saveConfig(config);
-    await window.ccr!.setOnboardingFinished?.();
+    await window.agentrouter!.saveConfig(config);
+    await window.agentrouter!.setOnboardingFinished?.();
   }, configOnlyProvider);
 
   await page.reload();
@@ -132,13 +132,13 @@ test("refuses to save a malformed advanced JSON box", async ({ page }) => {
 
   await expect(page.getByText(/Extra request body JSON is invalid|附加请求体不是合法的 JSON/)).toBeVisible();
   await expect.poll(async () => page.evaluate(async () => {
-    const config = await window.ccr!.getConfig();
+    const config = await window.agentrouter!.getConfig();
     return config.Providers[0]?.extraBody;
   })).toEqual(configOnlyProvider.extraBody);
 });
 
 async function waitForBridge(page: Page): Promise<void> {
-  await page.waitForFunction(() => Boolean(window.ccr?.getConfig), undefined, { timeout: 20_000 });
+  await page.waitForFunction(() => Boolean(window.agentrouter?.getConfig), undefined, { timeout: 20_000 });
 }
 
 function requireRuntime(): CliWebRuntime {

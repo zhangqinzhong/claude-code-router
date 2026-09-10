@@ -1,16 +1,16 @@
-import type { AppConfig } from "@ccr/core/contracts/app";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
 import {
   buildCodexModelCatalog,
   type CodexModelCatalog,
   type CodexModelCatalogOptions
-} from "@ccr/core/agents/codex/model-catalog";
+} from "@agentrouter/core/agents/codex/model-catalog";
 import {
   findModelCatalogEntry,
   type ModelCatalogEntry,
   modelCatalogMaxInputTokens
-} from "@ccr/core/gateway/model-catalog";
-import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution";
+} from "@agentrouter/core/gateway/model-catalog";
+import { modelRegistryForConfig } from "@agentrouter/core/routing/model-registry";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 
 type ZcodeModelCatalogConfig = Partial<Pick<
   AppConfig,

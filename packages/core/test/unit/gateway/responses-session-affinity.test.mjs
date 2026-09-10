@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { applyResponsesSessionAffinity, isCodexResponsesUpstream, resolveResponsesSessionKey } from "@ccr/core/gateway/core-runtime/responses-session-affinity.ts";
-import { createGatewayPlugin } from "@ccr/core/gateway/core-runtime/upstream-header-sanitizer.ts";
+import { applyResponsesSessionAffinity, isCodexResponsesUpstream, resolveResponsesSessionKey } from "@agentrouter/core/gateway/core-runtime/responses-session-affinity.ts";
+import { createGatewayPlugin } from "@agentrouter/core/gateway/core-runtime/upstream-header-sanitizer.ts";
 
 function responsesInput(overrides = {}) {
   return {
@@ -166,7 +166,7 @@ test("outbound metadata supplied by the caller is preserved", () => {
 
 test("gateway boundary plugin registers the session affinity hook", async () => {
   const hooks = createGatewayPlugin().providerHooks;
-  const affinityHook = hooks.find((hook) => hook.key === "ccr-responses-session-affinity");
+  const affinityHook = hooks.find((hook) => hook.key === "ar-responses-session-affinity");
   assert.ok(affinityHook);
 
   const input = responsesInput();

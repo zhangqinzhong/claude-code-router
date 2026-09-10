@@ -3,7 +3,7 @@ import {
   parseJsonObjectSafe,
   serializeJsonBody,
   takeJsonObject
-} from "@ccr/core/gateway/http/body.ts";
+} from "@agentrouter/core/gateway/http/body.ts";
 
 const iterations = positiveInteger(process.env.AR_REQUEST_BODY_BENCHMARK_ITERATIONS, 200);
 const parsePasses = positiveInteger(process.env.AR_REQUEST_BODY_BENCHMARK_PARSE_PASSES, 7);

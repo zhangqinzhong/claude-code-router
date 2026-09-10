@@ -6,11 +6,11 @@ import path from "node:path";
 import test from "node:test";
 import { promisify } from "node:util";
 import { getHeapStatistics } from "node:v8";
-import { createSseErrorDetector, RequestLogStore } from "@ccr/core/observability/request-log-store.ts";
-import { requestLogRequestedModel, requestLogResponseModel } from "@ccr/core/observability/request-log-model.ts";
-import { resolveStreamRequestLogOutcome } from "@ccr/core/gateway/internal/shared.ts";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace.ts";
-import { createBetterSqliteDatabase } from "@ccr/core/storage/sqlite-native.ts";
+import { createSseErrorDetector, RequestLogStore } from "@agentrouter/core/observability/request-log-store.ts";
+import { requestLogRequestedModel, requestLogResponseModel } from "@agentrouter/core/observability/request-log-model.ts";
+import { resolveStreamRequestLogOutcome } from "@agentrouter/core/gateway/internal/shared.ts";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace.ts";
+import { createBetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native.ts";
 
 const execFileAsync = promisify(execFile);
 const isBoundedHeapWorker = process.env.AR_REQUEST_LOG_BOUNDED_HEAP_WORKER === "1";
@@ -37,7 +37,7 @@ test("request log model summaries support routed paths and streamed responses", 
 });
 
 test("RequestLogStore backfills model summaries when upgrading an existing database", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-model-migration-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-model-migration-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   let store;
   try {
@@ -79,7 +79,7 @@ test("RequestLogStore backfills model summaries when upgrading an existing datab
 });
 
 test("RequestLogStore resumes interrupted gateway migrations across bounded batches", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-paged-migration-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-paged-migration-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   let store;
   try {
@@ -265,7 +265,7 @@ async function recordLargeAgentRequests(store, dbFile, { paddingBytes, requestCo
 }
 
 test("RequestLogStore keeps list rows lightweight and detail rows complete", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -319,7 +319,7 @@ test("RequestLogStore keeps list rows lightweight and detail rows complete", asy
 });
 
 test("RequestLogStore keeps large request bodies in sidecar storage and reads them by chunk", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-sidecar-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-sidecar-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -417,13 +417,13 @@ test("RequestLogStore keeps large request bodies in sidecar storage and reads th
 });
 
 test("RequestLogStore stores decoded Claude App route models for observability", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-claude-app-model-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-claude-app-model-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
     const sessionId = "claude-app-hex-session";
     const routedModel = "Provider/real-model";
-    const encodedModel = `anthropic/claude-ccr-h${Buffer.from(routedModel, "utf8").toString("hex")}`;
+    const encodedModel = `anthropic/claude-ar-h${Buffer.from(routedModel, "utf8").toString("hex")}`;
     const startedAt = new Date().toISOString();
     const responseBodyText = [
       "event: message_start",
@@ -498,7 +498,7 @@ test("RequestLogStore stores decoded Claude App route models for observability",
 });
 
 test("RequestLogStore persists actively reported route hops without synthesizing Core diffs", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-route-trace-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-route-trace-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -568,8 +568,8 @@ test("RequestLogStore persists actively reported route hops without synthesizing
   }
 });
 
-test("RequestLogStore redacts secrets and records CCR metadata", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-metadata-test-"));
+test("RequestLogStore redacts secrets and records AgentRouter metadata", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-metadata-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -641,7 +641,7 @@ test("RequestLogStore redacts secrets and records CCR metadata", async () => {
 });
 
 test("RequestLogStore marks interrupted successful-status streams as errors", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-interrupted-stream-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-interrupted-stream-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -682,7 +682,7 @@ test("RequestLogStore marks interrupted successful-status streams as errors", as
 });
 
 test("RequestLogStore keeps an authoritative gateway failure when a later raw trace reports HTTP 200", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-raw-authority-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-raw-authority-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   const startedAt = new Date().toISOString();
   try {
@@ -726,7 +726,7 @@ test("RequestLogStore keeps an authoritative gateway failure when a later raw tr
 });
 
 test("RequestLogStore keeps an errorless gateway HTTP 500 authoritative over raw HTTP 200", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-status-authority-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-status-authority-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   const startedAt = new Date().toISOString();
   try {
@@ -763,7 +763,7 @@ test("RequestLogStore keeps an errorless gateway HTTP 500 authoritative over raw
 });
 
 test("RequestLogStore consumes fallback bundles by unique bundle id and only final attempt mutates outcome", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-fallback-bundles-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-fallback-bundles-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const store = new RequestLogStore(dbFile);
   const startedAt = new Date().toISOString();
@@ -875,7 +875,7 @@ test("RequestLogStore consumes fallback bundles by unique bundle id and only fin
 });
 
 test("RequestLogStore detects raw errors before applying errors-only body suppression", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-raw-error-policy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-raw-error-policy-test-"));
   const store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
   const startedAt = new Date().toISOString();
   try {
@@ -1022,7 +1022,7 @@ test("stream request log outcomes preserve completed client closures and mark re
 });
 
 test("RequestLogStore applies raw trace updates to existing request logs", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-raw-trace-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-raw-trace-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1092,7 +1092,7 @@ test("RequestLogStore applies raw trace updates to existing request logs", async
 });
 
 test("RequestLogStore analyzes agent sessions and exposes trace payloads", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-agent-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-agent-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1219,7 +1219,7 @@ test("RequestLogStore analyzes agent sessions and exposes trace payloads", async
 });
 
 test("RequestLogStore pairs tool results without stable call ids", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-tool-result-fallback-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-tool-result-fallback-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1299,7 +1299,7 @@ test("RequestLogStore pairs tool results without stable call ids", async () => {
 });
 
 test("RequestLogStore reads sidecar bodies when pairing session tool results", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-tool-result-sidecar-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-tool-result-sidecar-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1386,7 +1386,7 @@ test("RequestLogStore reads sidecar bodies when pairing session tool results", a
 });
 
 test("RequestLogStore extracts assistant text from nested responses completion payloads", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-agent-response-text-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-agent-response-text-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1435,7 +1435,7 @@ test("RequestLogStore extracts assistant text from nested responses completion p
 });
 
 test("RequestLogStore ignores subagent markers in tool definitions and placeholder text", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-subagent-detection-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-subagent-detection-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1473,11 +1473,11 @@ test("RequestLogStore ignores subagent markers in tool definitions and placehold
       body: {
         messages: [{ content: "normal main-agent request", role: "user" }],
         tools: [{
-          description: "Use <CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL> when spawning an agent.",
+          description: "Use <AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL> when spawning an agent.",
           input_schema: {
             properties: {
               prompt: {
-                description: "Start with <CCR-SUBAGENT-MODEL>Provider/model</CCR-SUBAGENT-MODEL>.",
+                description: "Start with <AR-SUBAGENT-MODEL>Provider/model</AR-SUBAGENT-MODEL>.",
                 type: "string"
               }
             },
@@ -1492,7 +1492,7 @@ test("RequestLogStore ignores subagent markers in tool definitions and placehold
     await recordClaudeRequest({
       body: {
         messages: [{ content: "normal request", role: "user" }],
-        system: "Example: <CCR-SUBAGENT-MODEL>Provider/model</CCR-SUBAGENT-MODEL>"
+        system: "Example: <AR-SUBAGENT-MODEL>Provider/model</AR-SUBAGENT-MODEL>"
       },
       offsetMs: 1000,
       sessionId: "placeholder-session"
@@ -1500,7 +1500,7 @@ test("RequestLogStore ignores subagent markers in tool definitions and placehold
     await recordClaudeRequest({
       body: {
         messages: [{
-          content: "<CCR-SUBAGENT-MODEL>Provider/claude-opus</CCR-SUBAGENT-MODEL>\nInspect the repository.",
+          content: "<AR-SUBAGENT-MODEL>Provider/claude-opus</AR-SUBAGENT-MODEL>\nInspect the repository.",
           role: "user"
         }]
       },
@@ -1538,7 +1538,7 @@ test("RequestLogStore ignores subagent markers in tool definitions and placehold
 });
 
 test("RequestLogStore distinguishes partial session failures from failed sessions", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-agent-status-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-agent-status-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1622,7 +1622,7 @@ test("RequestLogStore distinguishes partial session failures from failed session
 });
 
 test("RequestLogStore agent analysis cache ratio denominator includes cache tokens when total tokens omit cache", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-cache-ratio-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-cache-ratio-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1679,7 +1679,7 @@ test("RequestLogStore analyzes large bodies without dropping agent metadata", {
   skip: isBoundedHeapWorker,
   timeout: 30000
 }, async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-large-analysis-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-large-analysis-test-"));
   let store;
   try {
     const dbFile = path.join(dir, "request-logs.sqlite");
@@ -1707,7 +1707,7 @@ test("RequestLogStore streams more body text than the bounded worker heap", {
   skip: !isBoundedHeapWorker,
   timeout: 30000
 }, async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-bounded-heap-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-bounded-heap-test-"));
   let store;
   try {
     const dbFile = path.join(dir, "request-logs.sqlite");
@@ -1735,7 +1735,7 @@ test("RequestLogStore reports when analysis is bounded by the maximum row count"
   skip: isBoundedHeapWorker,
   timeout: 30000
 }, async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-analysis-limit-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-analysis-limit-test-"));
   let store;
   try {
     const dbFile = path.join(dir, "request-logs.sqlite");
@@ -1814,7 +1814,7 @@ test("RequestLogStore bounded heap regression", {
 });
 
 test("RequestLogStore identifies Grok CLI requests in agent analysis", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-grok-agent-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-grok-agent-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1850,7 +1850,7 @@ test("RequestLogStore identifies Grok CLI requests in agent analysis", async () 
 });
 
 test("RequestLogStore does not identify an unknown client as Grok CLI from its model name", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-grok-model-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-grok-model-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1885,7 +1885,7 @@ test("RequestLogStore does not identify an unknown client as Grok CLI from its m
 });
 
 test("RequestLogStore identifies Kimi CLI without inferring it from a Kimi model name", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-kimi-agent-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-kimi-agent-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1928,7 +1928,7 @@ test("RequestLogStore identifies Kimi CLI without inferring it from a Kimi model
 });
 
 test("RequestLogStore identifies OpenCode from its explicit client header", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-opencode-agent-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-opencode-agent-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -1965,7 +1965,7 @@ test("RequestLogStore identifies OpenCode from its explicit client header", asyn
 });
 
 test("RequestLogStore identifies Kilo CLI from its explicit client header", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-kilo-agent-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-kilo-agent-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));
@@ -2002,7 +2002,7 @@ test("RequestLogStore identifies Kilo CLI from its explicit client header", asyn
 });
 
 test("RequestLogStore does not identify an unknown client as OpenCode from its model name", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-opencode-model-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-opencode-model-test-"));
   let store;
   try {
     store = new RequestLogStore(path.join(dir, "request-logs.sqlite"));

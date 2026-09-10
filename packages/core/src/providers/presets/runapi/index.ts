@@ -1,4 +1,4 @@
-import { defaultProviderAccountConfig, type ProviderPreset } from "@ccr/core/providers/presets/types";
+import { defaultProviderAccountConfig, type ProviderPreset } from "@agentrouter/core/providers/presets/types";
 
 export const runApiProviderPreset: ProviderPreset = {
   account: defaultProviderAccountConfig,
@@ -11,5 +11,5 @@ export const runApiProviderPreset: ProviderPreset = {
   ],
   id: "runapi",
   name: "RunAPI",
-  websiteUrl: "https://runapi.co/register?aff=IX1t"
+  websiteUrl: "https://runapi.co/register"
 };

@@ -1,6 +1,6 @@
 ---
-title: Install and start CCR
-pageTitle: Install and start CCR
+title: Install and start AgentRouter
+pageTitle: Install and start AgentRouter
 eyebrow: Quick start
 lead: Choose among the desktop app, npm CLI, and Docker distributions, complete installation and first startup, and verify the management UI and model gateway addresses. The CLI requires Node.js 22 or newer.
 ---
@@ -17,9 +17,9 @@ In desktop/CLI deployments, management and the model gateway use different ports
 
 ## Install the desktop app
 
-1. Open [GitHub Releases](https://github.com/musistudio/claude-code-router/releases).
+1. Open [GitHub Releases](https://github.com/zhangqinzhong/claude-code-router/releases).
 2. Download `.dmg`/`.zip` for macOS, `.exe` for Windows, or `.AppImage` for Linux.
-3. Install and open **Claude Code Router**.
+3. Install and open **AgentRouter**.
 4. Add a provider/model, create a client key under **API Keys**, then click **Start** under **Server**.
 
 When Server shows Running, the model gateway defaults to `http://127.0.0.1:3456`. Enable automatic startup under Server if the gateway should start whenever the app opens.
@@ -43,15 +43,15 @@ From a source checkout:
 docker compose up -d --build
 ```
 
-Open <http://127.0.0.1:3458>. Docker publishes one Nginx endpoint shared by management and the gateway. Add a provider/model, create a CCR client key, and start the gateway under Server. See [Docker deployment](../docker/) for ports, authentication, persistence, backups, and remote access.
+Open <http://127.0.0.1:3458>. Docker publishes one Nginx endpoint shared by management and the gateway. Add a provider/model, create a AgentRouter client key, and start the gateway under Server. See [Docker deployment](../docker/) for ports, authentication, persistence, backups, and remote access.
 
 ## Verify the installation
 
-After configuring a provider, model, and CCR client key:
+After configuring a provider, model, and AgentRouter client key:
 
 1. Confirm Server shows Running.
 2. Request `/health` on the deployment's gateway address and expect a `200` running response.
-3. Send one minimal model request to a compatible endpoint using the CCR client key.
+3. Send one minimal model request to a compatible endpoint using the AgentRouter client key.
 4. Confirm requested/resolved model, provider, status, and latency under Logs.
 
 A reachable management UI does not prove that the model gateway is usable. Docker `/health` returning `502` is expected before a provider/model has been configured.

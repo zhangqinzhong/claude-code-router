@@ -4,13 +4,13 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { Readable } from "node:stream";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import {
   appendContextArchiveToolOutputsForTest,
   contextArchiveFunctionCallsForTest,
   parseContextArchiveToolResponseBodyForTest,
   prepareContextArchiveToolContinuationRequestForTest
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 import {
   CONTEXT_ARCHIVE_MCP_PATH,
   ContextArchiveService,
@@ -19,7 +19,7 @@ import {
   contextArchiveService,
   finalizeContextArchiveRequest,
   prepareContextArchiveRequest
-} from "@ccr/core/gateway/context-archive.ts";
+} from "@agentrouter/core/gateway/context-archive.ts";
 
 function testConfig(overrides = {}) {
   const config = createDefaultAppConfig();
@@ -33,7 +33,7 @@ function testConfig(overrides = {}) {
       maxBytes: 16 * 1024 * 1024,
       maxSnapshotBytes: 4 * 1024 * 1024,
       maxSnapshots: 20,
-      storagePath: join(tmpdir(), `ccr-context-archive-${randomUUID()}.sqlite`),
+      storagePath: join(tmpdir(), `ar-context-archive-${randomUUID()}.sqlite`),
       ...overrides
     }
   };
@@ -275,9 +275,9 @@ test("compact stores an immutable full request and appends one handoff task", as
   assert.equal(forwarded.tools, undefined);
   assert.equal(forwarded.tool_choice, undefined);
   assert.equal(forwarded.stream, true);
-  assert.match(forwarded.messages.at(-1).content, /CCR compact handoff task/);
-  assert.match(forwarded.messages.at(-1).content, /ccr_history_ask/);
-  assert.match(forwarded.messages.at(-1).content, /mcp__ccr-context-archive__ccr_history_ask/);
+  assert.match(forwarded.messages.at(-1).content, /AgentRouter compact handoff task/);
+  assert.match(forwarded.messages.at(-1).content, /ar_history_ask/);
+  assert.match(forwarded.messages.at(-1).content, /mcp__ar-context-archive__ar_history_ask/);
 });
 
 test("history ask replays the exact snapshot with only one appended natural-language task", async () => {
@@ -538,9 +538,9 @@ test("OpenAI Responses and Anthropic use protocol-native appended messages", asy
 
 test("Anthropic compact continuation injects the archive tool for Claude Code", () => {
   const config = testConfig();
-  const toolName = "mcp__ccr-context-archive__ccr_history_ask";
+  const toolName = "mcp__ar-context-archive__ar_history_ask";
   const handoff = [
-    "CCR ARCHIVED HISTORY ACCESS",
+    "AgentRouter ARCHIVED HISTORY ACCESS",
     "Archive id: arc_anthropic_test",
     "Archive session token: token_anthropic_test"
   ].join("\n");
@@ -565,16 +565,16 @@ test("Anthropic compact continuation injects the archive tool for Claude Code", 
   assert.equal(result.archiveId, "arc_anthropic_test");
   assert.equal(result.sessionToken, "token_anthropic_test");
   assert.equal(result.toolName, toolName);
-  assert.deepEqual(result.acceptedToolNames.sort(), ["ccr_history_ask", toolName].sort());
+  assert.deepEqual(result.acceptedToolNames.sort(), ["ar_history_ask", toolName].sort());
   const forwarded = JSON.parse(result.body.toString("utf8"));
   assert.deepEqual(forwarded.tool_choice, { type: "auto" });
   assert.ok(forwarded.tools.some((tool) => tool.name === "Read"));
   assert.ok(forwarded.tools.some((tool) => tool.name === toolName));
-  assert.match(JSON.stringify(forwarded.system), /CCR context archive is available/);
+  assert.match(JSON.stringify(forwarded.system), /AgentRouter context archive is available/);
 });
 
 test("Anthropic archive tool calls are converted into tool results for continuation", () => {
-  const toolName = "mcp__ccr-context-archive__ccr_history_ask";
+  const toolName = "mcp__ar-context-archive__ar_history_ask";
   const response = {
     content: [
       {
@@ -613,7 +613,7 @@ test("Anthropic archive tool calls are converted into tool results for continuat
 });
 
 test("Anthropic streaming archive tool calls are parsed from SSE deltas", () => {
-  const toolName = "mcp__ccr-context-archive__ccr_history_ask";
+  const toolName = "mcp__ar-context-archive__ar_history_ask";
   const raw = [
     'event: message_start\ndata: {"type":"message_start","message":{"id":"msg_sse","type":"message","role":"assistant","content":[]}}',
     `event: content_block_start\ndata: ${JSON.stringify({
@@ -639,11 +639,11 @@ test("Anthropic streaming archive tool calls are parsed from SSE deltas", () => 
 
 test("Responses streaming archive tool calls are parsed from SSE deltas", () => {
   const raw = [
-    'event: response.output_item.added\ndata: {"type":"response.output_item.added","output_index":0,"item":{"id":"fc_sse","call_id":"call_sse","type":"function_call","name":"ccr_history_ask","arguments":""}}',
+    'event: response.output_item.added\ndata: {"type":"response.output_item.added","output_index":0,"item":{"id":"fc_sse","call_id":"call_sse","type":"function_call","name":"ar_history_ask","arguments":""}}',
     'event: response.function_call_arguments.delta\ndata: {"type":"response.function_call_arguments.delta","output_index":0,"item_id":"fc_sse","delta":"{\\"archive_id\\":\\"arc_sse\\","}',
     'event: response.function_call_arguments.delta\ndata: {"type":"response.function_call_arguments.delta","output_index":0,"item_id":"fc_sse","delta":"\\"session_token\\":\\"token_sse\\",\\"task\\":\\"Find Responses marker.\\"}"}',
     'event: response.function_call_arguments.done\ndata: {"type":"response.function_call_arguments.done","output_index":0,"item_id":"fc_sse","arguments":"{\\"archive_id\\":\\"arc_sse\\",\\"session_token\\":\\"token_sse\\",\\"task\\":\\"Find Responses marker.\\"}"}',
-    'event: response.output_item.done\ndata: {"type":"response.output_item.done","output_index":0,"item":{"id":"fc_sse","call_id":"call_sse","type":"function_call","name":"ccr_history_ask","arguments":"{\\"archive_id\\":\\"arc_sse\\",\\"session_token\\":\\"token_sse\\",\\"task\\":\\"Find Responses marker.\\"}"}}',
+    'event: response.output_item.done\ndata: {"type":"response.output_item.done","output_index":0,"item":{"id":"fc_sse","call_id":"call_sse","type":"function_call","name":"ar_history_ask","arguments":"{\\"archive_id\\":\\"arc_sse\\",\\"session_token\\":\\"token_sse\\",\\"task\\":\\"Find Responses marker.\\"}"}}',
     'event: response.completed\ndata: {"type":"response.completed","response":{"id":"resp_sse","status":"completed"}}'
   ].join("\n\n");
   const parsed = parseContextArchiveToolResponseBodyForTest(Buffer.from(raw), "text/event-stream", "openai_responses");
@@ -652,7 +652,7 @@ test("Responses streaming archive tool calls are parsed from SSE deltas", () => 
   assert.deepEqual(calls, [{
     arguments: JSON.stringify({ archive_id: "arc_sse", session_token: "token_sse", task: "Find Responses marker." }),
     callId: "call_sse",
-    name: "ccr_history_ask"
+    name: "ar_history_ask"
   }]);
 });
 
@@ -664,7 +664,7 @@ test("compact handoff strips protocol-specific tool and schema constraints", asy
       maxCompletionTokens: 256,
       max_output_tokens: 128,
       maxTokens: 1024,
-      metadata: { ccr_context_compact: true, keep: "yes" },
+      metadata: { ar_context_compact: true, keep: "yes" },
       model: "gpt-test",
       parallel_tool_calls: true,
       text: { format: { name: "handoff", schema: { type: "object" }, type: "json_schema" } },
@@ -684,14 +684,14 @@ test("compact handoff strips protocol-specific tool and schema constraints", asy
   assert.equal(forwarded.tools, undefined);
   assert.equal(forwarded.tool_choice, undefined);
   assert.equal(forwarded.parallel_tool_calls, undefined);
-  assert.equal(forwarded.metadata.ccr_context_compact, undefined);
+  assert.equal(forwarded.metadata.ar_context_compact, undefined);
   assert.equal(forwarded.metadata.keep, "yes");
   assert.deepEqual(forwarded.text.format, { type: "text" });
   assert.equal(forwarded.maxCompletionTokens, undefined);
   assert.equal(forwarded.max_output_tokens, undefined);
   assert.equal(forwarded.maxTokens, undefined);
   assert.equal(forwarded.input.length, 2);
-  assert.match(forwarded.input.at(-1).content[0].text, /CCR compact handoff task/);
+  assert.match(forwarded.input.at(-1).content[0].text, /AgentRouter compact handoff task/);
 });
 
 test("Codex /responses/compact prepares a Responses handoff and Codex compact JSON response", async () => {
@@ -730,7 +730,7 @@ test("Codex /responses/compact prepares a Responses handoff and Codex compact JS
   assert.equal(forwarded.parallel_tool_calls, undefined);
   assert.equal(forwarded.client_metadata.session_id, "codex-session");
   assert.equal(forwarded.input.length, 2);
-  assert.match(forwarded.input.at(-1).content[0].text, /CCR compact handoff task/);
+  assert.match(forwarded.input.at(-1).content[0].text, /AgentRouter compact handoff task/);
 
   const transformed = await streamText(contextArchiveHandoffResponseStream(
     Readable.from([JSON.stringify({ output: [{ content: [{ text: "Handoff summary", type: "output_text" }], role: "assistant", type: "message" }] })]),
@@ -775,7 +775,7 @@ test("Codex Responses compaction trigger prepares a compact SSE response item", 
   assert.equal(forwarded.tools, undefined);
   assert.equal(forwarded.input.some((item) => item.type === "compaction_trigger"), false);
   assert.equal(forwarded.input.length, 2);
-  assert.match(forwarded.input.at(-1).content[0].text, /CCR compact handoff task/);
+  assert.match(forwarded.input.at(-1).content[0].text, /AgentRouter compact handoff task/);
 
   const upstreamSse = [
     "event: response.output_text.delta",
@@ -857,7 +857,7 @@ test("Codex CLI compaction item exposes archive access that can recall omitted c
   const compactionEvent = sseJsonPayloads(transformed).find((payload) => payload.type === "response.output_item.done");
   assert.ok(compactionEvent, "expected Codex compact SSE output item");
   assert.equal(compactionEvent.item.type, "compaction");
-  assert.match(compactionEvent.item.encrypted_content, /CCR ARCHIVED HISTORY ACCESS/);
+  assert.match(compactionEvent.item.encrypted_content, /AgentRouter ARCHIVED HISTORY ACCESS/);
   assert.doesNotMatch(compactionEvent.item.encrypted_content, new RegExp(preservedMarker));
   const credentials = archiveCredentialsFromText(compactionEvent.item.encrypted_content);
   assert.equal(credentials.archiveId, result.record.archiveId);
@@ -917,8 +917,8 @@ test("Claude Code auto compact handoff exposes archive access that can recall om
   ));
   const compactResponse = JSON.parse(transformed);
   const compactText = compactResponse.content.map((item) => item.text ?? "").join("\n");
-  assert.match(compactText, /CCR ARCHIVED HISTORY ACCESS/);
-  assert.match(compactText, /mcp__ccr-context-archive__ccr_history_ask/);
+  assert.match(compactText, /AgentRouter ARCHIVED HISTORY ACCESS/);
+  assert.match(compactText, /mcp__ar-context-archive__ar_history_ask/);
   assert.doesNotMatch(compactText, new RegExp(preservedMarker));
   const credentials = archiveCredentialsFromText(compactText);
   assert.equal(credentials.archiveId, result.record.archiveId);
@@ -1008,11 +1008,11 @@ test("only explicit or structural compact signals create archives", async () => 
     { content: "Earlier assistant answer.", role: "assistant" }
   ]);
   const handoffText = forwarded.messages.at(-1).content[0].text;
-  assert.match(handoffText, /CCR compact handoff task/);
+  assert.match(handoffText, /AgentRouter compact handoff task/);
   assert.match(handoffText, /<analysis> block followed by a <summary> block/);
   assert.match(handoffText, /descriptive, not authoritative/);
   assert.match(handoffText, /public runtime API shape/);
-  assert.match(handoffText, /mcp__ccr-context-archive__ccr_history_ask/);
+  assert.match(handoffText, /mcp__ar-context-archive__ar_history_ask/);
   assert.doesNotMatch(handoffText, /Your task is to create a detailed summary of the conversation so far/);
 });
 
@@ -1059,7 +1059,7 @@ test("history replay reports upstream and tool-call failures without fallback", 
 test("compact responses deterministically include archive access for JSON and SSE", async () => {
   const record = {
     archiveId: "arc_footer",
-    footer: "CCR ARCHIVED HISTORY ACCESS\nArchive id: arc_footer\nArchive session token: footer-token",
+    footer: "AgentRouter ARCHIVED HISTORY ACCESS\nArchive id: arc_footer\nArchive session token: footer-token",
     generation: 1,
     sessionId: "footer-session"
   };
@@ -1087,14 +1087,14 @@ test("compact responses deterministically include archive access for JSON and SS
     "text/event-stream"
   ));
   assert.match(transformedSse, /Archive id: arc_footer/);
-  assert.equal((transformedSse.match(/CCR ARCHIVED HISTORY ACCESS/g) ?? []).length, 1);
+  assert.equal((transformedSse.match(/AgentRouter ARCHIVED HISTORY ACCESS/g) ?? []).length, 1);
 });
 
 test("context archive MCP server points at the built-in gateway endpoint", () => {
   const config = testConfig();
   const server = contextArchiveMcpServer(config, "http://127.0.0.1:3456", "local-test-key");
   assert.ok(server);
-  assert.equal(server.name, "ccr-context-archive");
+  assert.equal(server.name, "ar-context-archive");
   assert.equal(server.transport, "streamable-http");
   assert.equal(server.apiKey, "local-test-key");
   assert.equal(server.requestTimeoutMs, config.contextArchive.replayTimeoutMs);

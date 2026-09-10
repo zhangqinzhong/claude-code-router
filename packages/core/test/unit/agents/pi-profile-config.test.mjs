@@ -3,11 +3,11 @@ import { mkdtempSync, readFileSync, rmSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { writePiGatewayConfig } from "@ccr/core/agents/pi/profile-config.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { writePiGatewayConfig } from "@agentrouter/core/agents/pi/profile-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 
-test("Pi profile config writes a CCR OpenAI Responses provider", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-pi-profile-"));
+test("Pi profile config writes a AgentRouter OpenAI Responses provider", () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-pi-profile-"));
   try {
     const config = createDefaultAppConfig();
     config.gateway.host = "0.0.0.0";
@@ -27,24 +27,24 @@ test("Pi profile config writes a CCR OpenAI Responses provider", () => {
       id: "pi-main",
       model: "Example/alpha",
       name: "Pi Main",
-      providerId: "ccr-pi",
+      providerId: "ar-pi",
       scope: "ccr",
       surface: "cli"
     };
 
-    const result = writePiGatewayConfig(root, config, profile, "ccr-profile-token", "Example/alpha");
+    const result = writePiGatewayConfig(root, config, profile, "ar-profile-token", "Example/alpha");
     const payload = JSON.parse(readFileSync(result.file, "utf8"));
-    const provider = payload.providers["ccr-pi"];
+    const provider = payload.providers["ar-pi"];
 
     assert.equal(result.changed, true);
     assert.equal(result.model, "Example/alpha");
-    assert.equal(result.providerId, "ccr-pi");
+    assert.equal(result.providerId, "ar-pi");
     assert.equal(result.file, path.join(root, "profiles", "pi-main", "pi", "models.json"));
     assert.equal(result.profileHome, path.join(root, "profiles", "pi-main", "pi"));
     assert.equal(result.sessionDir, path.join(root, "profiles", "pi-main", "pi", "sessions"));
     assert.equal(provider.baseUrl, "http://127.0.0.1:3459/v1");
     assert.equal(provider.api, "openai-responses");
-    assert.equal(provider.apiKey, "ccr-profile-token");
+    assert.equal(provider.apiKey, "ar-profile-token");
     assert.equal(provider.authHeader, true);
     assert.deepEqual(provider.headers, {
       "x-ar-client": "pi",
@@ -53,7 +53,7 @@ test("Pi profile config writes a CCR OpenAI Responses provider", () => {
     assert.ok(provider.models.some((model) => model.id === "Example/alpha"));
     assert.ok(provider.models.some((model) => model.id === "Example/beta"));
 
-    const second = writePiGatewayConfig(root, config, profile, "ccr-profile-token", "Example/alpha");
+    const second = writePiGatewayConfig(root, config, profile, "ar-profile-token", "Example/alpha");
     assert.equal(second.changed, false);
   } finally {
     rmSync(root, { force: true, recursive: true });
@@ -61,7 +61,7 @@ test("Pi profile config writes a CCR OpenAI Responses provider", () => {
 });
 
 test("Pi profile config writes catalog token limits for known models", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-pi-profile-limits-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-pi-profile-limits-"));
   try {
     const config = createDefaultAppConfig();
     config.gateway.host = "127.0.0.1";
@@ -81,14 +81,14 @@ test("Pi profile config writes catalog token limits for known models", () => {
       id: "pi-main",
       model: "DeepSeek/deepseek-v4-flash",
       name: "Pi Main",
-      providerId: "ccr-pi",
+      providerId: "ar-pi",
       scope: "ccr",
       surface: "cli"
     };
 
-    const result = writePiGatewayConfig(root, config, profile, "ccr-profile-token", "DeepSeek/deepseek-v4-flash");
+    const result = writePiGatewayConfig(root, config, profile, "ar-profile-token", "DeepSeek/deepseek-v4-flash");
     const payload = JSON.parse(readFileSync(result.file, "utf8"));
-    const models = payload.providers["ccr-pi"].models;
+    const models = payload.providers["ar-pi"].models;
     const deepseek = models.find((model) => model.id === "DeepSeek/deepseek-v4-flash");
     const unknown = models.find((model) => model.id === "DeepSeek/unknown-model");
 
@@ -104,7 +104,7 @@ test("Pi profile config writes catalog token limits for known models", () => {
 });
 
 test("Pi profile config writes 1M catalog limits for GLM 5.3", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-pi-profile-glm-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-pi-profile-glm-"));
   try {
     const config = createDefaultAppConfig();
     config.gateway.host = "127.0.0.1";
@@ -124,14 +124,14 @@ test("Pi profile config writes 1M catalog limits for GLM 5.3", () => {
       id: "pi-main",
       model: "Zhipu AI (China) - Coding Plan/glm-5.3",
       name: "Pi Main",
-      providerId: "ccr-pi",
+      providerId: "ar-pi",
       scope: "ccr",
       surface: "cli"
     };
 
-    const result = writePiGatewayConfig(root, config, profile, "ccr-profile-token", "Zhipu AI (China) - Coding Plan/glm-5.3");
+    const result = writePiGatewayConfig(root, config, profile, "ar-profile-token", "Zhipu AI (China) - Coding Plan/glm-5.3");
     const payload = JSON.parse(readFileSync(result.file, "utf8"));
-    const models = payload.providers["ccr-pi"].models;
+    const models = payload.providers["ar-pi"].models;
     const glm = models.find((model) => model.id === "Zhipu AI (China) - Coding Plan/glm-5.3");
 
     assert.equal(glm?.contextWindow, 1_048_576);

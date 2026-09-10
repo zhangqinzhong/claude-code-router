@@ -3,7 +3,7 @@ import {
   ROUTER_SCRIPT_API_VERSION,
   ROUTER_SCRIPT_DEFAULT_TIMEOUT_MS,
   ROUTER_SCRIPT_MAX_TIMEOUT_MS
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   RouteScriptSampleRequest,
@@ -17,7 +17,7 @@ import type {
   RouterRuleRewrite,
   RouterRuleRewriteOperation,
   RouterRuleType
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   fallbackConfig
 } from "./fallbacks";

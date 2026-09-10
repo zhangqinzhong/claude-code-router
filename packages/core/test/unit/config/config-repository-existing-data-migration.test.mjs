@@ -15,10 +15,10 @@ test("legacy API keys are merged without replacing existing target keys", async 
   const {
     APP_CONFIG_DB_FILE,
     LEGACY_API_KEYS_DB_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   const {
     createBetterSqliteDatabase
-  } = await import("@ccr/core/storage/sqlite-native.ts");
+  } = await import("@agentrouter/core/storage/sqlite-native.ts");
 
   createApiKeyDatabase(createBetterSqliteDatabase, APP_CONFIG_DB_FILE, {
     id: "existing-key",
@@ -31,7 +31,7 @@ test("legacy API keys are merged without replacing existing target keys", async 
 
   const {
     loadPersistedApiKeys
-  } = await import("@ccr/core/config/config-repository.ts");
+  } = await import("@agentrouter/core/config/config-repository.ts");
   const apiKeys = await loadPersistedApiKeys();
   assert.deepEqual(apiKeys.map((apiKey) => apiKey.id), [
     "existing-key",

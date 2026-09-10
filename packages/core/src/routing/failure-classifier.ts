@@ -1,4 +1,4 @@
-import type { RouterFallbackMode } from "@ccr/core/contracts/app";
+import type { RouterFallbackMode } from "@agentrouter/core/contracts/app";
 
 export type RouteFailureClass = "client" | "rate-limit" | "retryable" | "server";
 

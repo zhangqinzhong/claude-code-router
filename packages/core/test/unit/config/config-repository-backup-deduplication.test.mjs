@@ -16,13 +16,13 @@ test("repeated legacy JSON cleanup failures keep one content-addressed backup", 
   const {
     APP_CONFIG_DB_FILE,
     LEGACY_ACTIVE_CONFIG_FILE
-  } = await import("@ccr/core/config/constants.ts");
+  } = await import("@agentrouter/core/config/constants.ts");
   const {
     ConfigRepository
-  } = await import("@ccr/core/config/config-repository.ts");
+  } = await import("@agentrouter/core/config/config-repository.ts");
   const {
     createBetterSqliteDatabase
-  } = await import("@ccr/core/storage/sqlite-native.ts");
+  } = await import("@agentrouter/core/storage/sqlite-native.ts");
 
   mkdirSync(path.dirname(LEGACY_ACTIVE_CONFIG_FILE), { recursive: true });
   const legacyContent = `${JSON.stringify({ PORT: 3456, Providers: [] }, null, 2)}\n`;

@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { AppConfig, PluginMarketplaceEntry } from "@ccr/core/contracts/app.ts";
-import { pluginConfigPatchFromSettingsDraft, resolvePluginInstallPlan } from "@ccr/ui/pages/home/shared/extensions.ts";
-import type { PluginInstallCandidate, PluginSettingsDraft } from "@ccr/ui/pages/home/shared/types.ts";
+import type { AppConfig, PluginMarketplaceEntry } from "@agentrouter/core/contracts/app.ts";
+import { pluginConfigPatchFromSettingsDraft, resolvePluginInstallPlan } from "@agentrouter/ui/pages/home/shared/extensions.ts";
+import type { PluginInstallCandidate, PluginSettingsDraft } from "@agentrouter/ui/pages/home/shared/types.ts";
 
 test("extension install dependencies require enabled installed plugins with required surfaces", () => {
   const marketplace: PluginMarketplaceEntry[] = [{

@@ -13,13 +13,13 @@ lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接�
 
 ## 你会用到哪些字段
 
-| 企业微信后台里的名字 | CCR 字段 | 是否必填 | 说明 |
+| 企业微信后台里的名字 | AgentRouter 字段 | 是否必填 | 说明 |
 | --- | --- | --- | --- |
 | 企业ID / CorpID | Corp ID | 必填 | 企业级标识，在「我的企业」里 |
 | AgentId | Agent ID | 必填 | 自建应用的应用 ID |
 | Secret | Secret | 必填 | 自建应用密钥，通常要管理员在手机端确认查看 |
 
-> CCR 会用 Corp ID 和应用 Secret 去换企业微信接口的 access_token，你不用自己手动获取。
+> AgentRouter 会用 Corp ID 和应用 Secret 去换企业微信接口的 access_token，你不用自己手动获取。
 
 ## 第一步：获取 Corp ID
 
@@ -27,14 +27,14 @@ lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接�
 2. 用管理员账号登录。
 3. 顶部打开 `我的企业`。
 4. 进入 `企业信息`。
-5. 找到 `企业ID`，复制，待会儿填到 CCR 的 Corp ID。
+5. 找到 `企业ID`，复制，待会儿填到 AgentRouter 的 Corp ID。
 
 ## 第二步：创建自建应用
 
 1. 在管理后台打开 `应用管理`。
 2. 找到 `自建` 区域。
 3. 点 `创建应用`。
-4. 填应用名，比如 `CCR`。
+4. 填应用名，比如 `AgentRouter`。
 5. 上传应用 Logo。
 6. 选可见范围。测试时先选你自己或一个小测试部门。
 7. 点创建。
@@ -42,16 +42,16 @@ lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接�
 ## 第三步：复制 Agent ID 和 Secret
 
 1. 进入刚创建的自建应用详情。
-2. 复制 `AgentId`，待会儿填到 CCR 的 Agent ID。
+2. 复制 `AgentId`，待会儿填到 AgentRouter 的 Agent ID。
 3. 找到 `Secret`，点查看。
 4. 按企业微信提示，在手机企业微信里确认。
 5. 复制显示出的 `Secret`。
 
-> 如果企业微信要求配 `企业可信 IP`，需要把运行 CCR Bot Gateway 的出口公网 IP（或你用的中继服务出口 IP）加进去。
+> 如果企业微信要求配 `企业可信 IP`，需要把运行 AgentRouter Bot Gateway 的出口公网 IP（或你用的中继服务出口 IP）加进去。
 
-## 在 CCR 中接入
+## 在 AgentRouter 中接入
 
-1. 打开 CCR 的 **Bot 管理** 页面，点 **添加 Bot**。
+1. 打开 AgentRouter 的 **Bot 管理** 页面，点 **添加 Bot**。
 2. 平台选 **企业微信（WeCom）**。
 3. 认证方式是 **App Secret**。
 4. 填 **Corp ID**、**Agent ID**、**Secret**。
@@ -59,7 +59,7 @@ lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接�
 6. 打开 **Agent 配置**，编辑你要接 Bot 的 Agent 配置。
 7. 打开 **Bot** 开关，选刚保存的 Bot。
 8. 按需打开 **转发 Agent 消息** 或 **接力**（见下一节）。
-9. 从 CCR 重新打开 Agent。
+9. 从 AgentRouter 重新打开 Agent。
 
 ## 转发还是接力
 
@@ -70,7 +70,7 @@ lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接�
 
 ## 测试
 
-1. 从 CCR 打开 Agent，触发一条消息。
+1. 从 AgentRouter 打开 Agent，触发一条消息。
 2. 到企业微信确认应用能收到并回复。
 3. 锁屏电脑，等过你设的空闲时间，确认接力触发后新消息会进企业微信。
 

@@ -1,44 +1,44 @@
-import type { RouterFallbackConfig } from "@ccr/core/contracts/app";
+import type { RouterFallbackConfig } from "@agentrouter/core/contracts/app";
 
-export const ccrRouterPluginKey = "ar-router";
-export const ccrRouterRequestTransformKey = "ar-router-request-transform";
-export const ccrCodexBridgeRequestTransformKey = "ar-codex-bridge-request-transform";
-export const ccrCodexBridgeResponseHookKey = "ar-codex-bridge-response-hook";
-export const ccrCodexBridgeStreamHookKey = "ar-codex-bridge-stream-hook";
-export const ccrOpenRouterDiscountFinalizeResponseHookKey = "ar-openrouter-discount-finalize-response-hook";
-export const ccrOpenRouterDiscountFinalizeStreamHookKey = "ar-openrouter-discount-finalize-stream-hook";
-export const ccrRouterRouteResolverKey = "ar-router-route-resolver";
-export const ccrRouterHttpRouteKey = "ar-router-route";
-export const ccrRouterHttpRoutePath = "/__ccr/route";
-export const ccrRawTraceSyncAckRouteKey = "ar-raw-trace-sync-ack";
-export const ccrRuntimeConfigReloadMessageType = "ar:runtime-config-reload";
+export const arRouterPluginKey = "ar-router";
+export const arRouterRequestTransformKey = "ar-router-request-transform";
+export const arCodexBridgeRequestTransformKey = "ar-codex-bridge-request-transform";
+export const arCodexBridgeResponseHookKey = "ar-codex-bridge-response-hook";
+export const arCodexBridgeStreamHookKey = "ar-codex-bridge-stream-hook";
+export const arOpenRouterDiscountFinalizeResponseHookKey = "ar-openrouter-discount-finalize-response-hook";
+export const arOpenRouterDiscountFinalizeStreamHookKey = "ar-openrouter-discount-finalize-stream-hook";
+export const arRouterRouteResolverKey = "ar-router-route-resolver";
+export const arRouterHttpRouteKey = "ar-router-route";
+export const arRouterHttpRoutePath = "/__ar/route";
+export const arRawTraceSyncAckRouteKey = "ar-raw-trace-sync-ack";
+export const arRuntimeConfigReloadMessageType = "ar:runtime-config-reload";
 
-export const ccrRouteStageHeader = "x-ar-route-stage";
-export const ccrRouteReasonHeader = "x-ar-route-reason";
-export const ccrRouteSourceHeader = "x-ar-route-source";
-export const ccrRouteDiagnosticsHeader = "x-ar-route-diagnostics";
-export const ccrRoutedModelHeader = "x-ar-routed-model";
-export const ccrRouteFallbackHeader = "x-ar-route-fallback";
-export const ccrRouteSessionIdHeader = "x-ar-route-session-id";
-export const ccrRouteTokenCountHeader = "x-ar-route-token-count";
-export const ccrCodexApplyPatchBridgeHeader = "x-ar-codex-apply-patch-bridge";
-export const ccrCodexMultiAgentBridgeHeader = "x-ar-codex-multi-agent-bridge";
-export const ccrOpenRouterDiscountRequestIdHeader = "x-ar-openrouter-discount-request-id";
-export const ccrRouteHeaderNames = [
-  ccrCodexApplyPatchBridgeHeader,
-  ccrCodexMultiAgentBridgeHeader,
-  ccrOpenRouterDiscountRequestIdHeader,
-  ccrRouteDiagnosticsHeader,
-  ccrRouteFallbackHeader,
-  ccrRouteReasonHeader,
-  ccrRouteSessionIdHeader,
-  ccrRouteSourceHeader,
-  ccrRouteStageHeader,
-  ccrRouteTokenCountHeader,
-  ccrRoutedModelHeader
+export const arRouteStageHeader = "x-ar-route-stage";
+export const arRouteReasonHeader = "x-ar-route-reason";
+export const arRouteSourceHeader = "x-ar-route-source";
+export const arRouteDiagnosticsHeader = "x-ar-route-diagnostics";
+export const arRoutedModelHeader = "x-ar-routed-model";
+export const arRouteFallbackHeader = "x-ar-route-fallback";
+export const arRouteSessionIdHeader = "x-ar-route-session-id";
+export const arRouteTokenCountHeader = "x-ar-route-token-count";
+export const arCodexApplyPatchBridgeHeader = "x-ar-codex-apply-patch-bridge";
+export const arCodexMultiAgentBridgeHeader = "x-ar-codex-multi-agent-bridge";
+export const arOpenRouterDiscountRequestIdHeader = "x-ar-openrouter-discount-request-id";
+export const arRouteHeaderNames = [
+  arCodexApplyPatchBridgeHeader,
+  arCodexMultiAgentBridgeHeader,
+  arOpenRouterDiscountRequestIdHeader,
+  arRouteDiagnosticsHeader,
+  arRouteFallbackHeader,
+  arRouteReasonHeader,
+  arRouteSessionIdHeader,
+  arRouteSourceHeader,
+  arRouteStageHeader,
+  arRouteTokenCountHeader,
+  arRoutedModelHeader
 ] as const;
 
-export type CcrRouterPluginRouteRequest = {
+export type ArRouterPluginRouteRequest = {
   body: Record<string, unknown>;
   headers?: Record<string, string | string[] | undefined>;
   method?: string;
@@ -46,7 +46,7 @@ export type CcrRouterPluginRouteRequest = {
   url?: string;
 };
 
-export type CcrRouterPluginRouteResponse = {
+export type ArRouterPluginRouteResponse = {
   body: Record<string, unknown>;
   decision: {
     diagnostics: unknown[];
@@ -59,11 +59,11 @@ export type CcrRouterPluginRouteResponse = {
   };
 };
 
-export function encodeCcrRouteFallbackHeader(fallback: RouterFallbackConfig): string {
+export function encodeArRouteFallbackHeader(fallback: RouterFallbackConfig): string {
   return Buffer.from(JSON.stringify(fallback), "utf8").toString("base64url");
 }
 
-export function decodeCcrRouteFallbackHeader(value: string | undefined): RouterFallbackConfig | undefined {
+export function decodeArRouteFallbackHeader(value: string | undefined): RouterFallbackConfig | undefined {
   if (!value) {
     return undefined;
   }

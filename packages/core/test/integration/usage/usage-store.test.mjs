@@ -3,11 +3,11 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { RequestLogStore } from "@ccr/core/observability/request-log-store.ts";
-import { createBetterSqliteDatabase } from "@ccr/core/storage/sqlite-native.ts";
-import { GatewayBillingSynchronizer } from "@ccr/core/usage/billing-sync.ts";
-import { resolveUsageModelAttribution } from "@ccr/core/usage/model-attribution.ts";
-import { UsageStore } from "@ccr/core/usage/store.ts";
+import { RequestLogStore } from "@agentrouter/core/observability/request-log-store.ts";
+import { createBetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native.ts";
+import { GatewayBillingSynchronizer } from "@agentrouter/core/usage/billing-sync.ts";
+import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution.ts";
+import { UsageStore } from "@agentrouter/core/usage/store.ts";
 
 const fusionUsageConfig = {
   Providers: [
@@ -99,7 +99,7 @@ test("usage attribution preserves slash-containing physical model IDs", () => {
 });
 
 test("UsageStore aggregates stats in SQLite without loading all events", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
     const now = new Date();
@@ -150,7 +150,7 @@ test("UsageStore aggregates stats in SQLite without loading all events", async (
 });
 
 test("UsageStore cache ratio denominator includes cache tokens when total tokens omit cache", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-cache-ratio-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-cache-ratio-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
 
@@ -183,7 +183,7 @@ test("UsageStore cache ratio denominator includes cache tokens when total tokens
 });
 
 test("UsageStore excludes proxy rows by default and includes them on request", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-proxy-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-proxy-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
     const createdAt = new Date().toISOString();
@@ -231,7 +231,7 @@ test("UsageStore excludes proxy rows by default and includes them on request", a
 });
 
 test("UsageStore treats null web RPC usage filters as empty filters", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-null-filter-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-null-filter-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
 
@@ -263,7 +263,7 @@ test("UsageStore treats null web RPC usage filters as empty filters", async () =
 });
 
 test("UsageStore keeps the Fusion logical model while grouping by the upstream model", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-fusion-attribution-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-fusion-attribution-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
     await store.record({
@@ -290,10 +290,10 @@ test("UsageStore keeps the Fusion logical model while grouping by the upstream m
 });
 
 test("UsageStore attributes Claude App encoded response model IDs to the routed upstream model", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-claude-app-encoded-model-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-claude-app-encoded-model-test-"));
   try {
     const store = new UsageStore(path.join(dir, "usage.sqlite"));
-    const encodedModel = `anthropic/claude-ccr-h${Buffer.from("Fusion/kimisearch", "utf8").toString("hex")}`;
+    const encodedModel = `anthropic/claude-ar-h${Buffer.from("Fusion/kimisearch", "utf8").toString("hex")}`;
 
     await store.recordCapture({
       bodyText: [
@@ -326,7 +326,7 @@ test("UsageStore attributes Claude App encoded response model IDs to the routed 
 });
 
 test("lightweight usage synchronization records and deduplicates Fusion internal upstream calls", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-fusion-internal-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-fusion-internal-test-"));
   try {
     let estimateCallCount = 0;
     const store = new UsageStore(path.join(dir, "usage.sqlite"), {
@@ -391,7 +391,7 @@ test("lightweight usage synchronization records and deduplicates Fusion internal
 });
 
 test("lightweight Fusion usage normalizes OpenAI cache tokens and estimates unconfigured zero costs", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-fusion-zero-cost-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-fusion-zero-cost-test-"));
   try {
     const estimatedInputs = [];
     const store = new UsageStore(path.join(dir, "usage.sqlite"), {
@@ -448,7 +448,7 @@ test("lightweight Fusion usage normalizes OpenAI cache tokens and estimates unco
 });
 
 test("lightweight Fusion usage preserves slash-containing external model IDs through storage", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-fusion-external-model-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-fusion-external-model-test-"));
   try {
     const estimatedInputs = [];
     const store = new UsageStore(path.join(dir, "usage.sqlite"), {
@@ -496,7 +496,7 @@ test("lightweight Fusion usage preserves slash-containing external model IDs thr
 });
 
 test("lightweight Fusion usage honors numeric-string zero costs from global core billing rates", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-fusion-global-rate-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-fusion-global-rate-test-"));
   try {
     let estimateCallCount = 0;
     const store = new UsageStore(path.join(dir, "usage.sqlite"), {
@@ -595,7 +595,7 @@ test("lightweight Fusion usage coalesces concurrent deliveries of the same event
 });
 
 test("UsageStore backfills missing events from request logs", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-request-log-backfill-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-request-log-backfill-test-"));
   try {
     const requestLogDbFile = path.join(dir, "request-logs.sqlite");
     const requestLogStore = new RequestLogStore(requestLogDbFile);
@@ -641,7 +641,7 @@ test("UsageStore backfills missing events from request logs", async () => {
 });
 
 test("UsageStore reset clears overview stats and does not backfill old request logs", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-usage-reset-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-usage-reset-test-"));
   try {
     const requestLogDbFile = path.join(dir, "request-logs.sqlite");
     const requestLogStore = new RequestLogStore(requestLogDbFile);

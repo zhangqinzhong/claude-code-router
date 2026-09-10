@@ -3,10 +3,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { codexDefaultBaseUrl } from "@ccr/core/agents/local-providers/service.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
-import { prepareGatewayUpstreamAttemptForTest } from "@ccr/core/gateway/upstream/executor.ts";
+import { codexDefaultBaseUrl } from "@agentrouter/core/agents/local-providers/service.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
+import { prepareGatewayUpstreamAttemptForTest } from "@agentrouter/core/gateway/upstream/executor.ts";
 
 test("provider plugins use compiled runtime and capability identities", async () => {
   const unchangedPlugin = { key: "unscoped-plugin" };
@@ -97,7 +97,7 @@ test("Codex OAuth plugins retain the default base URL after runtime identity nor
 });
 
 test("Codex OAuth plugins prefer live login credentials over imported snapshots", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-codex-runtime-live-credentials-");
+  const home = useTemporaryCodexHome(t, "ar-codex-runtime-live-credentials-");
   fs.mkdirSync(path.join(home, ".codex"), { recursive: true });
   fs.writeFileSync(path.join(home, ".codex", "auth.json"), JSON.stringify({
     tokens: {
@@ -140,7 +140,7 @@ test("Codex OAuth plugins prefer live login credentials over imported snapshots"
 });
 
 test("Codex local providers synthesize OAuth plugins when persisted plugins are missing", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-codex-runtime-missing-plugins-");
+  const home = useTemporaryCodexHome(t, "ar-codex-runtime-missing-plugins-");
   fs.mkdirSync(path.join(home, ".codex"), { recursive: true });
   fs.writeFileSync(path.join(home, ".codex", "auth.json"), JSON.stringify({
     tokens: {
@@ -178,7 +178,7 @@ test("Codex local providers synthesize OAuth plugins when persisted plugins are 
 });
 
 test("Codex local provider fallback respects disabled OAuth plugins", async (t) => {
-  const home = useTemporaryCodexHome(t, "ccr-codex-runtime-disabled-plugin-");
+  const home = useTemporaryCodexHome(t, "ar-codex-runtime-disabled-plugin-");
   fs.mkdirSync(path.join(home, ".codex"), { recursive: true });
   fs.writeFileSync(path.join(home, ".codex", "auth.json"), JSON.stringify({
     tokens: {

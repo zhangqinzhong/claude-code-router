@@ -2,12 +2,12 @@
 title: Docker deployment
 pageTitle: Docker deployment
 eyebrow: Quick start
-lead: "For persistent server deployments: run CCR Core and the browser management UI in Docker behind a single Nginx entrypoint, and configure ports, authentication, persistence, remote access, backup, and upgrades."
+lead: "For persistent server deployments: run AgentRouter Core and the browser management UI in Docker behind a single Nginx entrypoint, and configure ports, authentication, persistence, remote access, backup, and upgrades."
 ---
 
 ## Scope and limitations
 
-The Docker image is intended for a persistent model gateway and browser administration. It contains CCR Core, the built management UI, PM2, and Nginx. It does not include:
+The Docker image is intended for a persistent model gateway and browser administration. It contains AgentRouter Core, the built management UI, PM2, and Nginx. It does not include:
 
 - The Electron desktop app, system tray, or desktop notifications;
 - The `ccr` command from the npm distribution;
@@ -33,7 +33,7 @@ Nginx exposes:
 | Path | Purpose |
 | --- | --- |
 | `/`, `/pages/home/index.html` | Management UI. The root path redirects to a page URL containing the management token. |
-| `/api/ccr/rpc` | Management RPC, protected by the management token. |
+| `/api/ar/rpc` | Management RPC, protected by the management token. |
 | `/health` | Model gateway health; container or UI status is not reflected here. |
 | `/v1/*`, `/v1beta/*`, `/messages`, `/chat/completions`, `/responses`, `/interactions`, `/mcp/*` | Model and MCP gateway endpoints. |
 
@@ -51,10 +51,10 @@ Open <http://127.0.0.1:3458>. On a fresh volume the management UI is available i
 Complete the first-time configuration in this order:
 
 1. Add a provider and at least one model.
-2. Create a CCR client key on the **API Keys** page.
+2. Create a AgentRouter client key on the **API Keys** page.
 3. Start the gateway on the **Server** page.
 4. Request `/health` and confirm it returns `200` with a running status.
-5. Point the client Base URL at `http://127.0.0.1:3458` and use the CCR client key you just created.
+5. Point the client Base URL at `http://127.0.0.1:3458` and use the AgentRouter client key you just created.
 
 Stopping or removing the container does not delete the named volume:
 
@@ -63,7 +63,7 @@ docker compose stop
 docker compose down
 ```
 
-Do not add `--volumes` to `docker compose down` unless you explicitly want to delete all CCR data.
+Do not add `--volumes` to `docker compose down` unless you explicitly want to delete all AgentRouter data.
 
 ## Local-only access
 
@@ -71,7 +71,7 @@ The repository default mapping `3458:8080` listens on every host interface. If y
 
 ```yaml
 services:
-  ccr:
+  agentrouter:
     ports:
       - "127.0.0.1:3458:8080"
 ```
@@ -89,19 +89,19 @@ docker run -d \
   --restart unless-stopped \
   -p 127.0.0.1:3458:8080 \
   -e AR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
-  -v ccr-data:/data \
+  -v ar-data:/data \
   claude-code-router:local
 ```
 
-The repository also provides `npm run docker:build` and `npm run docker:run`. The latter uses `3458` and `ccr-data`, but the container runs with `--rm` and has no fixed name or restart policy, so it is better suited to temporary verification.
+The repository also provides `npm run docker:build` and `npm run docker:run`. The latter uses `3458` and `ar-data`, but the container runs with `--rm` and has no fixed name or restart policy, so it is better suited to temporary verification.
 
 ## Do not mix up the three credentials
 
 | Credential | Purpose | Where configured |
 | --- | --- | --- |
 | `AR_WEB_AUTH_TOKEN` | Management UI / RPC authentication | Container environment variable |
-| CCR client API key | Model gateway request authentication | **API Keys** page in the UI |
-| Upstream provider credential | CCR calling model providers | **Providers** page in the UI |
+| AgentRouter client API key | Model gateway request authentication | **API Keys** page in the UI |
+| Upstream provider credential | AgentRouter calling model providers | **Providers** page in the UI |
 
 Without `AR_WEB_AUTH_TOKEN`, the entrypoint generates a new random token on every container start. Opening the root address still works because Nginx redirects to a URL containing the current token; but persistent and remote deployments should pin a sufficiently long, strong token.
 
@@ -112,7 +112,7 @@ AR_WEB_AUTH_TOKEN=replace-with-a-long-random-value
 AR_PUBLIC_BASE_URL=http://127.0.0.1:3458
 ```
 
-Use it via `docker run --env-file`, or map the same variables into the Compose service `environment`. The complete management URL containing `ccr_web_token` should also be protected like a password, because it can appear in browser history, reverse proxy logs, screenshots, and tickets.
+Use it via `docker run --env-file`, or map the same variables into the Compose service `environment`. The complete management URL containing `ar_web_token` should also be protected like a password, because it can appear in browser history, reverse proxy logs, screenshots, and tickets.
 
 ## Change the external port or address
 
@@ -120,7 +120,7 @@ The host-facing address and the container-internal port are two layers of config
 
 ```yaml
 services:
-  ccr:
+  agentrouter:
     ports:
       - "127.0.0.1:8088:8080"
     environment:
@@ -128,7 +128,7 @@ services:
       AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
-`AR_PUBLIC_BASE_URL` is synchronized into CCR's public router endpoint. It does not publish a Docker port by itself, nor does it change the Nginx listen address.
+`AR_PUBLIC_BASE_URL` is synchronized into AgentRouter's public router endpoint. It does not publish a Docker port by itself, nor does it change the Nginx listen address.
 
 ## Domain, HTTPS, and reverse proxy
 
@@ -136,15 +136,15 @@ When a reverse proxy or ingress terminates TLS:
 
 ```yaml
 services:
-  ccr:
+  agentrouter:
     ports:
       - "127.0.0.1:3458:8080"
     environment:
-      AR_PUBLIC_BASE_URL: https://ccr.example.com
+      AR_PUBLIC_BASE_URL: https://ar.example.com
       AR_WEB_AUTH_TOKEN: ${AR_WEB_AUTH_TOKEN:?set AR_WEB_AUTH_TOKEN}
 ```
 
-The reverse proxy should forward all paths to the CCR Nginx and must:
+The reverse proxy should forward all paths to the AgentRouter Nginx and must:
 
 - Support long-running model requests;
 - Not buffer SSE and streaming model responses;
@@ -169,7 +169,7 @@ The entrypoint sets `HOME=/data`; the actual data lives at:
 └── bin/
 ```
 
-Prefer a named volume. A bind-mount directory must be writable by the container, and two running CCR containers must not share the same data.
+Prefer a named volume. A bind-mount directory must be writable by the container, and two running AgentRouter containers must not share the same data.
 
 On a brand-new data directory with neither `config.json` nor `config.sqlite`, the entrypoint writes a minimal legacy-format `config.json` as the first boot. Once the UI saves configuration, SQLite becomes authoritative. On every start, the gateway listener fields and `routerEndpoint` in the JSON / SQLite are also synchronized to the current Docker public address by default.
 
@@ -179,11 +179,11 @@ For application-level backup, prefer **Settings → Export data**. For a complet
 
 ```sh
 docker compose stop ccr
-docker compose cp ccr:/data/. ./ccr-data-backup/
+docker compose cp ccr:/data/. ./ar-data-backup/
 docker compose start ccr
 ```
 
-The backup contains provider credentials and CCR client keys, and may contain request / response data; store it as sensitive data.
+The backup contains provider credentials and AgentRouter client keys, and may contain request / response data; store it as sensitive data.
 
 For a full restore, copy the backup into a new empty volume or an empty `/data` directory with the container stopped. Do not overlay an old backup onto an active directory that still has newer data, otherwise old SQLite WAL / SHM files may mix with new runtime files. Take another backup before replacing existing data.
 
@@ -208,7 +208,7 @@ A typical deployment only needs `AR_WEB_AUTH_TOKEN`, `AR_PUBLIC_BASE_URL`, and t
 | Variable | Default | Description |
 | --- | --- | --- |
 | `AR_WEB_AUTH_TOKEN` | Randomly generated per start | Management UI / RPC token. Persistent or remote deployments should set a fixed strong value. |
-| `AR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | Full public address written into CCR configuration; takes precedence over Public Host / Port once set. |
+| `AR_PUBLIC_BASE_URL` | `http://127.0.0.1:3458` | Full public address written into AgentRouter configuration; takes precedence over Public Host / Port once set. |
 | `AR_PUBLIC_HOST` | `127.0.0.1` | Only used to compose the public address when no full public URL is set; does not change the Docker port binding. |
 | `AR_PUBLIC_PORT` | `3458` | Only used to compose the public address when no full public URL is set. |
 | `AR_DATA_DIR` | `/data` | Data root, also used as the process `HOME`. |
@@ -266,7 +266,7 @@ It checks the model gateway, not Nginx or the UI. A fresh volume without a confi
 
 ### The UI returns `401` after a token change
 
-Reopen the bare root address so Nginx generates a URL containing the new token; close tabs and bookmarks that still use the old `ccr_web_token`.
+Reopen the bare root address so Nginx generates a URL containing the new token; close tabs and bookmarks that still use the old `ar_web_token`.
 
 ### Clients still use the old port or domain
 
@@ -282,7 +282,7 @@ Confirm the host directory exists, is writable by the container, and is not moun
 
 ### The container is healthy, but model requests fail
 
-Container health only means Nginx / UI are reachable. Continue checking **Server** status, provider connectivity, the CCR client key, routing, and request logs, and inspect:
+Container health only means Nginx / UI are reachable. Continue checking **Server** status, provider connectivity, the AgentRouter client key, routing, and request logs, and inspect:
 
 ```sh
 docker compose logs --tail=200 ccr
@@ -290,7 +290,7 @@ docker compose logs --tail=200 ccr
 
 ## Related pages
 
-- [Install and start CCR](../install/)
+- [Install and start AgentRouter](../install/)
 - [CLI installation and command reference](../cli/)
 - [Server](../../configuration/server/)
 - [API Keys](../../configuration/api-keys/)

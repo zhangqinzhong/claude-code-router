@@ -3,10 +3,10 @@ import type {
   ProviderCatalogModelsResult,
   ProviderModelMetadata,
   ProviderModelPricing
-} from "@ccr/core/contracts/app";
-import { providerUrlWithDefaultScheme } from "@ccr/core/providers/url";
-import { loadModelCatalogPayload } from "@ccr/core/models/catalog-file";
-import { findProviderPreset, findProviderPresetByBaseUrl } from "@ccr/core/providers/presets/index";
+} from "@agentrouter/core/contracts/app";
+import { providerUrlWithDefaultScheme } from "@agentrouter/core/providers/url";
+import { loadModelCatalogPayload } from "@agentrouter/core/models/catalog-file";
+import { findProviderPreset, findProviderPresetByBaseUrl } from "@agentrouter/core/providers/presets/index";
 
 type CatalogProviderEntry = {
   apiUrls: string[];

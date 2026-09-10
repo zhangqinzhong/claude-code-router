@@ -123,9 +123,9 @@ const logoSrc = withBase("/logo.png");
 const pageDescription =
   description ??
   (locale === "zh"
-    ? "Claude Code Router（CCR）文档：安装、配置、供应商接入与故障排查指南。"
-    : "Claude Code Router (CCR) documentation: installation, configuration, provider setup, and troubleshooting guides.");
-const pageTitle = isHome && docTitle ? String(docTitle) : `${title} | Claude Code Router`;
+    ? "AgentRouter（AgentRouter）文档：安装、配置、供应商接入与故障排查指南。"
+    : "AgentRouter (AgentRouter) documentation: installation, configuration, provider setup, and troubleshooting guides.");
+const pageTitle = isHome && docTitle ? String(docTitle) : `${title} | AgentRouter`;
 const canonicalUrl = absoluteHref(currentPath);
 const ogImageUrl = absoluteHref("/logo.png");
 const sitemapUrl = withBase("/sitemap-index.xml");
@@ -152,7 +152,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
     <link rel="sitemap" href={sitemapUrl} />
     <script is:inline>
       (() => {
-        const storageKey = "ccr-docs-theme";
+        const storageKey = "ar-docs-theme";
 
         try {
           const storedTheme = localStorage.getItem(storageKey);
@@ -188,9 +188,9 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
     <div class="shell">
       <header class="topbar" data-topbar>
         <div class="top-left">
-          <a class="brand" href={homeHref} aria-label="Claude Code Router Docs">
+          <a class="brand" href={homeHref} aria-label="AgentRouter Docs">
             <img src={logoSrc} alt="" class="brand-logo" />
-            <span>CCR docs</span>
+            <span>AgentRouter docs</span>
           </a>
 
           <details class="language-switcher">
@@ -263,7 +263,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
             </div>
             <a
               class="icon-button github-button hide-small"
-              href="https://github.com/musistudio/claude-code-router"
+              href="https://github.com/zhangqinzhong/claude-code-router"
               aria-label={ui.githubLabel}
             >
               <Github size={18} aria-hidden="true" />
@@ -279,7 +279,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
             </button>
             <a
               class="cta-button"
-              href="https://github.com/musistudio/claude-code-router/releases"
+              href="https://github.com/zhangqinzhong/claude-code-router/releases"
               aria-label={ui.downloadLabel}
             >
               <Download size={16} aria-hidden="true" />
@@ -438,7 +438,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
                 </a>
               )
             }
-            <p class="copyright">© {currentYear} Claude Code Router</p>
+            <p class="copyright">© {currentYear} AgentRouter</p>
           </footer>
         </main>
 
@@ -484,7 +484,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
         return count.toLocaleString();
       };
 
-      fetch("https://api.github.com/repos/musistudio/claude-code-router", {
+      fetch("https://api.github.com/repos/zhangqinzhong/claude-code-router", {
         headers: { Accept: "application/vnd.github+json" },
       })
         .then((response) => {
@@ -504,7 +504,7 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
     </script>
     <script define:vars={{ searchNoResults, searchIndexUrl, searchLoadingLabel: ui.searchLoading }}>
       const themeToggle = document.querySelector("[data-theme-toggle]");
-      const themeStorageKey = "ccr-docs-theme";
+      const themeStorageKey = "ar-docs-theme";
       const themeMediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
       const getStoredTheme = () => {

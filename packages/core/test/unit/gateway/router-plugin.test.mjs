@@ -1,28 +1,28 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import {
-  ccrCodexApplyPatchBridgeHeader,
-  ccrCodexBridgeRequestTransformKey,
-  ccrCodexBridgeResponseHookKey,
-  ccrCodexBridgeStreamHookKey,
-  ccrCodexMultiAgentBridgeHeader,
-  ccrOpenRouterDiscountFinalizeResponseHookKey,
-  ccrRuntimeConfigReloadMessageType,
-  ccrRouteReasonHeader,
-  ccrRouteSourceHeader,
-  ccrRoutedModelHeader,
-  ccrRouterHttpRoutePath,
-  ccrRouterRouteResolverKey,
-  ccrRouterRequestTransformKey
-} from "@ccr/core/gateway/core-runtime/router-plugin-contract.ts";
-import { coreGatewayAuthHeader } from "@ccr/core/gateway/internal/shared.ts";
-import { ccrRemoteControlPathPrefix } from "@ccr/core/gateway/remote-control-service.ts";
-import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@ccr/core/gateway/runtime-config-control.ts";
-import { createGatewayPlugin } from "@ccr/core/gateway/core-runtime/router-plugin.ts";
-import { providerRuntimeId } from "@ccr/core/routing/model-registry.ts";
+  arCodexApplyPatchBridgeHeader,
+  arCodexBridgeRequestTransformKey,
+  arCodexBridgeResponseHookKey,
+  arCodexBridgeStreamHookKey,
+  arCodexMultiAgentBridgeHeader,
+  arOpenRouterDiscountFinalizeResponseHookKey,
+  arRuntimeConfigReloadMessageType,
+  arRouteReasonHeader,
+  arRouteSourceHeader,
+  arRoutedModelHeader,
+  arRouterHttpRoutePath,
+  arRouterRouteResolverKey,
+  arRouterRequestTransformKey
+} from "@agentrouter/core/gateway/core-runtime/router-plugin-contract.ts";
+import { coreGatewayAuthHeader } from "@agentrouter/core/gateway/internal/shared.ts";
+import { arRemoteControlPathPrefix } from "@agentrouter/core/gateway/remote-control-service.ts";
+import { gatewayRuntimeConfigControlPath, gatewayRuntimeConfigRevision } from "@agentrouter/core/gateway/runtime-config-control.ts";
+import { createGatewayPlugin } from "@agentrouter/core/gateway/core-runtime/router-plugin.ts";
+import { providerRuntimeId } from "@agentrouter/core/routing/model-registry.ts";
 
-test("CCR router core plugin exposes route endpoint and beforeRouting transform", async () => {
+test("AgentRouter router core plugin exposes route endpoint and beforeRouting transform", async () => {
   const config = createDefaultAppConfig();
   config.Providers = [
     { models: ["alpha"], name: "Primary", type: "openai_chat_completions" },
@@ -38,7 +38,7 @@ test("CCR router core plugin exposes route endpoint and beforeRouting transform"
   }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config } } });
-  assert.equal(plugin.httpRoutes[0].path, ccrRouterHttpRoutePath);
+  assert.equal(plugin.httpRoutes[0].path, arRouterHttpRoutePath);
 
   const transformed = await plugin.requestTransforms[0].transform({
     request: {
@@ -59,11 +59,11 @@ test("CCR router core plugin exposes route endpoint and beforeRouting transform"
   assert.ok(transformed);
   assert.equal(transformed.requestBody.model, "Secondary/beta");
   assert.equal(transformed.model, "Secondary/beta");
-  assert.equal(transformed.headers[ccrRoutedModelHeader], "Secondary/beta");
-  assert.equal(transformed.headers[ccrRouteReasonHeader], "rule:route-to-secondary");
-  assert.equal(transformed.headers[ccrRouteSourceHeader], "rule");
+  assert.equal(transformed.headers[arRoutedModelHeader], "Secondary/beta");
+  assert.equal(transformed.headers[arRouteReasonHeader], "rule:route-to-secondary");
+  assert.equal(transformed.headers[arRouteSourceHeader], "rule");
 
-  const resolver = plugin.routeResolvers.find((item) => item.key === ccrRouterRouteResolverKey);
+  const resolver = plugin.routeResolvers.find((item) => item.key === arRouterRouteResolverKey);
   const resolved = resolver.resolve({
     model: transformed.model,
     request: {
@@ -83,7 +83,7 @@ test("CCR router core plugin exposes route endpoint and beforeRouting transform"
   assert.equal(resolved.requestBody.model, "beta");
 });
 
-test("CCR router core plugin resolves bare Codex companion models through the authenticated profile provider", async () => {
+test("AgentRouter router core plugin resolves bare Codex companion models through the authenticated profile provider", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "bs-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "profile:bs-2", key: "bs-key" }];
@@ -158,12 +158,12 @@ test("CCR router core plugin resolves bare Codex companion models through the au
   });
 
   assert.ok(transformed);
-  assert.equal(transformed.headers[ccrRouteReasonHeader], "default");
-  assert.equal(transformed.headers[ccrRoutedModelHeader], "gpt-5.6-luna");
+  assert.equal(transformed.headers[arRouteReasonHeader], "default");
+  assert.equal(transformed.headers[arRoutedModelHeader], "gpt-5.6-luna");
   assert.equal(transformed.model, "gpt-5.6-luna");
   assert.equal(transformed.requestBody.model, "gpt-5.6-luna");
 
-  const resolver = plugin.routeResolvers.find((item) => item.key === ccrRouterRouteResolverKey);
+  const resolver = plugin.routeResolvers.find((item) => item.key === arRouterRouteResolverKey);
   const resolved = resolver.resolve({
     model: transformed.model,
     request: {
@@ -186,7 +186,7 @@ test("CCR router core plugin resolves bare Codex companion models through the au
   assert.equal(resolved.requestBody.model, "gpt-5.6-luna");
 });
 
-test("CCR router core plugin applies Codex bridge request and response hooks", async () => {
+test("AgentRouter router core plugin applies Codex bridge request and response hooks", async () => {
   const config = createDefaultAppConfig();
   config.Providers = [{
     models: ["claude-sonnet"],
@@ -195,7 +195,7 @@ test("CCR router core plugin applies Codex bridge request and response hooks", a
   }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config } } });
-  const transform = plugin.requestTransforms.find((item) => item.key === ccrCodexBridgeRequestTransformKey);
+  const transform = plugin.requestTransforms.find((item) => item.key === arCodexBridgeRequestTransformKey);
   const patch = "*** Begin Patch\n*** Add File: foo.txt\n+hi\n*** End Patch\n";
   const transformed = await transform.transform({
     model: "Primary/claude-sonnet",
@@ -229,14 +229,14 @@ test("CCR router core plugin applies Codex bridge request and response hooks", a
   });
 
   assert.ok(transformed);
-  assert.equal(transformed.headers[ccrCodexApplyPatchBridgeHeader]?.startsWith("Primary/claude-sonnet:"), true);
-  assert.equal(transformed.headers[ccrCodexMultiAgentBridgeHeader]?.startsWith("Primary/claude-sonnet:"), true);
+  assert.equal(transformed.headers[arCodexApplyPatchBridgeHeader]?.startsWith("Primary/claude-sonnet:"), true);
+  assert.equal(transformed.headers[arCodexMultiAgentBridgeHeader]?.startsWith("Primary/claude-sonnet:"), true);
   assert.equal(transformed.requestBody.tools[0].name, "virtual_apply_patch");
   assert.equal(transformed.requestBody.tools[1].name, "multi_agent_v1_spawn_agent");
   assert.equal(transformed.requestBody.input[0].name, "virtual_apply_patch");
   assert.equal(transformed.requestBody.input[1].name, "multi_agent_v1_spawn_agent");
 
-  const responseHook = plugin.responseHooks.find((item) => item.key === ccrCodexBridgeResponseHookKey);
+  const responseHook = plugin.responseHooks.find((item) => item.key === arCodexBridgeResponseHookKey);
   const response = await responseHook.transformResponse({
     request: {
       headers: transformed.headers,
@@ -267,7 +267,7 @@ test("CCR router core plugin applies Codex bridge request and response hooks", a
   assert.equal(response.responsePayload.output[1].name, "wait_agent");
   assert.equal(response.responsePayload.output[1].namespace, "multi_agent_v1");
 
-  const streamHook = plugin.streamHooks.find((item) => item.key === ccrCodexBridgeStreamHookKey);
+  const streamHook = plugin.streamHooks.find((item) => item.key === arCodexBridgeStreamHookKey);
   const streamed = await streamHook.transformResponse({
     request: {
       headers: transformed.headers,
@@ -308,7 +308,7 @@ test("CCR router core plugin applies Codex bridge request and response hooks", a
   assert.match(streamText, /"name":"apply_patch"/);
 });
 
-test("CCR router core plugin skips Codex bridge for native Responses passthrough", async () => {
+test("AgentRouter router core plugin skips Codex bridge for native Responses passthrough", async () => {
   const config = createDefaultAppConfig();
   config.Providers = [{
     models: ["gpt-5.5"],
@@ -317,7 +317,7 @@ test("CCR router core plugin skips Codex bridge for native Responses passthrough
   }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config } } });
-  const transform = plugin.requestTransforms.find((item) => item.key === ccrCodexBridgeRequestTransformKey);
+  const transform = plugin.requestTransforms.find((item) => item.key === arCodexBridgeRequestTransformKey);
   const transformed = await transform.transform({
     model: "gpt-5.5",
     request: {
@@ -355,7 +355,7 @@ test("CCR router core plugin skips Codex bridge for native Responses passthrough
   assert.equal(transformed, undefined);
 });
 
-test("CCR router core plugin applies OpenRouter discount provider routing", async (t) => {
+test("AgentRouter router core plugin applies OpenRouter discount provider routing", async (t) => {
   const config = createDefaultAppConfig();
   config.Providers = [{
     api_base_url: "https://openrouter.ai/api/v1",
@@ -441,7 +441,7 @@ test("CCR router core plugin applies OpenRouter discount provider routing", asyn
   });
   assert.equal(beforeConfirm.responseHeaders["x-ar-openrouter-discount-reason"], "initial-cheapest");
 
-  const finalizer = plugin.responseHooks.find((item) => item.key === ccrOpenRouterDiscountFinalizeResponseHookKey);
+  const finalizer = plugin.responseHooks.find((item) => item.key === arOpenRouterDiscountFinalizeResponseHookKey);
   await finalizer.transformResponse({
     request: {
       headers: {
@@ -501,7 +501,7 @@ test("CCR router core plugin applies OpenRouter discount provider routing", asyn
   });
 });
 
-test("CCR router core plugin maps public API keys before gateway auth", async () => {
+test("AgentRouter router core plugin maps public API keys before gateway auth", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "client-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "profile:limited", key: "client-key" }];
@@ -515,7 +515,7 @@ test("CCR router core plugin maps public API keys before gateway auth", async ()
   assert.equal(headers["x-auth-sub"], "profile:limited");
 });
 
-test("CCR router core plugin maps SDK-compatible public API key headers before gateway auth", async () => {
+test("AgentRouter router core plugin maps SDK-compatible public API key headers before gateway auth", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "client-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "profile:limited", key: "client-key" }];
@@ -531,7 +531,7 @@ test("CCR router core plugin maps SDK-compatible public API key headers before g
   }
 });
 
-test("CCR router core plugin rejects expired public API keys before gateway static auth", async () => {
+test("AgentRouter router core plugin rejects expired public API keys before gateway static auth", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "expired-key";
   config.APIKEYS = [{
@@ -554,14 +554,14 @@ test("CCR router core plugin rejects expired public API keys before gateway stat
   assert.equal(headers["x-auth-sub"], undefined);
 });
 
-test("CCR router core plugin protects internal route decisions with the core token", async () => {
+test("AgentRouter router core plugin protects internal route decisions with the core token", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "client-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "client", key: "client-key" }];
   config.Providers = [{ models: ["alpha"], name: "Primary", type: "openai_chat_completions" }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config, coreAuthToken: "core-token", publicGatewayMode: true } } });
-  const route = plugin.httpRoutes.find((item) => item.path === ccrRouterHttpRoutePath);
+  const route = plugin.httpRoutes.find((item) => item.path === arRouterHttpRoutePath);
 
   const clientReply = createReply();
   const denied = await route.handler({
@@ -569,20 +569,20 @@ test("CCR router core plugin protects internal route decisions with the core tok
       body: { body: { model: "Primary/alpha" }, method: "POST", path: "/v1/messages", url: "/v1/messages" },
       headers: { authorization: "Bearer client-key" },
       method: "POST",
-      url: ccrRouterHttpRoutePath
+      url: arRouterHttpRoutePath
     },
     reply: clientReply
   });
 
   assert.equal(clientReply.statusCode, 401);
-  assert.match(denied.error.message, /Unauthorized CCR router route/);
+  assert.match(denied.error.message, /Unauthorized AgentRouter router route/);
 
   const allowed = await route.handler({
     request: {
       body: { body: { model: "Primary/alpha" }, method: "POST", path: "/v1/messages", url: "/v1/messages" },
       headers: { [coreGatewayAuthHeader]: "core-token" },
       method: "POST",
-      url: ccrRouterHttpRoutePath
+      url: arRouterHttpRoutePath
     },
     reply: createReply()
   });
@@ -591,7 +591,7 @@ test("CCR router core plugin protects internal route decisions with the core tok
   assert.equal(allowed.decision.source, "default");
 });
 
-test("CCR router core plugin exposes runtime config control through the managed parent process", async (t) => {
+test("AgentRouter router core plugin exposes runtime config control through the managed parent process", async (t) => {
   const config = createDefaultAppConfig();
   config.APIKEY = "primary-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "primary", key: "primary-key" }];
@@ -638,11 +638,11 @@ test("CCR router core plugin exposes runtime config control through the managed 
     configRevision: revision,
     forceRestart: true,
     protocolVersion: 1,
-    type: ccrRuntimeConfigReloadMessageType
+    type: arRuntimeConfigReloadMessageType
   });
 });
 
-test("CCR router core plugin allows internal core auth tokens before public gateway auth", async () => {
+test("AgentRouter router core plugin allows internal core auth tokens before public gateway auth", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "client-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "client", key: "client-key" }];
@@ -656,21 +656,21 @@ test("CCR router core plugin allows internal core auth tokens before public gate
   assert.equal(headers["x-auth-sub"], undefined);
 });
 
-test("CCR router core plugin serves remote control capabilities with query auth", async () => {
+test("AgentRouter router core plugin serves remote control capabilities with query auth", async () => {
   const config = createDefaultAppConfig();
   config.APIKEY = "client-key";
   config.APIKEYS = [{ createdAt: new Date(0).toISOString(), id: "client", key: "client-key" }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config, coreAuthToken: "core-token", publicGatewayMode: true } } });
-  const route = plugin.httpRoutes.find((item) => item.path === ccrRemoteControlPathPrefix);
+  const route = plugin.httpRoutes.find((item) => item.path === arRemoteControlPathPrefix);
   const response = createRawResponse();
   const reply = createReply({ raw: response });
   const payload = await route.handler({
     request: {
       headers: {},
       method: "GET",
-      raw: { headers: {}, method: "GET", url: `${ccrRemoteControlPathPrefix}?api_key=client-key` },
-      url: `${ccrRemoteControlPathPrefix}?api_key=client-key`
+      raw: { headers: {}, method: "GET", url: `${arRemoteControlPathPrefix}?api_key=client-key` },
+      url: `${arRemoteControlPathPrefix}?api_key=client-key`
     },
     reply
   });
@@ -679,10 +679,10 @@ test("CCR router core plugin serves remote control capabilities with query auth"
   assert.equal(reply.hijacked, true);
   assert.equal(response.statusCode, 200);
   assert.equal(response.headers["content-type"], "application/json; charset=utf-8");
-  assert.equal(JSON.parse(response.body).name, "ccr-remote-control");
+  assert.equal(JSON.parse(response.body).name, "ar-remote-control");
 });
 
-test("CCR router core plugin serves public model discovery before built-in gateway routes", async () => {
+test("AgentRouter router core plugin serves public model discovery before built-in gateway routes", async () => {
   const config = createDefaultAppConfig();
   config.Providers = [{
     models: ["alpha", "beta"],
@@ -712,7 +712,7 @@ test("CCR router core plugin serves public model discovery before built-in gatew
   assert.deepEqual(payload.data.map((model) => model.id), ["Primary/alpha"]);
 });
 
-test("CCR router core plugin rejects profile-disallowed routed models", async () => {
+test("AgentRouter router core plugin rejects profile-disallowed routed models", async () => {
   const config = createDefaultAppConfig();
   config.Providers = [{
     models: ["alpha", "beta"],
@@ -731,7 +731,7 @@ test("CCR router core plugin rejects profile-disallowed routed models", async ()
   }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config } } });
-  const transform = plugin.requestTransforms.find((item) => item.key === ccrRouterRequestTransformKey);
+  const transform = plugin.requestTransforms.find((item) => item.key === arRouterRequestTransformKey);
   const transformed = await transform.transform({
     request: {
       headers: { authorization: "Bearer client-key" },

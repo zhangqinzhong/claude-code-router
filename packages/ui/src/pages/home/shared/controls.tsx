@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { MorphIcon } from "@musistudio/lucide-morph-react";
+import { MorphIcon } from "@/vendor/lucide-morph";
 import { AnimatePresence } from "motion/react";
 import {
   Check,
@@ -24,7 +24,7 @@ import type {
   UsageSeriesPoint,
   UsageStatsRange,
   UsageTotals
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   translateOptions,
   useAppText

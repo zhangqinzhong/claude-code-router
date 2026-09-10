@@ -1,7 +1,7 @@
 import {
   GATEWAY_PLUGIN_PERMISSION_IDS,
   GATEWAY_PLUGIN_SURFACE_IDS
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   AppConfig,
   GatewayProviderConfig,
@@ -11,7 +11,7 @@ import type {
   GatewayPluginSurfacesConfig,
   PluginDependency,
   PluginMarketplaceEntry
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 import { isPlainRecord, stringValue } from "./common";
 import { isClaudeDesignPluginConfig, isCursorProxyPluginConfig, readClaudeDesignRoutingConfig } from "./routing";
@@ -252,7 +252,7 @@ function normalizePluginAppUrlForSettings(value: string | undefined): { ok: true
     return { ok: false, message: "Plugin app URL cannot be protocol-relative." };
   }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
-    return { ok: false, message: "Plugin app URL must be an http(s) URL or a CCR gateway path." };
+    return { ok: false, message: "Plugin app URL must be an http(s) URL or a AgentRouter gateway path." };
   }
   return { ok: true, value: trimmed.startsWith("/") ? trimmed : `/${trimmed}` };
 }

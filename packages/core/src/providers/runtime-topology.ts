@@ -1,12 +1,12 @@
 /**
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
-import { isGatewayProviderEnabled } from "@ccr/core/contracts/app";
-import type { AppConfig, GatewayProviderCapability, GatewayProviderCapabilityProtocol, GatewayProviderConfig, GatewayProviderProtocol, ProviderCredentialConfig } from "@ccr/core/contracts/app";
-import { findProviderPresetByBaseUrl, providerApiKeySafetyIssue } from "@ccr/core/providers/presets/index";
-import { normalizeProviderBaseUrl as normalizeProviderBaseUrlInput } from "@ccr/core/providers/url";
-import { modelRegistryForConfig, parseProviderModelSelector, providerRuntimeId } from "@ccr/core/routing/model-registry";
-import { gatewayProviderProtocolFallbackOrder, type CoreGatewayProvider } from "@ccr/core/gateway/internal/shared";
+import { isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
+import type { AppConfig, GatewayProviderCapability, GatewayProviderCapabilityProtocol, GatewayProviderConfig, GatewayProviderProtocol, ProviderCredentialConfig } from "@agentrouter/core/contracts/app";
+import { findProviderPresetByBaseUrl, providerApiKeySafetyIssue } from "@agentrouter/core/providers/presets/index";
+import { normalizeProviderBaseUrl as normalizeProviderBaseUrlInput } from "@agentrouter/core/providers/url";
+import { modelRegistryForConfig, parseProviderModelSelector, providerRuntimeId } from "@agentrouter/core/routing/model-registry";
+import { gatewayProviderProtocolFallbackOrder, type CoreGatewayProvider } from "@agentrouter/core/gateway/internal/shared";
 
 export function providerCapabilityForClientProtocol(
   provider: GatewayProviderConfig,
@@ -455,9 +455,9 @@ export function inferProtocol(provider: GatewayProviderConfig): GatewayProviderP
 }
 
 export function resolveResponseProviderProtocol(headers: Headers, config: AppConfig | undefined): GatewayProviderProtocol | undefined {
-  const ccrProtocol = normalizeProviderProtocol(headers.get("x-ar-provider-protocol"));
-  if (ccrProtocol) {
-    return ccrProtocol;
+  const arProtocol = normalizeProviderProtocol(headers.get("x-ar-provider-protocol"));
+  if (arProtocol) {
+    return arProtocol;
   }
   const providerName =
     headers.get("x-gateway-target-provider-name")?.trim() ||

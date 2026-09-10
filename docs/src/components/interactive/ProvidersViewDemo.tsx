@@ -18,7 +18,7 @@ import {
 } from "@/pages/home/shared/providers";
 import { setProviderPresets } from "@/pages/home/shared/external";
 import type { AddProviderDraft } from "@/pages/home/shared/types";
-import type { GatewayProviderConfig, ProviderAccountSnapshot } from "@ccr/core/contracts/app";
+import type { GatewayProviderConfig, ProviderAccountSnapshot } from "@agentrouter/core/contracts/app";
 import {
   DemoShell,
   readDemoLocale,
@@ -31,9 +31,9 @@ import {
 } from "./demoRuntime";
 // The UI's getProviderPresets() reads a runtime cache (shared/external.tsx) that
 // the desktop app fills from the bridge on startup; with no bridge in docs it
-// stays empty and the preset picker shows nothing. Seed it from the @ccr/core
+// stays empty and the preset picker shows nothing. Seed it from the @agentrouter/core
 // static list so the demo shows the real built-in presets.
-import { getProviderPresets as getCoreProviderPresets } from "@ccr/core/providers/presets";
+import { getProviderPresets as getCoreProviderPresets } from "@agentrouter/core/providers/presets";
 setProviderPresets(getCoreProviderPresets());
 
 const notify = (_: string) => {};

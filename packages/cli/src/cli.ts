@@ -3,19 +3,19 @@ import { spawn } from "node:child_process";
 import { randomBytes } from "node:crypto";
 import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { botGatewayProfileEnv } from "@ccr/core/agents/bot-gateway/env";
-import { applyClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service";
-import { launchClaudeAppProfile, resolveClaudeAppProfileUserDataDir } from "@ccr/core/agents/claude-app/launch";
-import { codexDesktopAppName, launchZcodeAppProfile } from "@ccr/core/agents/codex/app-launch";
-import { loadAppConfig } from "@ccr/core/config/config";
-import { CONFIGDIR } from "@ccr/core/config/constants";
-import { installSocketTypeOfServiceCompat } from "@ccr/core/platform/socket-compat";
-import { resolveModelCatalogPath } from "@ccr/core/models/catalog-file";
-import { applyProfileConfig, applyProfileRuntimeConfig } from "@ccr/core/profiles/service";
-import { ensureProfileGateway, ProfileGatewayUnavailableError } from "@ccr/core/profiles/launch-service";
-import { buildProfileLaunchPlan, defaultProfileOpenSurface, findProfileForOpen, profileLaunchSpawnCommand, resolveProfileOpenSurface, shouldAutoStartProfileGateway } from "@ccr/core/profiles/launch-core";
-import { openSystemExternal, startWebManagementServer } from "@ccr/core/web/management-server";
-import { assertAvailableGatewayModels, type AppConfig, type GatewayStatus, type ProfileConfig, type ProfileOpenResult, type ProfileOpenSurface } from "@ccr/core/contracts/app";
+import { botGatewayProfileEnv } from "@agentrouter/core/agents/bot-gateway/env";
+import { applyClaudeAppGatewayConfig } from "@agentrouter/core/agents/claude-app/gateway-service";
+import { launchClaudeAppProfile, resolveClaudeAppProfileUserDataDir } from "@agentrouter/core/agents/claude-app/launch";
+import { codexDesktopAppName, launchZcodeAppProfile } from "@agentrouter/core/agents/codex/app-launch";
+import { loadAppConfig } from "@agentrouter/core/config/config";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
+import { installSocketTypeOfServiceCompat } from "@agentrouter/core/platform/socket-compat";
+import { resolveModelCatalogPath } from "@agentrouter/core/models/catalog-file";
+import { applyProfileConfig, applyProfileRuntimeConfig } from "@agentrouter/core/profiles/service";
+import { ensureProfileGateway, ProfileGatewayUnavailableError } from "@agentrouter/core/profiles/launch-service";
+import { buildProfileLaunchPlan, defaultProfileOpenSurface, findProfileForOpen, profileLaunchSpawnCommand, resolveProfileOpenSurface, shouldAutoStartProfileGateway } from "@agentrouter/core/profiles/launch-core";
+import { openSystemExternal, startWebManagementServer } from "@agentrouter/core/web/management-server";
+import { assertAvailableGatewayModels, type AppConfig, type GatewayStatus, type ProfileConfig, type ProfileOpenResult, type ProfileOpenSurface } from "@agentrouter/core/contracts/app";
 
 installSocketTypeOfServiceCompat();
 
@@ -66,7 +66,7 @@ const serviceStopTimeoutMs = 10_000;
 const profileGatewayIdleGraceMs = 2_000;
 const profileGatewayLeasePollMs = 500;
 const webAuthHeader = "x-ar-web-auth";
-const webAuthQueryParam = "ccr_web_token";
+const webAuthQueryParam = "ar_web_token";
 const defaultCliCommandName = "ccr";
 const prepareProfileOnlyEnv = "AR_CLI_PREPARE_PROFILE_ONLY";
 
@@ -122,7 +122,7 @@ async function main(): Promise<void> {
     throw new Error("ZCode profiles can only open the app; agent arguments are not supported.");
   }
   if (profile.agent === "claude-design") {
-    throw new Error("Claude Design profiles can only be opened from CCR Desktop.");
+    throw new Error("Claude Design profiles can only be opened from AgentRouter Desktop.");
   }
   if (profile.agent === "claude-code" && resolvedSurface === "app" && profileOptions.agentArgs.length > 0) {
     throw new Error("Claude App profiles do not support agent arguments.");
@@ -208,7 +208,7 @@ async function main(): Promise<void> {
     const plan = buildProfileLaunchPlan(configDir, profile, resolvedSurface, profileOptions.agentArgs);
 
     if (path.isAbsolute(plan.command) && !existsSync(plan.command)) {
-      throw new Error(`Profile launcher was not found: ${plan.command}. Open CCR once or re-save the profile.`);
+      throw new Error(`Profile launcher was not found: ${plan.command}. Open AgentRouter once or re-save the profile.`);
     }
 
     const childEnv = {
@@ -404,15 +404,15 @@ async function startService(options: WebCliOptions): Promise<ServiceState> {
     });
     const spawnError = await waitForImmediateSpawnError(child, 1000);
     if (spawnError) {
-      throw new Error(`Failed to start CCR service: ${spawnError}`);
+      throw new Error(`Failed to start AgentRouter service: ${spawnError}`);
     }
     child.unref();
 
     const state = await waitForServiceState(child.pid, serviceStartTimeoutMs);
     if (!state) {
-      throw new Error(`CCR service did not report ready within ${serviceStartTimeoutMs}ms.`);
+      throw new Error(`AgentRouter service did not report ready within ${serviceStartTimeoutMs}ms.`);
     }
-    process.stdout.write(`CCR service started at ${state.url} (pid ${state.pid}).\n`);
+    process.stdout.write(`AgentRouter service started at ${state.url} (pid ${state.pid}).\n`);
     if (options.open) {
       await openManagementUrl(state.url);
     }
@@ -427,7 +427,7 @@ async function reuseRunningService(current: ServiceState, options: WebCliOptions
   if (options.startGateway && (!state.startGateway || options.ensureGatewayRunning)) {
     const gatewayStatus = await callServiceRpc<GatewayStatus>(state, "startGateway");
     if (gatewayStatus.state !== "running") {
-      throw new Error(gatewayStatus.lastError || "CCR service did not start the gateway.");
+      throw new Error(gatewayStatus.lastError || "AgentRouter service did not start the gateway.");
     }
     state = { ...state, startGateway: true };
   }
@@ -437,7 +437,7 @@ async function reuseRunningService(current: ServiceState, options: WebCliOptions
   if (state !== current) {
     writeServiceState(state);
   }
-  process.stdout.write(`CCR service is already running at ${state.url} (pid ${state.pid}).\n`);
+  process.stdout.write(`AgentRouter service is already running at ${state.url} (pid ${state.pid}).\n`);
   if (options.open) {
     await openManagementUrl(state.url);
   }
@@ -454,10 +454,10 @@ async function openManagementUi(options: WebCliOptions): Promise<void> {
 async function openManagementUrl(url: string): Promise<void> {
   try {
     await openSystemExternal(url);
-    process.stdout.write(`Opened CCR management UI at ${url}\n`);
+    process.stdout.write(`Opened AgentRouter management UI at ${url}\n`);
   } catch (error) {
     process.stderr.write(`Failed to open browser: ${formatError(error)}\n`);
-    process.stdout.write(`CCR management UI is available at ${url}\n`);
+    process.stdout.write(`AgentRouter management UI is available at ${url}\n`);
   }
 }
 
@@ -495,7 +495,7 @@ async function runWebServer(options: WebCliOptions): Promise<void> {
       url: runtime.url
     });
   }
-  process.stdout.write(`CCR web management is running at ${runtime.url}\n`);
+  process.stdout.write(`AgentRouter web management is running at ${runtime.url}\n`);
 
   let closing = false;
   let profileLeaseMonitor: NodeJS.Timeout | undefined;
@@ -544,13 +544,13 @@ async function runWebServer(options: WebCliOptions): Promise<void> {
 async function stopService(): Promise<void> {
   const state = readServiceState();
   if (!state) {
-    process.stdout.write("CCR service is not running.\n");
+    process.stdout.write("AgentRouter service is not running.\n");
     return;
   }
   const verification = await verifyServiceState(state);
   if (!verification.ok) {
     clearServiceState(state.pid);
-    process.stdout.write("CCR service is not running.\n");
+    process.stdout.write("AgentRouter service is not running.\n");
     return;
   }
 
@@ -559,10 +559,10 @@ async function stopService(): Promise<void> {
     ? await waitForProcessExit(state.pid, serviceStopTimeoutMs)
     : await waitForServiceUnavailable(state, serviceStopTimeoutMs);
   if (!stopped) {
-    throw new Error(`CCR service did not stop within ${serviceStopTimeoutMs}ms.`);
+    throw new Error(`AgentRouter service did not stop within ${serviceStopTimeoutMs}ms.`);
   }
   clearServiceState(state.pid);
-  process.stdout.write("CCR service stopped.\n");
+  process.stdout.write("AgentRouter service stopped.\n");
 }
 
 function printHelp(exitCode: number): void {
@@ -624,7 +624,7 @@ function printUiHelp(exitCode: number): void {
     "Usage:",
     `  ${command} ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]`,
     "",
-    "Starts the background CCR service if needed and opens the management UI in the default browser.",
+    "Starts the background AgentRouter service if needed and opens the management UI in the default browser.",
     "",
     "Options:",
     "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
@@ -650,7 +650,7 @@ function printStopHelp(exitCode: number): void {
     "Usage:",
     `  ${command} stop`,
     "",
-    `Stops the background CCR service started by \`${command} start\`.`
+    `Stops the background AgentRouter service started by \`${command} start\`.`
   ].join("\n");
   const stream = exitCode === 0 ? process.stdout : process.stderr;
   stream.write(`${output}\n`);
@@ -844,7 +844,7 @@ async function acquireServiceStartLock(): Promise<() => void> {
       await delay(100);
     }
   }
-  throw new Error(`Timed out waiting for the CCR service startup lock after ${serviceStartTimeoutMs + 5_000}ms.`);
+  throw new Error(`Timed out waiting for the AgentRouter service startup lock after ${serviceStartTimeoutMs + 5_000}ms.`);
 }
 
 function readJsonRecord(file: string): Record<string, unknown> | undefined {
@@ -950,7 +950,7 @@ async function callServiceRpc<T>(state: ServiceState, method: string, args: unkn
   const endpoint = serviceRpcEndpoint(state.url);
   const authToken = serviceAuthToken(state.url);
   if (!endpoint || !authToken) {
-    throw new Error("CCR service state does not include a usable management URL.");
+    throw new Error("AgentRouter service state does not include a usable management URL.");
   }
 
   const controller = new AbortController();
@@ -967,7 +967,7 @@ async function callServiceRpc<T>(state: ServiceState, method: string, args: unkn
     });
     const payload = await response.json().catch(() => undefined) as { ok?: boolean; value?: T } | undefined;
     if (!response.ok || !payload?.ok) {
-      throw new Error(`CCR service RPC ${method} failed with HTTP ${response.status}`);
+      throw new Error(`AgentRouter service RPC ${method} failed with HTTP ${response.status}`);
     }
     return payload.value as T;
   } finally {
@@ -978,7 +978,7 @@ async function callServiceRpc<T>(state: ServiceState, method: string, args: unkn
 function serviceRpcEndpoint(url: string): string | undefined {
   try {
     const parsed = new URL(url);
-    return `${parsed.origin}/api/ccr/rpc`;
+    return `${parsed.origin}/api/ar/rpc`;
   } catch {
     return undefined;
   }

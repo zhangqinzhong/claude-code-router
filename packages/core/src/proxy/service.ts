@@ -20,10 +20,10 @@ import type {
   ProxyNetworkSnapshot,
   ProxyRouteTarget,
   ProxyStatus
-} from "@ccr/core/contracts/app";
-import { PROXY_CA_CERT_FILE } from "@ccr/core/config/constants";
-import { windowsSystemCommand } from "@ccr/core/platform/windows-system";
-import { pluginService, type GatewayPluginProxyRouteMatch } from "@ccr/core/plugins/service";
+} from "@agentrouter/core/contracts/app";
+import { PROXY_CA_CERT_FILE } from "@agentrouter/core/config/constants";
+import { windowsSystemCommand } from "@agentrouter/core/platform/windows-system";
+import { pluginService, type GatewayPluginProxyRouteMatch } from "@agentrouter/core/plugins/service";
 import {
   createCertificateForHost,
   ensureProxyCertificateAuthority,
@@ -35,7 +35,7 @@ import {
   readProxyCertificateFingerprintSha256,
   readProxyCertificateAuthority,
   type CertificateAuthority
-} from "@ccr/core/proxy/certificates";
+} from "@agentrouter/core/proxy/certificates";
 import {
   customUpstreamProxyFromConfig,
   formatUpstreamProxy,
@@ -45,7 +45,7 @@ import {
   upstreamProxyUrl,
   type UpstreamProxyConfig,
   type UpstreamProxyServer
-} from "@ccr/core/proxy/system-proxy";
+} from "@agentrouter/core/proxy/system-proxy";
 
 type MitmServer = {
   host: string;
@@ -428,7 +428,7 @@ class ProxyService {
         return {
           caCertFile: proxyCaCertFile(),
           manualCommand: macosManualCertificateInstallCommand(),
-          message: `macOS did not allow CCR to request administrator authorization: ${formatError(error)}.${terminalMessage}`,
+          message: `macOS did not allow AgentRouter to request administrator authorization: ${formatError(error)}.${terminalMessage}`,
           ok: false,
           status
         };
@@ -632,7 +632,7 @@ class ProxyService {
     const mitmServer = await this.getMitmServer(target.hostname);
     const localSocket = net.connect(mitmServer.port, "127.0.0.1");
     localSocket.once("connect", () => {
-      clientSocket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: CCR-MITM\r\n\r\n");
+      clientSocket.write("HTTP/1.1 200 Connection Established\r\nProxy-agent: AR-MITM\r\n\r\n");
       if (head.length > 0) {
         localSocket.write(head);
       }
@@ -1583,7 +1583,7 @@ async function windowsCurrentUserRootContainsCertificateThumbprint(thumbprint: s
 }
 
 async function openMacosTerminalCertificateInstaller(): Promise<string> {
-  const installerFile = path.join(os.tmpdir(), `ccr-install-proxy-ca-${randomUUID()}.command`);
+  const installerFile = path.join(os.tmpdir(), `ar-install-proxy-ca-${randomUUID()}.command`);
   writeFileSync(installerFile, `${macosTerminalCertificateInstallScript()}\n`, "utf8");
   chmodSync(installerFile, 0o700);
   await execFilePromise("/usr/bin/open", [installerFile]);
@@ -1606,14 +1606,14 @@ function macosTerminalCertificateInstallScript(): string {
   return [
     "#!/bin/zsh",
     "set -e",
-    "echo 'Installing CCR Proxy CA into the macOS System keychain.'",
+    "echo 'Installing AgentRouter Proxy CA into the macOS System keychain.'",
     "echo 'Terminal will ask for your macOS password if sudo is required.'",
     "echo ''",
     "sudo /usr/bin/security delete-certificate -c 'AgentRouter CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
     "sudo /usr/bin/security delete-certificate -c 'Claude Code Router CA' /Library/Keychains/System.keychain >/dev/null 2>&1 || true",
     `sudo /usr/bin/security add-trusted-cert -d -r trustRoot -p ssl -k /Library/Keychains/System.keychain ${quoteShellArg(PROXY_CA_CERT_FILE)}`,
     "echo ''",
-    "echo 'Done. Return to CCR, click Check Trust, then restart proxy mode and Chrome.'",
+    "echo 'Done. Return to AgentRouter, click Check Trust, then restart proxy mode and Chrome.'",
     "printf 'Press Return to close this window...'",
     "read reply"
   ].join("\n");

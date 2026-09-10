@@ -2,25 +2,25 @@ import { randomUUID } from "node:crypto";
 import { closeSync, copyFileSync, existsSync, fstatSync, mkdirSync, openSync, readFileSync, readSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
-import { REQUEST_LOG_BODIES_DIR, REQUEST_LOGS_DB_FILE } from "@ccr/core/config/constants";
-import { decodeClaudeAppGatewayRouteId } from "@ccr/core/agents/claude-app/gateway-routes";
+import { REQUEST_LOG_BODIES_DIR, REQUEST_LOGS_DB_FILE } from "@agentrouter/core/config/constants";
+import { decodeClaudeAppGatewayRouteId } from "@agentrouter/core/agents/claude-app/gateway-routes";
 import {
   estimateUsageCostUsd,
   estimateUsageCostUsdFromLoadedCatalog,
   usagePriceCatalogNeedsRefresh
-} from "@ccr/core/models/pricing-service";
-import { createBetterSqliteDatabase, type BetterSqliteDatabase, type BetterSqliteStatement } from "@ccr/core/storage/sqlite-native";
-import { normalizeUsageInputTokens } from "@ccr/core/usage/normalization";
+} from "@agentrouter/core/models/pricing-service";
+import { createBetterSqliteDatabase, type BetterSqliteDatabase, type BetterSqliteStatement } from "@agentrouter/core/storage/sqlite-native";
+import { normalizeUsageInputTokens } from "@agentrouter/core/usage/normalization";
 import {
   createRequestLogRuntime,
   suppressRequestLogRawTraceBodies,
   type RequestLogEnqueueResult
-} from "@ccr/core/observability/request-log-runtime";
-import { maxRequestLogBodyBytes, rawTraceHardMaxBodyBytes } from "@ccr/core/observability/request-log-limits";
-import { compactBase64ImagePayloads } from "@ccr/core/observability/request-log-body";
-import { requestLogRequestedModel, requestLogResponseModel } from "@ccr/core/observability/request-log-model";
-import { isSensitiveRequestLogHeaderName } from "@ccr/core/observability/sensitive-headers";
-import { inferGatewayClient } from "@ccr/core/gateway/http/io";
+} from "@agentrouter/core/observability/request-log-runtime";
+import { maxRequestLogBodyBytes, rawTraceHardMaxBodyBytes } from "@agentrouter/core/observability/request-log-limits";
+import { compactBase64ImagePayloads } from "@agentrouter/core/observability/request-log-body";
+import { requestLogRequestedModel, requestLogResponseModel } from "@agentrouter/core/observability/request-log-model";
+import { isSensitiveRequestLogHeaderName } from "@agentrouter/core/observability/sensitive-headers";
+import { inferGatewayClient } from "@agentrouter/core/gateway/http/io";
 import type {
   AgentAnalysisAgentRow,
   AgentAnalysisConversationItem,
@@ -65,7 +65,7 @@ import type {
   RequestRouteTraceHop,
   RequestRouteTraceSnapshot,
   UsageStatsRange
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type SqlDatabase = BetterSqliteDatabase;
 type SqlValue = bigint | Buffer | number | string | null;
@@ -624,7 +624,7 @@ export class RequestLogStore {
       inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
     const model = normalizeLabel(usageModelForStorage ?? route.model ?? requestModelForStorage ?? input.fallbackModel, "unknown");
     const providerName = normalizeLabel(provider, "unknown");
-    // CCR credential IDs are structured metadata, but their header names also
+    // AgentRouter credential IDs are structured metadata, but their header names also
     // match the fail-closed secret classifier. Extract them before sanitizing;
     // the persisted header JSON remains redacted.
     const credentialInfo = readCredentialLogInfo(rawResponseHeaders, rawRequestHeaders);
@@ -1789,7 +1789,7 @@ function suppressedRawTraceBody(
 
 export const requestLogStore = new RequestLogStore(REQUEST_LOGS_DB_FILE);
 export const requestLogRuntime = createRequestLogRuntime({ dbFile: REQUEST_LOGS_DB_FILE });
-export { createRequestLogRuntime } from "@ccr/core/observability/request-log-runtime";
+export { createRequestLogRuntime } from "@agentrouter/core/observability/request-log-runtime";
 
 export function recordGatewayRequestLog(input: RequestLogRecordInput): RequestLogEnqueueResult {
   return requestLogRuntime.enqueueRecord(input);
@@ -2407,7 +2407,7 @@ function extractSubagentModelFromContent(content: unknown): string | undefined {
 }
 
 function extractSubagentModelFromText(text: string): string | undefined {
-  const match = text.match(/<CCR-SUBAGENT-MODEL>(.*?)<\/CCR-SUBAGENT-MODEL>/s);
+  const match = text.match(/<AR-SUBAGENT-MODEL>(.*?)<\/AR-SUBAGENT-MODEL>/s);
   const model = match?.[1]?.trim();
   return model && model.toLowerCase() !== "provider/model" ? model : undefined;
 }

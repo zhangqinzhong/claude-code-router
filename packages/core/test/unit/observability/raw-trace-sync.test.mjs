@@ -4,9 +4,9 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { Readable } from "node:stream";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { rawTraceSyncHeader } from "@ccr/core/gateway/internal/shared.ts";
-import { rawTraceHardMaxBodyBytes, rawTraceMaxPartBytes } from "@ccr/core/observability/request-log-limits.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { rawTraceSyncHeader } from "@agentrouter/core/gateway/internal/shared.ts";
+import { rawTraceHardMaxBodyBytes, rawTraceMaxPartBytes } from "@agentrouter/core/observability/request-log-limits.ts";
 import {
   applyRawTraceRequestLogPolicy,
   buildRawTraceConfig,
@@ -14,7 +14,7 @@ import {
   isToleratedDirectorySyncErrorForTest,
   readRawTraceRequestLogBundle,
   RawTraceSynchronizer
-} from "@ccr/core/observability/raw-trace-sync.ts";
+} from "@agentrouter/core/observability/raw-trace-sync.ts";
 
 test("raw trace applies metadata-only body privacy while retaining original sizes", () => {
   const config = createConfig();
@@ -160,7 +160,7 @@ test("stream sampler retains the original response byte size after capture trunc
 });
 
 test("raw trace sync acknowledges only after durable inbox ownership and retains queue rejections", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-sync-reject-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-sync-reject-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -215,7 +215,7 @@ test("raw trace sync acknowledges only after durable inbox ownership and retains
 });
 
 test("raw trace sync acknowledges and cleans bundles for terminally dropped records", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-sync-record-dropped-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-sync-record-dropped-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -265,7 +265,7 @@ test("raw trace sync acknowledges and cleans bundles for terminally dropped reco
 });
 
 test("raw trace startup replay outlives producer retries and applies a pending bundle later", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-replay-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "producer-bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -310,7 +310,7 @@ test("raw trace startup replay outlives producer retries and applies a pending b
 });
 
 test("raw trace replay recovers an inbox bundle after the accepting process crashes", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-crash-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-crash-replay-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "producer-bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -356,7 +356,7 @@ test("raw trace replay recovers an inbox bundle after the accepting process cras
 });
 
 test("raw trace durable ACK waits for every part fsync and refuses ACK when fsync fails", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-fsync-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-fsync-test-"));
   const spoolDirectory = path.join(dir, "spool");
   try {
     for (const shouldFail of [false, true]) {
@@ -398,7 +398,7 @@ test("raw trace durable ACK waits for every part fsync and refuses ACK when fsyn
 });
 
 test("raw trace publishes a fully durable staging directory atomically", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-atomic-publish-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-atomic-publish-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -426,14 +426,14 @@ test("raw trace publishes a fully durable staging directory atomically", async (
     });
     await waitFor(() => syncing);
     assert.equal(readdirSync(path.join(spoolDirectory, ".ar-inbox")).length, 0);
-    assert.equal(readdirSync(path.join(spoolDirectory, ".ccr-staging")).length, 1);
+    assert.equal(readdirSync(path.join(spoolDirectory, ".ar-staging")).length, 1);
     releaseSync();
     const result = await upload;
     assert.equal(result.statusCode, 202);
     const published = readdirSync(path.join(spoolDirectory, ".ar-inbox"));
     assert.equal(published.length, 1);
-    assert.equal(existsSync(path.join(spoolDirectory, ".ar-inbox", published[0], ".ccr-delivery.json")), true);
-    assert.equal(readdirSync(path.join(spoolDirectory, ".ccr-staging")).length, 0);
+    assert.equal(existsSync(path.join(spoolDirectory, ".ar-inbox", published[0], ".ar-delivery.json")), true);
+    assert.equal(readdirSync(path.join(spoolDirectory, ".ar-staging")).length, 0);
   } finally {
     releaseSync?.();
     await synchronizer.stop();
@@ -442,7 +442,7 @@ test("raw trace publishes a fully durable staging directory atomically", async (
 });
 
 test("raw trace startup does not wait for backlog delivery", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-background-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-background-replay-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const inboxDirectory = path.join(spoolDirectory, ".ar-inbox");
   const bundleDirectory = path.join(inboxDirectory, "backlog");
@@ -481,7 +481,7 @@ test("raw trace startup does not wait for backlog delivery", async () => {
 });
 
 test("raw trace inbox and dead letters stay within configured capacity", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-capacity-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-capacity-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const synchronizer = new RawTraceSynchronizer({
     deadLetterMaxBundles: 1,
@@ -506,7 +506,7 @@ test("raw trace inbox and dead letters stay within configured capacity", async (
       await synchronizer.stop();
     }
     assert.equal(readdirSync(path.join(spoolDirectory, ".ar-inbox")).length, 1);
-    assert.equal(readdirSync(path.join(spoolDirectory, ".ccr-dead-letter")).length, 1);
+    assert.equal(readdirSync(path.join(spoolDirectory, ".ar-dead-letter")).length, 1);
   } finally {
     await synchronizer.stop();
     rmSync(dir, { force: true, recursive: true });
@@ -514,7 +514,7 @@ test("raw trace inbox and dead letters stay within configured capacity", async (
 });
 
 test("raw trace isolates incomplete source bundles under the same bounded retention", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-incomplete-source-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-incomplete-source-test-"));
   const spoolDirectory = path.join(dir, "spool");
   for (let index = 0; index < 3; index += 1) {
     const bundleDirectory = path.join(spoolDirectory, `incomplete-${index}`);
@@ -537,14 +537,14 @@ test("raw trace isolates incomplete source bundles under the same bounded retent
   try {
     await synchronizer.start();
     await waitFor(() => readdirSync(spoolDirectory)
-      .filter((name) => ![".ar-inbox", ".ccr-dead-letter", ".ccr-staging"].includes(name))
+      .filter((name) => ![".ar-inbox", ".ar-dead-letter", ".ar-staging"].includes(name))
       .length === 0);
     const sourceEntries = readdirSync(spoolDirectory)
-      .filter((name) => ![".ar-inbox", ".ccr-dead-letter", ".ccr-staging"].includes(name));
+      .filter((name) => ![".ar-inbox", ".ar-dead-letter", ".ar-staging"].includes(name));
     assert.deepEqual(sourceEntries, []);
     assert.equal(readdirSync(path.join(spoolDirectory, ".ar-inbox")).length, 0);
-    await waitFor(() => readdirSync(path.join(spoolDirectory, ".ccr-dead-letter")).length === 1);
-    assert.equal(readdirSync(path.join(spoolDirectory, ".ccr-dead-letter")).length, 1);
+    await waitFor(() => readdirSync(path.join(spoolDirectory, ".ar-dead-letter")).length === 1);
+    assert.equal(readdirSync(path.join(spoolDirectory, ".ar-dead-letter")).length, 1);
   } finally {
     await synchronizer.stop();
     rmSync(dir, { force: true, recursive: true });
@@ -552,7 +552,7 @@ test("raw trace isolates incomplete source bundles under the same bounded retent
 });
 
 test("raw trace keeps an over-capacity streaming source while its files are active", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-active-source-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-active-source-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "active-stream");
   const bodyFile = path.join(bundleDirectory, "upstream_response.sse");
@@ -574,7 +574,7 @@ test("raw trace keeps an over-capacity streaming source while its files are acti
     }
     assert.equal(existsSync(bundleDirectory), true);
     await waitFor(() => !existsSync(bundleDirectory));
-    assert.equal(readdirSync(path.join(spoolDirectory, ".ccr-dead-letter")).length, 1);
+    assert.equal(readdirSync(path.join(spoolDirectory, ".ar-dead-letter")).length, 1);
   } finally {
     await synchronizer.stop();
     rmSync(dir, { force: true, recursive: true });
@@ -582,7 +582,7 @@ test("raw trace keeps an over-capacity streaming source while its files are acti
 });
 
 test("raw trace ACK measures only the newly admitted bundle after startup indexing", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-incremental-capacity-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-incremental-capacity-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const inboxDirectory = path.join(spoolDirectory, ".ar-inbox");
   mkdirSync(inboxDirectory, { recursive: true });
@@ -640,7 +640,7 @@ test("raw trace ACK measures only the newly admitted bundle after startup indexi
 });
 
 test("raw trace moves permanently pending bundles to bounded dead letter after max attempts", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-max-attempt-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-max-attempt-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "pending-bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -665,7 +665,7 @@ test("raw trace moves permanently pending bundles to bounded dead letter after m
   });
   try {
     await synchronizer.start();
-    await waitFor(() => readdirSync(path.join(spoolDirectory, ".ccr-dead-letter")).length === 1);
+    await waitFor(() => readdirSync(path.join(spoolDirectory, ".ar-dead-letter")).length === 1);
     assert.equal(attempts, 1);
     assert.equal(readdirSync(path.join(spoolDirectory, ".ar-inbox")).length, 0);
   } finally {
@@ -675,7 +675,7 @@ test("raw trace moves permanently pending bundles to bounded dead letter after m
 });
 
 test("raw trace backs off record-pending retries without repeatedly persisting attempts", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-pending-backoff-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-pending-backoff-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const bundleDirectory = path.join(spoolDirectory, "pending-backoff-bundle");
   const bodyFile = path.join(bundleDirectory, "upstream_request.json");
@@ -705,7 +705,7 @@ test("raw trace backs off record-pending retries without repeatedly persisting a
     await waitFor(() => attempts >= 1);
     const inboxDirectory = path.join(spoolDirectory, ".ar-inbox");
     const storedDirectory = path.join(inboxDirectory, readdirSync(inboxDirectory)[0]);
-    const deliveryFile = path.join(storedDirectory, ".ccr-delivery.json");
+    const deliveryFile = path.join(storedDirectory, ".ar-delivery.json");
     await waitFor(() => JSON.parse(readFileSync(deliveryFile, "utf8")).lastError === "record_pending");
     const firstPersistedState = readFileSync(deliveryFile, "utf8");
 
@@ -720,7 +720,7 @@ test("raw trace backs off record-pending retries without repeatedly persisting a
 });
 
 test("raw trace replay rotates through a bounded number of bundles per pass", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-replay-budget-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-replay-budget-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const inboxDirectory = path.join(spoolDirectory, ".ar-inbox");
   mkdirSync(inboxDirectory, { recursive: true });
@@ -763,7 +763,7 @@ test("raw trace replay rotates through a bounded number of bundles per pass", as
 });
 
 test("raw trace replay stops when its time budget is exhausted", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-replay-time-budget-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-replay-time-budget-test-"));
   const spoolDirectory = path.join(dir, "spool");
   const inboxDirectory = path.join(spoolDirectory, ".ar-inbox");
   mkdirSync(inboxDirectory, { recursive: true });
@@ -805,7 +805,7 @@ test("raw trace replay stops when its time budget is exhausted", async () => {
 });
 
 test("raw trace replay isolates a failing bundle and continues with later bundles", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-isolated-replay-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-isolated-replay-test-"));
   const spoolDirectory = path.join(dir, "spool");
   for (const name of ["bad", "good"]) {
     const bundleDirectory = path.join(spoolDirectory, `${name}-bundle`);
@@ -842,7 +842,7 @@ test("raw trace replay isolates a failing bundle and continues with later bundle
 });
 
 test("fallback raw bundles keep unique bundle ids while sharing the logical request", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-raw-trace-fallback-id-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-raw-trace-fallback-id-test-"));
   const spoolDirectory = path.join(dir, "spool");
   try {
     const bundles = [];

@@ -2,7 +2,7 @@
 title: Server
 pageTitle: Server
 eyebrow: Detailed configuration
-lead: Configure the CCR gateway host, port, and Proxy mode for MITM interception and proxying into CCR.
+lead: Configure the AgentRouter gateway host, port, and Proxy mode for MITM interception and proxying into AgentRouter.
 ---
 
 ## Management and gateway addresses are separate
@@ -21,12 +21,12 @@ CLI `--host`/`--port` options configure management; this page configures the gat
 
 | Field | Capability |
 | --- | --- |
-| Host | Host address the CCR gateway listens on. Common values are `127.0.0.1` and `0.0.0.0`. |
+| Host | Host address the AgentRouter gateway listens on. Common values are `127.0.0.1` and `0.0.0.0`. |
 | Port | Gateway listening port. Clients should point their API base URL to this port. |
 
-`127.0.0.1` allows local access only; `0.0.0.0` listens on every IPv4 interface. Use a wildcard only for intentional LAN/remote access, together with CCR client API keys, firewall/private-network controls, and TLS at a reverse proxy.
+`127.0.0.1` allows local access only; `0.0.0.0` listens on every IPv4 interface. Use a wildcard only for intentional LAN/remote access, together with AgentRouter client API keys, firewall/private-network controls, and TLS at a reverse proxy.
 
-Management tokens, CCR client API keys, and upstream credentials are separate. Gateway clients use keys created under **API Keys** and should never receive upstream provider credentials.
+Management tokens, AgentRouter client API keys, and upstream credentials are separate. Gateway clients use keys created under **API Keys** and should never receive upstream provider credentials.
 
 ## Start and verify
 
@@ -40,17 +40,17 @@ A reachable management UI does not prove the gateway is running. Docker returns 
 
 ## Proxy mode
 
-Proxy mode is the local proxy capability. When enabled, clients can send HTTP/HTTPS traffic to CCR. CCR uses MITM interception to identify and decrypt HTTPS requests, then proxies supported model requests into the CCR gateway path.
+Proxy mode is the local proxy capability. When enabled, clients can send HTTP/HTTPS traffic to AgentRouter. AgentRouter uses MITM interception to identify and decrypt HTTPS requests, then proxies supported model requests into the AgentRouter gateway path.
 
 | Field | Capability |
 | --- | --- |
-| Proxy mode | Enables Proxy mode. CCR can receive client traffic as an HTTP/HTTPS proxy and use MITM interception to proxy model requests into CCR. |
-| System proxy | Points the system proxy at CCR so apps that honor system proxy settings can go through CCR automatically. |
+| Proxy mode | Enables Proxy mode. AgentRouter can receive client traffic as an HTTP/HTTPS proxy and use MITM interception to proxy model requests into AgentRouter. |
+| System proxy | Points the system proxy at AgentRouter so apps that honor system proxy settings can go through AgentRouter automatically. |
 | Capture network | Stores network requests that pass through proxy mode so the Networking page can show request and response details. |
 | CA certificate | Trust status of the current proxy CA certificate. |
-| Install CA | Installs the CCR proxy CA into the system or user trust store. Installation differs by OS. |
+| Install CA | Installs the AgentRouter proxy CA into the system or user trust store. Installation differs by OS. |
 | Check Trust | Checks again whether the proxy CA is trusted by the system. |
 | Proxy status | Shows whether the proxy service is running. |
 | Restart Proxy | Restarts the proxy service when proxy mode is enabled. |
 
-Proxy mode changes local networking and certificate trust and is primarily a desktop feature. Container deployments should normally point clients directly at the public CCR Nginx gateway; changing the host system proxy or installing a host CA from inside the container is not supported.
+Proxy mode changes local networking and certificate trust and is primarily a desktop feature. Container deployments should normally point clients directly at the public AgentRouter Nginx gateway; changing the host system proxy or installing a host CA from inside the container is not supported.

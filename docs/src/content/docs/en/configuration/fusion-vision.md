@@ -7,7 +7,7 @@ lead: Give a non-multimodal model visual ability, for example GLM-5.2 + GLM-5V-T
 
 ## Capability composition
 
-Built-in vision connects a vision model in front of the base model without replacing the text model you already trust. The vision model understands images, screenshots, charts, and OCR content; CCR passes that visual result to the base model, which continues to handle reasoning, writing, coding, and final output.
+Built-in vision connects a vision model in front of the base model without replacing the text model you already trust. The vision model understands images, screenshots, charts, and OCR content; AgentRouter passes that visual result to the base model, which continues to handle reasoning, writing, coding, and final output.
 
 The combined Fusion model can be selected by routing or Agent Profiles like any other model. A typical form is:
 
@@ -21,9 +21,9 @@ This also applies to Codex computer use. After combining GLM-5.2 with GLM-5V-Tur
 
 ## Select the capability
 
-Select `ccr-fusion-builtins / vision_understand`, and choose a Vision model that actually supports image understanding.
+Select `ar-fusion-builtins / vision_understand`, and choose a Vision model that actually supports image understanding.
 
-You can also configure Vision retries and Vision fallback models. These retries apply to the built-in vision tool call itself: if the Vision model fails while preparing image context, CCR retries that Vision model first, then tries the configured fallback Vision models. The base text model remains unchanged.
+You can also configure Vision retries and Vision fallback models. These retries apply to the built-in vision tool call itself: if the Vision model fails while preparing image context, AgentRouter retries that Vision model first, then tries the configured fallback Vision models. The base text model remains unchanged.
 
 ## Model requirement
 

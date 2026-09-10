@@ -2,7 +2,7 @@
 title: Tray configuration
 pageTitle: Tray configuration
 eyebrow: Detailed configuration
-lead: Configure the CCR system tray icon, balance progress, and tray window widgets.
+lead: Configure the AgentRouter system tray icon, balance progress, and tray window widgets.
 ---
 
 ## Top fields

@@ -2,7 +2,7 @@
 title: 托盘配置
 pageTitle: 托盘配置
 eyebrow: 详细配置
-lead: 配置 CCR 系统托盘图标、余额进度条和托盘窗口组件。
+lead: 配置 AgentRouter 系统托盘图标、余额进度条和托盘窗口组件。
 ---
 
 ## 顶部字段

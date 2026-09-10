@@ -7,7 +7,7 @@ lead: "The full setup flow: create an IM bot, bind it to an Agent Config, and ch
 
 ## Prerequisites
 
-1. CCR Desktop is running and the gateway service is available.
+1. AgentRouter Desktop is running and the gateway service is available.
 2. A usable model is configured in **Provider Config**, or the Fusion model you want is ready.
 3. An **Agent Config** exists whose **entry mode** includes App. Full AgentClaw relay currently supports Claude App, Codex/ChatGPT App, OpenCode App, ZCode App, and WorkBuddy App; CLI-only agents do not forward Bot messages.
 4. The target IM platform has Bot credentials, app permissions, or QR login ready.
@@ -22,7 +22,7 @@ lead: "The full setup flow: create an IM bot, bind it to an Agent Config, and ch
 6. Turn on **Bot** and select the Bot you saved.
 7. Configure forwarding, handoff, language, timeout, attachments, streaming, and **Allow Agent shell tools** as needed.
 8. Save the Agent Config.
-9. Reopen Claude App, Codex/ChatGPT App, OpenCode App, ZCode App, or WorkBuddy App from CCR. AgentClaw is online only while the managed App is alive.
+9. Reopen Claude App, Codex/ChatGPT App, OpenCode App, ZCode App, or WorkBuddy App from AgentRouter. AgentClaw is online only while the managed App is alive.
 
 ## Choose a mode
 
@@ -39,7 +39,7 @@ Handoff currently uses screen lock and idle time. Wi-Fi / Bluetooth phone target
 | Setting | Recommendation |
 | --- | --- |
 | Bot language | Use `Auto` to follow the conversation; pin Chinese or English for team channels |
-| Maximum turn time | Match the expected task duration; CCR interrupts timed-out turns and reports the final state |
+| Maximum turn time | Match the expected task duration; AgentRouter interrupts timed-out turns and reports the final state |
 | Session idle reset | Use `0` to disable automatic reset; set minutes only when you want a fresh Session after inactivity |
 | Message chunk size | Match platform length limits; Slack/Discord can be larger, Weixin/LINE should stay conservative |
 | Attachment limit | Bound inbound files before they are handed to the agent |
@@ -49,7 +49,7 @@ Handoff currently uses screen lock and idle time. Wi-Fi / Bluetooth phone target
 
 ## How to use it
 
-After opening the Agent App from CCR, choose a workspace from IM:
+After opening the Agent App from AgentRouter, choose a workspace from IM:
 
 ```text
 /project list
@@ -82,7 +82,7 @@ Inspect state and diagnostics:
 
 ## Verification
 
-1. Open the target Agent App from CCR.
+1. Open the target Agent App from AgentRouter.
 2. Send `/project current` from IM and confirm the Bot is online and can read the current Project.
 3. Send `/session list` and confirm Sessions are listed for the current Project.
 4. Send one plain message and confirm the agent runs and replies in the same IM conversation.

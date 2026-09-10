@@ -5,26 +5,26 @@ import { createHash, randomUUID } from "node:crypto";
 import { mkdir, open, opendir, readFile, readdir, rename, rm, stat, writeFile } from "node:fs/promises";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { basename, dirname, join, resolve as pathResolve, sep as pathSep } from "node:path";
-import type { AppConfig } from "@ccr/core/contracts/app";
-import { RAW_TRACE_SPOOL_DIR } from "@ccr/core/config/constants";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
+import { RAW_TRACE_SPOOL_DIR } from "@agentrouter/core/config/constants";
 import {
   enqueueGatewayRequestLogFromRawTrace,
   type RequestLogRawTraceFile,
   type RequestLogRawTraceFiles,
   type RequestLogRawTraceUpdateInput
-} from "@ccr/core/observability/request-log-store";
+} from "@agentrouter/core/observability/request-log-store";
 import {
   suppressRequestLogRawTraceBodies,
   type RequestLogEnqueueResult
-} from "@ccr/core/observability/request-log-runtime";
-import { rawTraceMaxPartBytes, resolveRawTraceBodyLimit } from "@ccr/core/observability/request-log-limits";
-import { isRecord, numberValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { formatError, inferGatewayClient, parseJsonObject, readHeader, readRequestBody, sendJson, shouldCaptureGatewayUsage } from "@ccr/core/gateway/http/io";
-import { endpoint } from "@ccr/core/gateway/core-runtime/supervisor";
-import { maxUsageCaptureBytes, rawTraceSyncHeader, rawTraceSyncPath } from "@ccr/core/gateway/internal/shared";
-import type { RawTracePartText } from "@ccr/core/gateway/internal/shared";
-import { resolveResponseProviderProtocol } from "@ccr/core/providers/runtime-topology";
-import { recordGatewayUsageCaptureIfMissing } from "@ccr/core/usage/store";
+} from "@agentrouter/core/observability/request-log-runtime";
+import { rawTraceMaxPartBytes, resolveRawTraceBodyLimit } from "@agentrouter/core/observability/request-log-limits";
+import { isRecord, numberValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { formatError, inferGatewayClient, parseJsonObject, readHeader, readRequestBody, sendJson, shouldCaptureGatewayUsage } from "@agentrouter/core/gateway/http/io";
+import { endpoint } from "@agentrouter/core/gateway/core-runtime/supervisor";
+import { maxUsageCaptureBytes, rawTraceSyncHeader, rawTraceSyncPath } from "@agentrouter/core/gateway/internal/shared";
+import type { RawTracePartText } from "@agentrouter/core/gateway/internal/shared";
+import { resolveResponseProviderProtocol } from "@agentrouter/core/providers/runtime-topology";
+import { recordGatewayUsageCaptureIfMissing } from "@agentrouter/core/usage/store";
 
 type RawTraceSynchronizerDependencies = {
   enqueueUpdate?: (
@@ -113,10 +113,10 @@ type RawTraceStorageLimits = {
 };
 
 const rawTraceInboxDirectoryName = ".ar-inbox";
-const rawTraceDeadLetterDirectoryName = ".ccr-dead-letter";
-const rawTraceStagingDirectoryName = ".ccr-staging";
-const rawTraceDeliveryFileName = ".ccr-delivery.json";
-const rawTraceReadyFileName = ".ccr-ready.json";
+const rawTraceDeadLetterDirectoryName = ".ar-dead-letter";
+const rawTraceStagingDirectoryName = ".ar-staging";
+const rawTraceDeliveryFileName = ".ar-delivery.json";
+const rawTraceReadyFileName = ".ar-ready.json";
 const defaultRawTraceReplayIntervalMs = 1_000;
 const defaultRawTraceRetryCooldownMs = 5_000;
 const defaultRawTracePendingRetryMaxMs = 5 * 60 * 1_000;

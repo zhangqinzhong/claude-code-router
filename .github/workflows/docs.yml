@@ -39,7 +39,6 @@ jobs:
       - name: Build and upload docs
         uses: withastro/action@v6
         env:
-          ASTRO_SITE: https://ccrdesk.top
           ASTRO_BASE: /
         with:
           path: docs

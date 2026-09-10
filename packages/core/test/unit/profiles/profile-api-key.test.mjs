@@ -5,7 +5,7 @@ import {
   profileApiKeyId,
   profileIdFromApiKeyId,
   syncProfileApiKeys
-} from "@ccr/core/profiles/api-key.ts";
+} from "@agentrouter/core/profiles/api-key.ts";
 
 test("profile API key ids are stable, sanitized, and profile-scoped", () => {
   assert.equal(

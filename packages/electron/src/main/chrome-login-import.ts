@@ -8,7 +8,7 @@ import type {
   ChromeLoginImportRequest,
   ChromeLoginImportResult,
   ChromeLoginImportTarget
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type ServerInfo = {
   server: Server;
@@ -19,8 +19,8 @@ type StoredChromeLoginImportJob = ChromeLoginImportJob;
 
 type CookieSetDetails = Parameters<Electron.Cookies["set"]>[0];
 
-const browserPartition = "persist:ccr-built-in-browser";
-const webSearchPartition = "persist:ccr-browser-web-search-mcp";
+const browserPartition = "persist:ar-built-in-browser";
+const webSearchPartition = "persist:ar-browser-web-search-mcp";
 const importJobTtlMs = 5 * 60_000;
 const maxImportRequestBytes = 16 * 1024 * 1024;
 const maxStoredErrors = 20;
@@ -354,7 +354,7 @@ async function writeLocalStorage(partition: string, origin: string, items: Recor
     paintWhenInitiallyHidden: true,
     show: false,
     skipTaskbar: true,
-    title: "CCR Chrome Login Import",
+    title: "AgentRouter Chrome Login Import",
     webPreferences: {
       contextIsolation: true,
       nodeIntegration: false,
@@ -507,7 +507,7 @@ function confirmationPageHtml(job: StoredChromeLoginImportJob): string {
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>CCR Chrome Login Import</title>
+    <title>AgentRouter Chrome Login Import</title>
     <style>
       :root { color-scheme: light dark; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       * { box-sizing: border-box; }
@@ -526,16 +526,16 @@ function confirmationPageHtml(job: StoredChromeLoginImportJob): string {
   </head>
   <body>
     <main
-      id="ccr-chrome-login-import"
+      id="ar-chrome-login-import"
       data-import-url="${escapeHtml(job.importUrl)}"
       data-job-id="${escapeHtml(job.id)}"
       data-domains="${escapeHtml(job.domains.join(","))}"
     >
-      <h1>Import Chrome Login State into CCR</h1>
-      <p>CCR is requesting permission to import cookies and localStorage for these domains into the in-app browser.</p>
+      <h1>Import Chrome Login State into AgentRouter</h1>
+      <p>AgentRouter is requesting permission to import cookies and localStorage for these domains into the in-app browser.</p>
       <ul>${domains}</ul>
-      <button id="ccr-confirm-import" disabled type="button">Waiting for CCR Chrome extension</button>
-      <div id="ccr-import-status" class="status" role="status">Install or enable the CCR Login Import extension in Chrome to continue.</div>
+      <button id="ar-confirm-import" disabled type="button">Waiting for AgentRouter Chrome extension</button>
+      <div id="ar-import-status" class="status" role="status">Install or enable the AgentRouter Login Import extension in Chrome to continue.</div>
     </main>
   </body>
 </html>`;

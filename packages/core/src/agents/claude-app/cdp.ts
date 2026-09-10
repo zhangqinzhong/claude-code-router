@@ -1,7 +1,7 @@
 import { rmSync } from "node:fs";
 import { createServer, type AddressInfo } from "node:net";
 import path from "node:path";
-import { CdpClient } from "@ccr/core/agents/cdp-client";
+import { CdpClient } from "@agentrouter/core/agents/cdp-client";
 
 type ClaudeAppCdpLogger = Pick<Console, "info" | "warn">;
 
@@ -219,12 +219,12 @@ function claudeAppDesignFeatureScript(): string {
         return;
       }
       const existing = container.AppFeatures || {};
-      if (existing.__ccrClaudeDesignPatched) {
+      if (existing.__arClaudeDesignPatched) {
         return;
       }
       const previous = existing.getSupportedFeatures;
       container.AppFeatures = Object.assign({}, existing, {
-        __ccrClaudeDesignPatched: true,
+        __arClaudeDesignPatched: true,
         getSupportedFeatures() {
           if (typeof previous === "function") {
             return Promise.resolve(previous.call(existing)).then(merge, () => merge());
@@ -254,7 +254,7 @@ function claudeAppDesignFrameScript(designUrl: string): string {
       }
     }
     forceFrame();
-    globalThis.__ccrClaudeDesignFrameTimer = globalThis.__ccrClaudeDesignFrameTimer || setInterval(forceFrame, 500);
+    globalThis.__arClaudeDesignFrameTimer = globalThis.__arClaudeDesignFrameTimer || setInterval(forceFrame, 500);
   })();`;
 }
 
@@ -269,7 +269,7 @@ function normalizeClaudeAppDesignUrl(value: string | undefined): string {
       return "";
     }
     url.pathname = normalizeDesignPath(url.pathname);
-    url.searchParams.set("__ccr_design_iframe", "1");
+    url.searchParams.set("__ar_design_iframe", "1");
     return url.toString();
   } catch {
     return "";

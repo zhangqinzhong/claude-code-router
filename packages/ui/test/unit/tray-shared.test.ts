@@ -1,12 +1,12 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { DEFAULT_TRAY_COMPONENT_VARIANTS } from "@ccr/core/contracts/app.ts";
+import { DEFAULT_TRAY_COMPONENT_VARIANTS } from "@agentrouter/core/contracts/app.ts";
 import {
   normalizeTrayComponentVariants,
   normalizeTrayIconPreference,
   normalizeTrayWidgets,
   normalizeTrayWindowModules
-} from "@ccr/ui/pages/tray/shared.tsx";
+} from "@agentrouter/ui/pages/tray/shared.tsx";
 
 test("tray window modules reject unknown values and remove duplicates without reordering", () => {
   assert.deepEqual(

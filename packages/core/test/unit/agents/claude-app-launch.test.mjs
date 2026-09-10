@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { claudeAppLaunchCommand, findInstalledClaudeAppExecutable, normalizeClaudeAppCandidate } from "@ccr/core/agents/claude-app/launch.ts";
+import { claudeAppLaunchCommand, findInstalledClaudeAppExecutable, normalizeClaudeAppCandidate } from "@agentrouter/core/agents/claude-app/launch.ts";
 
 test("claudeAppLaunchCommand opens macOS app bundles through LaunchServices", (t) => {
   const tempDir = mkdtempForTest();
@@ -118,7 +118,7 @@ test("Claude App profile appPath overrides process env discovery", (t) => {
 });
 
 function mkdtempForTest() {
-  return mkdtempSync(path.join(os.tmpdir(), "ccr-claude-app-launch-"));
+  return mkdtempSync(path.join(os.tmpdir(), "ar-claude-app-launch-"));
 }
 
 function withPlatform(platform, callback) {

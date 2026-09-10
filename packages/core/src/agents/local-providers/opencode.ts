@@ -7,7 +7,7 @@ import type {
   LocalAgentProviderCandidate,
   LocalAgentProviderImportResult,
   ProviderAccountConnectorConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   apiKeyAuthPlugin,
   bearerAuthPlugin,
@@ -23,7 +23,7 @@ import {
   readString,
   uniqueProviderName,
   uniqueStrings
-} from "@ccr/core/agents/local-providers/shared";
+} from "@agentrouter/core/agents/local-providers/shared";
 
 type OpenCodeCredential = {
   apiKey?: string;

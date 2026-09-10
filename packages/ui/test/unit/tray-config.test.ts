@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { normalizeConfig } from "@ccr/ui/pages/home/shared/config.ts";
-import { normalizeTrayIconPreference } from "@ccr/ui/pages/home/shared/common.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { normalizeConfig } from "@agentrouter/ui/pages/home/shared/config.ts";
+import { normalizeTrayIconPreference } from "@agentrouter/ui/pages/home/shared/common.ts";
 
 test("home settings accept the layered icon without removing legacy choices", () => {
   for (const icon of ["layered", "random", "violet", "orange", "cyan", "progress"] as const) {

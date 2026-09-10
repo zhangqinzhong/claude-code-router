@@ -4,7 +4,7 @@ import {
   createBetterSqliteDatabase,
   type BetterSqliteDatabase,
   type BetterSqliteStatement
-} from "@ccr/core/storage/sqlite-native";
+} from "@agentrouter/core/storage/sqlite-native";
 
 export type RequestLogAdmission = {
   accepted: boolean;

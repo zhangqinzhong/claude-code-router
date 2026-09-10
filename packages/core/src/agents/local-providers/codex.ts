@@ -12,9 +12,9 @@ import type {
   ProviderAccountMeterDetail,
   ProviderModelMetadata,
   ProviderReasoningLevel
-} from "@ccr/core/contracts/app";
-import { normalizeProviderBaseUrl } from "@ccr/core/providers/url";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
+} from "@agentrouter/core/contracts/app";
+import { normalizeProviderBaseUrl } from "@agentrouter/core/providers/url";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
 import {
   isRecord,
   localAgentProviderApiKey,
@@ -31,7 +31,7 @@ import {
   uniqueProviderName,
   uniqueStrings,
   type OAuthTokenSet
-} from "@ccr/core/agents/local-providers/shared";
+} from "@agentrouter/core/agents/local-providers/shared";
 
 export const codexDefaultBaseUrl = "https://chatgpt.com/backend-api/codex";
 

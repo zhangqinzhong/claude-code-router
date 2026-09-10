@@ -9,9 +9,9 @@ import type {
   LocalAgentProviderImportResult,
   ProviderAccountConfig,
   ProviderModelMetadata
-} from "@ccr/core/contracts/app";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { findProviderPresetByBaseUrl } from "@ccr/core/providers/presets/index";
+} from "@agentrouter/core/contracts/app";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { findProviderPresetByBaseUrl } from "@agentrouter/core/providers/presets/index";
 import {
   bearerAuthPlugin,
   cloneProviderAccountConfig,
@@ -24,7 +24,7 @@ import {
   readString,
   uniqueProviderName,
   uniqueStrings
-} from "@ccr/core/agents/local-providers/shared";
+} from "@agentrouter/core/agents/local-providers/shared";
 
 const kimiDefaultBaseUrl = "https://api.kimi.com/coding/v1";
 const kimiPlatformBaseUrl = "https://api.moonshot.ai/v1";
@@ -475,7 +475,7 @@ function persistKimiAuth(auth: KimiTokenSet): void {
     } catch {
       // Ignore temporary-file cleanup failures.
     }
-    // Best effort. The refreshed access token is still usable for this CCR run.
+    // Best effort. The refreshed access token is still usable for this AgentRouter run.
   }
 }
 

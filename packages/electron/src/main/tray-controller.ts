@@ -2,13 +2,13 @@ import { BrowserWindow, Menu, Tray, app, nativeImage, nativeTheme, screen, type 
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import { deflateSync } from "node:zlib";
-import { loadAppConfig } from "@ccr/core/config/config";
-import { APP_NAME, IPC_CHANNELS } from "@ccr/core/config/constants";
-import { getProviderAccountSnapshots } from "@ccr/core/providers/account-service";
-import { getTodayUsageTotals, onUsageRecorded } from "@ccr/core/usage/store";
+import { loadAppConfig } from "@agentrouter/core/config/config";
+import { APP_NAME, IPC_CHANNELS } from "@agentrouter/core/config/constants";
+import { getProviderAccountSnapshots } from "@agentrouter/core/providers/account-service";
+import { getTodayUsageTotals, onUsageRecorded } from "@agentrouter/core/usage/store";
 import windowsManager from "./windows";
 import { layeredTrayAssetName, trayUsageTitle } from "./tray-appearance";
-import type { AppConfig, ProviderAccountMeter, TrayBalanceProgressConfig, TrayIconPreference } from "@ccr/core/contracts/app";
+import type { AppConfig, ProviderAccountMeter, TrayBalanceProgressConfig, TrayIconPreference } from "@agentrouter/core/contracts/app";
 
 const popoverMenuWidth = 420;
 const popoverPreferredHeight = 740;

@@ -10,13 +10,13 @@ import {
   type RouteScriptValidationResult,
   type RouterRule,
   type RouterRuleScript
-} from "@ccr/core/contracts/app";
-import type { RouteScriptInput } from "@ccr/core/routing/route-script-context";
+} from "@agentrouter/core/contracts/app";
+import type { RouteScriptInput } from "@agentrouter/core/routing/route-script-context";
 import type {
   ResolvedRouteScript,
   RouteScriptWorkerRequest,
   RouteScriptWorkerResponse
-} from "@ccr/core/routing/route-script-worker-protocol";
+} from "@agentrouter/core/routing/route-script-worker-protocol";
 
 const defaultWorkerCount = 2;
 const maxPendingRequests = 64;

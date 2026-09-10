@@ -5,18 +5,18 @@ import { existsSync, mkdtempSync, rmSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { grokCandidate, importGrokProvider } from "@ccr/core/agents/local-providers/grok.ts";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
-import { isCoreGatewayHealthy, spawnGatewayProcess } from "@ccr/core/gateway/core-runtime/supervisor.ts";
-import { coreGatewayAuthHeader } from "@ccr/core/gateway/internal/shared.ts";
-import { MediaService } from "@ccr/core/media/service.ts";
+import { grokCandidate, importGrokProvider } from "@agentrouter/core/agents/local-providers/grok.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
+import { isCoreGatewayHealthy, spawnGatewayProcess } from "@agentrouter/core/gateway/core-runtime/supervisor.ts";
+import { coreGatewayAuthHeader } from "@agentrouter/core/gateway/internal/shared.ts";
+import { MediaService } from "@agentrouter/core/media/service.ts";
 import {
   MEDIA_ARTIFACT_PATH_PREFIX,
   handleMediaArtifactRequest,
   handleMediaToolsMcpRequest
-} from "@ccr/core/mcp/grok-media-mcp.ts";
-import { getSystemProxyUrlForProtocol } from "@ccr/core/proxy/system-proxy-fetch.ts";
+} from "@agentrouter/core/mcp/grok-media-mcp.ts";
+import { getSystemProxyUrlForProtocol } from "@agentrouter/core/proxy/system-proxy-fetch.ts";
 
 const localGatewayEntry = process.env.AR_LIVE_AI_GATEWAY_ENTRY;
 const liveEnabled = process.env.AR_LIVE_GROK_MEDIA === "1";
@@ -36,8 +36,8 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
   assert.ok(imported.provider.models.includes(imageModel));
   assert.ok(imported.provider.models.includes(videoModel));
 
-  const configRoot = mkdtempSync(path.join(os.tmpdir(), "ccr-fusion-live-config-"));
-  const artifactRoot = path.join(os.tmpdir(), `ccr-fusion-live-artifacts-${Date.now()}`);
+  const configRoot = mkdtempSync(path.join(os.tmpdir(), "ar-fusion-live-config-"));
+  const artifactRoot = path.join(os.tmpdir(), `ar-fusion-live-artifacts-${Date.now()}`);
   const config = createDefaultAppConfig({});
   const corePort = await availablePort();
   const coreEndpoint = `http://127.0.0.1:${corePort}`;
@@ -161,7 +161,7 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
     const imageJob = parseToolResult(await mcpRequest(mcpServer, "tools/call", {
       arguments: {
         aspect_ratio: "1:1",
-        idempotency_key: `ccr-live-image-${randomUUID()}`,
+        idempotency_key: `ar-live-image-${randomUUID()}`,
         prompt: "A clean integration-test illustration: one glossy teal sphere floating over a soft white background, subtle studio shadow, no text, square composition."
       },
       name: toolNames.imageGenerate
@@ -173,7 +173,7 @@ test("Fusion generates image and video through the local ai-gateway", { skip: !l
     let videoJob = parseToolResult(await mcpRequest(mcpServer, "tools/call", {
       arguments: {
         duration: 6,
-        idempotency_key: `ccr-live-video-${randomUUID()}`,
+        idempotency_key: `ar-live-video-${randomUUID()}`,
         prompt: "A glossy teal sphere slowly rotates while floating over a soft white studio background, fixed camera, gentle shadow movement, no text.",
         resolution: "480p"
       },
@@ -224,12 +224,12 @@ function enableGatewayDiagnostics(generated) {
   generated.logging = { accessLog: false, enabled: true, level: "info" };
   const runtimeRoot = path.join(process.cwd(), ".test-dist", "core", "runtime");
   for (const plugin of generated.plugins ?? []) {
-    if (plugin.key === "ccr-upstream-header-sanitizer") {
+    if (plugin.key === "ar-upstream-header-sanitizer") {
       plugin.modulePath = path.join(runtimeRoot, "upstream-header-sanitizer.js");
     }
   }
   for (const server of generated.agent?.mcpServers ?? []) {
-    if (server.name === "ccr-media-tools") {
+    if (server.name === "ar-media-tools") {
       server.args = [path.join(runtimeRoot, "media-tools-proxy-mcp.js")];
     }
   }

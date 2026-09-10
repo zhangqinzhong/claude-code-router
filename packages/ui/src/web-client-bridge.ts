@@ -1,9 +1,9 @@
-type CcrApi = NonNullable<Window["ccr"]>;
+type AgentRouterApi = NonNullable<Window["agentrouter"]>;
 
-const rpcEndpoint = "/api/ccr/rpc";
+const rpcEndpoint = "/api/ar/rpc";
 const webAuthHeader = "x-ar-web-auth";
-const webAuthQueryParam = "ccr_web_token";
-const webAuthStorageKey = "ccr.webAuthToken";
+const webAuthQueryParam = "ar_web_token";
+const webAuthStorageKey = "ar.webAuthToken";
 const webAuthToken = readWebAuthToken();
 
 type RpcResponse =
@@ -29,8 +29,8 @@ async function rpc(method: string, args: unknown[] = []): Promise<unknown> {
     const message = payload && !payload.ok
       ? payload.error.message
       : response.status === 404
-        ? "CCR management service is unavailable. Make sure the CCR app or ccr ui command is running, then retry."
-        : `CCR web API failed with HTTP ${response.status}`;
+        ? "AgentRouter management service is unavailable. Make sure the AgentRouter app or ccr ui command is running, then retry."
+        : `AgentRouter web API failed with HTTP ${response.status}`;
     throw new Error(message);
   }
   return payload.value;
@@ -104,85 +104,85 @@ function normalizeExternalHttpUrl(value: string): string {
   return url.toString();
 }
 
-const webClientBridge: CcrApi = {
-  applyClaudeAppGateway: (config) => rpc("applyClaudeAppGateway", [config]) as ReturnType<CcrApi["applyClaudeAppGateway"]>,
-  applyProfile: () => rpc("applyProfile") as ReturnType<CcrApi["applyProfile"]>,
-  cancelBotGatewayQrLogin: (request) => rpc("cancelBotGatewayQrLogin", [request]) as ReturnType<CcrApi["cancelBotGatewayQrLogin"]>,
-  checkProviderConnectivity: (request) => rpc("checkProviderConnectivity", [request]) as ReturnType<CcrApi["checkProviderConnectivity"]>,
-  clearProxyNetworkCaptures: () => rpc("clearProxyNetworkCaptures") as ReturnType<CcrApi["clearProxyNetworkCaptures"]>,
-  closeBotGatewayQrWindow: (request) => rpc("closeBotGatewayQrWindow", [request]) as ReturnType<CcrApi["closeBotGatewayQrWindow"]>,
+const webClientBridge: AgentRouterApi = {
+  applyClaudeAppGateway: (config) => rpc("applyClaudeAppGateway", [config]) as ReturnType<AgentRouterApi["applyClaudeAppGateway"]>,
+  applyProfile: () => rpc("applyProfile") as ReturnType<AgentRouterApi["applyProfile"]>,
+  cancelBotGatewayQrLogin: (request) => rpc("cancelBotGatewayQrLogin", [request]) as ReturnType<AgentRouterApi["cancelBotGatewayQrLogin"]>,
+  checkProviderConnectivity: (request) => rpc("checkProviderConnectivity", [request]) as ReturnType<AgentRouterApi["checkProviderConnectivity"]>,
+  clearProxyNetworkCaptures: () => rpc("clearProxyNetworkCaptures") as ReturnType<AgentRouterApi["clearProxyNetworkCaptures"]>,
+  closeBotGatewayQrWindow: (request) => rpc("closeBotGatewayQrWindow", [request]) as ReturnType<AgentRouterApi["closeBotGatewayQrWindow"]>,
   closeTray: () => Promise.resolve(),
-  detectProviderIcon: (request) => rpc("detectProviderIcon", [request]) as ReturnType<CcrApi["detectProviderIcon"]>,
-  exportData: () => rpc("exportData") as ReturnType<CcrApi["exportData"]>,
-  fetchProviderManifest: (request) => rpc("fetchProviderManifest", [request]) as ReturnType<CcrApi["fetchProviderManifest"]>,
-  getAgentAnalysis: (filter) => rpc("getAgentAnalysis", [filter]) as ReturnType<CcrApi["getAgentAnalysis"]>,
-  getAgentTracePayload: (request) => rpc("getAgentTracePayload", [request]) as ReturnType<CcrApi["getAgentTracePayload"]>,
-  getAppInfo: () => rpc("getAppInfo") as ReturnType<CcrApi["getAppInfo"]>,
-  getConfig: () => rpc("getConfig") as ReturnType<CcrApi["getConfig"]>,
-  getGatewayStatus: () => rpc("getGatewayStatus") as ReturnType<CcrApi["getGatewayStatus"]>,
-  getLocalAgentProviderCandidates: () => rpc("getLocalAgentProviderCandidates") as ReturnType<CcrApi["getLocalAgentProviderCandidates"]>,
-  getOnboardingFinished: () => rpc("getOnboardingFinished") as ReturnType<CcrApi["getOnboardingFinished"]>,
+  detectProviderIcon: (request) => rpc("detectProviderIcon", [request]) as ReturnType<AgentRouterApi["detectProviderIcon"]>,
+  exportData: () => rpc("exportData") as ReturnType<AgentRouterApi["exportData"]>,
+  fetchProviderManifest: (request) => rpc("fetchProviderManifest", [request]) as ReturnType<AgentRouterApi["fetchProviderManifest"]>,
+  getAgentAnalysis: (filter) => rpc("getAgentAnalysis", [filter]) as ReturnType<AgentRouterApi["getAgentAnalysis"]>,
+  getAgentTracePayload: (request) => rpc("getAgentTracePayload", [request]) as ReturnType<AgentRouterApi["getAgentTracePayload"]>,
+  getAppInfo: () => rpc("getAppInfo") as ReturnType<AgentRouterApi["getAppInfo"]>,
+  getConfig: () => rpc("getConfig") as ReturnType<AgentRouterApi["getConfig"]>,
+  getGatewayStatus: () => rpc("getGatewayStatus") as ReturnType<AgentRouterApi["getGatewayStatus"]>,
+  getLocalAgentProviderCandidates: () => rpc("getLocalAgentProviderCandidates") as ReturnType<AgentRouterApi["getLocalAgentProviderCandidates"]>,
+  getOnboardingFinished: () => rpc("getOnboardingFinished") as ReturnType<AgentRouterApi["getOnboardingFinished"]>,
   getPendingProviderDeepLinks: () => Promise.resolve([]),
-  getPluginMarketplace: () => rpc("getPluginMarketplace") as ReturnType<CcrApi["getPluginMarketplace"]>,
-  getProfileOpenCommand: (request) => rpc("getProfileOpenCommand", [request]) as ReturnType<CcrApi["getProfileOpenCommand"]>,
-  getProfileRuntimeStatus: () => rpc("getProfileRuntimeStatus") as ReturnType<CcrApi["getProfileRuntimeStatus"]>,
-  getProviderAccountSnapshots: (provider, options) => rpc("getProviderAccountSnapshots", [provider, options]) as ReturnType<CcrApi["getProviderAccountSnapshots"]>,
-  getProviderCatalogModels: (request) => rpc("getProviderCatalogModels", [request]) as ReturnType<CcrApi["getProviderCatalogModels"]>,
-  getOpenRouterProviderCatalog: (request) => rpc("getOpenRouterProviderCatalog", [request]) as ReturnType<CcrApi["getOpenRouterProviderCatalog"]>,
-  getProviderPresets: () => rpc("getProviderPresets") as ReturnType<CcrApi["getProviderPresets"]>,
-  getProxyCertificateStatus: () => rpc("getProxyCertificateStatus") as ReturnType<CcrApi["getProxyCertificateStatus"]>,
-  getProxyNetworkCaptures: () => rpc("getProxyNetworkCaptures") as ReturnType<CcrApi["getProxyNetworkCaptures"]>,
-  getProxyStatus: () => rpc("getProxyStatus") as ReturnType<CcrApi["getProxyStatus"]>,
-  getRequestLogDetail: (request) => rpc("getRequestLogDetail", [request]) as ReturnType<CcrApi["getRequestLogDetail"]>,
-  getRequestLogBodyChunk: (request) => rpc("getRequestLogBodyChunk", [request]) as ReturnType<CcrApi["getRequestLogBodyChunk"]>,
-  getRequestLogs: (filter) => rpc("getRequestLogs", [filter]) as ReturnType<CcrApi["getRequestLogs"]>,
-  getUpdateStatus: () => rpc("getUpdateStatus") as ReturnType<CcrApi["getUpdateStatus"]>,
-  getUsageStats: (range, filter) => rpc("getUsageStats", [range, filter]) as ReturnType<CcrApi["getUsageStats"]>,
-  importLocalAgentProvider: (request) => rpc("importLocalAgentProvider", [request]) as ReturnType<CcrApi["importLocalAgentProvider"]>,
-  installProxyCertificate: () => rpc("installProxyCertificate") as ReturnType<CcrApi["installProxyCertificate"]>,
-  listMcpServerTools: (serverName) => rpc("listMcpServerTools", [serverName]) as ReturnType<CcrApi["listMcpServerTools"]>,
+  getPluginMarketplace: () => rpc("getPluginMarketplace") as ReturnType<AgentRouterApi["getPluginMarketplace"]>,
+  getProfileOpenCommand: (request) => rpc("getProfileOpenCommand", [request]) as ReturnType<AgentRouterApi["getProfileOpenCommand"]>,
+  getProfileRuntimeStatus: () => rpc("getProfileRuntimeStatus") as ReturnType<AgentRouterApi["getProfileRuntimeStatus"]>,
+  getProviderAccountSnapshots: (provider, options) => rpc("getProviderAccountSnapshots", [provider, options]) as ReturnType<AgentRouterApi["getProviderAccountSnapshots"]>,
+  getProviderCatalogModels: (request) => rpc("getProviderCatalogModels", [request]) as ReturnType<AgentRouterApi["getProviderCatalogModels"]>,
+  getOpenRouterProviderCatalog: (request) => rpc("getOpenRouterProviderCatalog", [request]) as ReturnType<AgentRouterApi["getOpenRouterProviderCatalog"]>,
+  getProviderPresets: () => rpc("getProviderPresets") as ReturnType<AgentRouterApi["getProviderPresets"]>,
+  getProxyCertificateStatus: () => rpc("getProxyCertificateStatus") as ReturnType<AgentRouterApi["getProxyCertificateStatus"]>,
+  getProxyNetworkCaptures: () => rpc("getProxyNetworkCaptures") as ReturnType<AgentRouterApi["getProxyNetworkCaptures"]>,
+  getProxyStatus: () => rpc("getProxyStatus") as ReturnType<AgentRouterApi["getProxyStatus"]>,
+  getRequestLogDetail: (request) => rpc("getRequestLogDetail", [request]) as ReturnType<AgentRouterApi["getRequestLogDetail"]>,
+  getRequestLogBodyChunk: (request) => rpc("getRequestLogBodyChunk", [request]) as ReturnType<AgentRouterApi["getRequestLogBodyChunk"]>,
+  getRequestLogs: (filter) => rpc("getRequestLogs", [filter]) as ReturnType<AgentRouterApi["getRequestLogs"]>,
+  getUpdateStatus: () => rpc("getUpdateStatus") as ReturnType<AgentRouterApi["getUpdateStatus"]>,
+  getUsageStats: (range, filter) => rpc("getUsageStats", [range, filter]) as ReturnType<AgentRouterApi["getUsageStats"]>,
+  importLocalAgentProvider: (request) => rpc("importLocalAgentProvider", [request]) as ReturnType<AgentRouterApi["importLocalAgentProvider"]>,
+  installProxyCertificate: () => rpc("installProxyCertificate") as ReturnType<AgentRouterApi["installProxyCertificate"]>,
+  listMcpServerTools: (serverName) => rpc("listMcpServerTools", [serverName]) as ReturnType<AgentRouterApi["listMcpServerTools"]>,
   onBeforeQuit: noopSubscription,
   onOpenSettingsRequest: noopSubscription,
   onOpenUpdateRequest: noopSubscription,
   onProviderDeepLink: noopSubscription,
   onUpdateStatusChanged: noopSubscription,
-  openBotGatewayQrWindow: (request) => rpc("openBotGatewayQrWindow", [request]) as ReturnType<CcrApi["openBotGatewayQrWindow"]>,
-  openBuiltInBrowser: (url) => rpc("openBuiltInBrowser", [url]) as ReturnType<CcrApi["openBuiltInBrowser"]>,
+  openBotGatewayQrWindow: (request) => rpc("openBotGatewayQrWindow", [request]) as ReturnType<AgentRouterApi["openBotGatewayQrWindow"]>,
+  openBuiltInBrowser: (url) => rpc("openBuiltInBrowser", [url]) as ReturnType<AgentRouterApi["openBuiltInBrowser"]>,
   openExternal: async (url) => {
     window.open(normalizeExternalHttpUrl(url), "_blank", "noopener,noreferrer");
   },
-  openProfile: (request) => rpc("openProfile", [request]) as ReturnType<CcrApi["openProfile"]>,
-  probeLocalAgentProvider: (request) => rpc("probeLocalAgentProvider", [request]) as ReturnType<NonNullable<CcrApi["probeLocalAgentProvider"]>>,
-  probeProvider: (request) => rpc("probeProvider", [request]) as ReturnType<CcrApi["probeProvider"]>,
-  probeProviderCandidates: (request) => rpc("probeProviderCandidates", [request]) as ReturnType<CcrApi["probeProviderCandidates"]>,
-  quitApp: () => rpc("quitApp") as ReturnType<CcrApi["quitApp"]>,
-  restartGateway: () => rpc("restartGateway") as ReturnType<CcrApi["restartGateway"]>,
-  restartProxy: () => rpc("restartProxy") as ReturnType<CcrApi["restartProxy"]>,
-  revealProxyCertificate: () => rpc("revealProxyCertificate") as ReturnType<CcrApi["revealProxyCertificate"]>,
-  resetCodexRateLimitCredit: (request) => rpc("resetCodexRateLimitCredit", [request]) as ReturnType<CcrApi["resetCodexRateLimitCredit"]>,
-  resetOverviewStatistics: () => rpc("resetOverviewStatistics") as ReturnType<CcrApi["resetOverviewStatistics"]>,
-  saveApiKeys: (apiKeys) => rpc("saveApiKeys", [apiKeys]) as ReturnType<CcrApi["saveApiKeys"]>,
-  saveConfig: (config, options) => rpc("saveConfig", [config, options]) as ReturnType<CcrApi["saveConfig"]>,
-  scanBotHandoffBluetoothTargets: () => rpc("scanBotHandoffBluetoothTargets") as ReturnType<CcrApi["scanBotHandoffBluetoothTargets"]>,
-  scanBotHandoffWifiTargets: () => rpc("scanBotHandoffWifiTargets") as ReturnType<CcrApi["scanBotHandoffWifiTargets"]>,
-  selectPluginDirectory: () => selectPluginDirectory() as ReturnType<CcrApi["selectPluginDirectory"]>,
-  setOnboardingFinished: () => rpc("setOnboardingFinished") as ReturnType<CcrApi["setOnboardingFinished"]>,
-  setProxyNetworkCaptureEnabled: (enabled) => rpc("setProxyNetworkCaptureEnabled", [enabled]) as ReturnType<CcrApi["setProxyNetworkCaptureEnabled"]>,
+  openProfile: (request) => rpc("openProfile", [request]) as ReturnType<AgentRouterApi["openProfile"]>,
+  probeLocalAgentProvider: (request) => rpc("probeLocalAgentProvider", [request]) as ReturnType<NonNullable<AgentRouterApi["probeLocalAgentProvider"]>>,
+  probeProvider: (request) => rpc("probeProvider", [request]) as ReturnType<AgentRouterApi["probeProvider"]>,
+  probeProviderCandidates: (request) => rpc("probeProviderCandidates", [request]) as ReturnType<AgentRouterApi["probeProviderCandidates"]>,
+  quitApp: () => rpc("quitApp") as ReturnType<AgentRouterApi["quitApp"]>,
+  restartGateway: () => rpc("restartGateway") as ReturnType<AgentRouterApi["restartGateway"]>,
+  restartProxy: () => rpc("restartProxy") as ReturnType<AgentRouterApi["restartProxy"]>,
+  revealProxyCertificate: () => rpc("revealProxyCertificate") as ReturnType<AgentRouterApi["revealProxyCertificate"]>,
+  resetCodexRateLimitCredit: (request) => rpc("resetCodexRateLimitCredit", [request]) as ReturnType<AgentRouterApi["resetCodexRateLimitCredit"]>,
+  resetOverviewStatistics: () => rpc("resetOverviewStatistics") as ReturnType<AgentRouterApi["resetOverviewStatistics"]>,
+  saveApiKeys: (apiKeys) => rpc("saveApiKeys", [apiKeys]) as ReturnType<AgentRouterApi["saveApiKeys"]>,
+  saveConfig: (config, options) => rpc("saveConfig", [config, options]) as ReturnType<AgentRouterApi["saveConfig"]>,
+  scanBotHandoffBluetoothTargets: () => rpc("scanBotHandoffBluetoothTargets") as ReturnType<AgentRouterApi["scanBotHandoffBluetoothTargets"]>,
+  scanBotHandoffWifiTargets: () => rpc("scanBotHandoffWifiTargets") as ReturnType<AgentRouterApi["scanBotHandoffWifiTargets"]>,
+  selectPluginDirectory: () => selectPluginDirectory() as ReturnType<AgentRouterApi["selectPluginDirectory"]>,
+  setOnboardingFinished: () => rpc("setOnboardingFinished") as ReturnType<AgentRouterApi["setOnboardingFinished"]>,
+  setProxyNetworkCaptureEnabled: (enabled) => rpc("setProxyNetworkCaptureEnabled", [enabled]) as ReturnType<AgentRouterApi["setProxyNetworkCaptureEnabled"]>,
   setTrayDetailOpen: () => Promise.resolve(),
   showMainWindow: () => Promise.resolve(),
-  startBotGatewayQrLogin: (request) => rpc("startBotGatewayQrLogin", [request]) as ReturnType<CcrApi["startBotGatewayQrLogin"]>,
-  startGateway: () => rpc("startGateway") as ReturnType<CcrApi["startGateway"]>,
-  stopGateway: () => rpc("stopGateway") as ReturnType<CcrApi["stopGateway"]>,
-  stopProfile: (request) => rpc("stopProfile", [request]) as ReturnType<CcrApi["stopProfile"]>,
-  testProviderAccountConnector: (request) => rpc("testProviderAccountConnector", [request]) as ReturnType<CcrApi["testProviderAccountConnector"]>,
-  testRouteScript: (request) => rpc("testRouteScript", [request]) as ReturnType<CcrApi["testRouteScript"]>,
-  updateCheck: () => rpc("updateCheck") as ReturnType<CcrApi["updateCheck"]>,
-  updateDownload: () => rpc("updateDownload") as ReturnType<CcrApi["updateDownload"]>,
-  updateInstall: () => rpc("updateInstall") as ReturnType<CcrApi["updateInstall"]>,
-  validateRouteScript: (request) => rpc("validateRouteScript", [request]) as ReturnType<CcrApi["validateRouteScript"]>,
-  waitBotGatewayQrLogin: (request) => rpc("waitBotGatewayQrLogin", [request]) as ReturnType<CcrApi["waitBotGatewayQrLogin"]>
+  startBotGatewayQrLogin: (request) => rpc("startBotGatewayQrLogin", [request]) as ReturnType<AgentRouterApi["startBotGatewayQrLogin"]>,
+  startGateway: () => rpc("startGateway") as ReturnType<AgentRouterApi["startGateway"]>,
+  stopGateway: () => rpc("stopGateway") as ReturnType<AgentRouterApi["stopGateway"]>,
+  stopProfile: (request) => rpc("stopProfile", [request]) as ReturnType<AgentRouterApi["stopProfile"]>,
+  testProviderAccountConnector: (request) => rpc("testProviderAccountConnector", [request]) as ReturnType<AgentRouterApi["testProviderAccountConnector"]>,
+  testRouteScript: (request) => rpc("testRouteScript", [request]) as ReturnType<AgentRouterApi["testRouteScript"]>,
+  updateCheck: () => rpc("updateCheck") as ReturnType<AgentRouterApi["updateCheck"]>,
+  updateDownload: () => rpc("updateDownload") as ReturnType<AgentRouterApi["updateDownload"]>,
+  updateInstall: () => rpc("updateInstall") as ReturnType<AgentRouterApi["updateInstall"]>,
+  validateRouteScript: (request) => rpc("validateRouteScript", [request]) as ReturnType<AgentRouterApi["validateRouteScript"]>,
+  waitBotGatewayQrLogin: (request) => rpc("waitBotGatewayQrLogin", [request]) as ReturnType<AgentRouterApi["waitBotGatewayQrLogin"]>
 };
 
-if (!window.ccr) {
-  window.ccr = webClientBridge;
+if (!window.agentrouter) {
+  window.agentrouter = webClientBridge;
 }

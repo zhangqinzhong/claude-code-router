@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { createDefaultAppConfig } from "@ccr/core/config/default-config.ts";
-import { compileCoreGatewayConfig } from "@ccr/core/gateway/core-runtime/config-compiler.ts";
-import { shouldRunGatewayRuntime } from "@ccr/core/gateway/core-runtime/supervisor.ts";
+import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
+import { compileCoreGatewayConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler.ts";
+import { shouldRunGatewayRuntime } from "@agentrouter/core/gateway/core-runtime/supervisor.ts";
 
 test("media tools start their internal gateway runtime when the public gateway is disabled", () => {
   const config = createDefaultAppConfig();

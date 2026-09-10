@@ -1,11 +1,11 @@
-import type { ApiKeyConfig, AppConfig, GatewayProviderProtocol, RouterFallbackConfig } from "@ccr/core/contracts/app";
+import type { ApiKeyConfig, AppConfig, GatewayProviderProtocol, RouterFallbackConfig } from "@agentrouter/core/contracts/app";
 import {
   CONTEXT_ARCHIVE_MCP_SERVER_NAME,
   contextArchiveConfigForApiKey,
   contextArchiveMcpEnabled,
   contextArchiveService,
   type ContextArchiveReplayExecutor
-} from "@ccr/core/gateway/context-archive";
+} from "@agentrouter/core/gateway/context-archive";
 import {
   appendCompactHandoffTask,
   codexCompactArchiveResponseContentType,
@@ -13,13 +13,13 @@ import {
   hasCodexResponsesCompactionTrigger,
   isCodexResponsesCompactPath,
   type ContextArchiveResponseMode
-} from "@ccr/core/gateway/context-archive/protocol";
-import { parseJsonObjectSafe, serializeJsonBody } from "@ccr/core/gateway/http/body";
-import { uniqueStrings } from "@ccr/core/gateway/internal/collections";
-import type { UpstreamFetchResult } from "@ccr/core/gateway/internal/shared";
-import { isRecord, numberValue, rawStringValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { parseSseEvents, type ParsedSseEvent } from "@ccr/core/gateway/features/hosted-web-search/sse";
-import { fetchUpstreamWithFallback, upstreamResponseHeaders } from "@ccr/core/gateway/upstream/executor";
+} from "@agentrouter/core/gateway/context-archive/protocol";
+import { parseJsonObjectSafe, serializeJsonBody } from "@agentrouter/core/gateway/http/body";
+import { uniqueStrings } from "@agentrouter/core/gateway/internal/collections";
+import type { UpstreamFetchResult } from "@agentrouter/core/gateway/internal/shared";
+import { isRecord, numberValue, rawStringValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { parseSseEvents, type ParsedSseEvent } from "@agentrouter/core/gateway/features/hosted-web-search/sse";
+import { fetchUpstreamWithFallback, upstreamResponseHeaders } from "@agentrouter/core/gateway/upstream/executor";
 
 type ContextArchiveToolContinuationProtocol = "anthropic_messages" | "openai_responses";
 
@@ -110,7 +110,7 @@ export function prepareContextArchiveToolContinuationRequest(input: {
   if (!archiveAccess) {
     return undefined;
   }
-  const rawToolName = config.contextArchive.toolName || "ccr_history_ask";
+  const rawToolName = config.contextArchive.toolName || "ar_history_ask";
   const toolName = input.protocol === "anthropic_messages"
     ? contextArchiveClaudeCodeToolName(rawToolName)
     : rawToolName;
@@ -601,7 +601,7 @@ function contextArchiveAnthropicMessagesTool(toolName: string): Record<string, u
 function contextArchiveToolDescription(): string {
   return [
     "Ask the archived pre-compaction agent lineage a natural-language history task.",
-    "Use this when the compact handoff says historical details are available in CCR archived history.",
+    "Use this when the compact handoff says historical details are available in AgentRouter archived history.",
     "Pass archive_id and session_token exactly from the compact handoff.",
     "For many related questions, include every question id and full question text in one task and ask for JSON evidence keyed by question id."
   ].join(" ");
@@ -622,7 +622,7 @@ function contextArchiveToolSchema(): Record<string, unknown> {
 
 function contextArchiveToolContinuationGuidance(toolName: string): string {
   return [
-    "CCR context archive is available for this compacted continuation.",
+    "AgentRouter context archive is available for this compacted continuation.",
     `If the compact handoff indicates missing historical details are stored in archived history, use the ${toolName} tool when that history is needed.`,
     "Use ordinary task judgment: answer directly when the compact handoff and retained tail are sufficient; call the history tool when exact pre-compaction details are needed.",
     "Before implementing or finalizing behavior that depends on pre-compaction requirements, tests, file edits, failure output, or edge cases that are not explicit in the handoff, ask the archive for the missing details instead of relying on memory.",
@@ -668,7 +668,7 @@ function anthropicMessagesContextArchiveTexts(body: Record<string, unknown>): st
 }
 
 function contextArchiveAccessFromText(text: string): { archiveId: string; sessionToken: string } | undefined {
-  if (!text.includes("CCR ARCHIVED HISTORY ACCESS")) {
+  if (!text.includes("AgentRouter ARCHIVED HISTORY ACCESS")) {
     return undefined;
   }
   const archiveId = (/Archive id:\s*([A-Za-z0-9_-]+)/.exec(text) ?? [])[1];

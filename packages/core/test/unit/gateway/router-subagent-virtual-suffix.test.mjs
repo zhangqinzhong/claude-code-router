@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin.ts";
-import { prepareClaudeAppDiscoveredModelRequest } from "@ccr/core/gateway/features/model-discovery.ts";
-import { prepareGatewayUpstreamAttemptForTest } from "@ccr/core/gateway/service.ts";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin.ts";
+import { prepareClaudeAppDiscoveredModelRequest } from "@agentrouter/core/gateway/features/model-discovery.ts";
+import { prepareGatewayUpstreamAttemptForTest } from "@agentrouter/core/gateway/service.ts";
 
 // Issue #1693: a claude-code profile model carrying the "[1m]" virtual suffix is
 // injected verbatim by the subagent remap path (cc_is_subagent), after ingress

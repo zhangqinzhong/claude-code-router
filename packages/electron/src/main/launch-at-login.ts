@@ -1,5 +1,5 @@
 import { app } from "electron";
-import type { AppConfig } from "@ccr/core/contracts/app";
+import type { AppConfig } from "@agentrouter/core/contracts/app";
 
 export function isLaunchAtLoginSupported(platform = process.platform): boolean {
   return platform === "darwin" || platform === "win32";

@@ -1,15 +1,15 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
-import type { ApiKeyConfig, AppConfig, ProfileConfig, RequestRouteTraceChange, RouterFallbackConfig } from "@ccr/core/contracts/app";
+import type { ApiKeyConfig, AppConfig, ProfileConfig, RequestRouteTraceChange, RouterFallbackConfig } from "@agentrouter/core/contracts/app";
 import {
   createSseErrorDetector,
   markGatewayRequestLogDropped,
   recordGatewayRequestLog
-} from "@ccr/core/observability/request-log-store";
-import { requestLogRequestedModel, requestLogResponseModel } from "@ccr/core/observability/request-log-model";
-import { recordGatewayUsageCapture, type UsageCaptureInput } from "@ccr/core/usage/store";
-import { ClaudeCodeRouterPlugin, type ClaudeCodeRouteDecision } from "@ccr/core/gateway/claude-code-router-plugin";
+} from "@agentrouter/core/observability/request-log-store";
+import { requestLogRequestedModel, requestLogResponseModel } from "@agentrouter/core/observability/request-log-model";
+import { recordGatewayUsageCapture, type UsageCaptureInput } from "@agentrouter/core/usage/store";
+import { ClaudeCodeRouterPlugin, type ClaudeCodeRouteDecision } from "@agentrouter/core/gateway/claude-code-router-plugin";
 import {
   codexCompactResponseStream,
   contextArchiveHandoffResponseStream,
@@ -19,48 +19,48 @@ import {
   type ContextArchiveRecord,
   type ContextArchiveReplayInput,
   type ContextArchiveReplayResult
-} from "@ccr/core/gateway/context-archive";
+} from "@agentrouter/core/gateway/context-archive";
 import {
   prepareCodexCompactCompatRequest,
   prepareContextArchiveToolContinuationRequest,
   resolveContextArchiveToolContinuation
-} from "@ccr/core/gateway/features/context-archive-continuation";
-import { isCodexResponsesCompactPath, type ContextArchiveResponseMode } from "@ccr/core/gateway/context-archive/protocol";
-import { adaptRouteRequestBody, restoreRouteRequestBody } from "@ccr/core/routing/protocol-adapter";
-import { reserveApiKeyLimits } from "@ccr/core/gateway/auth/api-key-authorizer";
-import { recordProviderCredentialOutcome } from "@ccr/core/providers/credential-pool";
-import { codexApplyPatchBridgeResponseStream, prepareCodexApplyPatchBridgeRequest } from "@ccr/core/gateway/features/codex-patch-bridge";
-import { codexMultiAgentBridgeResponseStream, prepareCodexMultiAgentBridgeRequest } from "@ccr/core/gateway/features/codex-multi-agent-bridge";
-import { rewriteAnthropicMessageStartModelStream, shouldRewriteAnthropicMessageStartModel } from "@ccr/core/gateway/features/anthropic-response-model";
-import { prepareCursorOpenAICompatChatBody } from "@ccr/core/gateway/features/cursor-compat";
-import { filteredResponseHeaders, formatError, formatUpstreamErrorForLog, forwardHeaders, inferGatewayClient, readRequestBody, sendJson, shouldCaptureGatewayUsage, shouldSendBody, stripLocalGatewayAuthHeaders } from "@ccr/core/gateway/http/io";
-import { parseJsonObjectSafe, serializeJsonBody, takeJsonObject } from "@ccr/core/gateway/http/body";
-import { createGatewayModelsResponse, prepareClaudeAppDiscoveredModelRequest, prepareClaudeCodeDiscoveredModelRequest, shouldServeGatewayModelsResponse } from "@ccr/core/gateway/features/model-discovery";
-import { providerProtocolForClientProtocol, resolveProviderLogName, resolveResponseProviderProtocol, sanitizeHeaderValue } from "@ccr/core/providers/runtime-topology";
-import { createBodySampler, requestLogSampled, shouldRecordRequestLogs } from "@ccr/core/observability/raw-trace-sync";
-import { RequestRouteTraceRecorder } from "@ccr/core/observability/route-trace";
-import { createStreamMetricsTracker } from "@ccr/core/observability/stream-metrics";
-import { coreGatewayUsageAttributionConfig } from "@ccr/core/gateway/core-runtime/config-compiler";
-import { providerModelPricingForUsage } from "@ccr/core/models/pricing-service";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { clientClosedRequestStatusCode, clientDisconnectMessage, coreGatewayAuthHeader, resolveStreamRequestLogOutcome, UpstreamRequestError } from "@ccr/core/gateway/internal/shared";
-import type { BrowserWebSearchMcpIntegration, BrowserWebSearchProtocolRecord, UpstreamFetchResult } from "@ccr/core/gateway/internal/shared";
-import { cancelResponseBody, destroyResponseStreams, fetchUpstreamWithFallback, mergeFallbackResponseHeaders, rewriteCapabilityResponseHeaders, uniqueStreams, upstreamResponseHeaders } from "@ccr/core/gateway/upstream/executor";
-import { requestProtocolForPath, shouldApplyGatewayRouting } from "@ccr/core/routing/protocol-endpoints";
-import { modelRegistryForConfig } from "@ccr/core/routing/model-registry";
-import { createClaudeCodeWebSearchContinuationContext, createHostedWebSearchProtocolContext, hostedWebSearchProtocolResponseStream, hostedWebSearchUnavailableMessage, prepareClaudeCodeWebSearchContinuationRequestBody, prepareHostedWebSearchProtocolRequestBody, selectClaudeCodeWebSearchContinuationRecords, selectHostedWebSearchProtocolRecords } from "@ccr/core/gateway/features/hosted-web-search/index";
-import { isModelAllowedForProfile, profileForApiKey } from "@ccr/core/profiles/model-allowlist";
-import { pluginService } from "@ccr/core/plugins/service";
-import { finalizeOpenRouterDiscountProviderRouterSelection } from "@ccr/core/plugins/built-ins/openrouter-discount-provider-router";
+} from "@agentrouter/core/gateway/features/context-archive-continuation";
+import { isCodexResponsesCompactPath, type ContextArchiveResponseMode } from "@agentrouter/core/gateway/context-archive/protocol";
+import { adaptRouteRequestBody, restoreRouteRequestBody } from "@agentrouter/core/routing/protocol-adapter";
+import { reserveApiKeyLimits } from "@agentrouter/core/gateway/auth/api-key-authorizer";
+import { recordProviderCredentialOutcome } from "@agentrouter/core/providers/credential-pool";
+import { codexApplyPatchBridgeResponseStream, prepareCodexApplyPatchBridgeRequest } from "@agentrouter/core/gateway/features/codex-patch-bridge";
+import { codexMultiAgentBridgeResponseStream, prepareCodexMultiAgentBridgeRequest } from "@agentrouter/core/gateway/features/codex-multi-agent-bridge";
+import { rewriteAnthropicMessageStartModelStream, shouldRewriteAnthropicMessageStartModel } from "@agentrouter/core/gateway/features/anthropic-response-model";
+import { prepareCursorOpenAICompatChatBody } from "@agentrouter/core/gateway/features/cursor-compat";
+import { filteredResponseHeaders, formatError, formatUpstreamErrorForLog, forwardHeaders, inferGatewayClient, readRequestBody, sendJson, shouldCaptureGatewayUsage, shouldSendBody, stripLocalGatewayAuthHeaders } from "@agentrouter/core/gateway/http/io";
+import { parseJsonObjectSafe, serializeJsonBody, takeJsonObject } from "@agentrouter/core/gateway/http/body";
+import { createGatewayModelsResponse, prepareClaudeAppDiscoveredModelRequest, prepareClaudeCodeDiscoveredModelRequest, shouldServeGatewayModelsResponse } from "@agentrouter/core/gateway/features/model-discovery";
+import { providerProtocolForClientProtocol, resolveProviderLogName, resolveResponseProviderProtocol, sanitizeHeaderValue } from "@agentrouter/core/providers/runtime-topology";
+import { createBodySampler, requestLogSampled, shouldRecordRequestLogs } from "@agentrouter/core/observability/raw-trace-sync";
+import { RequestRouteTraceRecorder } from "@agentrouter/core/observability/route-trace";
+import { createStreamMetricsTracker } from "@agentrouter/core/observability/stream-metrics";
+import { coreGatewayUsageAttributionConfig } from "@agentrouter/core/gateway/core-runtime/config-compiler";
+import { providerModelPricingForUsage } from "@agentrouter/core/models/pricing-service";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { clientClosedRequestStatusCode, clientDisconnectMessage, coreGatewayAuthHeader, resolveStreamRequestLogOutcome, UpstreamRequestError } from "@agentrouter/core/gateway/internal/shared";
+import type { BrowserWebSearchMcpIntegration, BrowserWebSearchProtocolRecord, UpstreamFetchResult } from "@agentrouter/core/gateway/internal/shared";
+import { cancelResponseBody, destroyResponseStreams, fetchUpstreamWithFallback, mergeFallbackResponseHeaders, rewriteCapabilityResponseHeaders, uniqueStreams, upstreamResponseHeaders } from "@agentrouter/core/gateway/upstream/executor";
+import { requestProtocolForPath, shouldApplyGatewayRouting } from "@agentrouter/core/routing/protocol-endpoints";
+import { modelRegistryForConfig } from "@agentrouter/core/routing/model-registry";
+import { createClaudeCodeWebSearchContinuationContext, createHostedWebSearchProtocolContext, hostedWebSearchProtocolResponseStream, hostedWebSearchUnavailableMessage, prepareClaudeCodeWebSearchContinuationRequestBody, prepareHostedWebSearchProtocolRequestBody, selectClaudeCodeWebSearchContinuationRecords, selectHostedWebSearchProtocolRecords } from "@agentrouter/core/gateway/features/hosted-web-search/index";
+import { isModelAllowedForProfile, profileForApiKey } from "@agentrouter/core/profiles/model-allowlist";
+import { pluginService } from "@agentrouter/core/plugins/service";
+import { finalizeOpenRouterDiscountProviderRouterSelection } from "@agentrouter/core/plugins/built-ins/openrouter-discount-provider-router";
 import {
-  ccrRouteHeaderNames,
-  ccrRouteDiagnosticsHeader,
-  ccrRouteReasonHeader,
-  ccrRouteSourceHeader,
-  ccrRoutedModelHeader,
-  ccrRouterHttpRoutePath
-} from "@ccr/core/gateway/core-runtime/router-plugin-contract";
-import { isRecord } from "@ccr/core/gateway/internal/value";
+  arRouteHeaderNames,
+  arRouteDiagnosticsHeader,
+  arRouteReasonHeader,
+  arRouteSourceHeader,
+  arRoutedModelHeader,
+  arRouterHttpRoutePath
+} from "@agentrouter/core/gateway/core-runtime/router-plugin-contract";
+import { isRecord } from "@agentrouter/core/gateway/internal/value";
 
 export type GatewayRequestPipelineDependencies = {
   getBrowserWebSearchMcpIntegration: () => BrowserWebSearchMcpIntegration | undefined;
@@ -92,9 +92,9 @@ function isReportedRouteChange(change: RequestRouteTraceChange | undefined): cha
   return change !== undefined;
 }
 
-function stripUntrustedCcrRouteHeaders(headers: Record<string, string>): RequestRouteTraceChange[] {
+function stripUntrustedArRouteHeaders(headers: Record<string, string>): RequestRouteTraceChange[] {
   const changes: RequestRouteTraceChange[] = [];
-  for (const headerName of ccrRouteHeaderNames) {
+  for (const headerName of arRouteHeaderNames) {
     const previous = headers[headerName];
     if (previous === undefined) {
       continue;
@@ -139,7 +139,7 @@ export class GatewayRequestPipeline {
       routeTrace?.captureIngress();
       const headerNormalizationStartedAt = Date.now();
       const headers = forwardHeaders(request.headers);
-      const strippedCcrRouteHeaderChanges = stripUntrustedCcrRouteHeaders(headers);
+      const strippedArRouteHeaderChanges = stripUntrustedArRouteHeaders(headers);
       const previousAuthorization = headers.authorization;
       const previousApiKey = headers["x-api-key"];
       const previousLegacyApiKey = headers["api-key"];
@@ -154,7 +154,7 @@ export class GatewayRequestPipeline {
       headers["x-client-request-id"] = requestId;
       routeTrace?.capture({
         changes: [
-          ...strippedCcrRouteHeaderChanges,
+          ...strippedArRouteHeaderChanges,
           ...(apiKey ? [
             reportedRouteChange("headers", "/headers/authorization", previousAuthorization, undefined),
             reportedRouteChange("headers", "/headers/x-api-key", previousApiKey, undefined),
@@ -198,7 +198,7 @@ export class GatewayRequestPipeline {
       let codexMultiAgentBridgeActive = false;
       const pluginResponseHeaders = new Headers();
       let openRouterDiscountSelectionFinalized = false;
-      let openRouterDiscountUsedCcrFallback = false;
+      let openRouterDiscountUsedArFallback = false;
       const finalizeOpenRouterDiscountSelection = (ok: boolean) => {
         if (openRouterDiscountSelectionFinalized) {
           return;
@@ -207,7 +207,7 @@ export class GatewayRequestPipeline {
         finalizeOpenRouterDiscountProviderRouterSelection(requestId, {
           ok,
           routedModel,
-          usedCcrFallback: openRouterDiscountUsedCcrFallback
+          usedArFallback: openRouterDiscountUsedArFallback
         });
       };
       const authenticatedProfile = profileForApiKey(activeConfig, apiKey);
@@ -395,16 +395,16 @@ export class GatewayRequestPipeline {
         });
         const serialized = serializeJsonBody(restoreRouteRequestBody(routed.body, adaptation));
         headers["content-type"] = "application/json";
-        headers[ccrRouteReasonHeader] = sanitizeHeaderValue(routed.decision.reason);
-        headers[ccrRouteSourceHeader] = routed.decision.source;
+        headers[arRouteReasonHeader] = sanitizeHeaderValue(routed.decision.reason);
+        headers[arRouteSourceHeader] = routed.decision.source;
         if (routed.decision.diagnostics.length > 0) {
-          headers[ccrRouteDiagnosticsHeader] = String(routed.decision.diagnostics.length);
+          headers[arRouteDiagnosticsHeader] = String(routed.decision.diagnostics.length);
         }
         routeFallback = routed.decision.fallback ?? routeFallback;
         routedSessionId = routed.decision.sessionId;
         routedTokenCount = routed.decision.tokenCount;
         if (routed.decision.model) {
-          headers[ccrRoutedModelHeader] = sanitizeHeaderValue(routed.decision.model);
+          headers[arRoutedModelHeader] = sanitizeHeaderValue(routed.decision.model);
           routedModel = routed.decision.model;
         }
         bodyToForward = serialized;
@@ -412,9 +412,9 @@ export class GatewayRequestPipeline {
           changes: [
             { operation: "replace", path: "/body", scope: "body" },
             { after: headers["content-type"], operation: "replace", path: "/headers/content-type", scope: "headers" },
-            { after: headers[ccrRouteReasonHeader], operation: "add", path: `/headers/${ccrRouteReasonHeader}`, scope: "headers" },
-            { after: headers[ccrRouteSourceHeader], operation: "add", path: `/headers/${ccrRouteSourceHeader}`, scope: "headers" },
-            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: `/headers/${ccrRoutedModelHeader}`, scope: "headers" as const }] : [])
+            { after: headers[arRouteReasonHeader], operation: "add", path: `/headers/${arRouteReasonHeader}`, scope: "headers" },
+            { after: headers[arRouteSourceHeader], operation: "add", path: `/headers/${arRouteSourceHeader}`, scope: "headers" },
+            ...(routedModel ? [{ after: routedModel, operation: "add" as const, path: `/headers/${arRoutedModelHeader}`, scope: "headers" as const }] : [])
           ],
           decision: {
             diagnostics: routed.decision.diagnostics,
@@ -845,7 +845,7 @@ export class GatewayRequestPipeline {
         bodyToForward = upstreamResult.attempt.body ?? bodyToForward;
         routedModel = upstreamResult.attempt.model ?? routedModel;
       }
-      openRouterDiscountUsedCcrFallback = upstreamResult.failedAttempts.length > 0;
+      openRouterDiscountUsedArFallback = upstreamResult.failedAttempts.length > 0;
       const responseHeaders = rewriteCapabilityResponseHeaders(
         // Copy into a mutable Headers instance: upstream fetch Response.headers
         // can be immutable (TypeError: immutable on .delete/.set), and
@@ -1127,7 +1127,7 @@ async function routeRequestWithCoreGatewayPlugin(input: {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 500);
   try {
-    const response = await fetchWithSystemProxy(new URL(ccrRouterHttpRoutePath, input.coreEndpoint), {
+    const response = await fetchWithSystemProxy(new URL(arRouterHttpRoutePath, input.coreEndpoint), {
       body: JSON.stringify({
         body: input.body,
         headers: input.headers,

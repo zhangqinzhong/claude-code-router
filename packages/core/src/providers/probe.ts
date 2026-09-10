@@ -11,25 +11,25 @@ import type {
   GatewayProviderProbeResult,
   GatewayProviderCapabilityProtocol,
   GatewayProviderProtocol
-} from "@ccr/core/contracts/app";
-import { codexDefaultBaseUrl, readCodexAuth } from "@ccr/core/agents/local-providers/codex";
-import { localAgentProviderApiKey } from "@ccr/core/agents/local-providers/shared";
-import { findProviderPresetByBaseUrl, providerApiKeySafetyIssue } from "@ccr/core/providers/presets/index";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
+} from "@agentrouter/core/contracts/app";
+import { codexDefaultBaseUrl, readCodexAuth } from "@agentrouter/core/agents/local-providers/codex";
+import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-providers/shared";
+import { findProviderPresetByBaseUrl, providerApiKeySafetyIssue } from "@agentrouter/core/providers/presets/index";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
 import {
   compactProviderUrl,
   parseProviderBaseUrl,
   providerBaseUrlForProtocol,
   type ParsedProviderBaseUrl
-} from "@ccr/core/providers/url";
+} from "@agentrouter/core/providers/url";
 import {
   detectedProviderFromHeaders,
   newApiKeyUsageAccountConfig,
   type DetectedProviderKind
-} from "@ccr/core/providers/new-api";
-import { recordGatewayRequestLog } from "@ccr/core/observability/request-log-store";
-import { requestLogSampled } from "@ccr/core/observability/raw-trace-sync";
+} from "@agentrouter/core/providers/new-api";
+import { recordGatewayRequestLog } from "@agentrouter/core/observability/request-log-store";
+import { requestLogSampled } from "@agentrouter/core/observability/raw-trace-sync";
 
 type ModelSource = NonNullable<GatewayProviderProbeResult["modelSource"]>;
 
@@ -305,7 +305,7 @@ function recordProviderConnectivityRequestLog(
     maxBodyBytes: options.maxBodyBytes,
     method: "POST",
     model: check.model,
-    path: "/__ccr/provider-connectivity",
+    path: "/__ar/provider-connectivity",
     providerName: providerProbeCandidateName(candidate),
     providerProtocol: protocol?.protocol as GatewayProviderProtocol | undefined,
     requestedModel: check.model,
@@ -862,7 +862,7 @@ function requestForProtocolSupport(protocol: GatewayProviderCapabilityProtocol, 
 function mediaProbeBody(protocol: GatewayProviderCapabilityProtocol): Record<string, unknown> {
   if (protocol === "openai_image_generations") {
     return {
-      model: "__ccr_media_protocol_probe__",
+      model: "__ar_media_protocol_probe__",
       n: 0,
       prompt: ""
     };
@@ -870,7 +870,7 @@ function mediaProbeBody(protocol: GatewayProviderCapabilityProtocol): Record<str
   if (protocol === "openai_video_generations" || protocol === "xai_video_generations") {
     return {
       duration: 0,
-      model: "__ccr_media_protocol_probe__",
+      model: "__ar_media_protocol_probe__",
       prompt: ""
     };
   }

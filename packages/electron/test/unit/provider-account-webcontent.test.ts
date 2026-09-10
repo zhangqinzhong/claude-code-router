@@ -3,7 +3,7 @@ import test from "node:test";
 import {
   createProviderAccountWebContentFetchHandler,
   providerAccountWebContentInternalsForTest
-} from "@ccr/electron/main/provider-account-webcontent.ts";
+} from "@agentrouter/electron/main/provider-account-webcontent.ts";
 
 test("browser account fetch handler uses built-in browser partition and sanitizes manual cookie headers", async () => {
   let browserWindowOptions: any;
@@ -63,7 +63,7 @@ test("browser account fetch handler uses built-in browser partition and sanitize
     WebContentsView: FakeWebContentsView,
     session: {
       fromPartition(partition: string) {
-        assert.equal(partition, "persist:ccr-built-in-browser");
+        assert.equal(partition, "persist:ar-built-in-browser");
         return {};
       }
     }
@@ -92,7 +92,7 @@ test("browser account fetch handler uses built-in browser partition and sanitize
   assert.equal(loadedUrl, "https://vendor.example.com");
   assert.equal(closed, true);
   assert.equal(browserWindowOptions.show, false);
-  assert.equal(viewOptions.webPreferences.partition, "persist:ccr-built-in-browser");
+  assert.equal(viewOptions.webPreferences.partition, "persist:ar-built-in-browser");
   assert.equal(scriptRequest.credentials, "omit");
   assert.equal(scriptRequest.endpoint, "https://vendor.example.com/api/account");
   assert.equal(scriptRequest.headerTemplates.authorization, "Bearer ${localStorage.accessToken}");

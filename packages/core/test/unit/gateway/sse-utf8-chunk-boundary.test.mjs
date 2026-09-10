@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import { Readable } from "node:stream";
 import test from "node:test";
-import { codexMultiAgentBridgeResponseStream } from "@ccr/core/gateway/features/codex-multi-agent-bridge.ts";
-import { codexApplyPatchBridgeResponseStream } from "@ccr/core/gateway/features/codex-patch-bridge.ts";
-import { hostedWebSearchProtocolResponseStream } from "@ccr/core/gateway/features/hosted-web-search/index.ts";
+import { codexMultiAgentBridgeResponseStream } from "@agentrouter/core/gateway/features/codex-multi-agent-bridge.ts";
+import { codexApplyPatchBridgeResponseStream } from "@agentrouter/core/gateway/features/codex-patch-bridge.ts";
+import { hostedWebSearchProtocolResponseStream } from "@agentrouter/core/gateway/features/hosted-web-search/index.ts";
 
 const sseHeaders = () => new Headers({ "content-type": "text/event-stream" });
 

@@ -13,8 +13,8 @@ import {
   normalizeGrokProviderAccountConfig,
   normalizeGrokProviderMediaCapabilities,
   resolveGrokAuth
-} from "@ccr/core/agents/local-providers/grok.ts";
-import { localAgentProviderApiKey } from "@ccr/core/agents/local-providers/shared.ts";
+} from "@agentrouter/core/agents/local-providers/grok.ts";
+import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-providers/shared.ts";
 
 test("Grok local provider imports bearer token and model override plugin", async () => {
   await withGrokHome(async (grokHome) => {
@@ -446,7 +446,7 @@ async function withGrokHome(run) {
   const previousGrokConfigFile = process.env.GROK_CONFIG_FILE;
   const previousGrokModelsCacheFile = process.env.GROK_MODELS_CACHE_FILE;
   const previousGrokTokenEndpoint = process.env.GROK_OIDC_TOKEN_ENDPOINT;
-  const grokHome = mkdtempSync(path.join(os.tmpdir(), "ccr-grok-test-"));
+  const grokHome = mkdtempSync(path.join(os.tmpdir(), "ar-grok-test-"));
   process.env.GROK_HOME = grokHome;
   delete process.env.GROK_AUTH_FILE;
   delete process.env.GROK_CONFIG_FILE;

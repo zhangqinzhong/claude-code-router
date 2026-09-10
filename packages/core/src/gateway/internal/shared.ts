@@ -3,10 +3,10 @@
  */
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { createRequire } from "node:module";
-import type { ApiKeyConfig, AppConfig, GatewayMcpServerConfig, GatewayProviderCapabilityProtocol, GatewayProviderConfig, GatewayProviderProtocol, VirtualModelFusionWebSearchProvider } from "@ccr/core/contracts/app";
-import type { ClaudeAppGatewayModelRouteOptions } from "@ccr/core/agents/claude-app/gateway-routes";
-import type { RouteModelRef } from "@ccr/core/routing/contracts";
-import { findModelCatalogEntry } from "@ccr/core/gateway/model-catalog";
+import type { ApiKeyConfig, AppConfig, GatewayMcpServerConfig, GatewayProviderCapabilityProtocol, GatewayProviderConfig, GatewayProviderProtocol, VirtualModelFusionWebSearchProvider } from "@agentrouter/core/contracts/app";
+import type { ClaudeAppGatewayModelRouteOptions } from "@agentrouter/core/agents/claude-app/gateway-routes";
+import type { RouteModelRef } from "@agentrouter/core/routing/contracts";
+import { findModelCatalogEntry } from "@agentrouter/core/gateway/model-catalog";
 
 
 export type CoreGatewayProvider = {
@@ -297,9 +297,9 @@ export const billingUsageSyncHeader = "x-ar-billing-usage-token";
 export const virtualApplyPatchToolName = "virtual_apply_patch";
 
 
-export const rawTraceSyncPath = "/__ccr/raw-trace-sync";
+export const rawTraceSyncPath = "/__ar/raw-trace-sync";
 
-export const billingUsageSyncPath = "/__ccr/billing-usage-sync";
+export const billingUsageSyncPath = "/__ar/billing-usage-sync";
 
 export const gatewayEntryOverrideEnv = "AR_GATEWAY_ENTRY";
 

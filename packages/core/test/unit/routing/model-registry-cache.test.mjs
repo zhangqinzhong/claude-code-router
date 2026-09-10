@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import test from "node:test";
-import { ModelRegistry, providerRuntimeId } from "@ccr/core/routing/model-registry.ts";
+import { ModelRegistry, providerRuntimeId } from "@agentrouter/core/routing/model-registry.ts";
 
 test("#1777 provider lookup reuses hashed identities across full scans", (t) => {
   const providers = Array.from({ length: 46 }, (_, index) => ({

@@ -6,9 +6,9 @@ import codexLogoUrl from "@/assets/agent-logos/codex.png";
 import trayCyanIconUrl from "@/assets/tray-cyan.png";
 import trayOrangeIconUrl from "@/assets/tray-orange.png";
 import trayVioletIconUrl from "@/assets/tray-violet.png";
-import { DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS } from "@ccr/core/contracts/app";
-import { formatLocalizedErrorMessage } from "@ccr/core/contracts/i18n";
-import { findProviderPreset, findProviderPresetByBaseUrl, providerPresets } from "@ccr/core/providers/presets";
+import { DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS } from "@agentrouter/core/contracts/app";
+import { formatLocalizedErrorMessage } from "@agentrouter/core/contracts/i18n";
+import { findProviderPreset, findProviderPresetByBaseUrl, providerPresets } from "@agentrouter/core/providers/presets";
 import { providerPresetIconUrls } from "../home/shared/options";
 import type {
   AppConfig,
@@ -26,7 +26,7 @@ import type {
   UsageStatsRange,
   UsageStatsSnapshot,
   UsageTotals
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 export  {
   createContext, useCallback, useContext, useEffect, useMemo, useState, createRoot,
@@ -49,7 +49,7 @@ export type SourceTab = {
 export type AppLanguagePreference = "system" | "en" | "zh";
 export type ResolvedLanguage = "en" | "zh";
 
-export const languagePreferenceStorageKey = "ccr.ui.language";
+export const languagePreferenceStorageKey = "ar.ui.language";
 
 export const trayText: Record<ResolvedLanguage, Record<string, string>> = {
   en: {},
@@ -93,7 +93,7 @@ export const trayText: Record<ResolvedLanguage, Record<string, string>> = {
     "No usage captured yet": "暂无用量记录",
     "Output": "输出",
     "Overview": "概览",
-    "Open CCR": "打开 CCR",
+    "Open AgentRouter": "打开 AgentRouter",
     "Peak daily tokens": "日峰值令牌",
     "Primary quota": "主额度",
     "Quit": "退出",
@@ -157,16 +157,16 @@ export function applyTrayThemePreference(theme: AppConfig["theme"] | undefined):
 export function useTrayThemePreference(): void {
   useEffect(() => {
     const syncTheme = () => {
-      if (!window.ccr) {
+      if (!window.agentrouter) {
         return;
       }
-      void window.ccr.getConfig()
+      void window.agentrouter.getConfig()
         .then((config) => applyTrayThemePreference(config.theme))
         .catch(() => undefined);
     };
 
     syncTheme();
-    const unsubscribeThemePreference = window.ccr?.onThemePreferenceChanged?.(applyTrayThemePreference);
+    const unsubscribeThemePreference = window.agentrouter?.onThemePreferenceChanged?.(applyTrayThemePreference);
     window.addEventListener("focus", syncTheme);
     return () => {
       unsubscribeThemePreference?.();

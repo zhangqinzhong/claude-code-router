@@ -14,8 +14,8 @@ import {
   VirtualModelProfileConfig, virtualModelToolSummary, X
 } from "../shared/index";
 import { PopoverPortal } from "@/components/ui/popover";
-import { createGrokMediaModelOptions } from "@ccr/core/media/models";
-import { ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@ccr/core/contracts/app";
+import { createGrokMediaModelOptions } from "@agentrouter/core/media/models";
+import { ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@agentrouter/core/contracts/app";
 
 const useClientLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
@@ -267,7 +267,7 @@ export function MediaModelConfigurationPanel({
           ))
         )}
       </div>
-      <p className="text-[11px] leading-4 text-muted-foreground">{t("CCR routes media through the selected ai-gateway provider. Imported Grok Agents reuse their existing login automatically.")}</p>
+      <p className="text-[11px] leading-4 text-muted-foreground">{t("AgentRouter routes media through the selected ai-gateway provider. Imported Grok Agents reuse their existing login automatically.")}</p>
     </div>
   );
 }
@@ -388,7 +388,7 @@ export function VirtualModelDialog({
   }
 
   async function discoverMcpServerTools(server: GatewayMcpServerConfig, force = false): Promise<GatewayMcpToolInfo[]> {
-    if (!window.ccr?.listMcpServerTools) {
+    if (!window.agentrouter?.listMcpServerTools) {
       const message = "MCP tool discovery is available in the Electron app.";
       setMcpToolStateByServer((current) => ({
         ...current,
@@ -417,7 +417,7 @@ export function VirtualModelDialog({
       [server.name]: { ...current[server.name], error: "", loading: true }
     }));
     try {
-      const tools = await window.ccr.listMcpServerTools(savedServer.name);
+      const tools = await window.agentrouter.listMcpServerTools(savedServer.name);
       setMcpToolStateByServer((current) => ({
         ...current,
         [server.name]: { loading: false, tools }

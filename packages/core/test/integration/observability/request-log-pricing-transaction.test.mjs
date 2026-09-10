@@ -3,12 +3,12 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { preloadUsagePriceCatalog } from "@ccr/core/models/pricing-service.ts";
-import { RequestLogStore } from "@ccr/core/observability/request-log-store.ts";
-import { createBetterSqliteDatabase } from "@ccr/core/storage/sqlite-native.ts";
+import { preloadUsagePriceCatalog } from "@agentrouter/core/models/pricing-service.ts";
+import { RequestLogStore } from "@agentrouter/core/observability/request-log-store.ts";
+import { createBetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native.ts";
 
 test("RequestLogStore commits while a background pricing refresh is stalled", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-pricing-lock-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-pricing-lock-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const first = new RequestLogStore(dbFile);
   const second = new RequestLogStore(dbFile);
@@ -116,7 +116,7 @@ test("RequestLogStore commits while a background pricing refresh is stalled", as
 });
 
 test("RequestLogStore applies persisted custom model pricing to raw trace usage updates", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-custom-pricing-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-custom-pricing-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const store = new RequestLogStore(dbFile);
   try {
@@ -185,7 +185,7 @@ test("RequestLogStore applies persisted custom model pricing to raw trace usage 
 });
 
 test("RequestLogStore prices Anthropic 5m and 1h cache writes separately", async () => {
-  const dir = mkdtempSync(path.join(tmpdir(), "ccr-request-log-cache-duration-pricing-test-"));
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-cache-duration-pricing-test-"));
   const dbFile = path.join(dir, "request-logs.sqlite");
   const store = new RequestLogStore(dbFile);
   try {

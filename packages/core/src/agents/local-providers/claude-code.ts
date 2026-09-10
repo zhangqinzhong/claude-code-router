@@ -7,7 +7,7 @@ import type {
   LocalAgentProviderImportResult,
   ProviderAccountConfig,
   ProviderAccountMappingConfig
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   bearerAuthPlugin,
   isRecord,
@@ -19,7 +19,7 @@ import {
   uniqueProviderName,
   uniqueStrings,
   type OAuthTokenSet
-} from "@ccr/core/agents/local-providers/shared";
+} from "@agentrouter/core/agents/local-providers/shared";
 
 const claudeDefaultModels = ["claude-sonnet-5"];
 const claudeCodeKeychainServiceBase = "Claude Code-credentials";

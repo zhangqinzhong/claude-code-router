@@ -1,18 +1,18 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { normalizeProviderModelSelector } from "@ccr/ui/pages/home/shared/common.ts";
-import { normalizeProfileClientModel } from "@ccr/ui/pages/home/shared/profiles.ts";
+import { normalizeProviderModelSelector } from "@agentrouter/ui/pages/home/shared/common.ts";
+import { normalizeProfileClientModel } from "@agentrouter/ui/pages/home/shared/profiles.ts";
 import {
   createRouteModelOptions,
   createRoutingRewriteDraftRowFromRewrite,
   routingRewriteFromDraftRow
-} from "@ccr/ui/pages/home/shared/providers.ts";
+} from "@agentrouter/ui/pages/home/shared/providers.ts";
 import {
   composeRouteTargetValue,
   normalizeRouterFallbackConfig,
   normalizeRouterRules
-} from "@ccr/ui/pages/home/shared/routing.ts";
-import { normalizeCoreModelSelector } from "@ccr/ui/pages/home/shared/virtual-models.ts";
+} from "@agentrouter/ui/pages/home/shared/routing.ts";
+import { normalizeCoreModelSelector } from "@agentrouter/ui/pages/home/shared/virtual-models.ts";
 
 test("route model options emit slash-form provider selectors", () => {
   const options = createRouteModelOptions([

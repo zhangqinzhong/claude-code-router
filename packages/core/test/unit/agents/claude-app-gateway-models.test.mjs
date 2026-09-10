@@ -5,16 +5,16 @@ import {
   buildClaudeAppGatewayModelRoutes,
   inferClaudeAppGatewayTargetModel,
   resolveClaudeAppGatewayRouteModel
-} from "@ccr/core/agents/claude-app/gateway-routes.ts";
+} from "@agentrouter/core/agents/claude-app/gateway-routes.ts";
 import {
   createClaudeCliBootstrapResponse,
   createGatewayModelsResponse,
   prepareClaudeAppDiscoveredModelRequest,
   shouldServeClaudeCliBootstrapResponse,
   shouldServeGatewayModelsResponse
-} from "@ccr/core/gateway/features/model-discovery.ts";
-import { profileApiKeyId } from "@ccr/core/profiles/api-key.ts";
-import { ModelRegistry } from "@ccr/core/routing/model-registry.ts";
+} from "@agentrouter/core/gateway/features/model-discovery.ts";
+import { profileApiKeyId } from "@agentrouter/core/profiles/api-key.ts";
+import { ModelRegistry } from "@agentrouter/core/routing/model-registry.ts";
 
 function createConfig({ profileModel, providers = [], virtualModelProfiles = [] } = {}) {
   return {

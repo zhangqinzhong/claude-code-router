@@ -1,13 +1,13 @@
 import assert from "node:assert/strict";
 import { Readable, Writable } from "node:stream";
 import test from "node:test";
-import { ClaudeCodeRouterPlugin } from "@ccr/core/gateway/claude-code-router-plugin.ts";
+import { ClaudeCodeRouterPlugin } from "@agentrouter/core/gateway/claude-code-router-plugin.ts";
 import {
   rewriteAnthropicMessageStartModelStream,
   rewriteAnthropicSseBlockMessageStartModelForTest,
   shouldRewriteAnthropicMessageStartModel
-} from "@ccr/core/gateway/features/anthropic-response-model.ts";
-import { GatewayRequestPipeline } from "@ccr/core/gateway/request/pipeline.ts";
+} from "@agentrouter/core/gateway/features/anthropic-response-model.ts";
+import { GatewayRequestPipeline } from "@agentrouter/core/gateway/request/pipeline.ts";
 
 async function streamText(stream) {
   const chunks = [];
@@ -83,7 +83,7 @@ test("gateway pipeline returns the Claude Code visible model when upstream respo
 });
 
 test("gateway pipeline preserves Claude Code hex model id in Anthropic SSE response", async () => {
-  const encodedModel = `anthropic/claude-ccr-h${Buffer.from("kimi-test/k3", "utf8").toString("hex")}`;
+  const encodedModel = `anthropic/claude-ar-h${Buffer.from("kimi-test/k3", "utf8").toString("hex")}`;
   const result = await runAnthropicPipelineModelRewrite(encodedModel);
 
   assert.equal(result.upstreamBody?.model, "k3");

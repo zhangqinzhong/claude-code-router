@@ -6,12 +6,12 @@
   "description": "Local Claude Code Router gateway with CLI and web management UI.",
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/musistudio/claude-code-router.git"
+    "url": "git+ssh://git@github.com/zhangqinzhong/claude-code-router.git"
   },
   "bugs": {
-    "url": "https://github.com/musistudio/claude-code-router/issues"
+    "url": "https://github.com/zhangqinzhong/claude-code-router/issues"
   },
-  "homepage": "https://github.com/musistudio/claude-code-router#readme",
+  "homepage": "https://github.com/zhangqinzhong/claude-code-router#readme",
   "keywords": [
     "claude-code",
     "codex",
@@ -52,8 +52,8 @@
     "bench:context-archive-agent": "node benchmarks/run-context-archive-real-agent-benchmark.mjs",
     "bench:context-archive-real": "node benchmarks/run-context-archive-real-agent-benchmark.mjs",
     "bench:claude-compact-real": "node benchmarks/claude-code-real-compact.mjs",
-    "docker:build": "docker build -t claude-code-router:local .",
-    "docker:run": "docker run --rm -p 3458:8080 -v ccr-data:/data claude-code-router:local",
+    "docker:build": "docker build -t agentrouter:local .",
+    "docker:run": "docker run --rm -p 3458:8080 -v ar-data:/data agentrouter:local",
     "test": "npm run test:packages && npm run test:architecture",
     "test:packages": "npm run test --workspaces --if-present",
     "test:core": "npm test -w @agentrouter/core",

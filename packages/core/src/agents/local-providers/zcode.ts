@@ -4,8 +4,8 @@ import type {
   LocalAgentProviderCandidate,
   LocalAgentProviderImportResult,
   ProviderAccountConfig
-} from "@ccr/core/contracts/app";
-import { findProviderPresetByBaseUrl } from "@ccr/core/providers/presets/index";
+} from "@agentrouter/core/contracts/app";
+import { findProviderPresetByBaseUrl } from "@agentrouter/core/providers/presets/index";
 import {
   apiKeyAuthPlugin,
   cloneProviderAccountConfig,
@@ -21,7 +21,7 @@ import {
   uniqueProviderName,
   uniqueStrings,
   type ApiTokenSet
-} from "@ccr/core/agents/local-providers/shared";
+} from "@agentrouter/core/agents/local-providers/shared";
 
 type ZcodeConfiguredProvider = {
   apiKey: string;

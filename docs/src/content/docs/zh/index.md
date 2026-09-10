@@ -1,13 +1,13 @@
 ---
-title: Claude Code Router 文档
-pageTitle: Claude Code Router 文档
+title: AgentRouter 文档
+pageTitle: AgentRouter 文档
 eyebrow: 产品文档
-lead: 介绍 CCR 的核心能力、文档的组织方式和推荐的阅读顺序。第一次接触 CCR 时从这一页开始。
+lead: 介绍 AgentRouter 的核心能力、文档的组织方式和推荐的阅读顺序。第一次接触 AgentRouter 时从这一页开始。
 ---
 
-## CCR 能帮你做什么
+## AgentRouter 能帮你做什么
 
-CCR 是运行在本地（或你自己的服务器上）的模型网关：它接收 Claude Code、Codex 等 Agent 发出的请求，按你的路由配置转发给任意供应商，并记录完整日志。核心能力：
+AgentRouter 是运行在本地（或你自己的服务器上）的模型网关：它接收 Claude Code、Codex 等 Agent 发出的请求，按你的路由配置转发给任意供应商，并记录完整日志。核心能力：
 
 - **接入任意供应商**：OpenRouter、DeepSeek、Z.AI，或任何兼容 OpenAI / Anthropic / Gemini 协议的服务，支持多 Key 轮换和用量展示。
 - **智能路由**：用条件规则选择模型，支持请求改写、失败重试和回退；Claude Code 的 Subagent / Workflow 可以自动选用不同模型。
@@ -22,7 +22,7 @@ CCR 是运行在本地（或你自己的服务器上）的模型网关：它接�
 
 | 分类 | 内容 |
 | --- | --- |
-| [文档](./) | CCR 能力、文档结构和阅读路径 |
+| [文档](./) | AgentRouter 能力、文档结构和阅读路径 |
 | [快速开始](guides/) | 桌面版、CLI、Docker 的安装部署，供应商和 Agent 配置的接入流程；侧边「详细配置」分组覆盖每个设置页面 |
 | [Fusion](fusion/) | 把基础模型与视觉、联网搜索、MCP 工具、生图或生视频组合成新的可选模型 |
 | [ToolHub](toolhub/) | 将多个 MCP server 收束成一个动态工具检索入口 |
@@ -35,10 +35,10 @@ AgentClaw 的平台接入教程是独立的子页面，每个平台一页，各�
 
 ## 阅读路径
 
-第一次使用 CCR 时，建议按下面的顺序阅读：
+第一次使用 AgentRouter 时，建议按下面的顺序阅读：
 
-1. [安装并启动 CCR](guides/install/)：在桌面版、npm CLI 和 Docker 之间选择；命令细节见 [CLI 参考](guides/cli/)，容器部署见 [Docker 部署](guides/docker/)。
+1. [安装并启动 AgentRouter](guides/install/)：在桌面版、npm CLI 和 Docker 之间选择；命令细节见 [CLI 参考](guides/cli/)，容器部署见 [Docker 部署](guides/docker/)。
 2. [接入供应商](guides/provider/)：添加至少一个供应商，用协议探测和连通性检查确认可用。
-3. [接入 Agent 配置](guides/agent-profile/)：让 Claude Code 等 Agent 通过 CCR 发请求。
-4. [开启日志与观测](guides/observability/)：在请求日志里确认请求确实经过了 CCR。
+3. [接入 Agent 配置](guides/agent-profile/)：让 Claude Code 等 Agent 通过 AgentRouter 发请求。
+4. [开启日志与观测](guides/observability/)：在请求日志里确认请求确实经过了 AgentRouter。
 5. 之后按需深入：[详细配置](configuration/overview/) 覆盖每个设置页面；[智能路由](routing/)、[Fusion](fusion/)、[AgentClaw](agentclaw/) 覆盖特色能力；[Q&A](troubleshooting/) 收录 401、404、超时、路由不符预期等常见问题。

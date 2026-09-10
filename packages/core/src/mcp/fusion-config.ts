@@ -2,13 +2,13 @@
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
 import { join as pathJoin } from "node:path";
-import type { AppConfig, GatewayMcpServerConfig, VirtualModelFusionVisionConfig, VirtualModelFusionWebSearchConfig, VirtualModelFusionWebSearchProvider } from "@ccr/core/contracts/app";
-import { BUILTIN_FUSION_VISION_TOOL_NAME, BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME, GROK_MEDIA_FUSION_TOOL_NAMES, MEDIA_TOOLS_MCP_SERVER_NAME, MEDIA_IMAGE_EDIT_TOOL_PREFIX, MEDIA_IMAGE_GENERATE_TOOL_PREFIX, MEDIA_JOB_CANCEL_TOOL_PREFIX, MEDIA_JOB_GET_TOOL_PREFIX, MEDIA_VIDEO_START_TOOL_PREFIX, ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@ccr/core/contracts/app";
-import { TOOL_HUB_MCP_SERVER_NAME, toolHubBuiltInBackendServers, toolHubMcpRuntimeConfig, toolHubRequestTimeoutMs } from "@ccr/core/mcp/toolhub-config";
-import { isRecord, numberValue, stringListValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { defaultFusionWebSearchProvider, fusionModelProviderName } from "@ccr/core/gateway/internal/shared";
-import type { BrowserWebSearchMcpIntegration, CoreGatewayProvider } from "@ccr/core/gateway/internal/shared";
-import { uniqueStrings } from "@ccr/core/gateway/internal/collections";
+import type { AppConfig, GatewayMcpServerConfig, VirtualModelFusionVisionConfig, VirtualModelFusionWebSearchConfig, VirtualModelFusionWebSearchProvider } from "@agentrouter/core/contracts/app";
+import { BUILTIN_FUSION_VISION_TOOL_NAME, BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME, GROK_MEDIA_FUSION_TOOL_NAMES, MEDIA_TOOLS_MCP_SERVER_NAME, MEDIA_IMAGE_EDIT_TOOL_PREFIX, MEDIA_IMAGE_GENERATE_TOOL_PREFIX, MEDIA_JOB_CANCEL_TOOL_PREFIX, MEDIA_JOB_GET_TOOL_PREFIX, MEDIA_VIDEO_START_TOOL_PREFIX, ROUTER_FALLBACK_MAX_RETRY_COUNT } from "@agentrouter/core/contracts/app";
+import { TOOL_HUB_MCP_SERVER_NAME, toolHubBuiltInBackendServers, toolHubMcpRuntimeConfig, toolHubRequestTimeoutMs } from "@agentrouter/core/mcp/toolhub-config";
+import { isRecord, numberValue, stringListValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { defaultFusionWebSearchProvider, fusionModelProviderName } from "@agentrouter/core/gateway/internal/shared";
+import type { BrowserWebSearchMcpIntegration, CoreGatewayProvider } from "@agentrouter/core/gateway/internal/shared";
+import { uniqueStrings } from "@agentrouter/core/gateway/internal/collections";
 
 type FusionUsageSyncConfig = {
   endpoint: string;
@@ -177,7 +177,7 @@ export function fusionToolFallbackMcpServer(
       ELECTRON_RUN_AS_NODE: "1",
       FUSION_FALLBACK_TOOLS_JSON: JSON.stringify(tools)
     },
-    name: uniqueMcpServerName("ccr-fusion-tool-fallback", existingServers),
+    name: uniqueMcpServerName("ar-fusion-tool-fallback", existingServers),
     protocolVersion: "2024-11-05",
     requestTimeoutMs: 600000,
     startupTimeoutMs: 600000,
@@ -303,9 +303,9 @@ function fusionFallbackToolUnavailableMessage(profile: unknown, toolName: string
 
 export function browserWebSearchUnavailableMessage(toolName: string): string {
   return [
-    `Fusion MCP tool "${toolName}" is unavailable because In-app Browser web search requires CCR Desktop.`,
+    `Fusion MCP tool "${toolName}" is unavailable because In-app Browser web search requires AgentRouter Desktop.`,
     "This runtime did not register the Electron browser web search integration, so the hidden browser search tool cannot run here.",
-    "Run the profile in CCR Desktop or switch the Fusion web search provider to Brave, Bing, Google CSE, Serper, SerpAPI, Tavily, or Exa."
+    "Run the profile in AgentRouter Desktop or switch the Fusion web search provider to Brave, Bing, Google CSE, Serper, SerpAPI, Tavily, or Exa."
   ].join(" ");
 }
 
@@ -321,7 +321,7 @@ function browserWebSearchFallbackToolDefinition(
     return undefined;
   }
   return {
-    description: "Fallback registration for CCR In-app Browser web search when the Electron browser integration is unavailable.",
+    description: "Fallback registration for AgentRouter In-app Browser web search when the Electron browser integration is unavailable.",
     inputSchema: {
       additionalProperties: true,
       properties: {

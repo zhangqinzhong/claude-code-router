@@ -1,11 +1,11 @@
 import { spawn, type ChildProcessWithoutNullStreams } from "node:child_process";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
 import type {
   GatewayMcpRemoteServerConfig,
   GatewayMcpServerConfig,
   GatewayMcpStdioServerConfig,
   GatewayMcpToolInfo
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 
 type JsonRpcMessage = {
   error?: unknown;
@@ -27,7 +27,7 @@ type SseEvent = {
 };
 
 const mcpClientInfo = {
-  name: "CCR",
+  name: "AgentRouter",
   version: "3.0.0"
 };
 

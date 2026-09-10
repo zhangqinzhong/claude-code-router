@@ -3,7 +3,7 @@ import { realpath, rm } from "node:fs/promises";
 import path from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { Worker } from "node:worker_threads";
-import { RAW_TRACE_SPOOL_DIR } from "@ccr/core/config/constants";
+import { RAW_TRACE_SPOOL_DIR } from "@agentrouter/core/config/constants";
 import type {
   AgentAnalysisFilter,
   AgentAnalysisSnapshot,
@@ -15,25 +15,25 @@ import type {
   RequestLogEntry,
   RequestLogListFilter,
   RequestLogPage
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import type {
   RequestLogRawTraceFiles,
   RequestLogRawTraceUpdateInput,
   RequestLogRecordInput,
   RequestLogStoreWriteCommand
-} from "@ccr/core/observability/request-log-store";
+} from "@agentrouter/core/observability/request-log-store";
 import {
   defaultRequestLogBodyBytes,
   maxRequestLogBodyBytes,
   resolveRawTraceBodyLimit
-} from "@ccr/core/observability/request-log-limits";
-import { compactBase64ImagePayloads } from "@ccr/core/observability/request-log-body";
+} from "@agentrouter/core/observability/request-log-limits";
+import { compactBase64ImagePayloads } from "@agentrouter/core/observability/request-log-body";
 import {
   RequestLogAdmissionStore,
   type RequestLogAdmission
-} from "@ccr/core/observability/request-log-admission-store";
-import { suppressRouteTraceBodyValues } from "@ccr/core/observability/route-trace";
-import { isSensitiveRequestLogHeaderName } from "@ccr/core/observability/sensitive-headers";
+} from "@agentrouter/core/observability/request-log-admission-store";
+import { suppressRouteTraceBodyValues } from "@agentrouter/core/observability/route-trace";
+import { isSensitiveRequestLogHeaderName } from "@agentrouter/core/observability/sensitive-headers";
 
 export type RequestLogEnqueueResult = {
   accepted: boolean;

@@ -8,7 +8,7 @@ import {
   AccountSummaryPanel, AnimatedUsageChart, ChartShell, ModelShareChart, RingMetrics,
   SourceGrid, StatsGrid, TokenActivityPanel, TokenMixPanel, TrayStatusStrip
 } from "./components/index";
-import { isGatewayProviderEnabled } from "@ccr/core/contracts/app";
+import { isGatewayProviderEnabled } from "@agentrouter/core/contracts/app";
 
 type TrayHeaderRange = Exclude<UsageStatsRange, "today">;
 
@@ -30,7 +30,7 @@ export function TrayApp() {
   const [selectedRange, setSelectedRange] = useState<TrayHeaderRange>("30d");
 
   const refresh = useCallback(async () => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setSnapshots(emptySnapshots);
       setAllSnapshots(emptySnapshots);
       setAccountSnapshots([]);
@@ -42,13 +42,13 @@ export function TrayApp() {
     try {
       const filter: UsageStatsFilter = selectedProvider ? { provider: selectedProvider } : { includeProxy: true };
       const [today, day, week, month, allMonth, config, accounts] = await Promise.all([
-        window.ccr.getUsageStats("today", filter),
-        window.ccr.getUsageStats("24h", filter),
-        window.ccr.getUsageStats("7d", filter),
-        window.ccr.getUsageStats("30d", filter),
-        selectedProvider ? window.ccr.getUsageStats("30d", { includeProxy: true }) : Promise.resolve(undefined),
-        window.ccr.getConfig(),
-        window.ccr.getProviderAccountSnapshots(selectedProvider)
+        window.agentrouter.getUsageStats("today", filter),
+        window.agentrouter.getUsageStats("24h", filter),
+        window.agentrouter.getUsageStats("7d", filter),
+        window.agentrouter.getUsageStats("30d", filter),
+        selectedProvider ? window.agentrouter.getUsageStats("30d", { includeProxy: true }) : Promise.resolve(undefined),
+        window.agentrouter.getConfig(),
+        window.agentrouter.getProviderAccountSnapshots(selectedProvider)
       ]);
 
       setSnapshots({ today, "24h": day, "7d": week, "30d": month });
@@ -65,7 +65,7 @@ export function TrayApp() {
   }, [formatError, selectedProvider]);
 
   const refreshAccountSnapshots = useCallback(async () => {
-    if (!window.ccr) {
+    if (!window.agentrouter) {
       setAccountSnapshots([]);
       return;
     }
@@ -73,7 +73,7 @@ export function TrayApp() {
     setAccountRefreshing(true);
     setError("");
     try {
-      const accounts = await window.ccr.getProviderAccountSnapshots(selectedProvider, { forceRefresh: true });
+      const accounts = await window.agentrouter.getProviderAccountSnapshots(selectedProvider, { forceRefresh: true });
       setAccountSnapshots(accounts);
     } catch (nextError) {
       setError(formatError(nextError));
@@ -86,14 +86,14 @@ export function TrayApp() {
     document.body.classList.add("tray-window");
     const closeOnEscape = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
-        void window.ccr?.closeTray();
+        void window.agentrouter?.closeTray();
       }
     };
     window.addEventListener("keydown", closeOnEscape);
     return () => {
       document.body.classList.remove("tray-window");
       window.removeEventListener("keydown", closeOnEscape);
-      void window.ccr?.setTrayDetailOpen(false);
+      void window.agentrouter?.setTrayDetailOpen(false);
     };
   }, []);
 

@@ -6,12 +6,12 @@ import net from "node:net";
 import os from "node:os";
 import path from "node:path";
 import packageJson from "../../package.json";
-import { loadOnboardingFinished, markOnboardingFinished } from "@ccr/core/config/onboarding-state";
-import { scanBotHandoffBluetoothTargets, scanBotHandoffWifiTargets } from "@ccr/core/agents/bot-gateway/handoff-scan-service";
-import { cancelBotGatewayQrLogin, startBotGatewayQrLogin, waitBotGatewayQrLogin } from "@ccr/core/agents/bot-gateway/qr-login-service";
-import { syncClaudeAppGatewayConfig, restoreClaudeAppGatewayConfig } from "@ccr/core/agents/claude-app/gateway-service";
-import { getAppInfoPaths } from "@ccr/core/agents/app-info-paths";
-import { loadAppConfig, saveApiKeysConfig, saveAppConfig } from "@ccr/core/config/config";
+import { loadOnboardingFinished, markOnboardingFinished } from "@agentrouter/core/config/onboarding-state";
+import { scanBotHandoffBluetoothTargets, scanBotHandoffWifiTargets } from "@agentrouter/core/agents/bot-gateway/handoff-scan-service";
+import { cancelBotGatewayQrLogin, startBotGatewayQrLogin, waitBotGatewayQrLogin } from "@agentrouter/core/agents/bot-gateway/qr-login-service";
+import { syncClaudeAppGatewayConfig, restoreClaudeAppGatewayConfig } from "@agentrouter/core/agents/claude-app/gateway-service";
+import { getAppInfoPaths } from "@agentrouter/core/agents/app-info-paths";
+import { loadAppConfig, saveApiKeysConfig, saveAppConfig } from "@agentrouter/core/config/config";
 import {
   APP_CONFIG_DB_FILE,
   APP_NAME,
@@ -25,27 +25,27 @@ import {
   PROXY_CA_CERT_FILE,
   REQUEST_LOGS_DB_FILE,
   USAGE_DB_FILE
-} from "@ccr/core/config/constants";
-import { detectProviderIcon } from "@ccr/core/providers/icons";
-import { fetchProviderManifest } from "@ccr/core/providers/manifest-service";
-import { getLocalAgentProviderCandidates, importLocalAgentProvider, probeLocalAgentProvider } from "@ccr/core/agents/local-providers/service";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog";
-import { getOpenRouterProviderCatalog } from "@ccr/core/providers/openrouter-provider-catalog";
-import { getProviderPresets } from "@ccr/core/providers/presets/index";
-import { checkGatewayProviderConnectivity, probeGatewayProvider, probeGatewayProviderCandidates } from "@ccr/core/providers/probe";
-import { stopProviderModelAutoRefreshService, syncProviderModelAutoRefreshService } from "@ccr/core/providers/model-auto-refresh";
-import { applyProfileConfig } from "@ccr/core/profiles/service";
-import { getProfileOpenCommand, getProfileRuntimeStatus, openProfileFromCcr, stopProfileFromCcr } from "@ccr/core/profiles/launch-service";
-import { getPluginMarketplace } from "@ccr/core/plugins/marketplace";
-import { ensureProxyCertificateAuthority } from "@ccr/core/proxy/certificates";
-import { proxyService } from "@ccr/core/proxy/service";
-import { listMcpServerTools } from "@ccr/core/mcp/tool-discovery";
-import { closeRequestLogRuntime, getAgentAnalysis, getAgentTracePayload, getRequestLogBodyChunk, getRequestLogDetail, getRequestLogs } from "@ccr/core/observability/request-log-store";
-import { shouldRecordRequestLogs } from "@ccr/core/observability/raw-trace-sync";
-import { getUsageStats, resetOverviewStatistics } from "@ccr/core/usage/store";
-import { gatewayService } from "@ccr/core/gateway/service";
-import { shouldRestartGatewayForRuntimeConfigChange } from "@ccr/core/gateway/runtime-change";
-import { getProviderAccountSnapshots, invalidateProviderAccountSnapshotCache, resetCodexRateLimitCredit, testProviderAccountConnector } from "@ccr/core/providers/account-service";
+} from "@agentrouter/core/config/constants";
+import { detectProviderIcon } from "@agentrouter/core/providers/icons";
+import { fetchProviderManifest } from "@agentrouter/core/providers/manifest-service";
+import { getLocalAgentProviderCandidates, importLocalAgentProvider, probeLocalAgentProvider } from "@agentrouter/core/agents/local-providers/service";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog";
+import { getOpenRouterProviderCatalog } from "@agentrouter/core/providers/openrouter-provider-catalog";
+import { getProviderPresets } from "@agentrouter/core/providers/presets/index";
+import { checkGatewayProviderConnectivity, probeGatewayProvider, probeGatewayProviderCandidates } from "@agentrouter/core/providers/probe";
+import { stopProviderModelAutoRefreshService, syncProviderModelAutoRefreshService } from "@agentrouter/core/providers/model-auto-refresh";
+import { applyProfileConfig } from "@agentrouter/core/profiles/service";
+import { getProfileOpenCommand, getProfileRuntimeStatus, openProfileFromAr, stopProfileFromAr } from "@agentrouter/core/profiles/launch-service";
+import { getPluginMarketplace } from "@agentrouter/core/plugins/marketplace";
+import { ensureProxyCertificateAuthority } from "@agentrouter/core/proxy/certificates";
+import { proxyService } from "@agentrouter/core/proxy/service";
+import { listMcpServerTools } from "@agentrouter/core/mcp/tool-discovery";
+import { closeRequestLogRuntime, getAgentAnalysis, getAgentTracePayload, getRequestLogBodyChunk, getRequestLogDetail, getRequestLogs } from "@agentrouter/core/observability/request-log-store";
+import { shouldRecordRequestLogs } from "@agentrouter/core/observability/raw-trace-sync";
+import { getUsageStats, resetOverviewStatistics } from "@agentrouter/core/usage/store";
+import { gatewayService } from "@agentrouter/core/gateway/service";
+import { shouldRestartGatewayForRuntimeConfigChange } from "@agentrouter/core/gateway/runtime-change";
+import { getProviderAccountSnapshots, invalidateProviderAccountSnapshotCache, resetCodexRateLimitCredit, testProviderAccountConnector } from "@agentrouter/core/providers/account-service";
 import type {
   AgentAnalysisFilter,
   AgentAnalysisTracePayloadRequest,
@@ -86,8 +86,8 @@ import type {
   RouteScriptValidationRequest,
   UsageStatsFilter,
   UsageStatsRange
-} from "@ccr/core/contracts/app";
-import { GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS } from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
+import { GATEWAY_PLUGIN_PERMISSION_IDS, GATEWAY_PLUGIN_SURFACE_IDS } from "@agentrouter/core/contracts/app";
 
 const gatewayPluginPermissionIdSet = new Set<string>(GATEWAY_PLUGIN_PERMISSION_IDS);
 const gatewayPluginSurfaceIdSet = new Set<string>(GATEWAY_PLUGIN_SURFACE_IDS);
@@ -124,7 +124,7 @@ const defaultWebHost = "127.0.0.1";
 const defaultWebPort = 3458;
 const maxRpcBodyBytes = 8 * 1024 * 1024;
 const webAuthHeader = "x-ar-web-auth";
-const webAuthQueryParam = "ccr_web_token";
+const webAuthQueryParam = "ar_web_token";
 const staticRoot = path.resolve(__dirname, "..", "renderer");
 const homeHtmlFile = path.join(staticRoot, "pages", "home", "index.html");
 const rendererAssetsRoot = path.join(staticRoot, "assets");
@@ -138,7 +138,7 @@ export async function startWebManagementServer(options: WebManagementServerOptio
   let security: WebManagementSecurityContext | undefined;
   const server = createServer((request, response) => {
     if (!security) {
-      sendJson(response, 503, { error: { message: "CCR web management server is not ready." }, ok: false });
+      sendJson(response, 503, { error: { message: "AgentRouter web management server is not ready." }, ok: false });
       return;
     }
     void handleRequest(request, response, security).catch((error) => {
@@ -182,7 +182,7 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse,
   // CORS: allow cross-origin browsers (e.g. the docs setup wizard) to call the
   // RPC endpoint. Origin-gated to loopback + AR_WEB_ALLOWED_ORIGINS. This only
   // relaxes the browser same-origin policy; the x-ar-web-auth token still
-  // authorizes /api/ccr/rpc, so no credential is exposed.
+  // authorizes /api/ar/rpc, so no credential is exposed.
   const corsOrigin = allowedWebCorsOrigin(request);
   if (corsOrigin) {
     applyWebCorsHeaders(response, corsOrigin);
@@ -194,7 +194,7 @@ async function handleRequest(request: IncomingMessage, response: ServerResponse,
   }
 
   const url = requestUrl(request);
-  if (url.pathname === "/api/ccr/rpc") {
+  if (url.pathname === "/api/ar/rpc") {
     await handleRpcRequest(request, response, security);
     return;
   }
@@ -223,7 +223,7 @@ async function handleRpcRequest(request: IncomingMessage, response: ServerRespon
     return;
   }
   if (!hasValidWebAuthToken(request, security)) {
-    sendJson(response, 401, { error: { message: "CCR web authentication token is missing or invalid." }, ok: false });
+    sendJson(response, 401, { error: { message: "AgentRouter web authentication token is missing or invalid." }, ok: false });
     return;
   }
 
@@ -238,7 +238,7 @@ async function handleRpcRequest(request: IncomingMessage, response: ServerRespon
   const method = typeof payload.method === "string" ? payload.method.trim() : "";
   const handler = rpcHandlers[method];
   if (!method || !handler) {
-    sendJson(response, 404, { error: { message: `Unknown CCR web RPC method: ${method || "(empty)"}` }, ok: false });
+    sendJson(response, 404, { error: { message: `Unknown AgentRouter web RPC method: ${method || "(empty)"}` }, ok: false });
     return;
   }
 
@@ -286,9 +286,9 @@ const rpcHandlers: Record<string, RpcHandler> = {
       invalidateProviderAccountSnapshotCache();
     }
     const gatewayDetail = runtimeStatus.state === "running"
-      ? "CCR gateway is running."
-      : `CCR gateway did not start: ${runtimeStatus.lastError || "unknown error"}`;
-    const apiKeyDetail = synced.result.apiKeyGenerated ? "Generated a Claude App API key." : "Reused an existing CCR API key.";
+      ? "AgentRouter gateway is running."
+      : `AgentRouter gateway did not start: ${runtimeStatus.lastError || "unknown error"}`;
+    const apiKeyDetail = synced.result.apiKeyGenerated ? "Generated a Claude App API key." : "Reused an existing AgentRouter API key.";
     return {
       ...synced.result,
       message: `${synced.result.message}\n${gatewayDetail}\n${apiKeyDetail}`
@@ -382,10 +382,10 @@ const rpcHandlers: Record<string, RpcHandler> = {
     const config = syncedClaudeAppConfig.config;
     const status = await gatewayService.ensureStarted(config);
     if (status.state !== "running") {
-      throw new Error(status.lastError || "CCR gateway did not start.");
+      throw new Error(status.lastError || "AgentRouter gateway did not start.");
     }
     logProfileApplyResult(await applyProfileConfig(config));
-    return openProfileFromCcr(config, request as ProfileOpenRequest);
+    return openProfileFromAr(config, request as ProfileOpenRequest);
   },
   probeLocalAgentProvider: (request) => probeLocalAgentProvider(request as LocalAgentProviderProbeRequest),
   probeProvider: (request) => probeGatewayProvider(request as GatewayProviderProbeRequest),
@@ -473,7 +473,7 @@ const rpcHandlers: Record<string, RpcHandler> = {
     return status;
   },
   stopGateway: () => gatewayService.stop(),
-  stopProfile: async (request) => stopProfileFromCcr(await loadAppConfig(), request as ProfileOpenRequest),
+  stopProfile: async (request) => stopProfileFromAr(await loadAppConfig(), request as ProfileOpenRequest),
   testProviderAccountConnector: (request) => testProviderAccountConnector(request as ProviderAccountTestRequest),
   testRouteScript: async (request) => gatewayService.testRouteScript(await loadAppConfig(), request as RouteScriptTestRequest),
   validateRouteScript: (request) => gatewayService.validateRouteScript(request as RouteScriptValidationRequest),
@@ -573,7 +573,7 @@ function getCliAppInfo(): AppInfo {
 
 function sendHomeHtml(response: ServerResponse, headOnly: boolean): void {
   if (!existsSync(homeHtmlFile)) {
-    sendText(response, 500, "CCR renderer assets were not found. Run npm run build:assets first.");
+    sendText(response, 500, "AgentRouter renderer assets were not found. Run npm run build:assets first.");
     return;
   }
   let html = readFileSync(homeHtmlFile, "utf8");
@@ -776,7 +776,7 @@ async function listenWithFallback(server: Server, port: number, host: string): P
       candidate += 1;
     }
   }
-  throw new Error(`No available CCR web management port found starting at ${port}.`);
+  throw new Error(`No available AgentRouter web management port found starting at ${port}.`);
 }
 
 function listen(server: Server, port: number, host: string): Promise<void> {
@@ -880,15 +880,15 @@ function assertExportTargetIsNotInternalDataFile(file: string): void {
     ...dataExportCandidateFiles()
   ].map((item) => path.resolve(item)));
   if (reserved.has(target)) {
-    throw new Error("Choose a different export path. Internal CCR data files cannot be overwritten.");
+    throw new Error("Choose a different export path. Internal AgentRouter data files cannot be overwritten.");
   }
 }
 
 function inspectPluginDirectory(directory: string): PluginDirectorySelection {
   const manifest = readFirstJson([
     path.join(directory, "plugin.json"),
-    path.join(directory, "ccr-plugin.json"),
-    path.join(directory, ".ccr-plugin", "plugin.json"),
+    path.join(directory, "ar-plugin.json"),
+    path.join(directory, ".ar-plugin", "plugin.json"),
     path.join(directory, ".codex-plugin", "plugin.json")
   ]);
   const packageJsonManifest = readFirstJson([path.join(directory, "package.json")]);
@@ -896,8 +896,8 @@ function inspectPluginDirectory(directory: string): PluginDirectorySelection {
     readString(manifest?.module) ||
     readString(manifest?.main) ||
     readString(manifest?.path) ||
-    readString(readRecord(packageJsonManifest?.ccr)?.module) ||
-    readString(readRecord(packageJsonManifest?.ccrPlugin)?.module) ||
+    readString(readRecord(packageJsonManifest?.ar)?.module) ||
+    readString(readRecord(packageJsonManifest?.arPlugin)?.module) ||
     readString(packageJsonManifest?.main);
   const id =
     pluginIdValue(readString(manifest?.id) || readString(manifest?.key) || readString(packageJsonManifest?.name)) ||
@@ -925,10 +925,10 @@ function readPluginPermissions(
 ): GatewayPluginPermission[] | undefined {
   const values = [
     manifest?.permissions,
-    readRecord(manifest?.ccr)?.permissions,
-    readRecord(manifest?.ccrPlugin)?.permissions,
-    readRecord(packageJsonManifest?.ccr)?.permissions,
-    readRecord(packageJsonManifest?.ccrPlugin)?.permissions
+    readRecord(manifest?.ar)?.permissions,
+    readRecord(manifest?.arPlugin)?.permissions,
+    readRecord(packageJsonManifest?.ar)?.permissions,
+    readRecord(packageJsonManifest?.arPlugin)?.permissions
   ];
   const parsedValues = values.map(parsePluginPermissions).filter((value): value is GatewayPluginPermission[] => Boolean(value));
   return parsedValues.length > 0 ? [...new Set(parsedValues.flat())] : undefined;
@@ -981,14 +981,14 @@ function readPluginSurfaces(
   const values = [
     manifest?.surfaces,
     manifest?.surface,
-    readRecord(manifest?.ccr)?.surfaces,
-    readRecord(manifest?.ccr)?.surface,
-    readRecord(manifest?.ccrPlugin)?.surfaces,
-    readRecord(manifest?.ccrPlugin)?.surface,
-    readRecord(packageJsonManifest?.ccr)?.surfaces,
-    readRecord(packageJsonManifest?.ccr)?.surface,
-    readRecord(packageJsonManifest?.ccrPlugin)?.surfaces,
-    readRecord(packageJsonManifest?.ccrPlugin)?.surface
+    readRecord(manifest?.ar)?.surfaces,
+    readRecord(manifest?.ar)?.surface,
+    readRecord(manifest?.arPlugin)?.surfaces,
+    readRecord(manifest?.arPlugin)?.surface,
+    readRecord(packageJsonManifest?.ar)?.surfaces,
+    readRecord(packageJsonManifest?.ar)?.surface,
+    readRecord(packageJsonManifest?.arPlugin)?.surfaces,
+    readRecord(packageJsonManifest?.arPlugin)?.surface
   ];
   const parsedValues = values.map(parsePluginSurfaces).filter((value): value is PluginDirectorySelection["surfaces"] => Boolean(value));
   return parsedValues.length > 0 ? Object.assign({}, ...parsedValues) as PluginDirectorySelection["surfaces"] : undefined;
@@ -1189,10 +1189,10 @@ function readPluginApps(
 ): GatewayPluginAppConfig[] {
   const values = [
     manifest?.apps,
-    readRecord(manifest?.ccr)?.apps,
-    readRecord(manifest?.ccrPlugin)?.apps,
-    readRecord(packageJsonManifest?.ccr)?.apps,
-    readRecord(packageJsonManifest?.ccrPlugin)?.apps
+    readRecord(manifest?.ar)?.apps,
+    readRecord(manifest?.arPlugin)?.apps,
+    readRecord(packageJsonManifest?.ar)?.apps,
+    readRecord(packageJsonManifest?.arPlugin)?.apps
   ];
   const apps = values.flatMap(parsePluginApps);
   const byId = new Map<string, GatewayPluginAppConfig>();
@@ -1247,7 +1247,7 @@ function normalizePluginAppUrl(value: string | undefined): string {
     throw new Error("Plugin app URL cannot be protocol-relative.");
   }
   if (/^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(trimmed)) {
-    throw new Error("Plugin app URL must be an http(s) URL or a CCR gateway path.");
+    throw new Error("Plugin app URL must be an http(s) URL or a AgentRouter gateway path.");
   }
   return trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
 }
@@ -1260,10 +1260,10 @@ function readPluginDependencies(
   const values = [
     manifest?.dependencies,
     manifest?.pluginDependencies,
-    readRecord(manifest?.ccr)?.dependencies,
-    readRecord(manifest?.ccrPlugin)?.dependencies,
-    readRecord(packageJsonManifest?.ccr)?.dependencies,
-    readRecord(packageJsonManifest?.ccrPlugin)?.dependencies
+    readRecord(manifest?.ar)?.dependencies,
+    readRecord(manifest?.arPlugin)?.dependencies,
+    readRecord(packageJsonManifest?.ar)?.dependencies,
+    readRecord(packageJsonManifest?.arPlugin)?.dependencies
   ];
   const dependencies = values.flatMap((value) => parsePluginDependencies(value, directory));
   const byId = new Map<string, PluginDependency>();
@@ -1466,7 +1466,7 @@ function normalizeExternalTarget(target: unknown): string | undefined {
   if (url.protocol === "ccr:" && url.hostname.toLowerCase() === "plugin") {
     return url.toString();
   }
-  throw new Error("Only http, https, and CCR plugin URLs can be opened.");
+  throw new Error("Only http, https, and AgentRouter plugin URLs can be opened.");
 }
 
 function execDetached(command: string, args: string[]): Promise<void> {

@@ -1,10 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { applyMetaTokenFloor } from "@ccr/core/gateway/core-runtime/meta-token-floor";
-import { applyResponsesSessionAffinity } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
-import type { ResponsesSessionAffinityInput } from "@ccr/core/gateway/core-runtime/responses-session-affinity";
-import { applyResponsesToolStrictness } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
-import type { ResponsesToolStrictnessInput } from "@ccr/core/gateway/core-runtime/responses-tool-strictness";
-import { sdkCompatibleTokenHeaderNames } from "@ccr/core/gateway/internal/shared";
+import { applyMetaTokenFloor } from "@agentrouter/core/gateway/core-runtime/meta-token-floor";
+import { applyResponsesSessionAffinity } from "@agentrouter/core/gateway/core-runtime/responses-session-affinity";
+import type { ResponsesSessionAffinityInput } from "@agentrouter/core/gateway/core-runtime/responses-session-affinity";
+import { applyResponsesToolStrictness } from "@agentrouter/core/gateway/core-runtime/responses-tool-strictness";
+import type { ResponsesToolStrictnessInput } from "@agentrouter/core/gateway/core-runtime/responses-tool-strictness";
+import { sdkCompatibleTokenHeaderNames } from "@agentrouter/core/gateway/internal/shared";
 
 type UpstreamRequest = {
   body: unknown;
@@ -30,12 +30,12 @@ type ProviderPluginRequestInput = {
   upstreamRequest: UpstreamRequest;
 };
 
-const ccrAuthHeaderNames = new Set([
+const arAuthHeaderNames = new Set([
   "x-auth-api-key-id",
   "x-auth-sub"
 ]);
 
-const ccrRoutingHeaderNames = new Set([
+const arRoutingHeaderNames = new Set([
   "x-gateway-target-provider",
   "x-gateway-target-provider-name",
   "x-target-model",
@@ -67,15 +67,15 @@ const transportHeaderNames = new Set([
 ]);
 
 /**
- * Removes CCR-owned routing, authentication and observability metadata at the
- * final provider boundary. Provider credentials and non-CCR custom X-Auth
+ * Removes AR-owned routing, authentication and observability metadata at the
+ * final provider boundary. Provider credentials and non-AgentRouter custom X-Auth
  * headers are deliberately preserved.
  */
 export function sanitizeUpstreamProviderHeaders(headers: Record<string, string>): Record<string, string> {
   const sanitized: Record<string, string> = {};
   for (const [name, value] of Object.entries(headers)) {
     const normalized = name.trim().toLowerCase();
-    if (normalized.startsWith("x-ar-") || ccrAuthHeaderNames.has(normalized)) continue;
+    if (normalized.startsWith("x-ar-") || arAuthHeaderNames.has(normalized)) continue;
     sanitized[name] = value;
   }
   return sanitized;
@@ -84,7 +84,7 @@ export function sanitizeUpstreamProviderHeaders(headers: Record<string, string>)
 /**
  * Restores client headers after the core protocol adapter has rebuilt the
  * provider request. Provider-generated auth and content headers win on name
- * collisions, while transport, proxy metadata and CCR-owned headers never
+ * collisions, while transport, proxy metadata and AR-owned headers never
  * cross the boundary.
  */
 export function mergeUpstreamProviderHeaders(
@@ -106,8 +106,8 @@ export function mergeUpstreamProviderHeaders(
       !normalized ||
       value === undefined ||
       normalized.startsWith("x-ar-") ||
-      ccrAuthHeaderNames.has(normalized) ||
-      ccrRoutingHeaderNames.has(normalized) ||
+      arAuthHeaderNames.has(normalized) ||
+      arRoutingHeaderNames.has(normalized) ||
       clientAuthHeaderNames.has(normalized) ||
       proxyMetadataHeaderNames.has(normalized) ||
       normalized.startsWith("x-forwarded-") ||
@@ -191,7 +191,7 @@ function joinUrlPath(base: string, remainder: string): string {
 export function createGatewayPlugin() {
   return {
     providerHooks: [{
-      key: "ccr-upstream-header-sanitizer",
+      key: "ar-upstream-header-sanitizer",
       transformRequest(input: ProviderPluginRequestInput) {
         const upstreamRequest = {
           ...input.upstreamRequest,
@@ -228,7 +228,7 @@ export function createGatewayPlugin() {
         };
       }
     }, {
-      key: "ccr-responses-session-affinity",
+      key: "ar-responses-session-affinity",
       transformRequest(input: ResponsesSessionAffinityInput) {
         return {
           ok: true as const,
@@ -236,7 +236,7 @@ export function createGatewayPlugin() {
         };
       }
     }, {
-      key: "ccr-responses-tool-strictness",
+      key: "ar-responses-tool-strictness",
       transformRequest(input: ResponsesToolStrictnessInput) {
         return {
           ok: true as const,

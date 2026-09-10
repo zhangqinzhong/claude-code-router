@@ -1,11 +1,11 @@
 import { randomUUID } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 
-export const ccrRemoteControlPathPrefix = "/__ccr/remote";
+export const arRemoteControlPathPrefix = "/__ar/remote";
 
 type RemoteDirection = "inbound" | "local" | "remote" | "system";
 
-export type CcrRemoteControlRequestContext = {
+export type ArRemoteControlRequestContext = {
   endpoint: string;
   path: string;
   readBody: (request: IncomingMessage) => Promise<Buffer>;
@@ -62,14 +62,14 @@ const maxEventsPerSession = 2_000;
 const maxInboundEventsPerSession = 500;
 const sseHeartbeatMs = 15_000;
 
-class CcrRemoteControlService {
+class ArRemoteControlService {
   private readonly sessions = new Map<string, RemoteSession>();
 
-  async handleRequest(context: CcrRemoteControlRequestContext): Promise<void> {
+  async handleRequest(context: ArRemoteControlRequestContext): Promise<void> {
     const segments = remotePathSegments(context.path);
     const [root, sessionId, resource] = segments;
 
-    if (segments.length === 0 || context.path === ccrRemoteControlPathPrefix) {
+    if (segments.length === 0 || context.path === arRemoteControlPathPrefix) {
       this.sendCapabilities(context);
       return;
     }
@@ -112,14 +112,14 @@ class CcrRemoteControlService {
     context.sendJson(context.response, 404, { error: { message: "Remote control session endpoint not found." } });
   }
 
-  private sendCapabilities(context: CcrRemoteControlRequestContext): void {
+  private sendCapabilities(context: ArRemoteControlRequestContext): void {
     context.sendJson(context.response, 200, {
       endpoints: {
-        createSession: `${context.endpoint}${ccrRemoteControlPathPrefix}/sessions`,
-        inbound: `${context.endpoint}${ccrRemoteControlPathPrefix}/sessions/{sessionId}/inbound`,
-        sessionEvents: `${context.endpoint}${ccrRemoteControlPathPrefix}/sessions/{sessionId}/events`
+        createSession: `${context.endpoint}${arRemoteControlPathPrefix}/sessions`,
+        inbound: `${context.endpoint}${arRemoteControlPathPrefix}/sessions/{sessionId}/inbound`,
+        sessionEvents: `${context.endpoint}${arRemoteControlPathPrefix}/sessions/{sessionId}/events`
       },
-      name: "ccr-remote-control",
+      name: "ar-remote-control",
       protocol: "ccr.remote.v1",
       transport: ["json", "sse"],
       capabilities: {
@@ -131,7 +131,7 @@ class CcrRemoteControlService {
     });
   }
 
-  private async handleSessionsRequest(context: CcrRemoteControlRequestContext): Promise<void> {
+  private async handleSessionsRequest(context: ArRemoteControlRequestContext): Promise<void> {
     if (context.request.method === "GET") {
       context.sendJson(context.response, 200, {
         sessions: [...this.sessions.values()].map((session) => this.sessionSummary(session, context.endpoint))
@@ -149,7 +149,7 @@ class CcrRemoteControlService {
       return;
     }
     const id = sanitizeSessionId(readString(body.id) || readString(body.sessionId)) || randomUUID();
-    const title = readString(body.title) || readString(body.name) || `CCR Remote ${id.slice(0, 8)}`;
+    const title = readString(body.title) || readString(body.name) || `AgentRouter Remote ${id.slice(0, 8)}`;
     const metadata = readRecord(body.metadata) ?? {};
     const session = this.ensureSession(id, title, metadata);
     this.appendEvent(session, {
@@ -164,7 +164,7 @@ class CcrRemoteControlService {
     });
   }
 
-  private async handleSessionRequest(context: CcrRemoteControlRequestContext, sessionId: string): Promise<void> {
+  private async handleSessionRequest(context: ArRemoteControlRequestContext, sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       context.sendJson(context.response, 404, { error: { message: "Remote session not found." } });
@@ -216,7 +216,7 @@ class CcrRemoteControlService {
     context.sendJson(context.response, 405, { error: { message: "Method not allowed." } });
   }
 
-  private async handleEventsRequest(context: CcrRemoteControlRequestContext, sessionId: string): Promise<void> {
+  private async handleEventsRequest(context: ArRemoteControlRequestContext, sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       context.sendJson(context.response, 404, { error: { message: "Remote session not found." } });
@@ -259,7 +259,7 @@ class CcrRemoteControlService {
     });
   }
 
-  private async handleInboundRequest(context: CcrRemoteControlRequestContext, sessionId: string): Promise<void> {
+  private async handleInboundRequest(context: ArRemoteControlRequestContext, sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       context.sendJson(context.response, 404, { error: { message: "Remote session not found." } });
@@ -302,7 +302,7 @@ class CcrRemoteControlService {
     });
   }
 
-  private async handlePresenceRequest(context: CcrRemoteControlRequestContext, sessionId: string): Promise<void> {
+  private async handlePresenceRequest(context: ArRemoteControlRequestContext, sessionId: string): Promise<void> {
     const session = this.sessions.get(sessionId);
     if (!session) {
       context.sendJson(context.response, 404, { error: { message: "Remote session not found." } });
@@ -417,7 +417,7 @@ class CcrRemoteControlService {
   }
 
   private openSse(
-    context: CcrRemoteControlRequestContext,
+    context: ArRemoteControlRequestContext,
     session: RemoteSession,
     kind: RemoteSubscriber["kind"],
     after: number
@@ -481,9 +481,9 @@ class CcrRemoteControlService {
       ...(session.archivedAt ? { archivedAt: session.archivedAt } : {}),
       createdAt: session.createdAt,
       endpoints: {
-        events: `${endpoint}${ccrRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/events`,
-        inbound: `${endpoint}${ccrRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/inbound`,
-        presence: `${endpoint}${ccrRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/presence`
+        events: `${endpoint}${arRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/events`,
+        inbound: `${endpoint}${arRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/inbound`,
+        presence: `${endpoint}${arRemoteControlPathPrefix}/sessions/${encodeURIComponent(session.id)}/presence`
       },
       eventCount: session.events.length,
       id: session.id,
@@ -510,7 +510,7 @@ class CcrRemoteControlService {
     }
   }
 
-  private async readJsonBody(context: CcrRemoteControlRequestContext): Promise<Record<string, unknown> | undefined> {
+  private async readJsonBody(context: ArRemoteControlRequestContext): Promise<Record<string, unknown> | undefined> {
     const body = await context.readBody(context.request);
     if (body.length === 0) {
       return {};
@@ -540,7 +540,7 @@ type RemoteEventInput = {
   type?: string;
 };
 
-export const ccrRemoteControlService = new CcrRemoteControlService();
+export const arRemoteControlService = new ArRemoteControlService();
 
 function normalizeEventInputs(body: Record<string, unknown>): RemoteEventInput[] {
   const rawEvents = Array.isArray(body.events) ? body.events : [body];
@@ -585,7 +585,7 @@ function remoteAfterSeq(request: IncomingMessage): number {
 }
 
 function remotePathSegments(path: string): string[] {
-  const suffix = path.slice(ccrRemoteControlPathPrefix.length).replace(/^\/+|\/+$/g, "");
+  const suffix = path.slice(arRemoteControlPathPrefix.length).replace(/^\/+|\/+$/g, "");
   if (!suffix) {
     return [];
   }

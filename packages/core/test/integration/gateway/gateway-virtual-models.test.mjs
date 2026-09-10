@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { PassThrough, Readable } from "node:stream";
 import test from "node:test";
-import { createHostedWebSearchProtocolContext } from "@ccr/core/gateway/features/hosted-web-search/index.ts";
+import { createHostedWebSearchProtocolContext } from "@agentrouter/core/gateway/features/hosted-web-search/index.ts";
 import {
   fusionFallbackToolDefinitions,
   fusionWebSearchToolNameForRequest,
@@ -23,7 +23,7 @@ import {
   transformOpenAiResponsesHostedWebSearchResponseValue,
   transformOpenAiResponsesHostedWebSearchSseText,
   normalizeCoreGatewayVirtualModelProfiles
-} from "@ccr/core/gateway/service.ts";
+} from "@agentrouter/core/gateway/service.ts";
 
 test("gateway config rewrites Fusion fixed base and vision models to core provider selectors", () => {
   const providerName = "Zhipu AI (China) - Coding Plan";
@@ -223,7 +223,7 @@ test("issue 1480 Fusion vision config injects core auth token into MCP gateway r
     undefined,
     undefined,
     {
-      endpoint: "http://127.0.0.1:3456/__ccr/billing-usage-sync",
+      endpoint: "http://127.0.0.1:3456/__ar/billing-usage-sync",
       header: "x-ar-billing-usage-token",
       token: "usage-token"
     }
@@ -234,7 +234,7 @@ test("issue 1480 Fusion vision config injects core auth token into MCP gateway r
   assert.equal(server.env.VISION_GATEWAY_BASE_URL, "http://127.0.0.1:3457/v1");
   assert.equal(server.env.VISION_GATEWAY_API_KEY, "core-token");
   assert.equal(server.env.VISION_API_KEY, undefined);
-  assert.equal(server.env.AR_FUSION_USAGE_SYNC_ENDPOINT, "http://127.0.0.1:3456/__ccr/billing-usage-sync");
+  assert.equal(server.env.AR_FUSION_USAGE_SYNC_ENDPOINT, "http://127.0.0.1:3456/__ar/billing-usage-sync");
   assert.equal(server.env.AR_FUSION_USAGE_SYNC_HEADER, "x-ar-billing-usage-token");
   assert.equal(server.env.AR_FUSION_USAGE_SYNC_TOKEN, "usage-token");
   assert.match(
@@ -343,7 +343,7 @@ test("gateway config passes proxy preload to Fusion built-in MCP runtimes", asyn
     proxyPreloadFile,
     proxyEnv,
     {
-      endpoint: "http://127.0.0.1:3456/__ccr/billing-usage-sync",
+      endpoint: "http://127.0.0.1:3456/__ar/billing-usage-sync",
       header: "x-ar-billing-usage-token",
       token: "usage-token"
     }
@@ -806,7 +806,7 @@ test("gateway fallback explains In-app Browser web search requires Desktop integ
   const definitions = fusionFallbackToolDefinitions(profiles);
 
   assert.equal(definitions[0].name, "fusion_2_web_search");
-  assert.match(definitions[0].unavailableMessage, /requires CCR Desktop/);
+  assert.match(definitions[0].unavailableMessage, /requires AgentRouter Desktop/);
   assert.match(definitions[0].unavailableMessage, /switch the Fusion web search provider/);
 });
 

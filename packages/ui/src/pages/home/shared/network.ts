@@ -1,4 +1,4 @@
-import type { ProxyNetworkExchange, RequestRouteTraceChange } from "@ccr/core/contracts/app";
+import type { ProxyNetworkExchange, RequestRouteTraceChange } from "@agentrouter/core/contracts/app";
 
 export function formatRouteTracePath(change: Pick<RequestRouteTraceChange, "path" | "scope">): string {
   const segments = change.path
@@ -168,7 +168,7 @@ export function clientInitial(value: string): string {
     return "C";
   }
   if (normalized.toLowerCase().includes("codex")) {
-    return "CCR";
+    return "AgentRouter";
   }
   return normalized.slice(0, 3).toUpperCase();
 }

@@ -6,7 +6,7 @@ import {
   parseProviderDeepLinkPayload,
   parseProviderManifestDeepLinkPayload,
   parseProviderManifestPayload
-} from "@ccr/core/contracts/deep-link.ts";
+} from "@agentrouter/core/contracts/deep-link.ts";
 
 function base64UrlJson(value) {
   return Buffer.from(JSON.stringify(value), "utf8")
@@ -153,11 +153,11 @@ test("parseProviderDeepLinkPayload builds usage account config from query params
 test("provider deeplink manifest parsing accepts only HTTPS manifest URLs", () => {
   assert.equal(isAppDeepLinkUrl(" agentrouter://provider?base_url=https://api.example.com "), true);
   assert.deepEqual(
-    parseProviderManifestDeepLinkPayload("agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Fccr.json"),
-    { url: "https://example.com/ccr.json" }
+    parseProviderManifestDeepLinkPayload("agentrouter://provider?manifest=https%3A%2F%2Fexample.com%2Far.json"),
+    { url: "https://example.com/ar.json" }
   );
   assert.throws(
-    () => parseProviderManifestDeepLinkPayload("agentrouter://provider?manifest=http%3A%2F%2Fexample.com%2Fccr.json"),
+    () => parseProviderManifestDeepLinkPayload("agentrouter://provider?manifest=http%3A%2F%2Fexample.com%2Far.json"),
     /must use https/
   );
 });

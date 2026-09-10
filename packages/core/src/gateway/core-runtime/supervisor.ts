@@ -7,20 +7,20 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import { networkInterfaces } from "node:os";
 import { chmodSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { delimiter as pathDelimiter, dirname as pathDirname, join as pathJoin, resolve as pathResolve } from "node:path";
-import { CONFIGDIR } from "@ccr/core/config/constants";
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
 import {
   deletePersistedRuntimeState,
   loadPersistedRuntimeState,
   replacePersistedRuntimeState
-} from "@ccr/core/config/config-repository";
-import type { AppConfig, GatewayNetworkEndpoint } from "@ccr/core/contracts/app";
-import { fetchWithSystemProxy } from "@ccr/core/proxy/system-proxy-fetch";
-import { uniqueStrings } from "@ccr/core/gateway/internal/collections";
-import { isRecord, numberValue, stringValue } from "@ccr/core/gateway/internal/value";
-import { formatError, readHeader } from "@ccr/core/gateway/http/io";
-import { coreGatewayAuthHeader, coreGatewayAuthTokenEnv, gatewayEntryOverrideEnv, gatewayPackageCandidates, gatewayRuntimeMarkerFile, requireFromHere } from "@ccr/core/gateway/internal/shared";
-import type { CoreGatewayHealth, ManagedGatewayRuntimeMarker } from "@ccr/core/gateway/internal/shared";
-import { delay } from "@ccr/core/gateway/internal/clock";
+} from "@agentrouter/core/config/config-repository";
+import type { AppConfig, GatewayNetworkEndpoint } from "@agentrouter/core/contracts/app";
+import { fetchWithSystemProxy } from "@agentrouter/core/proxy/system-proxy-fetch";
+import { uniqueStrings } from "@agentrouter/core/gateway/internal/collections";
+import { isRecord, numberValue, stringValue } from "@agentrouter/core/gateway/internal/value";
+import { formatError, readHeader } from "@agentrouter/core/gateway/http/io";
+import { coreGatewayAuthHeader, coreGatewayAuthTokenEnv, gatewayEntryOverrideEnv, gatewayPackageCandidates, gatewayRuntimeMarkerFile, requireFromHere } from "@agentrouter/core/gateway/internal/shared";
+import type { CoreGatewayHealth, ManagedGatewayRuntimeMarker } from "@agentrouter/core/gateway/internal/shared";
+import { delay } from "@agentrouter/core/gateway/internal/clock";
 
 const gatewayRuntimeStateKey = "gateway";
 const gatewayConfigAcceptanceTimeoutMs = 5_000;
@@ -172,7 +172,7 @@ function resolveGatewayBootstrapEntry(): string {
       : [])
   ].find((candidate) => existsSync(candidate));
   if (!entry) {
-    throw new Error("CCR gateway IPC bootstrap was not found. Run npm run build:assets.");
+    throw new Error("AgentRouter gateway IPC bootstrap was not found. Run npm run build:assets.");
   }
   return entry;
 }
@@ -373,7 +373,7 @@ function createGatewayProcessEnv(
   }
 
   // The managed gateway must use the generated raw-trace policy. Inheriting
-  // the upstream gateway's RAW_TRACE_* overrides could bypass CCR privacy,
+  // the upstream gateway's RAW_TRACE_* overrides could bypass AgentRouter privacy,
   // size, spool, or sync-endpoint controls.
   for (const key of Object.keys(env)) {
     if (key.startsWith("RAW_TRACE_")) delete env[key];
@@ -564,7 +564,7 @@ function gatewayFetchPreloadScript(): string {
     "  const realFetch = globalThis.fetch.bind(globalThis);",
     // The injected Agent/ProxyAgent come from the bundled undici module, so
     // they must be paired with that module's own fetch: Node's built-in fetch
-    // can use a different undici major (Node >= 25 ships undici 8 while CCR
+    // can use a different undici major (Node >= 25 ships undici 8 while AgentRouter
     // bundles undici 7), and a dispatcher from one major fails inside the
     // other's fetch with UND_ERR_INVALID_ARG ("invalid onError method").
     // Calls that already carry a caller-provided dispatcher stay on the

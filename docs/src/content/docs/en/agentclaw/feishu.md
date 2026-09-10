@@ -7,13 +7,13 @@ lead: "Connect agent messages to Feishu (Lark) groups or app chats, with optiona
 
 ## Who this is for
 
-Feishu is for teams that want agent messages in a Feishu group or app chat. CCR connects to Feishu apps using App Secret auth.
+Feishu is for teams that want agent messages in a Feishu group or app chat. AgentRouter connects to Feishu apps using App Secret auth.
 
 > New to AgentClaw? Read the AgentClaw overview and usage and configuration first, then come back here for a single platform.
 
 ## The fields you'll use
 
-| Name in the Feishu dashboard | CCR field | Required | Notes |
+| Name in the Feishu dashboard | AgentRouter field | Required | Notes |
 | --- | --- | --- | --- |
 | App ID | App ID | Required | App identifier, usually starts with `cli_` |
 | App Secret | App Secret | Required | App secret |
@@ -25,7 +25,7 @@ Feishu is for teams that want agent messages in a Feishu group or app chat. CCR 
 2. Go to the developer backend.
 3. Click `创建应用` (Create App).
 4. Choose `企业自建应用` (Enterprise Self-Built App).
-5. Name it, e.g. `CCR`.
+5. Name it, e.g. `AgentRouter`.
 6. Fill in the description and upload an icon.
 7. Create the app.
 
@@ -37,7 +37,7 @@ Feishu is for teams that want agent messages in a Feishu group or app chat. CCR 
 4. Copy `App ID`.
 5. Copy `App Secret`.
 
-These two are the required fields in CCR.
+These two are the required fields in AgentRouter.
 
 ## Step 3: Enable the bot capability
 
@@ -75,9 +75,9 @@ These two are the required fields in CCR.
 4. If the enterprise requires review, wait for approval.
 5. Find the app in the Feishu client, or add the bot to the target group.
 
-## Wire it up in CCR
+## Wire it up in AgentRouter
 
-1. Open CCR's **Bot Management** page and click **Add Bot**.
+1. Open AgentRouter's **Bot Management** page and click **Add Bot**.
 2. Pick **Feishu** as the platform.
 3. Auth is **App Secret**.
 4. Fill in **App ID** and **App Secret**.
@@ -86,7 +86,7 @@ These two are the required fields in CCR.
 7. Open **Agent Profiles** and edit the Agent Profiles you want to attach it to.
 8. Turn on **Bot** and select the bot.
 9. Optionally enable **Forward agent messages** or **Handoff** (next section).
-10. Reopen the agent from CCR.
+10. Reopen the agent from AgentRouter.
 
 ## Forward or handoff
 
@@ -97,7 +97,7 @@ These two are the required fields in CCR.
 
 ## Test it
 
-1. Open the agent from CCR and trigger a message.
+1. Open the agent from AgentRouter and trigger a message.
 2. Check Feishu to confirm the app received it and replied.
 3. For groups, add the app to the target group first and confirm members can see it.
 

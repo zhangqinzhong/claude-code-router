@@ -21,7 +21,7 @@ module.exports = {
 
 async function resolveSubscriptionSelf(request) {
   if (typeof request.fetchProviderAccountJson !== "function") {
-    throw new Error("New API account connector requires CCR Desktop browser account fetch support.");
+    throw new Error("New API account connector requires AgentRouter Desktop browser account fetch support.");
   }
 
   const options = isRecord(request.connector?.options) ? request.connector.options : {};

@@ -2,20 +2,20 @@
 title: Grok CLI setup and configuration
 pageTitle: Grok CLI
 eyebrow: Detailed configuration
-lead: "Connect Grok CLI to CCR. Grok CLI is CLI-only and always scoped to CCR-launched sessions."
+lead: "Connect Grok CLI to AgentRouter. Grok CLI is CLI-only and always scoped to AR-launched sessions."
 ---
 
 ## Who this is for
 
-Grok CLI is xAI's coding agent. In CCR it is **CLI only** and always uses **Only opened from CCR**.
+Grok CLI is xAI's coding agent. In AgentRouter it is **CLI only** and always uses **Only opened from AgentRouter**.
 
-Use this page to route Grok CLI to any CCR provider or Fusion model, or to run several separate Grok CLI sessions.
+Use this page to route Grok CLI to any AgentRouter provider or Fusion model, or to run several separate Grok CLI sessions.
 
-> New to CCR? Add a provider and model first. See [Add a provider](/en/guides/provider/) and the [Agent Config overview](/en/configuration/profiles/).
+> New to AgentRouter? Add a provider and model first. See [Add a provider](/en/guides/provider/) and the [Agent Config overview](/en/configuration/profiles/).
 
 ## Prerequisites
 
-1. CCR Desktop is running with at least one provider + model configured.
+1. AgentRouter Desktop is running with at least one provider + model configured.
 2. Grok CLI is installed (available as `grok` on `PATH`).
 3. You are on **Agent Config** and click **Add profile**.
 
@@ -29,11 +29,11 @@ Use this page to route Grok CLI to any CCR provider or Fusion model, or to run s
 
 ## Configuration reference
 
-Grok CLI is fixed to **Only opened from CCR** and **CLI only**, so those two fields are not editable. The fields you configure are:
+Grok CLI is fixed to **Only opened from AgentRouter** and **CLI only**, so those two fields are not editable. The fields you configure are:
 
 | Field | How to set it | Effect |
 | --- | --- | --- |
-| Agent | Choose **Grok CLI** | Creates a Grok CLI launch entry in CCR. |
+| Agent | Choose **Grok CLI** | Creates a Grok CLI launch entry in AgentRouter. |
 | Config name | Free text, e.g. `Grok - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Model | A provider model or Fusion model | The model Grok CLI uses at startup. |
@@ -53,7 +53,7 @@ For CLI, run:
 ccr "Grok - Work"
 ```
 
-Inside Grok CLI, use `/model` to switch among the provider and Fusion models CCR returns; switched requests still go through CCR.
+Inside Grok CLI, use `/model` to switch among the provider and Fusion models AgentRouter returns; switched requests still go through AgentRouter.
 
 ## Multi-instance
 
@@ -63,11 +63,11 @@ Create separate Grok CLI profiles when you want separate launch entries with dif
 
 1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `ccr` command.
 2. Send one message in Grok CLI and confirm it replies.
-3. Open **Request logs** in CCR and confirm the request passed through the gateway.
-4. Run `/model` and confirm the CCR-exposed models appear.
+3. Open **Request logs** in AgentRouter and confirm the request passed through the gateway.
+4. Run `/model` and confirm the AR-exposed models appear.
 
 ## Common issues
 
-- **Grok uses your xAI account instead of CCR:** confirm you launched Grok from the CCR profile card.
-- **`grok` not found:** make sure Grok CLI is installed and available from the same shell environment used to start CCR Desktop.
-- **`/model` shows no CCR models:** confirm a provider + model is configured in CCR.
+- **Grok uses your xAI account instead of AgentRouter:** confirm you launched Grok from the AgentRouter profile card.
+- **`grok` not found:** make sure Grok CLI is installed and available from the same shell environment used to start AgentRouter Desktop.
+- **`/model` shows no AgentRouter models:** confirm a provider + model is configured in AgentRouter.

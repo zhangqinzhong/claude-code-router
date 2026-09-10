@@ -19,7 +19,7 @@ import {
   createCursorApi,
   findByText,
 } from "./demoRuntime";
-import type { AppConfig, GatewayProviderConfig, ProfileConfig, ProfileRuntimeStatus } from "@ccr/core/contracts/app";
+import type { AppConfig, GatewayProviderConfig, ProfileConfig, ProfileRuntimeStatus } from "@agentrouter/core/contracts/app";
 import type { AddProfileDraft } from "@/pages/home/shared/types";
 
 const noop = () => {};

@@ -2,7 +2,7 @@
 title: Routing
 pageTitle: Routing
 eyebrow: Routing
-lead: "Control how CCR picks a model for each request: built-in routes for Claude Code and Codex, custom rules with conditions and rewrites, and fallback retry or failover when a request fails."
+lead: "Control how AgentRouter picks a model for each request: built-in routes for Claude Code and Codex, custom rules with conditions and rewrites, and fallback retry or failover when a request fails."
 ---
 
 ## Built-in routing
@@ -11,29 +11,29 @@ lead: "Control how CCR picks a model for each request: built-in routes for Claud
 
 The built-in Claude Code route detects requests from Claude Code and routes main requests to the Claude Code Agent Config model when the client has not selected a recognized model.
 
-Claude Code **main requests** prefer an explicit client-selected model that CCR recognizes. The Agent Config model is only the default when the client model is missing or unrecognized; if it is unset, the built-in route remains inactive. User-configured routing rules can still rewrite the model. CCR also automatically removes the first `x-anthropic-billing-header` system message injected by Claude Code so that billing helper messages do not affect later routing decisions. Claude Code Subagent, Task, and Workflow-created agents can still choose different models through the tag mechanism below.
+Claude Code **main requests** prefer an explicit client-selected model that AgentRouter recognizes. The Agent Config model is only the default when the client model is missing or unrecognized; if it is unset, the built-in route remains inactive. User-configured routing rules can still rewrite the model. AgentRouter also automatically removes the first `x-anthropic-billing-header` system message injected by Claude Code so that billing helper messages do not affect later routing decisions. Claude Code Subagent, Task, and Workflow-created agents can still choose different models through the tag mechanism below.
 
 #### Subagent / Workflow auto-routing
 
-Claude Code Agent / Task / Workflow can spawn additional model requests. CCR uses tag injection to let those spawned requests choose a more appropriate CCR model:
+Claude Code Agent / Task / Workflow can spawn additional model requests. AgentRouter uses tag injection to let those spawned requests choose a more appropriate AgentRouter model:
 
 ```text
-<CCR-SUBAGENT-MODEL>provider/model</CCR-SUBAGENT-MODEL>
+<AR-SUBAGENT-MODEL>provider/model</AR-SUBAGENT-MODEL>
 ```
 
 The full flow is:
 
-1. A Claude Code main request matches the built-in route, so CCR inspects the current tool list.
-2. If at least one model has a **Description**, CCR injects the available models and descriptions into the `Agent` / `Task` tool description and `prompt` field description.
-3. If the tool list includes `Workflow`, CCR appends a Workflow-specific instruction: whenever the workflow creates an `Agent` / `Task`, each spawned agent prompt must start with the same model tag.
-4. When Claude Code calls `Agent` / `Task`, or when a Workflow creates an agent, the prompt starts with `<CCR-SUBAGENT-MODEL>provider/model</CCR-SUBAGENT-MODEL>`.
-5. When the spawned request reaches CCR, CCR extracts and removes the tag from the system prompt or the first two user messages, then routes that request to the tagged model.
+1. A Claude Code main request matches the built-in route, so AgentRouter inspects the current tool list.
+2. If at least one model has a **Description**, AgentRouter injects the available models and descriptions into the `Agent` / `Task` tool description and `prompt` field description.
+3. If the tool list includes `Workflow`, AgentRouter appends a Workflow-specific instruction: whenever the workflow creates an `Agent` / `Task`, each spawned agent prompt must start with the same model tag.
+4. When Claude Code calls `Agent` / `Task`, or when a Workflow creates an agent, the prompt starts with `<AR-SUBAGENT-MODEL>provider/model</AR-SUBAGENT-MODEL>`.
+5. When the spawned request reaches AgentRouter, AgentRouter extracts and removes the tag from the system prompt or the first two user messages, then routes that request to the tagged model.
 
 Subagent / Workflow auto-routing therefore selects the model from the prompt tag. Headers such as `x-claude-code-agent-id` help with observation, but they do not drive model selection.
 
 ##### Pairing it with the Models page
 
-The **Description** field on the Models page is both the enablement switch and the selection guide for this mechanism. If no model has a Description, CCR does not inject Agent / Task / Workflow routing instructions, so it does not write an empty model list into tool descriptions.
+The **Description** field on the Models page is both the enablement switch and the selection guide for this mechanism. If no model has a Description, AgentRouter does not inject Agent / Task / Workflow routing instructions, so it does not write an empty model list into tool descriptions.
 
 Recommended setup:
 
@@ -41,7 +41,7 @@ Recommended setup:
 2. Open **Models** and fill Description for the models you want Subagents to choose automatically. Describe task fit, speed, cost, and limits.
 3. Enable a Claude Code config under **Agent Config**, and choose the default model. Claude Code uses it when the client has not selected a recognized model.
 4. Confirm that the built-in **Claude Code** route is enabled on the **Routing** page.
-5. Use Agent, Task, or Workflow in Claude Code. When Claude Code spawns an agent, it can choose a CCR model from the descriptions and write the tag.
+5. Use Agent, Task, or Workflow in Claude Code. When Claude Code spawns an agent, it can choose a AgentRouter model from the descriptions and write the tag.
 
 Write descriptions around the tasks the model handles. For example:
 
@@ -51,15 +51,15 @@ Write descriptions around the tasks the model handles. For example:
 | Strong reasoning model | Good for complex architecture analysis, large refactor planning, cross-file reasoning, and high-risk code review. |
 | Long-context model | Good for reading large logs, long documents, repository-scale context gathering, and Workflow summaries. |
 
-After saving, CCR formats those descriptions as “Configured CCR gateway models” in the injected Claude Code instructions. When Claude Code picks a model, request logs should show `builtin:claude-code-subagent`, and the tagged model becomes the final `resolved model`.
+After saving, AgentRouter formats those descriptions as “Configured AgentRouter gateway models” in the injected Claude Code instructions. When Claude Code picks a model, request logs should show `builtin:claude-code-subagent`, and the tagged model becomes the final `resolved model`.
 
 ### Codex
 
-CCR automatically adapts Codex's `apply_patch` file-editing tool for third-party or non-GPT models, so those models edit files through the patch tool.
+AgentRouter automatically adapts Codex's `apply_patch` file-editing tool for third-party or non-GPT models, so those models edit files through the patch tool.
 
-Technically, this is a tool protocol bridge. Native Codex `apply_patch` is a custom/freeform tool whose input is raw patch text, while many OpenAI-compatible third-party models handle ordinary function tools more reliably. CCR rewrites `apply_patch` into an upstream-visible `virtual_apply_patch` function tool and injects the full `apply_patch.lark` grammar into the tool description, requiring the model to put the patch in the `patch` field.
+Technically, this is a tool protocol bridge. Native Codex `apply_patch` is a custom/freeform tool whose input is raw patch text, while many OpenAI-compatible third-party models handle ordinary function tools more reliably. AgentRouter rewrites `apply_patch` into an upstream-visible `virtual_apply_patch` function tool and injects the full `apply_patch.lark` grammar into the tool description, requiring the model to put the patch in the `patch` field.
 
-When the model returns `virtual_apply_patch`, CCR rewrites it back to Codex's expected shape: `custom_tool_call` with `name = apply_patch` and `input = raw patch text`. CCR does not edit files directly; Codex still executes the resulting patch. This adaptation is enabled automatically for non-GPT models and is independent of the built-in **Codex** routing switch. GPT-named models, including Fusion models whose resolved base model is GPT, keep using Codex's native freeform `apply_patch` path.
+When the model returns `virtual_apply_patch`, AgentRouter rewrites it back to Codex's expected shape: `custom_tool_call` with `name = apply_patch` and `input = raw patch text`. AgentRouter does not edit files directly; Codex still executes the resulting patch. This adaptation is enabled automatically for non-GPT models and is independent of the built-in **Codex** routing switch. GPT-named models, including Fusion models whose resolved base model is GPT, keep using Codex's native freeform `apply_patch` path.
 
 ## Custom routing
 
@@ -87,16 +87,16 @@ Choose **Node.js script** as the rule type when a single condition is not enough
 
 Use a Node.js script rule when ordinary conditions cannot express multi-field decisions, gradual rollouts, external policy lookups, or dynamic request rewrites. A script runs as asynchronous JavaScript in a reusable Worker: it reads the complete request, uses the controlled `api` object to access the network, filesystem, and environment, and returns whether the rule matched together with its model, rewrites, and fallback behavior.
 
-Scripts run in rule-list order. A non-match continues to the next rule; a match uses the routing decision returned by the script. Exceptions, timeouts, and invalid results are fail-open: CCR records a routing diagnostic and continues to the next rule.
+Scripts run in rule-list order. A non-match continues to the next rule; a match uses the routing decision returned by the script. Exceptions, timeouts, and invalid results are fail-open: AgentRouter records a routing diagnostic and continues to the next rule.
 
 #### Create a script file
 
 1. Create a local file with a `.js`, `.mjs`, or `.cjs` extension.
 2. Set **Rule type** to **Node.js script** in the routing rule editor.
 3. Select the script file, choose a timeout from 10 to 30000 milliseconds, and use **Validate** or **Test script** to check it.
-4. Save the rule. CCR reads the file before every execution, so later file edits do not require saving the rule again.
+4. Save the rule. AgentRouter reads the file before every execution, so later file edits do not require saving the rule again.
 
-The Desktop file picker stores an absolute path. A Web UI cannot obtain the real local path selected by the browser, so enter an absolute, relative, or `~/...` path on the machine running CCR. Relative paths resolve from the CCR process working directory. A script file may be at most 5 MiB.
+The Desktop file picker stores an absolute path. A Web UI cannot obtain the real local path selected by the browser, so enter an absolute, relative, or `~/...` path on the machine running AgentRouter. Relative paths resolve from the AgentRouter process working directory. A script file may be at most 5 MiB.
 
 The script file is an **async function body**. Use the injected `input`, `api`, and `return` directly; do not write it as a CommonJS or ES module:
 
@@ -119,14 +119,14 @@ Each execution receives its own read-only `input` object:
 | Field | Type | Description |
 | --- | --- | --- |
 | `input.body` | `Record<string, unknown>` | Complete JSON request body. |
-| `input.headers` | `Record<string, string \| string[]>` | Complete request headers, potentially including authentication, cookies, API keys, and CCR-internal headers. |
+| `input.headers` | `Record<string, string \| string[]>` | Complete request headers, potentially including authentication, cookies, API keys, and AR-internal headers. |
 | `input.method` | `string` | HTTP method, such as `POST`. |
 | `input.url` | `string` | Gateway-relative request URL, such as `/v1/messages`. |
 | `input.model` | `string \| undefined` | Shortcut for `input.body.model` when that value is a string. |
-| `input.tokenCount` | `number` | CCR's estimated input token count, or `0` when unavailable. |
-| `input.sessionId` | `string \| undefined` | Session ID when CCR can resolve it. |
-| `input.apiKeyId` | `string \| undefined` | CCR API-key identifier from `x-auth-api-key-id`; use it to distinguish keys. |
-| `input.builtInSubagentModel` | `string \| undefined` | Built-in subagent model when CCR can identify it. |
+| `input.tokenCount` | `number` | AgentRouter's estimated input token count, or `0` when unavailable. |
+| `input.sessionId` | `string \| undefined` | Session ID when AgentRouter can resolve it. |
+| `input.apiKeyId` | `string \| undefined` | AgentRouter API-key identifier from `x-auth-api-key-id`; use it to distinguish keys. |
+| `input.builtInSubagentModel` | `string \| undefined` | Built-in subagent model when AgentRouter can identify it. |
 | `input.summary.lastUserText` | `string` | Text from the last user message, limited to 16 KiB characters. |
 | `input.summary.systemText` | `string` | Text from the system content, limited to 8 KiB characters. |
 | `input.summary.messageCount` | `number` | Number of elements in `body.messages`. |
@@ -208,7 +208,7 @@ The returned object has this shape:
 
 #### `api.fs`: Filesystem access
 
-Paths may be absolute, relative, or start with `~/...`. There is no path allowlist, but access is still limited by the operating-system permissions of the CCR process.
+Paths may be absolute, relative, or start with `~/...`. There is no path allowlist, but access is still limited by the operating-system permissions of the AgentRouter process.
 
 | API | Returns | Description |
 | --- | --- | --- |
@@ -226,7 +226,7 @@ Each file read or write is limited to 1 MiB.
 
 | API | Returns | Description |
 | --- | --- | --- |
-| `api.env(name)` | `string \| undefined` | Read any environment variable visible to the CCR process. |
+| `api.env(name)` | `string \| undefined` | Read any environment variable visible to the AgentRouter process. |
 | `api.hash(value)` | `number` | Return a stable unsigned 32-bit hash of the string form, useful for stable rollout buckets. Use it for bucketing only, not for security. |
 
 #### Return values
@@ -245,7 +245,7 @@ A dynamic decision object supports:
 | Field | Type | Description |
 | --- | --- | --- |
 | `match` | `boolean` | Only `false` is special and means no match. |
-| `model` | `string` | Target model selector; it must identify a currently configured CCR model. |
+| `model` | `string` | Target model selector; it must identify a currently configured AgentRouter model. |
 | `rewrites` | `Rewrite[]` | Request rewrites, limited to 32 and applied in array order. |
 | `fallback` | `Fallback` | Override the rule or global default fallback behavior. |
 
@@ -267,7 +267,7 @@ A string, number, or array is not a valid routing result. Unknown object fields 
 | --- | --- | --- |
 | `set` | `value` | Set or create a field. This is the default when `operation` is omitted. |
 | `delete` | None | Delete a field or array index. |
-| `array-append` | `value` | Add an element to the end. If the current value is already an array, append to it; otherwise CCR starts from an empty array. |
+| `array-append` | `value` | Add an element to the end. If the current value is already an array, append to it; otherwise AgentRouter starts from an empty array. |
 | `array-prepend` | `value` | Add an element to the beginning. |
 | `array-remove` | `value` | Remove array elements that match `value`. |
 | `array-replace` | `match`, `value` | Replace array elements that match `match` with `value`. |
@@ -374,7 +374,7 @@ return {
 };
 ```
 
-The example's `policy.model` and `policy.fallbackModels` values must identify models already configured in CCR. Otherwise, the rule emits a diagnostic and is treated as a non-match.
+The example's `policy.model` and `policy.fallbackModels` values must identify models already configured in AgentRouter. Otherwise, the rule emits a diagnostic and is treated as a non-match.
 
 #### Saved configuration and runtime limits
 
@@ -407,7 +407,7 @@ The saved rule has the following shape. It is normally generated by the UI and d
 
 Workers enforce heap, stack, pending-queue, and hard-timeout resource limits. Three failures for the same rule within 60 seconds open its circuit breaker for 30 seconds. A changed script file is recompiled and treated as a new script version for circuit-breaker accounting.
 
-Worker isolation isolates script execution at the execution level; scripts still inherit the network, file, and environment access available to the CCR process. Run trusted scripts only.
+Worker isolation isolates script execution at the execution level; scripts still inherit the network, file, and environment access available to the AgentRouter process. Run trusted scripts only.
 
 Legacy inline `source` continues to run. Selecting a script file for the rule and saving it migrates the rule to the local `file` shape above. Legacy `readPaths`, `permissions`, and static script-rule `rewrites` are no longer needed; return `model` or `rewrites` from the script when a request must be changed.
 
@@ -437,18 +437,18 @@ The value field is parsed as a common literal when possible: `true`, `false`, `n
 
 The **Rewrite request parameters** area starts with one `request.body.model` row. This is the common model-routing path: choose **Set**, use key `request.body.model`, and set the value to a target `provider/model` or Fusion model.
 
-Click **Add parameter** to add more rewrite rows. The trash button removes a row, but the last row cannot be removed. When the rule matches, CCR applies the rewrite rows in order.
+Click **Add parameter** to add more rewrite rows. The trash button removes a row, but the last row cannot be removed. When the rule matches, AgentRouter applies the rewrite rows in order.
 
 | Operation | Required fields | Behavior |
 | --- | --- | --- |
 | **Set** | key, value | Sets a request field, such as `request.body.model = provider/model` or `request.body.temperature = 0.2`. |
 | **Delete** | key | Deletes a request field. Deleting `request.header.x-test` removes that header; deleting `request.body.foo` removes that body field. |
-| **Append to array** | key, value | Appends the value to the target array. If the target is already an array, append to it; otherwise CCR starts from an empty array. |
+| **Append to array** | key, value | Appends the value to the target array. If the target is already an array, append to it; otherwise AgentRouter starts from an empty array. |
 | **Prepend to array** | key, value | Prepends the value to the target array. |
 | **Remove from array** | key, value | Removes array elements equal to the value. |
 | **Replace in array** | key, match value, value | Replaces array elements matching **Match value** with the new value. |
 
-Rewrite values are also parsed as literals, so `0.2` becomes a number, `true` becomes a boolean, and `{"type":"web_search"}` becomes an object. Only `request.body.model` receives additional CCR model-selector normalization.
+Rewrite values are also parsed as literals, so `0.2` becomes a number, `true` becomes a boolean, and `{"type":"web_search"}` becomes an object. Only `request.body.model` receives additional AgentRouter model-selector normalization.
 
 ### On failure
 
@@ -469,7 +469,7 @@ After saving, the rule appears in the list. Use request logs, especially `reques
 
 ## Fallback handling
 
-Fallback is the failure strategy after a model or upstream request fails. Routing picks the first model; Fallback decides whether CCR should keep trying after the current target fails.
+Fallback is the failure strategy after a model or upstream request fails. Routing picks the first model; Fallback decides whether AgentRouter should keep trying after the current target fails.
 
 The **Default on failure** control at the top of the Routing page is the global Fallback. Each rule also has **On failure**. When a rule matches, its rule-level Fallback overrides the global Fallback.
 
@@ -492,7 +492,7 @@ Network errors move to the next attempt. Status-code fallback depends on the mod
 | Retry | `408`, `409`, `429`, `5xx` |
 | Fallback targets | Any `4xx` or `5xx` |
 
-Before moving to the next attempt, CCR waits for every fallback-triggering failure, including network errors. It honors a positive `Retry-After` header when the upstream provides one; otherwise it uses exponential backoff starting at 1 second and capped at 30 seconds per attempt.
+Before moving to the next attempt, AgentRouter waits for every fallback-triggering failure, including network errors. It honors a positive `Retry-After` header when the upstream provides one; otherwise it uses exponential backoff starting at 1 second and capped at 30 seconds per attempt.
 
 **Fallback targets** also switches on `4xx` because model-not-found, auth, or provider-side rejection errors may only affect the current target. If the fallback model works, the request can still succeed.
 

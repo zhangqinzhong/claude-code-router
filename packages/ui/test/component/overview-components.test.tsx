@@ -2,11 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import * as React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { formatCodexResetCardExpiry, formatCodexResetCardNumber, OverviewStatisticsResetDialog, OverviewView } from "@ccr/ui/pages/home/components/dashboard.tsx";
-import { AppI18nContext, appCopy } from "@ccr/ui/pages/home/shared/i18n.tsx";
-import { parseStatusBucketDate } from "@ccr/ui/pages/home/shared/controls.tsx";
-import { formatProviderAccountMeterValue, providerAccountMeterDetailValidityProgress } from "@ccr/ui/pages/home/shared/provider-accounts.ts";
-import type { GatewayProviderConfig, OverviewWidgetConfig, ProviderAccountSnapshot } from "@ccr/core/contracts/app.ts";
+import { formatCodexResetCardExpiry, formatCodexResetCardNumber, OverviewStatisticsResetDialog, OverviewView } from "@agentrouter/ui/pages/home/components/dashboard.tsx";
+import { AppI18nContext, appCopy } from "@agentrouter/ui/pages/home/shared/i18n.tsx";
+import { parseStatusBucketDate } from "@agentrouter/ui/pages/home/shared/controls.tsx";
+import { formatProviderAccountMeterValue, providerAccountMeterDetailValidityProgress } from "@agentrouter/ui/pages/home/shared/provider-accounts.ts";
+import type { GatewayProviderConfig, OverviewWidgetConfig, ProviderAccountSnapshot } from "@agentrouter/core/contracts/app.ts";
 import { accountSnapshots, installBrowserGlobals, usageStats } from "../fixtures/index.ts";
 
 installBrowserGlobals();
@@ -69,7 +69,7 @@ test("OverviewView renders every overview widget type", () => {
   assert.match(html, /openai/);
   assert.match(html, /Save image/);
   assert.match(html, /AI Usage Wrapped/);
-  assert.match(html, /CCR Route Map/);
+  assert.match(html, /AgentRouter Route Map/);
   assert.match(html, /Model Leaderboard/);
   assert.match(html, /AI Fuel Cockpit/);
   assert.match(html, /Token Calendar Poster/);

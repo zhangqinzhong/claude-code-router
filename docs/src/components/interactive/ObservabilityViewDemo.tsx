@@ -1,6 +1,6 @@
 /**
  * Docs wrapper rendering the REAL, UNMODIFIED AgentAnalysisView (observability)
- * with real fixture data from the local CCR. selectedSession is wired to local
+ * with real fixture data from the local AgentRouter. selectedSession is wired to local
  * state so clicking "Details" opens the detail panel; the session detail data
  * (trace runs etc.) is injected into the snapshot only when a session is
  * selected, and stripped otherwise so the dialog starts closed and can close.
@@ -12,7 +12,7 @@ import { AppI18nContext, appCopy } from "@/pages/home/shared/i18n";
 import { getAgentAnalysisData } from "./mockData";
 import { DemoShell, readDemoLocale } from "./demoRuntime";
 import type { AgentFilterValue } from "@/pages/home/shared/options";
-import type { AgentAnalysisSessionSelection, AgentAnalysisSnapshot } from "@ccr/core/contracts/app";
+import type { AgentAnalysisSessionSelection, AgentAnalysisSnapshot } from "@agentrouter/core/contracts/app";
 
 const noop = () => {};
 

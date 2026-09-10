@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import type { RequestLogBody } from "@ccr/core/contracts/app";
-import { formatLogBodyForWorker } from "@ccr/ui/pages/home/shared/log-body-worker-protocol.ts";
-import { formatRouteTracePath } from "@ccr/ui/pages/home/shared/network.ts";
+import type { RequestLogBody } from "@agentrouter/core/contracts/app";
+import { formatLogBodyForWorker } from "@agentrouter/ui/pages/home/shared/log-body-worker-protocol.ts";
+import { formatRouteTracePath } from "@agentrouter/ui/pages/home/shared/network.ts";
 
 test("route trace paths use request and response dotted notation", () => {
   assert.equal(

@@ -1,15 +1,15 @@
-# Claude Code Router CLI
+# AgentRouter CLI
 
-[中文](README_zh.md) · [Documentation](https://ccrdesk.top/en/) · [GitHub](https://github.com/musistudio/claude-code-router)
+[中文](README_zh.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
 
-`@musistudio/claude-code-router` is the Node.js distribution of Claude Code Router. It provides the `ccr` command, the browser-based management UI, the local model gateway, and profile launch commands without requiring Electron.
+`@musistudio/claude-code-router` is the Node.js distribution of AgentRouter. It provides the `ccr` command, the browser-based management UI, the local model gateway, and profile launch commands without requiring Electron.
 
 Use the CLI on developer machines and headless hosts. If you want the tray, desktop notifications, automatic app updates, or desktop-only browser integrations, install the desktop application instead.
 
 ## Requirements And Installation
 
 - Node.js 22 or newer
-- A supported upstream model provider, or a locally logged-in agent account that CCR can import
+- A supported upstream model provider, or a locally logged-in agent account that AgentRouter can import
 - A locally installed agent executable when using profile launch commands
 
 Install globally:
@@ -26,7 +26,7 @@ npm install -g @musistudio/claude-code-router@latest
 npm uninstall -g @musistudio/claude-code-router
 ```
 
-Removing the package does not delete CCR's local configuration or databases.
+Removing the package does not delete AgentRouter's local configuration or databases.
 
 ## Quick Start
 
@@ -39,12 +39,12 @@ ccr ui
 Then:
 
 1. Add an upstream provider and at least one model.
-2. Create a CCR client key under **API Keys**.
+2. Create a AgentRouter client key under **API Keys**.
 3. Configure routing if the default provider/model is not sufficient.
 4. Confirm that the gateway is running under **Server**.
 5. Point your client at the gateway URL shown in the UI. The default gateway is `http://127.0.0.1:3456`; the management UI defaults to `http://127.0.0.1:3458`.
 
-The management token and CCR client API keys are different credentials. The management token protects the browser UI and RPC API. CCR client keys authenticate model requests sent to the gateway.
+The management token and AgentRouter client API keys are different credentials. The management token protects the browser UI and RPC API. AgentRouter client keys authenticate model requests sent to the gateway.
 
 ## Service Commands
 
@@ -84,7 +84,7 @@ ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 
 `serve` stays attached to the current terminal and handles `SIGINT`/`SIGTERM`. It is the appropriate mode for a process supervisor. `ccr stop` only manages the detached service; stop a foreground server through its terminal or supervisor.
 
-If the preferred management port is occupied, CCR tries the next available ports and prints the actual URL. When `start` or `ui` reuses an existing service, new host, port, and `--no-gateway` choices do not reconfigure that process. Run `ccr stop` first when those settings must change.
+If the preferred management port is occupied, AgentRouter tries the next available ports and prints the actual URL. When `start` or `ui` reuses an existing service, new host, port, and `--no-gateway` choices do not reconfigure that process. Run `ccr stop` first when those settings must change.
 
 ## Agent Profiles
 
@@ -104,11 +104,11 @@ ccr <profile-name-or-id> [cli|app] [-- <agent arguments>]
 ```
 
 - `--cli` and `--app` are accepted alternatives to the positional surface.
-- Put agent-specific arguments after `--` so they cannot be confused with CCR options.
-- If the surface is omitted, CCR uses the first surface allowed by the profile: CLI for Claude Code, Codex, Grok CLI, Kimi CLI, and Pi; App for ZCode.
+- Put agent-specific arguments after `--` so they cannot be confused with AgentRouter options.
+- If the surface is omitted, AgentRouter uses the first surface allowed by the profile: CLI for Claude Code, Codex, Grok CLI, Kimi CLI, and Pi; App for ZCode.
 - Grok CLI, Kimi CLI, and Pi support CLI only. ZCode supports App only. Claude App and ZCode App do not accept trailing agent arguments.
 - Desktop App launches require that app to be installed and a graphical session to be available.
-- Start the CCR service before opening most profiles. Grok CLI, Kimi CLI, and Pi profiles can start a temporary shared service automatically and stop it after the last managed session exits.
+- Start the AgentRouter service before opening most profiles. Grok CLI, Kimi CLI, and Pi profiles can start a temporary shared service automatically and stop it after the last managed session exits.
 
 The desktop application installs a related command named `agentrouter`. Commands copied from desktop Agent Profiles cards use `agentrouter`; the npm package documented here installs `ccr`.
 
@@ -127,7 +127,7 @@ Important files include:
 - `gateway.config.json`: generated gateway runtime configuration.
 - `profiles/` and `bin/`: isolated profile configuration and launch wrappers.
 
-Do not edit or copy live SQLite files while CCR is writing to them. Use the UI export feature, or stop CCR before taking a filesystem backup.
+Do not edit or copy live SQLite files while AgentRouter is writing to them. Use the UI export feature, or stop AgentRouter before taking a filesystem backup.
 
 ## Environment And Security
 
@@ -137,9 +137,9 @@ Do not edit or copy live SQLite files while CCR is writing to them. Use the UI e
 | `AR_WEB_PORT` | Default management port when `--port` is omitted. |
 | `AR_WEB_AUTH_TOKEN` | Fixes the management UI/RPC token instead of generating a random token for the process. |
 
-The authenticated management URL contains `ccr_web_token` in its query string. Treat that URL like a password and avoid copying it into logs, tickets, or shell history. Bind to `127.0.0.1` unless remote access is intentional. For remote access, use a firewall or private network plus TLS at a trusted reverse proxy.
+The authenticated management URL contains `ar_web_token` in its query string. Treat that URL like a password and avoid copying it into logs, tickets, or shell history. Bind to `127.0.0.1` unless remote access is intentional. For remote access, use a firewall or private network plus TLS at a trusted reverse proxy.
 
-Do not expose the gateway without creating CCR client API keys. Upstream provider credentials are stored in CCR's local data directory, so protect that directory and its backups.
+Do not expose the gateway without creating AgentRouter client API keys. Upstream provider credentials are stored in AgentRouter's local data directory, so protect that directory and its backups.
 
 ## Troubleshooting
 
@@ -156,7 +156,7 @@ Open a new shell after installation if your shell caches command paths.
 
 ### The management URL changed ports
 
-The requested port was already occupied. Use the URL printed by CCR, or stop the conflicting process and restart CCR.
+The requested port was already occupied. Use the URL printed by AgentRouter, or stop the conflicting process and restart AgentRouter.
 
 ### The UI opens but the gateway is unavailable
 
@@ -177,7 +177,7 @@ ccr start --host 127.0.0.1 --port 3458
 
 ## Docker
 
-The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `ccr` command into the runtime image. See the [Docker deployment guide](https://github.com/musistudio/claude-code-router/blob/main/docker/README.md).
+The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `ccr` command into the runtime image. See the [Docker deployment guide](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md).
 
 ## License
 

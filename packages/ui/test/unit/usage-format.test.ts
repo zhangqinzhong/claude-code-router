@@ -1,9 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { formatLogTokenSummary, logRequestModel, logResponseModel } from "@ccr/ui/pages/home/shared/logs.ts";
-import { formatCompactNumber, formatPercentFixed, formatTokenRate, formatUsdCost as formatHomeUsdCost } from "@ccr/ui/pages/home/shared/usage.ts";
-import { formatUsdCost as formatTrayUsdCost } from "@ccr/ui/pages/tray/shared.tsx";
-import type { RequestLogEntry } from "@ccr/core/contracts/app.ts";
+import { formatLogTokenSummary, logRequestModel, logResponseModel } from "@agentrouter/ui/pages/home/shared/logs.ts";
+import { formatCompactNumber, formatPercentFixed, formatTokenRate, formatUsdCost as formatHomeUsdCost } from "@agentrouter/ui/pages/home/shared/usage.ts";
+import { formatUsdCost as formatTrayUsdCost } from "@agentrouter/ui/pages/tray/shared.tsx";
+import type { RequestLogEntry } from "@agentrouter/core/contracts/app.ts";
 
 test("formatCompactNumber can be bound to the UI language locale", () => {
   assert.equal(formatCompactNumber(123456, "en-US"), "123.5K");

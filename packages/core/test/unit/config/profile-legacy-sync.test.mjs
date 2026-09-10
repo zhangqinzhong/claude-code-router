@@ -11,9 +11,9 @@ test("saving profiles synchronizes legacy profile enabled flags", async () => {
   process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
   process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
-  const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
-  const { loadPersistedAppConfig, replacePersistedAppConfig } = await import("@ccr/core/config/config-repository.ts");
-  const { loadAppConfig, saveAppConfig } = await import("@ccr/core/config/config.ts");
+  const { createDefaultAppConfig } = await import("@agentrouter/core/config/default-config.ts");
+  const { loadPersistedAppConfig, replacePersistedAppConfig } = await import("@agentrouter/core/config/config-repository.ts");
+  const { loadAppConfig, saveAppConfig } = await import("@agentrouter/core/config/config.ts");
 
   const config = createDefaultAppConfig();
   config.profile.profiles = config.profile.profiles.filter((profile) => profile.agent !== "claude-code");
@@ -91,9 +91,9 @@ test("saving an active Claude profile replaces stale legacy model fields", async
   process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
   process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
 
-  const { createDefaultAppConfig } = await import("@ccr/core/config/default-config.ts");
-  const { loadPersistedAppConfig } = await import("@ccr/core/config/config-repository.ts");
-  const { saveAppConfig } = await import("@ccr/core/config/config.ts");
+  const { createDefaultAppConfig } = await import("@agentrouter/core/config/default-config.ts");
+  const { loadPersistedAppConfig } = await import("@agentrouter/core/config/config-repository.ts");
+  const { saveAppConfig } = await import("@agentrouter/core/config/config.ts");
 
   const config = createDefaultAppConfig();
   const profile = config.profile.profiles.find((item) => item.agent === "claude-code");

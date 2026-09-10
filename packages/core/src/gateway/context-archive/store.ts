@@ -1,7 +1,7 @@
 import { chmodSync, existsSync, mkdirSync } from "node:fs";
 import { dirname } from "node:path";
-import { createBetterSqliteDatabase, type BetterSqliteDatabase } from "@ccr/core/storage/sqlite-native";
-import type { GatewayProviderProtocol } from "@ccr/core/contracts/app";
+import { createBetterSqliteDatabase, type BetterSqliteDatabase } from "@agentrouter/core/storage/sqlite-native";
+import type { GatewayProviderProtocol } from "@agentrouter/core/contracts/app";
 
 type SqlValue = bigint | Buffer | number | string | null;
 

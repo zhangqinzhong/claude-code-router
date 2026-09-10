@@ -13,7 +13,7 @@ import test from "node:test";
 import {
   copyMissingDirectoryContents,
   sameFilesystemPath
-} from "@ccr/core/storage/migration.ts";
+} from "@agentrouter/core/storage/migration.ts";
 
 test("filesystem path comparison normalizes relative segments and case", () => {
   assert.equal(sameFilesystemPath("./data/../config", "config"), true);
@@ -22,7 +22,7 @@ test("filesystem path comparison normalizes relative segments and case", () => {
 });
 
 test("directory migration copies nested missing files without replacing target files", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-migration-test-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-migration-test-"));
   try {
     const source = path.join(root, "source");
     const target = path.join(root, "target");
@@ -42,7 +42,7 @@ test("directory migration copies nested missing files without replacing target f
 });
 
 test("directory migration ignores absent sources and identical paths", () => {
-  const root = mkdtempSync(path.join(os.tmpdir(), "ccr-migration-skip-test-"));
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-migration-skip-test-"));
   try {
     const target = path.join(root, "target");
     copyMissingDirectoryContents(path.join(root, "missing"), target, "missing data");

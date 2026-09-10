@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { getProviderCatalogModels } from "@ccr/core/providers/model-catalog.ts";
+import { getProviderCatalogModels } from "@agentrouter/core/providers/model-catalog.ts";
 
 test("provider model catalog exposes models.json settings as editable defaults", () => {
   const catalog = getProviderCatalogModels({

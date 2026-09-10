@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import test from "node:test";
-import { CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID } from "@ccr/core/contracts/app.ts";
-import { AR_DESKTOP_APP_ENV } from "@ccr/core/runtime/desktop-app.ts";
-import { builtInPluginAppForOpen, configForPluginAppOpen, isLegacyClaudeDesignUrl, pluginAppUrlForOpen } from "@ccr/electron/main/plugin-app-url.ts";
+import { CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID } from "@agentrouter/core/contracts/app.ts";
+import { AR_DESKTOP_APP_ENV } from "@agentrouter/core/runtime/desktop-app.ts";
+import { builtInPluginAppForOpen, configForPluginAppOpen, isLegacyClaudeDesignUrl, pluginAppUrlForOpen } from "@agentrouter/electron/main/plugin-app-url.ts";
 
 const configWithIgnoredSavedDesignHtml = {
   plugins: [

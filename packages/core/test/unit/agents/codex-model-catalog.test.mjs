@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { buildCodexModelCatalog, buildCodexModelCatalogIds } from "@ccr/core/agents/codex/model-catalog.ts";
+import { buildCodexModelCatalog, buildCodexModelCatalogIds } from "@agentrouter/core/agents/codex/model-catalog.ts";
 
 function catalogModelFor(config, slug) {
   const catalog = buildCodexModelCatalog(config, slug);
@@ -441,9 +441,9 @@ test("codex catalog preserves pinned context windows", () => {
 });
 
 test("codex catalog falls back to local Codex model cache metadata", () => {
-  const previousCcrHome = process.env.AR_INTERNAL_HOME_DIR;
+  const previousArHome = process.env.AR_INTERNAL_HOME_DIR;
   const previousHome = process.env.HOME;
-  const home = mkdtempSync(path.join(os.tmpdir(), "ccr-codex-model-catalog-"));
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-codex-model-catalog-"));
   try {
     process.env.AR_INTERNAL_HOME_DIR = home;
     process.env.HOME = home;
@@ -488,10 +488,10 @@ test("codex catalog falls back to local Codex model cache metadata", () => {
     assert.deepEqual(model.service_tiers, [{ id: "auto" }]);
     assert.deepEqual(model.supported_reasoning_levels.map((level) => level.effort), ["low", "high"]);
   } finally {
-    if (previousCcrHome === undefined) {
+    if (previousArHome === undefined) {
       delete process.env.AR_INTERNAL_HOME_DIR;
     } else {
-      process.env.AR_INTERNAL_HOME_DIR = previousCcrHome;
+      process.env.AR_INTERNAL_HOME_DIR = previousArHome;
     }
     if (previousHome === undefined) {
       delete process.env.HOME;

@@ -39,7 +39,7 @@ import type {
   VirtualModelExecutionMode,
   VirtualModelFusionWebSearchProvider,
   VirtualModelToolVisibility
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   createEmptyAgentAnalysis,
   createEmptyRequestLogPage,

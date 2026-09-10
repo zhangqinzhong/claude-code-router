@@ -1,7 +1,7 @@
 import type {
   RequestLogBody,
   RequestLogEntry
-} from "@ccr/core/contracts/app";
+} from "@agentrouter/core/contracts/app";
 import {
   formatCompactNumber
 } from "./usage";

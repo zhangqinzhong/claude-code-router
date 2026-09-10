@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { installSocketTypeOfServiceCompat } from "@ccr/core/platform/socket-compat";
-import { startWebManagementServer } from "@ccr/core/web/management-server";
+import { installSocketTypeOfServiceCompat } from "@agentrouter/core/platform/socket-compat";
+import { startWebManagementServer } from "@agentrouter/core/web/management-server";
 
 installSocketTypeOfServiceCompat();
 
@@ -25,7 +25,7 @@ export async function runCoreServer(args = process.argv.slice(2)): Promise<void>
     port: options.port,
     startGateway: options.startGateway
   });
-  process.stdout.write(`CCR core server is running at ${runtime.url}\n`);
+  process.stdout.write(`AgentRouter core server is running at ${runtime.url}\n`);
 
   let closing = false;
   const shutdown = (signal: NodeJS.Signals) => {
@@ -98,7 +98,7 @@ function parseCoreServerArgs(args: string[]): CoreServerOptions {
 function printHelp(): void {
   process.stdout.write([
     "Usage:",
-    "  ccr-core-server [--host <host>] [--port <port>] [--no-gateway]",
+    "  ar-core-server [--host <host>] [--port <port>] [--no-gateway]",
     "",
     "Options:",
     "  --host <host>    Management server host. Defaults to AR_WEB_HOST or 127.0.0.1.",
