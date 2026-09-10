@@ -3,13 +3,13 @@ import path from "node:path";
 import { Writable } from "node:stream";
 import test, { type TestContext } from "node:test";
 
-const previousTestExports = process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
-process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = "1";
+const previousTestExports = process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
+process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = "1";
 const plugin = require(path.resolve("packages/electron/bundled-plugins/claude-design/index.cjs"));
 if (previousTestExports === undefined) {
-  delete process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
+  delete process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS;
 } else {
-  process.env.CCR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = previousTestExports;
+  process.env.AR_CLAUDE_DESIGN_PLUGIN_TEST_EXPORTS = previousTestExports;
 }
 
 const messages = [{ role: "user", content: "Create a dashboard." }];
