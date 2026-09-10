@@ -112,9 +112,9 @@ test("Claude Code WIF token exchange returns a bearer token for a configured pro
 
   const result = await exchangeClaudeCodeWifToken(config, Buffer.from(JSON.stringify({
     assertion: gatewayApiKey,
-    federation_rule_id: "ccr-local",
+    federation_rule_id: "ar-local",
     grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
-    organization_id: "ccr-local"
+    organization_id: "ar-local"
   })));
 
   assert.equal(result.statusCode, 200);

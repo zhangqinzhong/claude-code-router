@@ -46,6 +46,7 @@ function chartTooltipPortal(): HTMLElement | null {
 }
 
 export function OverviewView({
+  onConfigureProviderAccounts,
   onWidgetsChange,
   overviewWidgets,
   providerAccounts,
@@ -57,6 +58,7 @@ export function OverviewView({
   usageRange,
   usageStats
 }: {
+  onConfigureProviderAccounts?: () => void;
   onWidgetsChange: (widgets: OverviewWidgetConfig[]) => void;
   overviewWidgets: OverviewWidgetConfig[];
   providerAccounts: ProviderAccountSnapshot[];
@@ -91,7 +93,9 @@ export function OverviewView({
   const widgets = useMemo(() => normalizeOverviewWidgets(overviewWidgets), [overviewWidgets]);
   const configuredVisibleWidgets = useMemo(() => widgets.filter((widget) => widget.enabled), [widgets]);
   const displayWidgets = dragPreviewWidgets ?? widgets;
-  const visibleWidgets = displayWidgets.filter((widget) => widget.enabled);
+  const accountsUnconfigured = providerAccounts.length === 0 && !(usageFilters?.providers ?? []).some((provider) => provider.account?.enabled);
+  const showAccountSetup = !editing && accountsUnconfigured && displayWidgets.some((widget) => widget.enabled && widget.type === "account-balance");
+  const visibleWidgets = displayWidgets.filter((widget) => widget.enabled && !(showAccountSetup && widget.type === "account-balance"));
   const activeWidget = visibleWidgets.find((widget) => widget.id === activeWidgetId);
   const selectedWidget = widgets.find((widget) => widget.id === selectedWidgetId);
   const filterProviders = usageFilters?.providers ?? emptyOverviewProviders;
@@ -381,6 +385,12 @@ export function OverviewView({
               <OverviewEmptyState className="col-span-1 sm:col-span-2 xl:col-span-4" label={t("No widgets configured")} />
             ) : null}
           </section>
+          {showAccountSetup ? (
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-border bg-card px-4 py-3 text-[13px]">
+              <span className="text-muted-foreground">{t("No account balance connectors configured")}</span>
+              {onConfigureProviderAccounts ? <Button onClick={onConfigureProviderAccounts} variant="outline">{t("Configure account usage")}</Button> : null}
+            </div>
+          ) : null}
         </LayoutGroup>
       </SortableContext>
       <DragOverlay adjustScale={false}>
@@ -1285,7 +1295,7 @@ function OverviewMetricWidget({
 }) {
   const t = useAppText();
   const item = overviewMetricDatum(metric, totals, t);
-  const showsRatio = overviewMetricShowsRatio(metric);
+  const showsRatio = totals.requestCount > 0 && overviewMetricShowsRatio(metric);
 
   if (variant === "compact") {
     return (
@@ -2332,13 +2342,13 @@ function overviewMetricDatum(metric: OverviewMetricKind, totals: UsageTotals, tr
     return { label: translate("Estimated cost"), ratio: Math.min(1, Math.max(0, (totals.costUsd ?? 0) / 1)), tone: "slate", value: formatUsdCost(totals.costUsd) };
   }
   if (metric === "success-rate") {
-    return { label: translate("Success rate"), ratio: totals.successRate, tone: "teal", value: formatPercent(totals.successRate) };
+    return { label: translate("Request success rate"), ratio: totals.successRate, tone: "teal", value: totals.requestCount > 0 ? formatPercent(totals.successRate) : "—" };
   }
   if (metric === "errors") {
     return { label: translate("Errors"), ratio: totals.requestCount > 0 ? totals.errorCount / totals.requestCount : 0, tone: "rose", value: formatCompactNumber(totals.errorCount) };
   }
   if (metric === "avg-latency") {
-    return { label: translate("Average latency"), ratio: Math.min(1, Math.max(0, totals.avgDurationMs / 10_000)), tone: "amber", value: formatDuration(totals.avgDurationMs) };
+    return { label: translate("Average latency"), ratio: Math.min(1, Math.max(0, totals.avgDurationMs / 10_000)), tone: "amber", value: totals.requestCount > 0 ? formatDuration(totals.avgDurationMs) : "—" };
   }
   return { label: translate("Requests"), ratio: totals.requestCount > 0 ? 1 : 0, tone: "teal", value: formatCompactNumber(totals.requestCount) };
 }
@@ -2408,7 +2418,9 @@ function SystemStatusBar({
     point,
     tone: usageStatusTone(point)
   }));
-  const availability = usageStats.totals.requestCount > 0 ? usageStats.totals.successRate : 0;
+  const successLabel = usageStats.totals.requestCount > 0
+    ? `${formatPercent(usageStats.totals.successRate)} ${t("Request success rate")}`
+    : t("No requests yet");
   const overallTone = usageStatusTone(usageStats.totals);
   const StatusIcon = overallTone === "ok" ? Check : CircleAlert;
   const rangeLabel = formatSystemStatusRange(segments, usageRange);
@@ -2444,7 +2456,7 @@ function SystemStatusBar({
             </div>
           </div>
           <Badge variant={overallTone === "ok" ? "success" : overallTone === "warn" ? "warning" : overallTone === "error" ? "danger" : "outline"}>
-            {formatPercent(availability)}
+            {successLabel}
           </Badge>
         </CardContent>
       </Card>
@@ -2469,7 +2481,7 @@ function SystemStatusBar({
               <span className="min-w-0 truncate text-[13px] font-semibold">{t("API Service")}</span>
             </div>
             <Badge variant={overallTone === "ok" ? "success" : overallTone === "warn" ? "warning" : overallTone === "error" ? "danger" : "outline"}>
-              {formatPercent(availability)} {t("Availability")}
+              {successLabel}
             </Badge>
           </div>
 
@@ -2514,7 +2526,7 @@ function SystemStatusBar({
                 </span>
                 <span className="flex justify-between gap-3">
                   <span className="text-muted-foreground">{t("Success rate")}</span>
-                  <span className="font-medium">{formatPercent(statusTooltip.segment.point.successRate)}</span>
+                  <span className="font-medium">{statusTooltip.segment.point.requestCount > 0 ? formatPercent(statusTooltip.segment.point.successRate) : "—"}</span>
                 </span>
                 <span className="flex justify-between gap-3">
                   <span className="text-muted-foreground">{t("Failed requests")}</span>

@@ -240,7 +240,9 @@ test("OverviewView folds overflowing account bento cards into a summary tile", (
 
   assert.match(html, /grid-cols-3/);
   assert.match(html, /overview-account-bento-more/);
-  assert.match(html, /\+2/);
+  // Two available rows hold five cards plus the overflow tile.
+  assert.equal((html.match(/data-provider-account-sortable-id=/g) ?? []).length, 5);
+  assert.match(html, /\+5/);
 });
 
 test("OverviewView compacts large account bento cards before showing a summary tile", () => {
@@ -326,7 +328,7 @@ test("OverviewView uses height-aware balance layouts at every account card size"
           accountCardSizes: { "DeepSeek::deepseek": cardSize.size },
           enabled: true,
           id: "account",
-          size: "4:2",
+          size: "4:3",
           type: "account-balance",
           variant: "cards"
         }]}
@@ -439,7 +441,7 @@ test("OverviewView shows secondary meters on tall account cards instead of foldi
         accountCardSizes: { "Zhipu AI (China) - Coding Plan::test": "1:2" },
         enabled: true,
         id: "account",
-        size: "1:2",
+        size: "2:2",
         type: "account-balance",
         variant: "cards"
       }]}
@@ -578,7 +580,7 @@ test("OverviewView applies manual bento account card sizes", () => {
         },
         enabled: true,
         id: "account",
-        size: "4:2",
+        size: "4:3",
         type: "account-balance",
         variant: "cards"
       }]}
