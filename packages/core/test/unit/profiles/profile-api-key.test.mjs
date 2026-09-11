@@ -43,7 +43,7 @@ test("profile API key sync creates stable independent keys per enabled profile",
     id: "profile-a",
     model: "Provider/model",
     name: "Profile A",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   const profileB = {
     agent: "codex",
@@ -51,7 +51,7 @@ test("profile API key sync creates stable independent keys per enabled profile",
     id: "profile-b",
     model: "Provider/model",
     name: "Profile B",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   let generated = 0;
 

@@ -28,7 +28,7 @@ test("Pi profile config writes a AgentRouter OpenAI Responses provider", () => {
       model: "Example/alpha",
       name: "Pi Main",
       providerId: "ar-pi",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     };
 
@@ -82,7 +82,7 @@ test("Pi profile config writes catalog token limits for known models", () => {
       model: "DeepSeek/deepseek-v4-flash",
       name: "Pi Main",
       providerId: "ar-pi",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     };
 
@@ -125,7 +125,7 @@ test("Pi profile config writes 1M catalog limits for GLM 5.3", () => {
       model: "Zhipu AI (China) - Coding Plan/glm-5.3",
       name: "Pi Main",
       providerId: "ar-pi",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     };
 

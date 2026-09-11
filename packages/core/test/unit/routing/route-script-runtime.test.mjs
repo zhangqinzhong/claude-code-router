@@ -529,7 +529,7 @@ test("the route-script test service exposes the configured profile id", async ()
     id: "Claude Work/Profile",
     model: "Provider/alpha",
     name: "Claude Work",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   const script = routeScript(`
     return {

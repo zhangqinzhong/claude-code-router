@@ -21,7 +21,7 @@ function testConfig(profileOverrides = {}) {
     id: "work",
     model: "Provider/alpha",
     name: "Work",
-    scope: "ccr",
+    scope: "agentrouter",
     ...profileOverrides
   };
   return {

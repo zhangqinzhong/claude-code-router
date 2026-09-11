@@ -119,7 +119,7 @@ test("sync applies the gateway config for auto, app, and unset surfaces", async 
 
 test("sync applies the gateway config regardless of profile scope", async () => {
   const { BACKUP_FILE, hasClaudeAppEntryProfile, syncClaudeAppGatewayConfig } = await loadModules();
-  for (const scope of ["ccr", "global", "custom"]) {
+  for (const scope of ["agentrouter", "global", "custom"]) {
     const synced = await syncClaudeAppGatewayConfig(createConfig({
       profile: {
         profiles: [claudeCodeProfile({ scope, surface: "auto" })]

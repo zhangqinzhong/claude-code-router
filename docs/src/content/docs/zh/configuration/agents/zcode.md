@@ -35,7 +35,7 @@ ZCode 固定为 **仅 App**，入口模式不可编辑。可配置的字段为�
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
 | Agent | 选择 **ZCode** | 在 AgentRouter 中创建 ZCode App 启动入口。 |
-| 配置名称 | 自由文本，例如 `ZCode - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>" app`，CLI 命令使用 `ccr "<名称>" app`。 |
+| 配置名称 | 自由文本，例如 `ZCode - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>" app`，CLI 命令使用 `agentrouter "<名称>" app`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | 生效范围 | `仅从 AgentRouter 打开时生效` / `系统默认` | 仅影响从 AgentRouter 打开的 ZCode，或作为系统默认 ZCode 配置。同一 Agent 只允许一个启用的系统默认配置。 |
 | 供应商 ID | 默认 `claude-code-router` | 当前 ZCode 配置使用的供应商引用。 |
@@ -58,7 +58,7 @@ agentrouter "ZCode - Work" app
 CLI请执行：
 
 ```text
-ccr "ZCode - Work" app
+agentrouter "ZCode - Work" app
 ```
 
 ## 多实例

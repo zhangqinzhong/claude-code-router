@@ -477,7 +477,7 @@ export function createProfileDraft(agent: ProfileConfig["agent"] = "claude-code"
     providerId: "claude-code-router",
     providerName: "AgentRouter",
     ...createProfileRoutingDraft(),
-    scope: "ccr",
+    scope: "agentrouter",
     settingsFile: "~/.claude/settings.json",
     showAllSessions: false,
     sonnetModel: "",
@@ -539,7 +539,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
       availableModels: profileDraftAvailableModels(profile),
       envRows: keyValueRowsFromRecord(codexCompatibleProfileEnv(profile.env ?? {})),
       model: profile.model,
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     };
   }
@@ -549,7 +549,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
       ...createProfileRoutingDraft(profile.routing),
       envRows: [],
       model: "",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
   }
@@ -856,7 +856,7 @@ function botGatewayConfigValue(key: string, value: string): unknown {
 }
 
 function createBotGatewayTenantId(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "") || "ccr";
+  return value.toLowerCase().replace(/[^a-z0-9_.-]+/g, "-").replace(/^-+|-+$/g, "") || "ar";
 }
 
 function createBotGatewayIntegrationId(profileId: string): string {
@@ -961,7 +961,7 @@ export function normalizeProfileScope(value: unknown): ProfileScope {
 
 export function normalizeProfileFormScope(value: unknown): ProfileScope {
   const scope = normalizeProfileScope(value);
-  return scope === "custom" ? "ccr" : scope;
+  return scope === "custom" ? "agentrouter" : scope;
 }
 
 export function normalizeProfileSurface(value: unknown): ProfileSurface {
@@ -1346,7 +1346,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
       model,
       name,
       ...(routing ? { routing } : {}),
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     };
   }
@@ -1359,7 +1359,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
       model: "",
       name,
       ...(routing ? { routing } : {}),
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
   }
@@ -1654,7 +1654,7 @@ export function profileOpenSurfaces(profile: ProfileConfig): ProfileOpenSurface[
 
 export function profileOpenCommandFallback(profile: ProfileConfig, surface: ProfileOpenSurface = profile.agent === "workbuddy" || profile.agent === "zcode" || profile.agent === "claude-design" ? "app" : "cli"): string {
   const profileRef = profile.name.trim() || profile.id;
-  return ["ccr", shellCommandQuote(profileRef), ...(surface === "app" ? ["app"] : [])].join(" ");
+  return ["agentrouter", shellCommandQuote(profileRef), ...(surface === "app" ? ["app"] : [])].join(" ");
 }
 
 function shellCommandQuote(value: string): string {

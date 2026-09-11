@@ -3740,12 +3740,17 @@ function normalizeCodexRemoteFrontendMode(value: ProfileConfig["remoteFrontendMo
   return value === "cli" || value === "claude-code" ? value : "app";
 }
 
-function normalizeProfileScope(value: ProfileConfig["scope"]): "ccr" | "global" | "custom" {
-  return value === "ccr" || value === "custom" ? value : "global";
+function normalizeProfileScope(value: unknown): "agentrouter" | "global" | "custom" {
+  if (value === "custom") {
+    return "custom";
+  }
+  // "ccr" is the pre-rename spelling still present in profiles that have
+  // not been re-applied since the rename.
+  return value === "agentrouter" || value === "ccr" ? "agentrouter" : "global";
 }
 
-function isGeneratedProfileScope(value: ProfileConfig["scope"]): boolean {
-  return value === "ccr" || value === "custom";
+function isGeneratedProfileScope(value: unknown): boolean {
+  return value === "agentrouter" || value === "ccr" || value === "custom";
 }
 
 function normalizeProfileSurface(value: ProfileConfig["surface"]): "auto" | "cli" | "app" {

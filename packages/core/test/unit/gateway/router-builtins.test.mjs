@@ -515,7 +515,7 @@ test("profile routing rules match only the authenticated profile API key", async
             type: "condition"
           }]
         },
-        scope: "ccr"
+        scope: "agentrouter"
       },
       {
         agent: "claude-code",
@@ -523,7 +523,7 @@ test("profile routing rules match only the authenticated profile API key", async
         id: "profile-b",
         model: "Provider/claude-haiku",
         name: "Profile B",
-        scope: "ccr"
+        scope: "agentrouter"
       }
     ]
   });
@@ -575,7 +575,7 @@ test("profile routing keeps identical conditions isolated by independent profile
         type: "condition"
       }]
     },
-    scope: "ccr"
+    scope: "agentrouter"
   };
   const profileB = {
     agent: "claude-code",
@@ -595,7 +595,7 @@ test("profile routing keeps identical conditions isolated by independent profile
         type: "condition"
       }]
     },
-    scope: "ccr"
+    scope: "agentrouter"
   };
   const plugin = createRouterPlugin({
     authenticatedProfileId: null,
@@ -651,7 +651,7 @@ test("profile routing uses the global fallback for authenticated profile traffic
         enhancedRoute: true,
         rules: []
       },
-      scope: "ccr"
+      scope: "agentrouter"
     }]
   });
   const result = await plugin.routeRequest({
@@ -677,7 +677,7 @@ test("profile enhanced route switch disables the built-in Claude Code route when
         enhancedRoute: false,
         rules: []
       },
-      scope: "ccr"
+      scope: "agentrouter"
     }]
   });
   const result = await plugin.routeRequest({
@@ -707,7 +707,7 @@ test("profile enhanced route switch disables the built-in Claude Code route when
         enhancedRoute: false,
         rules: []
       },
-      scope: "ccr"
+      scope: "agentrouter"
     }]
   });
   const result = await plugin.routeRequest({
@@ -733,7 +733,7 @@ test("router rules can match the authenticated profile id through request.auth",
       id: "profile-a",
       model: "Provider/claude-sonnet",
       name: "Profile A",
-      scope: "ccr"
+      scope: "agentrouter"
     }],
     routerRules: [{
       condition: { left: "request.auth.profileId", operator: "==", right: "profile-a" },
@@ -762,7 +762,7 @@ test("router auth profile id uses the configured profile id instead of the API k
     id: "Claude Work/Profile",
     model: "Provider/claude-sonnet",
     name: "Claude Work",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   const plugin = createRouterPlugin({
     authenticatedProfileId: null,
@@ -798,7 +798,7 @@ test("route scripts receive the configured profile id instead of the API key slu
     id: "Claude Work/Profile",
     model: "Provider/claude-sonnet",
     name: "Claude Work",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   let input;
   const plugin = createRouterPlugin({
@@ -848,7 +848,7 @@ test("built-in Codex route uses the authenticated profile instead of the first C
         id: "codex",
         model: "Codex API/gpt-5.6-sol",
         name: "Codex",
-        scope: "ccr"
+        scope: "agentrouter"
       },
       {
         agent: "codex",
@@ -856,7 +856,7 @@ test("built-in Codex route uses the authenticated profile instead of the first C
         id: "bs-2",
         model: "uuroute/gpt-5.5",
         name: "bs",
-        scope: "ccr"
+        scope: "agentrouter"
       }
     ],
     providers: [
@@ -903,7 +903,7 @@ test("profile enhanced route switch disables the built-in Codex route", async ()
         enhancedRoute: false,
         rules: []
       },
-      scope: "ccr"
+      scope: "agentrouter"
     }]
   });
   const result = await plugin.routeRequest({
@@ -1014,7 +1014,7 @@ test("Grok explicit model selection routes chat requests through a Responses pro
         id: "grok-cli",
         model: "Grok CLI API/grok-4.5",
         name: "Grok CLI",
-        scope: "ccr"
+        scope: "agentrouter"
       }]
     },
     virtualModelProfiles: []

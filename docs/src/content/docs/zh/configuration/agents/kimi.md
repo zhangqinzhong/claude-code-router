@@ -34,7 +34,7 @@ Kimi CLI 固定为 **仅从 AgentRouter 打开时生效** 和 **仅 CLI**，这�
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
 | Agent | 选择 **Kimi CLI** | 在 AgentRouter 中创建 Kimi CLI 启动入口。 |
-| 配置名称 | 自由文本，例如 `Kimi - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
+| 配置名称 | 自由文本，例如 `Kimi - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `agentrouter "<名称>"`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | Kimi 模型 | 供应商模型或 Fusion 模型 | 默认模型，至少需要一个。 |
 | 可用模型 | 一个或多个供应商/Fusion 模型 | Kimi `/model` 菜单里可切换的模型。默认模型始终包含在内。 |
@@ -51,7 +51,7 @@ agentrouter "Kimi - Work"
 CLI请执行：
 
 ```text
-ccr "Kimi - Work"
+agentrouter "Kimi - Work"
 ```
 
 进入 Kimi CLI 后，使用 `/model` 在默认模型与可用模型之间切换。每一次选择都仍经过 AgentRouter 的供应商、路由与 Fusion。
@@ -62,7 +62,7 @@ ccr "Kimi - Work"
 
 ## 验证
 
-1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `ccr` 命令。
+1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `agentrouter` 命令。
 2. 在 Kimi CLI 中发送一条消息，确认能正常回复。
 3. 打开 AgentRouter 的 **请求日志**，确认请求经过了网关。
 4. 运行 `/model`，确认默认模型与可用模型均出现。

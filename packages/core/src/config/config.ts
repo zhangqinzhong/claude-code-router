@@ -3698,7 +3698,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
           model,
           name,
           ...(routing ? { routing } : {}),
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         };
       }
@@ -3712,7 +3712,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
           model: "",
           name,
           ...(routing ? { routing } : {}),
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "app"
         };
       }
@@ -3971,8 +3971,8 @@ function parseProfileScope(value: string | undefined): ProfileConfig["scope"] | 
     return undefined;
   }
   const normalized = value.trim().toLowerCase().replace(/_/g, "-").replace(/\s+/g, "-");
-  if (normalized === "ccr" || normalized === "managed" || normalized === "local" || normalized === "ar-only" || normalized === "only-ccr") {
-    return "ccr";
+  if (normalized === "agentrouter" || normalized === "ccr" || normalized === "managed" || normalized === "local" || normalized === "ar-only" || normalized === "only-ccr" || normalized === "only-agentrouter") {
+    return "agentrouter";
   }
   if (normalized === "global" || normalized === "system" || normalized === "system-default" || normalized === "default") {
     return "global";

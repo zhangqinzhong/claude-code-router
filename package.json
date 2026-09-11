@@ -59,7 +59,7 @@
     "test:core": "npm test -w @agentrouter/core",
     "test:ui": "npm test -w @agentrouter/ui",
     "test:electron": "npm test -w @agentrouter/electron",
-    "test:cli": "npm test -w @musistudio/claude-code-router",
+    "test:cli": "npm test -w @zhangqinzhong/agentrouter",
     "test:architecture": "node build/test.mjs architecture && node build/run-tests.mjs architecture",
     "test:system": "node tests/system/docker-smoke.mjs",
     "test:docker": "npm run test:system",

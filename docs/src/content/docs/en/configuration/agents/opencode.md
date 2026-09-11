@@ -37,7 +37,7 @@ Use this page to route OpenCode to any AgentRouter provider or Fusion model, or 
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **OpenCode** | Creates OpenCode launch entries in AgentRouter. |
-| Config name | Free text, e.g. `OpenCode - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `OpenCode - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `agentrouter "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Effect scope | `Only opened from AgentRouter` / `System default` | Keeps changes limited to AgentRouter launches, or makes this the system-default OpenCode profile. Only one enabled system-default OpenCode profile is allowed. |
 | Entry mode | `CLI & APP` / `CLI only` / `App only` | Which launch entries (terminal command and/or App) are exposed. |
@@ -56,7 +56,7 @@ Use this page to route OpenCode to any AgentRouter provider or Fusion model, or 
   ```
   For CLI, run:
   ```text
-  ccr "OpenCode - Work"
+  agentrouter "OpenCode - Work"
   ```
 - **App:** click the play button to open OpenCode Desktop with this profile. OpenCode Desktop is single-instance, so AgentRouter switches the active profile for you.
 

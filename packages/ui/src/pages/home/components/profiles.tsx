@@ -134,7 +134,7 @@ export function ProfileView({
                   <div className="mt-3 min-w-0 flex-1 space-y-1.5 border-t border-border/60 pt-2">
                     <div className="flex min-w-0 flex-wrap items-center gap-1.5">
                       <Badge variant="secondary">{t(profileAgentLabel(profile.agent))}</Badge>
-                      <Badge variant={scope === "ccr" ? "success" : scope === "global" ? "warning" : "outline"}>
+                      <Badge variant={scope === "agentrouter" ? "success" : scope === "global" ? "warning" : "outline"}>
                         {t(profileScopeLabel(scope))}
                       </Badge>
                       <Badge variant="outline">{t(profileSurfaceLabel(surface))}</Badge>
@@ -776,7 +776,7 @@ export function AddProfileForm({
                   botConfigured: true,
                   botEnabled: false,
                   model: "",
-                  scope: "ccr",
+                  scope: "agentrouter",
                   surface: "cli"
                 }
               : agent === "kilo"
@@ -796,7 +796,7 @@ export function AddProfileForm({
                     botEnabled: false,
                     envRows: [],
                     model: "",
-                    scope: "ccr",
+                    scope: "agentrouter",
                     surface: "app"
                   }
               : agent === "workbuddy" || agent === "zcode"
@@ -815,7 +815,7 @@ export function AddProfileForm({
             options={translateOptions(
               draft.agent === "grok" || draft.agent === "kimi" || draft.agent === "pi"
                 || draft.agent === "claude-design"
-                ? profileScopeOptions.filter((option) => option.value === "ccr")
+                ? profileScopeOptions.filter((option) => option.value === "agentrouter")
                 : profileScopeOptions,
               t
             )}

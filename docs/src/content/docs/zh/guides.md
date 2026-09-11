@@ -12,7 +12,7 @@ AgentRouter 提供三种发行方式：桌面应用、Node.js 22+ 的 npm CLI，
 | 方式 | 启动入口 | 默认管理地址 | 默认模型网关 |
 | --- | --- | --- | --- |
 | 桌面应用 | 应用界面 / `agentrouter` | 应用内窗口 | `http://127.0.0.1:3456` |
-| npm CLI | `ccr ui` / `ccr serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| npm CLI | `agentrouter ui` / `agentrouter serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | `docker compose up -d --build` | 与网关共用 `http://127.0.0.1:3458` | 与管理界面共用 Nginx 入口 |
 
 先阅读 [安装页](install/) 选择发行方式；完整终端命令见 [CLI 参考](cli/)，容器端口、鉴权、持久化和升级见 [Docker 部署](docker/)。

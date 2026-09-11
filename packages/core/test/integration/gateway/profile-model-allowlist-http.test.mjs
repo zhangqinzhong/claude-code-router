@@ -202,7 +202,7 @@ function createProfileAllowlistHttpTestConfig() {
     id: "beta-profile",
     model: "Provider/beta",
     name: "Beta Profile",
-    scope: "ccr",
+    scope: "agentrouter",
     availableModels: ["Provider/beta"]
   };
   const config = createDefaultAppConfig();

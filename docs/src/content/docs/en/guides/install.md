@@ -10,7 +10,7 @@ lead: Choose among the desktop app, npm CLI, and Docker distributions, complete 
 | Distribution | Best for | Entry | Default management address | Default gateway address |
 | --- | --- | --- | --- | --- |
 | Desktop app | Daily local use, tray, multi-instance Agent Apps, desktop integrations | App UI, `agentrouter` | In-app window | `http://127.0.0.1:3456` |
-| npm CLI | Terminal, SSH, no Electron, external process supervisors | `ccr` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| npm CLI | Terminal, SSH, no Electron, external process supervisors | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | Persistent servers and container operations | Nginx | Shared public endpoint | `http://127.0.0.1:3458` with the default mapping |
 
 In desktop/CLI deployments, management and the model gateway use different ports. CLI management uses `3458` by default, while the model gateway uses `3456`. Docker intentionally combines both through one Nginx endpoint.
@@ -29,11 +29,11 @@ When Server shows Running, the model gateway defaults to `http://127.0.0.1:3456`
 Node.js 22 or newer is required:
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr ui
+npm install -g @zhangqinzhong/agentrouter
+agentrouter ui
 ```
 
-`ccr ui` starts a background service and opens the browser. Use `ccr ui --no-open` on a headless host or `ccr serve --no-open` under a process supervisor. See the [CLI installation and reference](../cli/) for all commands and profile launches.
+`agentrouter ui` starts a background service and opens the browser. Use `agentrouter ui --no-open` on a headless host or `agentrouter serve --no-open` under a process supervisor. See the [CLI installation and reference](../cli/) for all commands and profile launches.
 
 ## Use Docker
 

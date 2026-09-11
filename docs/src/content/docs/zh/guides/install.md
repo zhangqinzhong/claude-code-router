@@ -10,7 +10,7 @@ lead: 按运行场景在桌面应用、npm CLI 和 Docker 三种发行方式中�
 | 方式 | 适合场景 | 入口 | 默认管理地址 | 默认网关地址 |
 | --- | --- | --- | --- | --- |
 | 桌面应用 | 日常本机使用、托盘、多开 Agent App、桌面集成 | 应用界面、`agentrouter` | 应用内窗口 | `http://127.0.0.1:3456` |
-| npm CLI | 终端、SSH、无 Electron 环境、进程管理器 | `ccr` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| npm CLI | 终端、SSH、无 Electron 环境、进程管理器 | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
 | Docker | 常驻服务器、容器运维、统一浏览器入口 | Nginx | 与网关共用公开地址 | `http://127.0.0.1:3458`（默认端口映射） |
 
 桌面版 / CLI 中，管理 UI 与模型网关使用不同端口。CLI 的 `3458` 是管理端口，默认模型网关端口是 `3456`；Docker 通过 Nginx 把管理 UI 和模型网关合并到同一公开入口。
@@ -29,11 +29,11 @@ lead: 按运行场景在桌面应用、npm CLI 和 Docker 三种发行方式中�
 要求 Node.js 22 或更高版本：
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr ui
+npm install -g @zhangqinzhong/agentrouter
+agentrouter ui
 ```
 
-`ccr ui` 会启动后台服务并打开浏览器。无桌面环境使用 `ccr ui --no-open`，生产前台托管使用 `ccr serve --no-open`。完整命令和按 Agent 配置启动的说明见 [CLI 安装与命令参考](../cli/)。
+`agentrouter ui` 会启动后台服务并打开浏览器。无桌面环境使用 `agentrouter ui --no-open`，生产前台托管使用 `agentrouter serve --no-open`。完整命令和按 Agent 配置启动的说明见 [CLI 安装与命令参考](../cli/)。
 
 ## 使用 Docker
 

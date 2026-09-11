@@ -18,7 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["./packages/ui/src/*"],
-      "@agentrouter/cli/*": ["./packages/cli/src/*"],
+      "@zhangqinzhong/agentrouter/*": ["./packages/cli/src/*"],
       "@agentrouter/core/*": ["./packages/core/src/*"],
       "@agentrouter/electron/*": ["./packages/electron/src/*"],
       "@agentrouter/ui/*": ["./packages/ui/src/*"]

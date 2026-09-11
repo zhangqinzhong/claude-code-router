@@ -181,7 +181,7 @@ test("applies Workbuddy profiles through the desktop bridge", async () => {
         providerId: "claude-code-router",
         providerName: "Claude Code Router",
         showAllSessions: true,
-        scope: "ccr",
+        scope: "agentrouter",
         surface: "app"
       }]
     };

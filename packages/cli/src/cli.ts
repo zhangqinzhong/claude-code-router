@@ -67,7 +67,7 @@ const profileGatewayIdleGraceMs = 2_000;
 const profileGatewayLeasePollMs = 500;
 const webAuthHeader = "x-ar-web-auth";
 const webAuthQueryParam = "ar_web_token";
-const defaultCliCommandName = "ccr";
+const defaultCliCommandName = "agentrouter";
 const prepareProfileOnlyEnv = "AR_CLI_PREPARE_PROFILE_ONLY";
 
 async function main(): Promise<void> {

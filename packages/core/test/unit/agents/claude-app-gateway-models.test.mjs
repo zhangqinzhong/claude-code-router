@@ -154,7 +154,7 @@ test("Claude App discovery prioritizes the authenticated profile default model",
     id: "claude-code-work",
     model: "claude-sonnet-4-5",
     name: "Work",
-    scope: "ccr"
+    scope: "agentrouter"
   };
   config.profile.profiles = [profile];
   const apiKey = {

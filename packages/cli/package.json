@@ -1,5 +1,5 @@
 {
-  "name": "@musistudio/claude-code-router",
+  "name": "@zhangqinzhong/agentrouter",
   "version": "3.0.22",
   "license": "MIT",
   "description": "Local Claude Code Router gateway with CLI and web management UI.",
@@ -20,7 +20,7 @@
   ],
   "main": "dist/main/cli.js",
   "bin": {
-    "ccr": "dist/main/cli.js"
+    "agentrouter": "dist/main/cli.js"
   },
   "files": [
     "dist",

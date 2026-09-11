@@ -29,7 +29,7 @@ function testProfile(overrides = {}) {
     name: "Kilo Main",
     providerId: "claude-code-router",
     providerName: "AgentRouter",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli",
     ...overrides
   };

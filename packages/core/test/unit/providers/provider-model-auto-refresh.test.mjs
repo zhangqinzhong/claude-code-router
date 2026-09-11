@@ -56,7 +56,7 @@ function testConfig(overrides = {}) {
           id: "work",
           model: "Provider/alpha",
           name: "Work",
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         },
         {
@@ -66,7 +66,7 @@ function testConfig(overrides = {}) {
           id: "other",
           model: "Other/omega",
           name: "Other Work",
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         },
         {
@@ -75,7 +75,7 @@ function testConfig(overrides = {}) {
           id: "all",
           model: "Provider/alpha",
           name: "All Models",
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         }
       ]
@@ -336,7 +336,7 @@ test("auto model refresh uses Codex local model catalog during hot apply", async
           id: "codex-work",
           model: "Codex API/gpt-5-codex",
           name: "Codex Work",
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         }
       ]

@@ -213,8 +213,8 @@ Your agent is now connected to AgentRouter. To add conditions, retries, request 
 The npm CLI requires Node.js 22 or newer. It starts the same gateway and a browser-based management UI without Electron:
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr ui
+npm install -g @zhangqinzhong/agentrouter
+agentrouter ui
 ```
 
 Open `http://127.0.0.1:3458`, then follow the same **Providers → Server → Agent Profiles** flow above. The model gateway remains at `http://127.0.0.1:3456`. See the CLI reference for service modes, authentication, and profile commands.

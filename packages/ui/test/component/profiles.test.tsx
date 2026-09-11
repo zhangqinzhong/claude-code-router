@@ -405,7 +405,7 @@ test("AddProfileForm treats Claude Design as a AR-only App profile", () => {
   );
 
   assert.equal(draft.name, "Claude Design");
-  assert.equal(draft.scope, "ccr");
+  assert.equal(draft.scope, "agentrouter");
   assert.equal(draft.surface, "app");
   assert.equal(isProfileDraftSubmittable(draft), true);
   assert.match(html, /Claude Design/);
@@ -423,7 +423,7 @@ test("ProfileView renders agent profiles as compact cards with inline actions", 
   config.profile.profiles = [
     {
       ...profile,
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "auto"
     },
     {
@@ -480,7 +480,7 @@ test("profileSummaryItems uses Kimi-specific model labels", () => {
     id: "kimi-main",
     model: "kimi/k2",
     name: "Kimi Main",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli"
   }, config, (value) => value);
 
@@ -497,7 +497,7 @@ test("profileSummaryItems uses Pi-specific model labels", () => {
     id: "pi-main",
     model: "openai/gpt-5.2",
     name: "Pi Main",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli"
   }, config, (value) => value);
 
@@ -513,7 +513,7 @@ test("profileSummaryItems uses a generic App path label", () => {
     id: "workbuddy-main",
     model: "openai/gpt-5.2",
     name: "Workbuddy Main",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "app"
   }, config, (value) => value);
 
@@ -532,7 +532,7 @@ test("profileSummaryItems omits disabled profile properties from cards", () => {
     model: "openai/gpt-5.2",
     name: "Codex Main",
     providerId: "claude-code-router",
-    scope: "ccr",
+    scope: "agentrouter",
     showAllSessions: false,
     surface: "auto"
   }, config, (value) => value);
@@ -548,7 +548,7 @@ test("profileSummaryItems omits disabled profile properties from cards", () => {
     model: "openai/gpt-5.2",
     name: "Codex Main",
     providerId: "claude-code-router",
-    scope: "ccr",
+    scope: "agentrouter",
     showAllSessions: true,
     surface: "auto"
   }, config, (value) => value);
@@ -571,7 +571,7 @@ test("profileSummaryItems shows disabled profile enhanced route without private 
       enhancedRoute: false,
       rules: []
     },
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli"
   }, config, (value) => value);
   const text = items.map((item) => `${item.label} ${item.value}`).join(" ");
@@ -608,7 +608,7 @@ test("Grok CLI profile defaults to a AR-scoped CLI entry", () => {
   const draft = createProfileDraft("grok");
 
   assert.equal(draft.name, "Grok CLI");
-  assert.equal(draft.scope, "ccr");
+  assert.equal(draft.scope, "agentrouter");
   assert.equal(draft.surface, "cli");
 });
 
@@ -624,7 +624,7 @@ test("persisted Grok profiles are normalized to the supported launch scope", () 
   }, 0);
 
   assert.equal(profile?.agent, "grok");
-  assert.equal(profile?.scope, "ccr");
+  assert.equal(profile?.scope, "agentrouter");
   assert.equal(profile?.surface, "cli");
 });
 
@@ -647,7 +647,7 @@ test("profile routing survives profile draft round trip", () => {
         type: "condition"
       }]
     },
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli"
   }, 0);
 
@@ -709,7 +709,7 @@ test("OpenCode profiles support local CLI and App configuration", () => {
     id: "opencode-work",
     model: "Provider/model",
     name: "OpenCode Work",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "auto"
   }, 0);
   assert.equal(profile?.agent, "opencode");

@@ -316,7 +316,7 @@ test("router config compilation disables Node.js script rules in profile routing
             type: "script"
           }]
         },
-        scope: "ccr"
+        scope: "agentrouter"
       }]
     }
   });
@@ -350,7 +350,7 @@ test("router config compilation ignores rules from disabled profile routing", ()
             type: "condition"
           }]
         },
-        scope: "ccr"
+        scope: "agentrouter"
       }]
     }
   });

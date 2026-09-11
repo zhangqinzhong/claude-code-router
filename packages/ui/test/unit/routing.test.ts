@@ -21,7 +21,7 @@ test("global routing rows omit Claude Code and Codex built-in profile routes", (
       id: "claude",
       model: "Provider/claude-sonnet",
       name: "Claude",
-      scope: "ccr"
+      scope: "agentrouter"
     },
     {
       agent: "codex",
@@ -29,7 +29,7 @@ test("global routing rows omit Claude Code and Codex built-in profile routes", (
       id: "codex",
       model: "uuroute/gpt-5.5",
       name: "Codex",
-      scope: "ccr"
+      scope: "agentrouter"
     }
   ];
 

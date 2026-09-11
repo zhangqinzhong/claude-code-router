@@ -34,7 +34,7 @@ Pi 固定为 **仅从 AgentRouter 打开时生效** 和 **仅 CLI**，这两项�
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
 | Agent | 选择 **Pi** | 在 AgentRouter 中创建 Pi 启动入口。 |
-| 配置名称 | 自由文本，例如 `Pi - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
+| 配置名称 | 自由文本，例如 `Pi - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `agentrouter "<名称>"`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | 模型 | 供应商模型或 Fusion 模型 | Pi 每一轮使用的模型。 |
 | 环境变量 | 键值对 | 可选高级设置；普通使用保持为空。 |
@@ -50,7 +50,7 @@ agentrouter "Pi - Work"
 CLI请执行：
 
 ```text
-ccr "Pi - Work"
+agentrouter "Pi - Work"
 ```
 
 ## 多实例
@@ -59,7 +59,7 @@ ccr "Pi - Work"
 
 ## 验证
 
-1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `ccr` 命令。
+1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `agentrouter` 命令。
 2. 在 Pi 中发送一条消息，确认能正常回复。
 3. 打开 AgentRouter 的 **请求日志**，确认请求经过了网关。
 

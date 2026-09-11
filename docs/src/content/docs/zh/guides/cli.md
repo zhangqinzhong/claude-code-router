@@ -5,16 +5,16 @@ eyebrow: 快速开始
 lead: 面向不使用桌面应用的部署：通过 npm 安装 AgentRouter CLI，管理后台服务、网关端口与凭据，并按 Agent 配置启动本机 Agent。
 ---
 
-## CLI 与桌面版命令的区别
+## 命令名
 
-AgentRouter 有两个相关命令：
+AgentRouter 只暴露一个命令名 `agentrouter`，由两个发行版提供：
 
-| 命令 | 来源 | 主要用途 |
-| --- | --- | --- |
-| `ccr` | npm 包 `@musistudio/claude-code-router` | 不依赖 Electron，提供浏览器管理界面和模型网关，并按配置启动 Agent。 |
-| `agentrouter` | AgentRouter 桌面应用 | 桌面版生成的配置启动器；Agent 配置卡片复制的命令使用这个名称。 |
+| 来源 | 主要用途 |
+| --- | --- |
+| npm 包 `@zhangqinzhong/agentrouter` | 不依赖 Electron，提供浏览器管理界面和模型网关，并按配置启动 Agent。 |
+| AgentRouter 桌面应用 | 桌面版生成的配置启动器；Agent 配置卡片复制的命令使用这个名称。 |
 
-两个发行版会读取同一套本机配置目录，但不要把命令名混用。需要托盘、桌面通知、自动更新和桌面专属浏览器集成时，使用桌面版；需要无桌面部署或由进程管理器托管时，使用 npm CLI。
+两个发行版读取同一套本机配置目录，参数也一致。需要托盘、桌面通知、自动更新和桌面专属浏览器集成时，使用桌面版；需要无桌面部署或由进程管理器托管时，使用 npm CLI。
 
 ## 安装、升级与卸载
 
@@ -22,15 +22,15 @@ CLI 要求 Node.js 22 或更高版本：
 
 ```sh
 node --version
-npm install -g @musistudio/claude-code-router
-ccr --help
+npm install -g @zhangqinzhong/agentrouter
+agentrouter --help
 ```
 
 升级和卸载：
 
 ```sh
-npm install -g @musistudio/claude-code-router@latest
-npm uninstall -g @musistudio/claude-code-router
+npm install -g @zhangqinzhong/agentrouter@latest
+npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
 卸载 npm 包不会删除 AgentRouter 的本地配置和数据库。
@@ -42,13 +42,13 @@ npm uninstall -g @musistudio/claude-code-router
 在后台启动 AgentRouter 并打开管理界面：
 
 ```sh
-ccr ui
+agentrouter ui
 ```
 
 SSH 或无桌面环境使用：
 
 ```sh
-ccr ui --no-open
+agentrouter ui --no-open
 ```
 
 随后按这个顺序完成配置：
@@ -65,17 +65,17 @@ ccr ui --no-open
 
 | 命令 | 运行方式 | 用途 |
 | --- | --- | --- |
-| `ccr start` | 后台 | 启动管理服务和模型网关，打印带认证信息的管理 URL。 |
-| `ccr ui` | 后台 | 复用或启动后台服务，并打开浏览器。 |
-| `ccr stop` | 一次性 | 停止由 `start` 或 `ui` 启动的后台服务。 |
-| `ccr serve` | 前台 | 在当前终端运行，适合查看日志或交给进程管理器。 |
-| `ccr web` | 前台 | `serve` 的别名。 |
-| `ccr <配置名称或 ID>` | 前台 | 启动一个已启用的 Agent 配置。 |
+| `agentrouter start` | 后台 | 启动管理服务和模型网关，打印带认证信息的管理 URL。 |
+| `agentrouter ui` | 后台 | 复用或启动后台服务，并打开浏览器。 |
+| `agentrouter stop` | 一次性 | 停止由 `start` 或 `ui` 启动的后台服务。 |
+| `agentrouter serve` | 前台 | 在当前终端运行，适合查看日志或交给进程管理器。 |
+| `agentrouter web` | 前台 | `serve` 的别名。 |
+| `agentrouter <配置名称或 ID>` | 前台 | 启动一个已启用的 Agent 配置。 |
 
-## `ccr start`
+## `agentrouter start`
 
 ```text
-ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 | 选项 | 说明 |
@@ -89,23 +89,23 @@ ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 
 如果首选端口被占用，AgentRouter 会继续尝试后续端口并打印实际 URL。端口必须是 `1` 到 `65535` 的整数。
 
-## `ccr ui`
+## `agentrouter ui`
 
 ```text
-ccr ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 `ui` 与 `start` 使用同一个后台服务，但默认会打开浏览器。管理 URL 包含 `ar_web_token` 查询参数；请把完整 URL 当作密码，不要粘贴到日志、工单或公开截图。
 
-## `ccr serve`
+## `agentrouter serve`
 
 ```text
-ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 `serve` 留在前台，收到 `SIGINT` 或 `SIGTERM` 后关闭管理服务和已配置服务。排查启动错误时优先使用它，因为错误会直接输出到当前终端。
 
-`ccr stop` 只管理后台服务。前台 `serve` 应通过当前终端或外部进程管理器停止。
+`agentrouter stop` 只管理后台服务。前台 `serve` 应通过当前终端或外部进程管理器停止。
 
 ## 后台服务的复用规则
 
@@ -119,8 +119,8 @@ ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 需要修改监听参数时先执行：
 
 ```sh
-ccr stop
-ccr start --host 127.0.0.1 --port 3458
+agentrouter stop
+agentrouter start --host 127.0.0.1 --port 3458
 ```
 
 ## 按 Agent 配置启动
@@ -128,16 +128,16 @@ ccr start --host 127.0.0.1 --port 3458
 先在 **Agent 配置** 中创建并启用配置，然后使用：
 
 ```text
-ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
+agentrouter <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 ```
 
 示例：
 
 ```sh
-ccr "Codex - Work"
-ccr "Codex - Work" app
-ccr "Claude - Review" cli -- --model sonnet
-ccr profile-id -- --help
+agentrouter "Codex - Work"
+agentrouter "Codex - Work" app
+agentrouter "Claude - Review" cli -- --model sonnet
+agentrouter profile-id -- --help
 ```
 
 规则如下：
@@ -188,13 +188,13 @@ ccr profile-id -- --help
 
 ## 进程管理器示例
 
-生产环境应使用 `ccr serve --no-open`，让外部管理器负责重启和日志。启动命令至少应固定工作用户、`HOME`、监听地址和 `AR_WEB_AUTH_TOKEN`。不要同时运行由 `ccr start` 创建的后台服务，否则可能得到两个管理端口或竞争同一套配置。
+生产环境应使用 `agentrouter serve --no-open`，让外部管理器负责重启和日志。启动命令至少应固定工作用户、`HOME`、监听地址和 `AR_WEB_AUTH_TOKEN`。不要同时运行由 `agentrouter start` 创建的后台服务，否则可能得到两个管理端口或竞争同一套配置。
 
 ## 常见问题
 
 ### UI 能打开，但 `/health` 或模型请求失败
 
-管理服务可以在没有可用模型网关时运行。添加供应商和模型、创建 AgentRouter 客户端 Key，然后从 **服务** 页面启动或重启网关。使用 `ccr serve` 查看启动错误。
+管理服务可以在没有可用模型网关时运行。添加供应商和模型、创建 AgentRouter 客户端 Key，然后从 **服务** 页面启动或重启网关。使用 `agentrouter serve` 查看启动错误。
 
 ### 管理端口发生偏移
 
@@ -210,7 +210,7 @@ ccr profile-id -- --help
 
 ### 后台服务无法停止
 
-先运行 `ccr stop`。如果状态文件已经失效，命令会清理它并报告服务未运行。前台 `ccr serve` 不受 `ccr stop` 管理，应回到对应终端或进程管理器停止。
+先运行 `agentrouter stop`。如果状态文件已经失效，命令会清理它并报告服务未运行。前台 `agentrouter serve` 不受 `agentrouter stop` 管理，应回到对应终端或进程管理器停止。
 
 ## 相关页面
 

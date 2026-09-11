@@ -14,7 +14,7 @@ function claudeProfileConfig(authMode = "api-key-helper") {
     id: "claude-main",
     model: "Provider/model",
     name: "Claude Main",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "cli"
   };
   const config = createDefaultAppConfig();

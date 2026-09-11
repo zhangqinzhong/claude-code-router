@@ -2,7 +2,7 @@
 
 [中文](README_zh.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
 
-`@musistudio/claude-code-router` is the Node.js distribution of AgentRouter. It provides the `ccr` command, the browser-based management UI, the local model gateway, and profile launch commands without requiring Electron.
+`@zhangqinzhong/agentrouter` is the Node.js distribution of AgentRouter. It provides the `agentrouter` command, the browser-based management UI, the local model gateway, and profile launch commands without requiring Electron.
 
 Use the CLI on developer machines and headless hosts. If you want the tray, desktop notifications, automatic app updates, or desktop-only browser integrations, install the desktop application instead.
 
@@ -15,15 +15,15 @@ Use the CLI on developer machines and headless hosts. If you want the tray, desk
 Install globally:
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr --help
+npm install -g @zhangqinzhong/agentrouter
+agentrouter --help
 ```
 
 Upgrade or remove it with npm:
 
 ```sh
-npm install -g @musistudio/claude-code-router@latest
-npm uninstall -g @musistudio/claude-code-router
+npm install -g @zhangqinzhong/agentrouter@latest
+npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
 Removing the package does not delete AgentRouter's local configuration or databases.
@@ -33,7 +33,7 @@ Removing the package does not delete AgentRouter's local configuration or databa
 Start the background service and open the management UI:
 
 ```sh
-ccr ui
+agentrouter ui
 ```
 
 Then:
@@ -50,16 +50,16 @@ The management token and AgentRouter client API keys are different credentials. 
 
 | Command | Behavior |
 | --- | --- |
-| `ccr start` | Starts a detached background management service and gateway, then prints its authenticated management URL. |
-| `ccr ui` | Reuses or starts the background service and opens the management UI. |
-| `ccr stop` | Stops the detached service started by `ccr start` or `ccr ui`. |
-| `ccr serve` | Runs the management service and gateway in the foreground. `ccr web` is an alias. |
-| `ccr <profile>` | Opens an enabled Agent Profiles profile by name or ID. |
+| `agentrouter start` | Starts a detached background management service and gateway, then prints its authenticated management URL. |
+| `agentrouter ui` | Reuses or starts the background service and opens the management UI. |
+| `agentrouter stop` | Stops the detached service started by `agentrouter start` or `agentrouter ui`. |
+| `agentrouter serve` | Runs the management service and gateway in the foreground. `agentrouter web` is an alias. |
+| `agentrouter <profile>` | Opens an enabled Agent Profiles profile by name or ID. |
 
-### `ccr start`
+### `agentrouter start`
 
 ```text
-ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 - `--host <host>`: management listener, default `127.0.0.1`.
@@ -68,39 +68,39 @@ ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 - `--gateway`: explicitly request gateway startup; this is the default.
 - `--no-gateway`: start only the management service.
 
-### `ccr ui`
+### `agentrouter ui`
 
 ```text
-ccr ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 `ui` opens the browser by default. Use `--no-open` on SSH or other headless sessions.
 
-### `ccr serve`
+### `agentrouter serve`
 
 ```text
-ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
-`serve` stays attached to the current terminal and handles `SIGINT`/`SIGTERM`. It is the appropriate mode for a process supervisor. `ccr stop` only manages the detached service; stop a foreground server through its terminal or supervisor.
+`serve` stays attached to the current terminal and handles `SIGINT`/`SIGTERM`. It is the appropriate mode for a process supervisor. `agentrouter stop` only manages the detached service; stop a foreground server through its terminal or supervisor.
 
-If the preferred management port is occupied, AgentRouter tries the next available ports and prints the actual URL. When `start` or `ui` reuses an existing service, new host, port, and `--no-gateway` choices do not reconfigure that process. Run `ccr stop` first when those settings must change.
+If the preferred management port is occupied, AgentRouter tries the next available ports and prints the actual URL. When `start` or `ui` reuses an existing service, new host, port, and `--no-gateway` choices do not reconfigure that process. Run `agentrouter stop` first when those settings must change.
 
 ## Agent Profiles
 
 Create and enable profiles in **Agent Profiles**, then launch one by name or ID:
 
 ```sh
-ccr "Codex - Work"
-ccr "Codex - Work" app
-ccr "Claude - Review" cli -- --model sonnet
-ccr profile-id -- --help
+agentrouter "Codex - Work"
+agentrouter "Codex - Work" app
+agentrouter "Claude - Review" cli -- --model sonnet
+agentrouter profile-id -- --help
 ```
 
 The syntax is:
 
 ```text
-ccr <profile-name-or-id> [cli|app] [-- <agent arguments>]
+agentrouter <profile-name-or-id> [cli|app] [-- <agent arguments>]
 ```
 
 - `--cli` and `--app` are accepted alternatives to the positional surface.
@@ -110,7 +110,7 @@ ccr <profile-name-or-id> [cli|app] [-- <agent arguments>]
 - Desktop App launches require that app to be installed and a graphical session to be available.
 - Start the AgentRouter service before opening most profiles. Grok CLI, Kimi CLI, and Pi profiles can start a temporary shared service automatically and stop it after the last managed session exits.
 
-The desktop application installs a related command named `agentrouter`. Commands copied from desktop Agent Profiles cards use `agentrouter`; the npm package documented here installs `ccr`.
+The desktop application installs a related command named `agentrouter`. Commands copied from desktop Agent Profiles cards use `agentrouter`; the npm package documented here installs `agentrouter`.
 
 ## Configuration And Runtime Files
 
@@ -143,7 +143,7 @@ Do not expose the gateway without creating AgentRouter client API keys. Upstream
 
 ## Troubleshooting
 
-### `ccr` is not found
+### `agentrouter` is not found
 
 Confirm Node.js is version 22 or later and that npm's global binary directory is on `PATH`:
 
@@ -160,7 +160,7 @@ The requested port was already occupied. Use the URL printed by AgentRouter, or 
 
 ### The UI opens but the gateway is unavailable
 
-The management service can run without a usable gateway. Add a provider and model, create a client API key, then start or restart the gateway from **Server**. Check the foreground output from `ccr serve` when diagnosing startup errors.
+The management service can run without a usable gateway. Add a provider and model, create a client API key, then start or restart the gateway from **Server**. Check the foreground output from `agentrouter serve` when diagnosing startup errors.
 
 ### A profile cannot be found
 
@@ -171,13 +171,13 @@ Only enabled profiles are launchable. Names are matched without case and sanitiz
 Stop and recreate it:
 
 ```sh
-ccr stop
-ccr start --host 127.0.0.1 --port 3458
+agentrouter stop
+agentrouter start --host 127.0.0.1 --port 3458
 ```
 
 ## Docker
 
-The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `ccr` command into the runtime image. See the [Docker deployment guide](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md).
+The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `agentrouter` command into the runtime image. See the [Docker deployment guide](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md).
 
 ## License
 

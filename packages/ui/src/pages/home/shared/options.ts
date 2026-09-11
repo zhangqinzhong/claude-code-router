@@ -150,7 +150,7 @@ export function profileAgentOptionsForRuntime(desktop: boolean): ProfileAgentOpt
 }
 
 export const profileScopeOptions: Array<{ label: string; value: ProfileScope }> = [
-  { label: "Only opened from AgentRouter", value: "ccr" },
+  { label: "Only opened from AgentRouter", value: "agentrouter" },
   { label: "System default", value: "global" }
 ];
 

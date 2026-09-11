@@ -390,7 +390,7 @@ function isExecutableFile(file) {
 function createEphemeralCodexApiKeyBootstrap(runtimeAgent) {
   if (runtimeAgent !== "codex") return () => {};
   const scope = nonEmptyEnv("AR_PROFILE_SCOPE");
-  if (scope !== "ccr" && scope !== "custom") return () => {};
+  if (scope !== "agentrouter" && scope !== "custom") return () => {};
   const authFile = path.join(codexRuntimeHome(), "auth.json");
   if (fs.existsSync(authFile)) return () => {};
   const temporary = authFile + ".tmp-" + process.pid;
@@ -6536,7 +6536,7 @@ function createClaudeAppLocalAgentSession(text, projectDirectory) {
 function defaultClaudeAppLocalAgentParentDir(root) {
   const config = readJsonFile(path.join(nonEmptyEnv("CLAUDE_CONFIG_DIR") || path.join(os.homedir(), ".claude"), ".claude.json")) || {};
   const account = config.oauthAccount && typeof config.oauthAccount === "object" ? config.oauthAccount : {};
-  const accountPrefix = uuidPrefix(stringValue(account.accountUuid)) || "ccr";
+  const accountPrefix = uuidPrefix(stringValue(account.accountUuid)) || "agentrouter";
   const orgPrefix = uuidPrefix(stringValue(account.organizationUuid)) || "00000000";
   return path.join(root, accountPrefix, orgPrefix);
 }

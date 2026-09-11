@@ -21,3 +21,6 @@ blob-report
 .tmp
 .test-dist
 output/
+
+# npm pack output
+*.tgz

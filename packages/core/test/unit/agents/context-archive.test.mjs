@@ -163,7 +163,7 @@ test("managed compact profile enables archive only for that profile API key", as
       managedCompact: true,
       model: "test/model",
       name: "Managed Compact",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       smallFastModel: "",
       surface: "auto"
@@ -176,7 +176,7 @@ test("managed compact profile enables archive only for that profile API key", as
       managedCompact: false,
       model: "test/model",
       name: "Plain Profile",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       smallFastModel: "",
       surface: "auto"

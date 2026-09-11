@@ -30,7 +30,7 @@ type OpenCodeResolvedModelMetadata = {
 };
 
 export function resolveOpenCodeConfigFile(configDir: string, profile: ProfileConfig): string {
-  if (profile.scope === "ccr" || profile.scope === "custom") {
+  if (profile.scope === "agentrouter" || profile.scope === "custom") {
     const slug = sanitizePathSegment(profile.id || profile.name || "opencode") || "opencode";
     const baseDir = path.join(configDir, "profiles", slug);
     return path.join(profile.scope === "custom" ? path.join(baseDir, "custom") : baseDir, "opencode", "opencode.jsonc");

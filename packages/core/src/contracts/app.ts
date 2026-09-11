@@ -1465,7 +1465,7 @@ export const DEFAULT_TRAY_WIDGETS: TrayWidgetConfig[] = [
 export type ProfileClientKind = "claude-code" | "codex" | "grok" | "kimi" | "kilo" | "opencode" | "pi" | "workbuddy" | "zcode" | "claude-design";
 export type CodexProfileConfigFormat = "legacy" | "separate_profile_files";
 export type CodexRemoteFrontendMode = "app" | "cli" | "claude-code";
-export type ProfileScope = "ccr" | "global" | "custom";
+export type ProfileScope = "agentrouter" | "global" | "custom";
 export type ProfileSurface = "auto" | "cli" | "app";
 export type ProfileOpenSurface = "cli" | "app";
 
@@ -1536,7 +1536,12 @@ export type ProfileRuntimeConfig = {
 };
 
 export function normalizeProfileScopeValue(value: unknown): ProfileScope {
-  return value === "ccr" || value === "custom" ? value : "global";
+  if (value === "custom") {
+    return "custom";
+  }
+  // "ccr" is the pre-rename spelling of "agentrouter" still on disk for
+  // profiles that have not been re-applied yet.
+  return value === "agentrouter" || value === "ccr" ? "agentrouter" : "global";
 }
 
 export function isEnabledGlobalProfile(profile: Pick<ProfileConfig, "enabled" | "scope">): boolean {

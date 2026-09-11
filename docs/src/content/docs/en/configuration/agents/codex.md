@@ -37,7 +37,7 @@ Use this page to route Codex to a non-OpenAI provider, pin a model, or run separ
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Codex** | Creates Codex launch entries in AgentRouter. |
-| Config name | Free text, e.g. `Codex - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Codex - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `agentrouter "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Effect scope | `Only opened from AgentRouter` / `System default` | Keeps changes limited to AgentRouter launches, or makes this the system-default Codex profile. Only one enabled system-default Codex profile is allowed. |
 | Entry mode | `CLI & APP` / `CLI only` / `App only` | Which launch entries (terminal command and/or ChatGPT app) are exposed. |
@@ -61,7 +61,7 @@ Use this page to route Codex to a non-OpenAI provider, pin a model, or run separ
   ```
   For CLI, run:
   ```text
-  ccr "Codex - Work"
+  agentrouter "Codex - Work"
   ```
 - **App:** click the play button to open ChatGPT with this profile's model and provider. Reopening the same profile activates the existing window.
 

@@ -34,7 +34,7 @@ Grok CLI is fixed to **Only opened from AgentRouter** and **CLI only**, so those
 | Field | How to set it | Effect |
 | --- | --- | --- |
 | Agent | Choose **Grok CLI** | Creates a Grok CLI launch entry in AgentRouter. |
-| Config name | Free text, e.g. `Grok - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `ccr "<name>"`. |
+| Config name | Free text, e.g. `Grok - Work` | Identifies the profile. Desktop commands use `agentrouter "<name>"`; CLI commands use `agentrouter "<name>"`. |
 | Enabled | Toggle on/off | Disabled profiles are not applied and not offered as launch entries. |
 | Model | A provider model or Fusion model | The model Grok CLI uses at startup. |
 | Environment variables | Key/value rows | Optional advanced overrides; leave empty for normal use. |
@@ -50,7 +50,7 @@ agentrouter "Grok - Work"
 For CLI, run:
 
 ```text
-ccr "Grok - Work"
+agentrouter "Grok - Work"
 ```
 
 Inside Grok CLI, use `/model` to switch among the provider and Fusion models AgentRouter returns; switched requests still go through AgentRouter.
@@ -61,7 +61,7 @@ Create separate Grok CLI profiles when you want separate launch entries with dif
 
 ## Verify
 
-1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `ccr` command.
+1. Run the desktop `agentrouter` command copied from the profile card, or the CLI `agentrouter` command.
 2. Send one message in Grok CLI and confirm it replies.
 3. Open **Request logs** in AgentRouter and confirm the request passed through the gateway.
 4. Run `/model` and confirm the AR-exposed models appear.

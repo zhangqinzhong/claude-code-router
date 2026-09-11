@@ -171,8 +171,13 @@ function packageAliasPlugin() {
   return {
     name: "test-package-alias",
     setup(build) {
-      build.onResolve({ filter: /^@agentrouter\/(cli|core|electron|ui)\// }, (args) => {
-        const match = args.path.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
+      build.onResolve({ filter: /^(@zhangqinzhong\/agentrouter|@agentrouter\/(?:cli|core|electron|ui))\// }, (args) => {
+        // The cli workspace publishes as @zhangqinzhong/agentrouter, while this
+        // table keeps its historical short name.
+        const aliasPath = args.path.startsWith("@zhangqinzhong/agentrouter/")
+          ? `@agentrouter/cli/${args.path.slice("@zhangqinzhong/agentrouter/".length)}`
+          : args.path;
+        const match = aliasPath.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
         if (!match) {
           return undefined;
         }

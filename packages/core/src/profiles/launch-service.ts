@@ -139,7 +139,7 @@ export async function getProfileOpenCommand(config: AppConfig, request: ProfileO
     ensureArCliLauncher(config);
   }
   return {
-    command: profileOpenCommand(profile, surface, options.commandName ?? "ccr", commandProfileRef(config, profile)),
+    command: profileOpenCommand(profile, surface, options.commandName ?? desktopCliCommandName, commandProfileRef(config, profile)),
     profileId: profile.id,
     profileName: profile.name,
     surface

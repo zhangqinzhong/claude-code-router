@@ -638,8 +638,8 @@ function packageAliasPlugin() {
   return {
     name: "ar-package-alias",
     setup(build) {
-      build.onResolve({ filter: /^@agentrouter\/cli\// }, (args) => {
-        return { path: resolvePackageImport(cliSourceRoot, args.path.slice("@agentrouter/cli/".length)) };
+      build.onResolve({ filter: /^@zhangqinzhong\/agentrouter\// }, (args) => {
+        return { path: resolvePackageImport(cliSourceRoot, args.path.slice("@zhangqinzhong/agentrouter/".length)) };
       });
       build.onResolve({ filter: /^@agentrouter\/core\// }, (args) => {
         return { path: resolvePackageImport(coreSourceRoot, args.path.slice("@agentrouter/core/".length)) };

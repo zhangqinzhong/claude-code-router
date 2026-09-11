@@ -27,7 +27,7 @@ Each Agent Config is a separate launch profile. Create multiple profiles when yo
 | Option | Applies to | Description |
 | --- | --- | --- |
 | Agent | All | Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI, ZCode, or WorkBuddy. Grok CLI and Kimi CLI support CLI only; ZCode and WorkBuddy support App only. |
-| Config name | All | Identifies the config in AgentRouter. Desktop commands use `agentrouter <config-name>`; CLI commands use `ccr <config-name>`. Names can contain spaces; copied commands are quoted automatically. |
+| Config name | All | Identifies the config in AgentRouter. Desktop commands use `agentrouter <config-name>`; CLI commands use `agentrouter <config-name>`. Names can contain spaces; copied commands are quoted automatically. |
 | Enabled | All | Disabled configs are not exposed as active launch entries and are not applied as effective startup configs. |
 | Effect scope | All | **Only opened from AgentRouter** limits changes to AgentRouter launches; **System default** also affects the agent when opened directly. Only one enabled system-default config is allowed per agent. |
 | Entry mode | Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI | `CLI & APP` exposes both CLI and App entry points; `CLI only` only generates a CLI command; `App only` only exposes the App entry point. Grok CLI and Kimi CLI are fixed to `CLI only`; ZCode and WorkBuddy are fixed to `App only`. |
@@ -84,11 +84,11 @@ With a Bot bound, OpenCode can relay conversations through the selected IM chann
 | Environment variables | Optional advanced overrides; leave empty for normal use. |
 | Bot | Applies only to the ChatGPT app entry. |
 
-After saving, use the terminal button on the desktop config card to copy the Codex CLI command, for example `agentrouter "Codex - Work"`. For CLI, run: `ccr "Codex - Work"`. Use the play button to open ChatGPT.
+After saving, use the terminal button on the desktop config card to copy the Codex CLI command, for example `agentrouter "Codex - Work"`. For CLI, run: `agentrouter "Codex - Work"`. Use the play button to open ChatGPT.
 
 ### Grok CLI
 
-Grok CLI profiles are fixed to **Only opened from AgentRouter** and **CLI only**. After saving, run the profile command: desktop `agentrouter "Grok - Work"`, or CLI `ccr "Grok - Work"`. Inside Grok CLI, use `/model` to switch among the provider and Fusion models returned by AgentRouter.
+Grok CLI profiles are fixed to **Only opened from AgentRouter** and **CLI only**. After saving, run the profile command: desktop `agentrouter "Grok - Work"`, or CLI `agentrouter "Grok - Work"`. Inside Grok CLI, use `/model` to switch among the provider and Fusion models returned by AgentRouter.
 
 ### Kimi CLI
 
@@ -126,7 +126,7 @@ WorkBuddy supports App only, so its entry mode is fixed to `App only`.
 
 | Mode | How to open | Best for | Key differences |
 | --- | --- | --- | --- |
-| CLI | Desktop: click the terminal button and run `agentrouter <config-name>`; CLI: run `ccr <config-name>` | Working inside a project directory, shell workflows, scripting | Opens the selected profile in the terminal; Bot forwarding support is pending. |
+| CLI | Desktop: click the terminal button and run `agentrouter <config-name>`; CLI: run `agentrouter <config-name>` | Working inside a project directory, shell workflows, scripting | Opens the selected profile in the terminal; Bot forwarding support is pending. |
 | App | Click the play button in the AgentRouter desktop app | Desktop windows, Bot forwarding, handoff | Reopening the same config activates the existing window. Multi-instance behavior depends on the Agent; OpenCode Desktop is single-instance, so AgentRouter stops the managed instance before switching OpenCode profiles. |
 | CLI & APP | One config exposes both CLI and App entry points | Reusing the same model config in both terminal and desktop App workflows | Both entries share the config name, model, effect scope, and environment variables, but launch differently. |
 

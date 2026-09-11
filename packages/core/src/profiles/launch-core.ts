@@ -90,7 +90,9 @@ export function shouldAutoStartProfileGateway(
 export function profileOpenCommand(
   profile: ProfileConfig,
   surface: ProfileOpenSurface = defaultProfileOpenSurface(profile),
-  command = "ccr",
+  // Mirrors desktopCliCommandName in launch-service.ts, which cannot be
+  // imported here without a cycle.
+  command = "agentrouter",
   profileRef = profile.name?.trim() || profile.id
 ): string {
   const quote = process.platform === "win32" ? windowsCommandQuote : shellQuote;
@@ -399,8 +401,8 @@ function normalizeProfileSurface(value: ProfileConfig["surface"]): "auto" | "cli
   return value === "cli" || value === "app" ? value : "auto";
 }
 
-function isGeneratedProfileScope(value: ProfileConfig["scope"]): boolean {
-  return value === "ccr" || value === "custom";
+function isGeneratedProfileScope(value: unknown): boolean {
+  return value === "agentrouter" || value === "ccr" || value === "custom";
 }
 
 function resolveUserPath(value: string): string {

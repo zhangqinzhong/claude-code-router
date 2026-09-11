@@ -125,7 +125,7 @@ test("AgentRouter router core plugin resolves bare Codex companion models throug
       enhancedRoute: false,
       rules: []
     },
-    scope: "ccr"
+    scope: "agentrouter"
   }];
 
   const plugin = await createGatewayPlugin({ plugin: { config: { appConfig: config } } });

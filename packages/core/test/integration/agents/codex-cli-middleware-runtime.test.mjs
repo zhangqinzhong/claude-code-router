@@ -204,7 +204,7 @@ test("Codex app-server uses a local non-OpenAI identity without credentials", { 
       ...process.env,
       AR_CODEX_REMOTE_FRONTEND_MODE: "app",
       AR_CODEX_CHATGPT_AUTH_FILE: "",
-      AR_PROFILE_SCOPE: "ccr",
+      AR_PROFILE_SCOPE: "agentrouter",
       AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: "",
@@ -272,7 +272,7 @@ test("Codex app-server reads but never overwrites an existing ChatGPT auth file"
     env: {
       ...process.env,
       AR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      AR_PROFILE_SCOPE: "ccr",
+      AR_PROFILE_SCOPE: "agentrouter",
       AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome
     },
@@ -328,7 +328,7 @@ test("Codex app-server bridges shared ChatGPT auth into an isolated profile with
       ...process.env,
       AR_CODEX_CHATGPT_AUTH_FILE: sharedAuthFile,
       AR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      AR_PROFILE_SCOPE: "ccr",
+      AR_PROFILE_SCOPE: "agentrouter",
       AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome,
       CODEXL_CODEX_CHATGPT_AUTH_FILE: ""
@@ -379,7 +379,7 @@ test("Codex app-server delegates public Git marketplaces and leaves account-priv
     env: {
       ...process.env,
       AR_CODEX_REMOTE_FRONTEND_MODE: "app",
-      AR_PROFILE_SCOPE: "ccr",
+      AR_PROFILE_SCOPE: "agentrouter",
       AR_REAL_CODEX_CLI_PATH: fakeCodex,
       CODEX_HOME: codexHome
     },

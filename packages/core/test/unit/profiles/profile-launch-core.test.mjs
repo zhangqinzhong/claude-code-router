@@ -25,7 +25,7 @@ const claudeProfile = {
   model: "provider,model",
   name: "Claude Main",
   opusModel: "provider,opus",
-  scope: "ccr",
+  scope: "agentrouter",
   sonnetModel: "provider,sonnet",
   smallFastModel: "provider,small",
   surface: "auto"
@@ -38,7 +38,7 @@ const codexProfile = {
   model: "provider,model",
   name: "Codex Main",
   providerId: "openai-codex",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "auto"
 };
 
@@ -48,7 +48,7 @@ const grokProfile = {
   id: "grok-main",
   model: "provider,model",
   name: "Grok Main",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "cli"
 };
 
@@ -58,7 +58,7 @@ const kimiProfile = {
   id: "kimi-main",
   model: "provider,model",
   name: "Kimi Main",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "cli"
 };
 
@@ -68,7 +68,7 @@ const piProfile = {
   id: "pi-main",
   model: "provider,model",
   name: "Pi Main",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "cli"
 };
 
@@ -79,7 +79,7 @@ const openCodeProfile = {
   model: "provider,model",
   name: "OpenCode Main",
   providerId: "claude-code-router",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "auto"
 };
 
@@ -90,7 +90,7 @@ const kiloProfile = {
   model: "provider,model",
   name: "Kilo Main",
   providerId: "claude-code-router",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "cli"
 };
 
@@ -101,7 +101,7 @@ const workbuddyProfile = {
   model: "provider,model",
   name: "Workbuddy Main",
   providerId: "claude-code-router",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "app"
 };
 
@@ -111,7 +111,7 @@ const claudeDesignProfile = {
   id: "claude-design-main",
   model: "",
   name: "Claude Design",
-  scope: "ccr",
+  scope: "agentrouter",
   surface: "app"
 };
 

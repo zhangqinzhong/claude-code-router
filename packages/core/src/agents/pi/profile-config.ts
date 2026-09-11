@@ -33,7 +33,7 @@ type PiResolvedModelMetadata = {
 };
 
 export function resolvePiAgentDir(configDir: string, profile: ProfileConfig): string {
-  if (profile.scope === "ccr" || profile.scope === "custom") {
+  if (profile.scope === "agentrouter" || profile.scope === "custom") {
     const slug = sanitizePathSegment(profile.id || profile.name || "pi") || "pi";
     const baseDir = path.join(configDir, "profiles", slug);
     return path.join(profile.scope === "custom" ? path.join(baseDir, "custom") : baseDir, "pi");

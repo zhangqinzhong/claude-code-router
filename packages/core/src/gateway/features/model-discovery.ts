@@ -552,7 +552,7 @@ function buildGatewayDiscoverableModelIds(config: AppConfig, profile?: ProfileCo
 
 function gatewayModelOwner(id: string): string {
   const separator = id.indexOf("/");
-  return separator > 0 ? id.slice(0, separator).trim() || "ccr" : "ccr";
+  return separator > 0 ? id.slice(0, separator).trim() || "agentrouter" : "agentrouter";
 }
 
 

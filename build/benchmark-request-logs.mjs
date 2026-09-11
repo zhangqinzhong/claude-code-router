@@ -111,8 +111,13 @@ function packageAliasPlugin() {
   return {
     name: "request-log-benchmark-alias",
     setup(build) {
-      build.onResolve({ filter: /^@agentrouter\/(cli|core|electron|ui)\// }, (resolveArgs) => {
-        const match = resolveArgs.path.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
+      build.onResolve({ filter: /^(@zhangqinzhong\/agentrouter|@agentrouter\/(?:cli|core|electron|ui))\// }, (resolveArgs) => {
+        // The cli workspace publishes as @zhangqinzhong/agentrouter, while this
+        // table keeps its historical short name.
+        const aliasPath = resolveArgs.path.startsWith("@zhangqinzhong/agentrouter/")
+          ? `@agentrouter/cli/${resolveArgs.path.slice("@zhangqinzhong/agentrouter/".length)}`
+          : resolveArgs.path;
+        const match = aliasPath.match(/^@agentrouter\/(cli|core|electron|ui)\/(.+)$/);
         if (!match) return undefined;
         return { path: resolvePackageImport(roots[match[1]], match[2]) };
       });

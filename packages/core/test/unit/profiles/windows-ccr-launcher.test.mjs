@@ -13,7 +13,7 @@ test("Windows AgentRouter launcher prepares CLI profiles before direct TTY dispa
           id: "claude-main",
           model: "provider/model",
           name: "Claude Main",
-          scope: "ccr",
+          scope: "agentrouter",
           surface: "cli"
         }
       ]

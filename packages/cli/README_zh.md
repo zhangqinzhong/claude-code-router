@@ -2,7 +2,7 @@
 
 [English](README.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
 
-`@musistudio/claude-code-router` 是 AgentRouter 的 Node.js 发行版。它通过 `ccr` 命令提供浏览器管理界面、本地模型网关和 Agent 配置启动能力，不需要安装 Electron。
+`@zhangqinzhong/agentrouter` 是 AgentRouter 的 Node.js 发行版。它通过 `agentrouter` 命令提供浏览器管理界面、本地模型网关和 Agent 配置启动能力，不需要安装 Electron。
 
 CLI 适合开发机和无桌面的服务器。如果你需要系统托盘、桌面通知、应用自动更新或桌面端专属的浏览器集成，请安装桌面应用。
 
@@ -15,15 +15,15 @@ CLI 适合开发机和无桌面的服务器。如果你需要系统托盘、桌�
 全局安装：
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr --help
+npm install -g @zhangqinzhong/agentrouter
+agentrouter --help
 ```
 
 升级或卸载：
 
 ```sh
-npm install -g @musistudio/claude-code-router@latest
-npm uninstall -g @musistudio/claude-code-router
+npm install -g @zhangqinzhong/agentrouter@latest
+npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
 卸载 npm 包不会删除 AgentRouter 的本地配置和数据库。
@@ -33,7 +33,7 @@ npm uninstall -g @musistudio/claude-code-router
 启动后台服务并打开管理界面：
 
 ```sh
-ccr ui
+agentrouter ui
 ```
 
 然后按以下顺序配置：
@@ -50,16 +50,16 @@ ccr ui
 
 | 命令 | 行为 |
 | --- | --- |
-| `ccr start` | 在后台启动管理服务和网关，并打印带认证信息的管理 URL。 |
-| `ccr ui` | 复用或启动后台服务，然后打开管理界面。 |
-| `ccr stop` | 停止由 `ccr start` 或 `ccr ui` 启动的后台服务。 |
-| `ccr serve` | 在前台运行管理服务和网关；`ccr web` 是别名。 |
-| `ccr <配置>` | 按名称或 ID 打开一个已启用的 Agent 配置。 |
+| `agentrouter start` | 在后台启动管理服务和网关，并打印带认证信息的管理 URL。 |
+| `agentrouter ui` | 复用或启动后台服务，然后打开管理界面。 |
+| `agentrouter stop` | 停止由 `agentrouter start` 或 `agentrouter ui` 启动的后台服务。 |
+| `agentrouter serve` | 在前台运行管理服务和网关；`agentrouter web` 是别名。 |
+| `agentrouter <配置>` | 按名称或 ID 打开一个已启用的 Agent 配置。 |
 
-### `ccr start`
+### `agentrouter start`
 
 ```text
-ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 - `--host <host>`：管理服务监听地址，默认 `127.0.0.1`。
@@ -68,39 +68,39 @@ ccr start [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gat
 - `--gateway`：明确要求启动模型网关；这是默认行为。
 - `--no-gateway`：只启动管理服务，不启动模型网关。
 
-### `ccr ui`
+### `agentrouter ui`
 
 ```text
-ccr ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter ui [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
 `ui` 默认会打开浏览器。在 SSH 或其他无桌面环境中使用 `--no-open`。
 
-### `ccr serve`
+### `agentrouter serve`
 
 ```text
-ccr serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
+agentrouter serve [--host <host>] [--port <port>] [--open|--no-open] [--gateway|--no-gateway]
 ```
 
-`serve` 会留在当前终端并处理 `SIGINT` / `SIGTERM`，适合交给进程管理器托管。`ccr stop` 只管理后台服务；前台服务需要在终端或进程管理器中停止。
+`serve` 会留在当前终端并处理 `SIGINT` / `SIGTERM`，适合交给进程管理器托管。`agentrouter stop` 只管理后台服务；前台服务需要在终端或进程管理器中停止。
 
-如果首选管理端口已被占用，AgentRouter 会继续尝试后续端口并打印实际 URL。`start` 或 `ui` 复用已运行服务时，新传入的 Host、Port 和 `--no-gateway` 不会重配该进程；要修改这些选项，请先运行 `ccr stop`。
+如果首选管理端口已被占用，AgentRouter 会继续尝试后续端口并打印实际 URL。`start` 或 `ui` 复用已运行服务时，新传入的 Host、Port 和 `--no-gateway` 不会重配该进程；要修改这些选项，请先运行 `agentrouter stop`。
 
 ## Agent 配置启动
 
 先在 **Agent 配置档案** 中创建并启用配置，然后按名称或 ID 启动：
 
 ```sh
-ccr "Codex - Work"
-ccr "Codex - Work" app
-ccr "Claude - Review" cli -- --model sonnet
-ccr profile-id -- --help
+agentrouter "Codex - Work"
+agentrouter "Codex - Work" app
+agentrouter "Claude - Review" cli -- --model sonnet
+agentrouter profile-id -- --help
 ```
 
 完整语法：
 
 ```text
-ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
+agentrouter <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 ```
 
 - `--cli` 和 `--app` 也可以代替位置形式的入口类型。
@@ -110,7 +110,7 @@ ccr <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 - 启动桌面 App 时，本机必须已安装对应应用，并且当前环境必须有图形会话。
 - 大多数配置需要先启动 AgentRouter 服务。Grok CLI、Kimi CLI 和 Pi 配置可以自动启动一个临时共享服务，并在最后一个受管会话退出后停止。
 
-桌面应用会安装一个相关命令 `agentrouter`。桌面 Agent 配置档案卡片复制出来的命令使用 `agentrouter`；本文介绍的 npm 包安装的是 `ccr`。
+桌面应用会安装一个相关命令 `agentrouter`。桌面 Agent 配置档案卡片复制出来的命令使用 `agentrouter`；本文介绍的 npm 包安装的是 `agentrouter`。
 
 ## 配置与运行文件
 
@@ -143,7 +143,7 @@ AgentRouter 写入 SQLite 时不要直接编辑或复制活跃数据库。优先
 
 ## 常见问题
 
-### 找不到 `ccr` 命令
+### 找不到 `agentrouter` 命令
 
 确认 Node.js 不低于 22，并检查 npm 全局可执行目录是否在 `PATH`：
 
@@ -160,7 +160,7 @@ npm prefix -g
 
 ### UI 能打开，但网关不可用
 
-管理服务可以在没有可用网关时单独运行。请添加供应商和模型、创建客户端 API Key，然后从 **服务** 页面启动或重启网关。排查启动错误时，可以使用 `ccr serve` 查看前台输出。
+管理服务可以在没有可用网关时单独运行。请添加供应商和模型、创建客户端 API Key，然后从 **服务** 页面启动或重启网关。排查启动错误时，可以使用 `agentrouter serve` 查看前台输出。
 
 ### 找不到 Agent 配置
 
@@ -171,13 +171,13 @@ npm prefix -g
 停止并重新创建服务：
 
 ```sh
-ccr stop
-ccr start --host 127.0.0.1 --port 3458
+agentrouter stop
+agentrouter start --host 127.0.0.1 --port 3458
 ```
 
 ## Docker
 
-仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `ccr` 命令。请参阅 [Docker 部署文档](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md)。
+仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `agentrouter` 命令。请参阅 [Docker 部署文档](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md)。
 
 ## 许可证
 

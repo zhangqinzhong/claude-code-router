@@ -560,7 +560,7 @@ test("profile service overwrites generated bin files without creating backups", 
       model: "Provider/long",
       name: "Generated Bin Test",
       opusModel: "Provider/opus",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       sonnetModel: "Provider/sonnet",
       smallFastModel: "",
@@ -678,7 +678,7 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
       id: profileId,
       model: "Provider/model",
       name: "Old Claude Code",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       smallFastModel: "",
       surface: "auto"
@@ -752,7 +752,7 @@ test("Codex profile launcher bypasses middleware for Browser and Computer Use he
       name: "Browser Helper Bypass",
       providerId: "claude-code-router",
       providerName: "AgentRouter",
-      scope: "ccr",
+      scope: "agentrouter",
       showAllSessions: false,
       surface: "app"
     }];
@@ -849,7 +849,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
       name: "Codex ToolHub Test",
       providerId: "claude-code-router",
       providerName: "AgentRouter",
-      scope: "ccr",
+      scope: "agentrouter",
       showAllSessions: false,
       surface: "auto"
     }
@@ -972,7 +972,7 @@ test("profile service injects Context Archive MCP for managed Claude Code profil
       managedCompact: true,
       model: "Provider/model",
       name: "Managed Compact Claude",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       smallFastModel: "",
       surface: "auto"
@@ -1031,7 +1031,7 @@ test("profile service injects Context Archive MCP for managed Codex profile", { 
       name: "Managed Compact Codex",
       providerId: "claude-code-router",
       providerName: "AgentRouter",
-      scope: "ccr",
+      scope: "agentrouter",
       showAllSessions: false,
       surface: "auto"
     }
@@ -1086,7 +1086,7 @@ test("profile service injects Context Archive MCP for managed Claude Code withou
       managedCompact: true,
       model: "Provider/model",
       name: "Context Archive MCP Test",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile: "~/.claude/settings.json",
       smallFastModel: "",
       surface: "auto"
@@ -1148,7 +1148,7 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
       id: profileId,
       model: "Provider/model",
       name: "Grok Gateway Test",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     }
   ];
@@ -1271,7 +1271,7 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
       id: profileId,
       model: "Provider/model",
       name: "Kimi Gateway Test",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     }
   ];
@@ -1364,7 +1364,7 @@ test("profile service writes a Pi config and wrapper that points inference to Ag
       model: "Provider/model",
       name: "Pi Gateway Test",
       providerId: "ar-pi",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "cli"
     }
   ];
@@ -1439,7 +1439,7 @@ test("profile service writes an OpenCode CLI wrapper and shared CLI/App config",
       name: "OpenCode Gateway Test",
       providerId: "claude-code-router",
       providerName: "AgentRouter",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "auto"
     }
   ];
@@ -1502,7 +1502,7 @@ test("profile service removes disabled and deleted OpenCode wrappers and API key
     name: "OpenCode Cleanup Test",
     providerId: "claude-code-router",
     providerName: "AgentRouter",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "auto"
   };
   config.profile.profiles = [profile];
@@ -1578,7 +1578,7 @@ test("profile service clears stale Claude Code ToolHub artifacts when no gateway
       id: profileId,
       model: "",
       name: "Claude Code",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile,
       smallFastModel: "",
       surface: "auto"
@@ -1634,7 +1634,7 @@ test("profile service restores managed global Claude settings when only AR-scope
         id: "claude-code-2",
         model: "Fusion/kimisearch",
         name: "Claude Code",
-        scope: "ccr",
+        scope: "agentrouter",
         settingsFile: "~/.claude/settings.json",
         smallFastModel: "",
         surface: "auto"
@@ -1785,7 +1785,7 @@ test("profile service restores global agent configs on exit", () => {
     const inactiveStatuses = restoreInactiveGlobalProfileConfigs([
       {
         agent: "codex", configFile: codexFile, enabled: false, env: {}, id: "codex", model: "test", name: "Codex",
-        providerId: "claude-code-router", scope: "ccr", surface: "cli"
+        providerId: "claude-code-router", scope: "agentrouter", surface: "cli"
       },
       {
         agent: "opencode", configFile: openCodeFile, enabled: false, env: {}, id: "opencode", model: "test", name: "OpenCode",
@@ -1793,7 +1793,7 @@ test("profile service restores global agent configs on exit", () => {
       },
       {
         agent: "zcode", configFile: zcodeFile, enabled: false, env: {}, id: "zcode", model: "test", name: "ZCode",
-        providerId: "claude-code-router", scope: "ccr", surface: "app"
+        providerId: "claude-code-router", scope: "agentrouter", surface: "app"
       }
     ]);
     assert.equal(inactiveStatuses.filter((status) => status.client === "codex").length, 1);
@@ -1844,7 +1844,7 @@ test("profile service invalidates Claude gateway model discovery cache only when
       id: profileId,
       model: "Provider/alpha",
       name: "Claude Code",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile,
       smallFastModel: "",
       surface: "cli"
@@ -1910,7 +1910,7 @@ test("profile service reports a failed model discovery cache invalidation withou
       id: profileId,
       model: "Provider/alpha",
       name: "Claude Code",
-      scope: "ccr",
+      scope: "agentrouter",
       settingsFile,
       smallFastModel: "",
       surface: "cli"
@@ -1924,7 +1924,7 @@ test("profile service reports a failed model discovery cache invalidation withou
       id: followingProfileId,
       model: "Provider/alpha",
       name: "Codex",
-      scope: "ccr",
+      scope: "agentrouter",
       smallFastModel: "",
       surface: "cli"
     }

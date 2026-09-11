@@ -67,7 +67,7 @@ test("ChatGPT model catalog write includes patch bridge capabilities", () => {
       model: "DeepSeek/deepseek-v4-flash",
       name: "Codex Main",
       providerId: "openai-codex",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 
@@ -121,7 +121,7 @@ test("ChatGPT model catalog write includes latest reasoning effort aliases", () 
       model: "Codex API/gpt-5-codex",
       name: "Codex Main",
       providerId: "openai-codex",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 
@@ -159,7 +159,7 @@ test("ChatGPT model catalog write gives gateway GPT models reasoning effort fall
       model: "uuroute/gpt-5.6",
       name: "Codex Main",
       providerId: "openai-codex",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 
@@ -335,7 +335,7 @@ test("WorkBuddy AI app profile writes the virtual desktop auth session", () => {
       model: "Codex API/gpt-5-codex",
       name: "WorkBuddy Main",
       providerId: "claude-code-router",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 
@@ -415,7 +415,7 @@ test("WorkBuddy AI app profile writes every allowed model to models.json", () =>
       model: "Codex API/gpt-5-codex",
       name: "WorkBuddy Main",
       providerId: "claude-code-router",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 
@@ -447,7 +447,7 @@ test("WorkBuddy AI app profile writes every catalog model when the allowlist is 
       model: "Codex API/gpt-5-codex",
       name: "WorkBuddy Main",
       providerId: "claude-code-router",
-      scope: "ccr",
+      scope: "agentrouter",
       surface: "app"
     };
 

@@ -10,7 +10,7 @@ lead: 面向常驻服务器部署：用 Docker 和 Nginx 单入口运行 AgentRo
 Docker 镜像适合常驻模型网关和浏览器管理。它包含 AgentRouter Core、构建后的管理 UI、PM2 和 Nginx，但不包含：
 
 - Electron 桌面应用、系统托盘和桌面通知；
-- npm 发行版的 `ccr` 命令；
+- npm 发行版的 `agentrouter` 命令；
 - 从容器中启动宿主机 Claude App、ChatGPT、ZCode 等桌面 App；
 - 桌面自动更新和桌面专属的内置浏览器集成。
 

@@ -35,7 +35,7 @@ Kilo Code 固定为 **仅 CLI**，入口模式不可编辑。可配置的字段�
 | 字段 | 如何配置 | 效果 |
 | --- | --- | --- |
 | Agent | 选择 **Kilo Code** | 在 AgentRouter 中创建 Kilo Code 启动入口。 |
-| 配置名称 | 自由文本，例如 `Kilo - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `ccr "<名称>"`。 |
+| 配置名称 | 自由文本，例如 `Kilo - Work` | 标识该配置。桌面端命令使用 `agentrouter "<名称>"`，CLI 命令使用 `agentrouter "<名称>"`。 |
 | 启用 | 开关 | 关闭的配置不会被应用，也不会出现在启动入口。 |
 | 生效范围 | `仅从 AgentRouter 打开时生效` / `系统默认` | 仅影响从 AgentRouter 打开的 Kilo，或作为系统默认 Kilo 配置。同一 Agent 只允许一个启用的系统默认配置。 |
 | 供应商 ID | 默认 `claude-code-router` | 当前 Kilo 配置使用的供应商引用。 |
@@ -55,7 +55,7 @@ agentrouter "Kilo - Work"
 CLI请执行：
 
 ```text
-ccr "Kilo - Work"
+agentrouter "Kilo - Work"
 ```
 
 ## 多实例
@@ -64,7 +64,7 @@ ccr "Kilo - Work"
 
 ## 验证
 
-1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `ccr` 命令。
+1. 运行桌面端配置卡片复制的 `agentrouter` 命令，或 CLI 的 `agentrouter` 命令。
 2. 在 Kilo 中发送一条消息，确认能正常回复。
 3. 打开 AgentRouter 的 **请求日志**，确认请求经过了网关。
 

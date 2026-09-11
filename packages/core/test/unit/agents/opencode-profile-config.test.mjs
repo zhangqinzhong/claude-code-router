@@ -53,7 +53,7 @@ function testProfile(overrides = {}) {
     name: "OpenCode Main",
     providerId: "claude-code-router",
     providerName: "AgentRouter",
-    scope: "ccr",
+    scope: "agentrouter",
     surface: "auto",
     ...overrides
   };

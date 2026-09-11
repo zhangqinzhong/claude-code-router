@@ -213,8 +213,8 @@ AgentRouter 支持 OpenAI Chat / Responses、Anthropic Messages、Gemini Generat
 npm CLI 要求 Node.js 22 或更高版本。无需 Electron，也能启动相同的模型网关与浏览器管理界面：
 
 ```sh
-npm install -g @musistudio/claude-code-router
-ccr ui
+npm install -g @zhangqinzhong/agentrouter
+agentrouter ui
 ```
 
 打开 `http://127.0.0.1:3458`，然后按照上面的 **供应商 → 服务 → Agent 配置档案** 流程操作。模型网关仍位于 `http://127.0.0.1:3456`。服务模式、鉴权和 Profile 命令见 CLI 命令参考。

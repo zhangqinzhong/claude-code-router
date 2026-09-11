@@ -10,7 +10,7 @@ lead: "For persistent server deployments: run AgentRouter Core and the browser m
 The Docker image is intended for a persistent model gateway and browser administration. It contains AgentRouter Core, the built management UI, PM2, and Nginx. It does not include:
 
 - The Electron desktop app, system tray, or desktop notifications;
-- The `ccr` command from the npm distribution;
+- The `agentrouter` command from the npm distribution;
 - Launching host-side desktop apps such as Claude App, ChatGPT, or ZCode from inside the container;
 - Desktop automatic updates and desktop-only built-in browser integrations.
 
