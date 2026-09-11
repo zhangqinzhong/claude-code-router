@@ -43,7 +43,7 @@ From the repository root:
 
 ```sh
 docker compose up -d --build
-docker compose logs -f ccr
+docker compose logs -f agentrouter
 ```
 
 Open <http://127.0.0.1:3458>. On a fresh volume the management UI is available immediately; the model gateway only starts working after a provider and a model have been added.
@@ -178,9 +178,9 @@ On a brand-new data directory with neither `config.json` nor `config.sqlite`, th
 For application-level backup, prefer **Settings → Export data**. For a complete file-level backup, stop writes first:
 
 ```sh
-docker compose stop ccr
-docker compose cp ccr:/data/. ./ar-data-backup/
-docker compose start ccr
+docker compose stop agentrouter
+docker compose cp agentrouter:/data/. ./ar-data-backup/
+docker compose start agentrouter
 ```
 
 The backup contains provider credentials and AgentRouter client keys, and may contain request / response data; store it as sensitive data.
@@ -196,7 +196,7 @@ git pull
 docker compose build --pull
 docker compose up -d
 docker compose ps
-docker compose logs --tail=200 ccr
+docker compose logs --tail=200 agentrouter
 ```
 
 Upgrades run the migrations the current version needs against the persisted data. When rolling back, use both the old image / old source and the pre-upgrade backup together; do not assume an older version can always read a newer database.
@@ -247,8 +247,8 @@ The test creates a temporary container and volume, verifies the single Nginx por
 
 ```sh
 docker compose ps
-docker compose logs -f ccr
-docker compose restart ccr
+docker compose logs -f agentrouter
+docker compose restart agentrouter
 docker compose config
 ```
 
@@ -285,7 +285,7 @@ Confirm the host directory exists, is writable by the container, and is not moun
 Container health only means Nginx / UI are reachable. Continue checking **Server** status, provider connectivity, the AgentRouter client key, routing, and request logs, and inspect:
 
 ```sh
-docker compose logs --tail=200 ccr
+docker compose logs --tail=200 agentrouter
 ```
 
 ## Related pages

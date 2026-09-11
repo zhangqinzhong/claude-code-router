@@ -727,9 +727,12 @@ export function AddRoutingRuleDialog({
 }
 
 function routeScriptDocsUrl(language: "en" | "zh"): string {
-  const path = language === "zh" ? "/configuration/routing" : "/en/configuration/routing";
+  // The docs live in this repository; there is no standalone documentation site.
+  const path = language === "zh"
+    ? "docs/src/content/docs/zh/configuration/routing.md"
+    : "docs/src/content/docs/en/configuration/routing.md";
   const section = language === "zh"
     ? "#nodejs-%E8%84%9A%E6%9C%AC%E8%A7%84%E5%88%99"
     : "#nodejs-script-rules";
-  return `https://ccrdesk.top${path}${section}`;
+  return `https://github.com/zhangqinzhong/claude-code-router/blob/main/${path}${section}`;
 }

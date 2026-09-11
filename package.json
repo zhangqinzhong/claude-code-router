@@ -3,7 +3,7 @@
   "version": "3.0.22",
   "private": true,
   "license": "MIT",
-  "description": "Local Claude Code Router gateway with CLI and web management UI.",
+  "description": "Local AgentRouter gateway with CLI and web management UI.",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/zhangqinzhong/claude-code-router.git"
@@ -38,7 +38,7 @@
     "build:assets": "node build/build.mjs",
     "build:docker": "node build/docker-build.mjs",
     "build:app:mac": "npm run build:app:mac:local",
-    "build:app:mac:local": "npm run build:assets && electron-builder --config build/electron-builder.local.cjs --mac --dir --publish never",
+    "build:app:mac:local": "npm run build:assets && electron-builder --config build/electron-builder.local.cjs --mac --publish never",
     "build:app:mac:release": "node build/macos-release-preflight.mjs && npm run models:update && npm run build:assets && electron-builder --mac --publish never",
     "build:app:win": "npm run build:app:win:local",
     "build:app:win:local": "node build/windows-package-preflight.mjs && npm run build:assets && electron-builder --config build/electron-builder.local.cjs --win --publish never",

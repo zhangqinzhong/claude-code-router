@@ -61,7 +61,7 @@ test("exposes the desktop renderer through CDP", async () => {
   const current = requireRuntime();
   expect(current.cdpUrl).toBe(`http://${host}:${new URL(current.cdpUrl).port}`);
   expect(current.mainPage.url()).toContain("/pages/home/index.html");
-  await expect(current.mainPage).toHaveTitle("Claude Code Router");
+  await expect(current.mainPage).toHaveTitle("AgentRouter");
 });
 
 test("loads the Electron preload bridge and IPC contract", async () => {
@@ -74,7 +74,7 @@ test("loads the Electron preload bridge and IPC contract", async () => {
 
   const appInfo = await page.evaluate(async () => window.agentrouter?.getAppInfo());
   expect(appInfo?.desktop).toBe(true);
-  expect(appInfo?.name).toBe("Claude Code Router");
+  expect(appInfo?.name).toBe("AgentRouter");
   expect(appInfo?.configDir).toContain(current.testHome);
   expect(appInfo?.configDbFile).toContain("config.sqlite");
 

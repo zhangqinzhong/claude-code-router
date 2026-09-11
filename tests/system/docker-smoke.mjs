@@ -64,7 +64,7 @@ try {
   const page = await fetch(`${baseUrl}${redirectLocation}`);
   assert.equal(page.status, 200);
   const pageHtml = await page.text();
-  assert.match(pageHtml, /Claude Code Router/);
+  assert.match(pageHtml, /AgentRouter/);
   assert.match(pageHtml, /web-client-bridge\.js/);
 
   const bridge = await fetch(`${baseUrl}/assets/web-client-bridge.js`);

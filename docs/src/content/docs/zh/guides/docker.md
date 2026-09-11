@@ -43,7 +43,7 @@ Nginx 对外提供：
 
 ```sh
 docker compose up -d --build
-docker compose logs -f ccr
+docker compose logs -f agentrouter
 ```
 
 打开 <http://127.0.0.1:3458>。新数据卷上管理 UI 会立即可用；模型网关要在添加供应商和模型后才能正常启动。
@@ -178,9 +178,9 @@ EntryPoint 会设置 `HOME=/data`，实际数据位于：
 应用级备份优先使用 **Settings → Export data**。做完整文件备份时，先停止写入：
 
 ```sh
-docker compose stop ccr
-docker compose cp ccr:/data/. ./ar-data-backup/
-docker compose start ccr
+docker compose stop agentrouter
+docker compose cp agentrouter:/data/. ./ar-data-backup/
+docker compose start agentrouter
 ```
 
 备份包含供应商凭据、AgentRouter 客户端 Key，并可能包含请求 / 响应数据，必须按敏感数据保存。
@@ -196,7 +196,7 @@ git pull
 docker compose build --pull
 docker compose up -d
 docker compose ps
-docker compose logs --tail=200 ccr
+docker compose logs --tail=200 agentrouter
 ```
 
 升级会对持久化数据执行当前版本需要的迁移。回滚时应同时使用旧镜像 / 旧源码和升级前备份，不要假设旧版本一定能读取新版本数据库。
@@ -247,8 +247,8 @@ npm run test:docker
 
 ```sh
 docker compose ps
-docker compose logs -f ccr
-docker compose restart ccr
+docker compose logs -f agentrouter
+docker compose restart agentrouter
 docker compose config
 ```
 
@@ -285,7 +285,7 @@ docker compose config
 容器健康只代表 Nginx / UI 可访问。继续检查 **服务** 状态、供应商连通性、AgentRouter 客户端 Key、路由和请求日志，并查看：
 
 ```sh
-docker compose logs --tail=200 ccr
+docker compose logs --tail=200 agentrouter
 ```
 
 ## 相关页面

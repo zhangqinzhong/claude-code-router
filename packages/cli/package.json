@@ -2,7 +2,7 @@
   "name": "@zhangqinzhong/agentrouter",
   "version": "3.0.22",
   "license": "MIT",
-  "description": "Local Claude Code Router gateway with CLI and web management UI.",
+  "description": "Local AgentRouter gateway with CLI and web management UI.",
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/zhangqinzhong/claude-code-router.git"

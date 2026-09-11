@@ -25,7 +25,7 @@ test("uses AR_WEB_AUTH_TOKEN for CLI web authentication", async () => {
 test("serves the management UI in a browser", async ({ page }) => {
   const current = requireRuntime();
   await page.goto(`${current.baseUrl}/?ar_web_token=${current.token}`);
-  await expect(page).toHaveTitle("Claude Code Router");
+  await expect(page).toHaveTitle("AgentRouter");
   await expect(page.locator("#root")).toBeAttached();
   await expect(page.locator("body")).toContainText(/Configure provider|Connect agent|Let's start/, { timeout: 15_000 });
   await expect(page.evaluate(() => Boolean(window.agentrouter?.getAppInfo))).resolves.toBe(true);
@@ -57,7 +57,7 @@ test("handles authenticated web RPC requests", async ({ request }) => {
 
   expect(response.status()).toBe(200);
   expect(payload.ok).toBe(true);
-  expect(payload.value.name).toBe("Claude Code Router");
+  expect(payload.value.name).toBe("AgentRouter");
   expect(payload.value.configDir).toContain(current.testHome);
   expect(payload.value.configDbFile).toContain("config.sqlite");
   expect(payload.value.usageDbFile).toContain("usage.sqlite");
