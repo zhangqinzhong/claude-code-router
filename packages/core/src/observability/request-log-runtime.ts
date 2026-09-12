@@ -247,25 +247,38 @@ export class RequestLogRuntime {
     input: RequestLogRawTraceUpdateInput,
     rawTraceFiles?: RequestLogRawTraceFiles
   ): RequestLogEnqueueResult {
-    const recordAdmission = input.deferOutcomeUntilRecord
-      ? this.resolveRecordAdmission(input.requestId)
-      : this.readRecordAdmission(input.requestId);
-    if (recordAdmission === "pending" ||
-      (input.deferOutcomeUntilRecord && recordAdmission?.state === "pending") ||
-      (recordAdmission === undefined && input.deferOutcomeUntilRecord)) {
-      return {
-        accepted: false,
-        degraded: false,
-        reason: "record_pending"
-      };
-    }
-    if (recordAdmission && !recordAdmission.accepted) {
-      this.dropped += 1;
-      return {
-        accepted: false,
-        degraded: false,
-        reason: "record_dropped"
-      };
+    // A standalone record IS the record for this request: the writer's
+    // `allowStandaloneRecord` branch produces it from this very trace. Nothing
+    // else will ever admit it, so the admission store must not be consulted at
+    // all. A missing admission reports `record_pending` forever, and an expired
+    // one is rejected as `record_missing` and then dropped by the check below —
+    // neither can resolve, because that writer branch only runs once the trace
+    // gets past here. Skip admission and let the writer record the trace.
+    // After the guards below, `"pending"` is impossible, so the tail only ever
+    // sees an admission or undefined.
+    let recordAdmission: RequestLogAdmission | undefined;
+    if (!input.allowStandaloneRecord) {
+      const resolved: RequestLogAdmission | "pending" | undefined = input.deferOutcomeUntilRecord
+        ? this.resolveRecordAdmission(input.requestId)
+        : this.readRecordAdmission(input.requestId);
+      if (resolved === "pending" ||
+        (input.deferOutcomeUntilRecord && resolved?.state === "pending") ||
+        (resolved === undefined && input.deferOutcomeUntilRecord)) {
+        return {
+          accepted: false,
+          degraded: false,
+          reason: "record_pending"
+        };
+      }
+      if (resolved && !resolved.accepted) {
+        this.dropped += 1;
+        return {
+          accepted: false,
+          degraded: false,
+          reason: "record_dropped"
+        };
+      }
+      recordAdmission = resolved;
     }
     const ordinarySuccess = input.statusCode !== undefined &&
       input.statusCode >= 200 && input.statusCode < 400;

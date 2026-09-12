@@ -1696,3 +1696,68 @@ async function waitForCondition(predicate, timeoutMs) {
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
 }
+
+// A raw-trace update carrying `allowStandaloneRecord` IS the record for that
+// request: the writer falls through to `standaloneRecordInputFromRawTrace`.
+// Nothing else will ever admit it, so the runtime must not hold it behind an
+// admission that can never arrive. Regression: the pending gate ran before the
+// standalone branch, so every trace was rejected with `record_pending` forever
+// and the Logs / Observability pages stayed empty.
+test("a standalone raw trace records itself instead of waiting for an admission", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-standalone-test-"));
+  const runtime = createRuntime(dir);
+  try {
+    const result = runtime.enqueueRawTrace({
+      allowStandaloneRecord: true,
+      completedAt: new Date().toISOString(),
+      // applyRawTraceRequestLogPolicy always sets this; without it the pending
+      // gate is never reached and the test would not exercise the regression.
+      deferOutcomeUntilRecord: true,
+      model: "standalone-model",
+      provider: "standalone-provider",
+      requestId: "standalone-request",
+      statusCode: 200
+    });
+    // Before the fix this was { accepted: false, reason: "record_pending" }.
+    assert.equal(result.accepted, true, `expected acceptance, got ${JSON.stringify(result)}`);
+
+    const flush = await runtime.flush({ timeoutMs: 10_000 });
+    assert.equal(flush.timedOut, false);
+
+    const page = await runtime.list({ pageSize: 25 });
+    assert.equal(page.items.length, 1, "the standalone trace should produce exactly one request log");
+    assert.equal(page.items[0].requestId, "standalone-request");
+    assert.equal(page.items[0].model, "standalone-model");
+    assert.equal(page.items[0].provider, "standalone-provider");
+    assert.equal(page.items[0].statusCode, 200);
+  } finally {
+    await runtime.close({ timeoutMs: 5_000 });
+    rmSync(dir, { force: true, recursive: true });
+  }
+});
+
+// The gate still has to hold ordinary traces: without `allowStandaloneRecord`
+// nothing has admitted the request yet, so the trace waits rather than writing
+// a record that a later real record would duplicate.
+test("a non-standalone raw trace still waits for its admission", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-request-log-deferred-test-"));
+  const runtime = createRuntime(dir);
+  try {
+    const result = runtime.enqueueRawTrace({
+      deferOutcomeUntilRecord: true,
+      model: "deferred-model",
+      provider: "deferred-provider",
+      requestId: "deferred-request",
+      statusCode: 200
+    });
+    assert.equal(result.accepted, false);
+    assert.equal(result.reason, "record_pending");
+
+    await runtime.flush({ timeoutMs: 5_000 });
+    const page = await runtime.list({ pageSize: 25 });
+    assert.equal(page.items.length, 0, "a deferred trace must not be written on its own");
+  } finally {
+    await runtime.close({ timeoutMs: 5_000 });
+    rmSync(dir, { force: true, recursive: true });
+  }
+});
