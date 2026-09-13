@@ -287,3 +287,18 @@ test("profileOpenCommand quotes profile references for shell usage", () => {
   assert.match(appCommand, / app$/);
   assert.match(workbuddyCommand, / app$/);
 });
+
+
+test("CLI profiles apply per-agent YOLO flags and saved arguments, without affecting App launches", () => {
+  const claude = buildProfileLaunchPlan("/tmp/config", { ...claudeProfile, permissionMode: "yolo", launchArgs: ["--verbose", "a b"] }, "cli", ["--resume"]);
+  assert.ok(claude.args.includes("--dangerously-skip-permissions"));
+  assert.ok(claude.args.includes("a b"));
+  assert.ok(claude.args.includes("--resume"));
+  const codex = buildProfileLaunchPlan("/tmp/config", { ...codexProfile, permissionMode: "yolo" }, "cli");
+  assert.ok(codex.args.includes("--dangerously-bypass-approvals-and-sandbox"));
+  const repeated = buildProfileLaunchPlan("/tmp/config", { ...claudeProfile, permissionMode: "yolo" }, "cli", ["--dangerously-skip-permissions"]);
+  assert.equal(repeated.args.filter((arg) => arg === "--dangerously-skip-permissions").length, 1);
+  const app = buildProfileLaunchPlan("/tmp/config", { ...codexProfile, permissionMode: "yolo", launchArgs: ["--verbose"] }, "app");
+  assert.ok(!app.args.includes("--dangerously-bypass-approvals-and-sandbox"));
+  assert.ok(!app.args.includes("--verbose"));
+});

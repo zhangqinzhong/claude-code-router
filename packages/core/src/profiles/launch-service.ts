@@ -1,3 +1,4 @@
+import { profileTerminalLaunch } from "@agentrouter/core/profiles/terminal-launch";
 import { syncProfileAliases } from "@agentrouter/core/profiles/aliases";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
@@ -163,6 +164,32 @@ export async function openProfileFromAr(config: AppConfig, request: ProfileOpenR
   }
   if (profile.agent === "opencode" && surface === "app") {
     return await openOpenCodeAppProfile(config, profile);
+  }
+  if (surface === "cli") {
+    const launcher = ensureArCliLauncher(config);
+    const terminal = profileTerminalLaunch(CONFIGDIR, launcher, profile.id);
+    if (terminal.scriptFile && terminal.scriptContent) {
+      mkdirSync(path.dirname(terminal.scriptFile), { recursive: true });
+      writeFileIfChanged(terminal.scriptFile, terminal.scriptContent);
+      chmodSafe(terminal.scriptFile);
+    }
+    const child = spawn(terminal.command, terminal.args, { detached: true, stdio: "ignore", cwd: os.homedir() });
+    const error = await new Promise<string | undefined>((resolve) => {
+      const timer = setTimeout(() => finish(undefined), 500);
+      const finish = (message: string | undefined) => {
+        clearTimeout(timer);
+        child.off("error", onError);
+        child.off("exit", onExit);
+        resolve(message);
+      };
+      const onError = (error: Error) => finish(formatError(error));
+      const onExit = (code: number | null) => finish(code === 0 ? undefined : `Terminal launcher exited with code ${code}.`);
+      child.once("error", onError);
+      child.once("exit", onExit);
+    });
+    if (error) throw new Error(`Failed to open terminal: ${error}`);
+    child.unref();
+    return { message: `Opened ${profile.name || profile.id}.`, profileId: profile.id, profileName: profile.name, surface };
   }
   const plan = buildProfileLaunchPlan(CONFIGDIR, profile, surface);
   if (path.isAbsolute(plan.command) && !existsSync(plan.command)) {

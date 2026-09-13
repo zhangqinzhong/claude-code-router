@@ -1,3 +1,4 @@
+import { profileCliArgs } from "@agentrouter/core/profiles/launch-options";
 import path from "node:path";
 import type { AppConfig, ProfileConfig, ProfileOpenSurface } from "@agentrouter/core/contracts/app";
 import { claudeCodeModelEnv as claudeCodeProfileModelEnv, claudeCodeUtcTimezoneEnvOverride } from "@agentrouter/core/agents/claude-code/environment";
@@ -113,6 +114,7 @@ export function buildProfileLaunchPlan(
   extraArgs: string[] = []
 ): ProfileLaunchPlan {
   const resolvedSurface = resolveProfileOpenSurface(profile, surface);
+  if (resolvedSurface === "cli") extraArgs = profileCliArgs(profile, extraArgs);
   if (profile.agent === "claude-design") {
     throw new Error("Claude Design profiles can only be opened from AgentRouter Desktop.");
   }

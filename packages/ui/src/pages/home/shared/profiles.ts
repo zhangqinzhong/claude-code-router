@@ -558,6 +558,8 @@ export function createProfileDraft(agent: ProfileConfig["agent"] = "claude-code"
     managedCompact: false,
     model: "",
     launchAlias: "",
+    permissionMode: "default",
+    launchArgsText: "",
     name: name ?? profileAgentLabel(agent),
     opusModel: "",
     providerId: "claude-code-router",
@@ -601,6 +603,8 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
       ...createProfileDraft("claude-code", profile.name),
       ...createProfileRoutingDraft(profile.routing),
       launchAlias: profile.launchAlias ?? "",
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgsText: (profile.launchArgs ?? []).join("\n"),
       ...botDraft,
       appPath: profile.appPath ?? "",
       botConfigId,
@@ -625,6 +629,8 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
       ...createProfileDraft(profile.agent, profile.name),
       ...createProfileRoutingDraft(profile.routing),
       launchAlias: profile.launchAlias ?? "",
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgsText: (profile.launchArgs ?? []).join("\n"),
       availableModels: profileDraftAvailableModels(profile),
       envRows: keyValueRowsFromRecord(codexCompatibleProfileEnv(profile.env ?? {})),
       model: profile.model,
@@ -637,6 +643,8 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
       ...createProfileDraft("claude-design", profile.name),
       ...createProfileRoutingDraft(profile.routing),
       launchAlias: profile.launchAlias ?? "",
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgsText: (profile.launchArgs ?? []).join("\n"),
       envRows: [],
       model: "",
       scope: "agentrouter",
@@ -648,6 +656,8 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
     ...createProfileDraft(profile.agent, profile.name),
     ...createProfileRoutingDraft(profile.routing),
       launchAlias: profile.launchAlias ?? "",
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgsText: (profile.launchArgs ?? []).join("\n"),
     ...botDraft,
     appPath: profile.appPath ?? "",
     availableModels: profileDraftAvailableModels(profile),
@@ -757,6 +767,8 @@ export function profileConfigFromDraft(
     managedCompact: draft.managedCompact,
     model: draft.model,
     launchAlias: draft.launchAlias?.trim() || undefined,
+    permissionMode: draft.permissionMode ?? "default",
+    launchArgs: (draft.launchArgsText ?? "").split(/\r?\n/).map((arg) => arg.trim()).filter(Boolean),
     name: draft.name,
     opusModel: draft.opusModel,
     providerId: draft.providerId.trim() || "claude-code-router",
@@ -1297,6 +1309,10 @@ export function profileSummaryItems(
 ): Array<{ label: string; value: string }> {
   const surface = normalizeProfileSurfaceForAgent(profile.agent, profile.surface);
   const envCount = Object.keys(profile.env ?? {}).length;
+  const launchSummaryItems = [
+    ...(profile.launchAlias ? [{ label: t("Launch alias"), value: profile.launchAlias }] : []),
+    ...(surface !== "app" && profile.permissionMode === "yolo" && ["claude-code", "codex"].includes(profile.agent) ? [{ label: t("Permission mode"), value: "YOLO" }] : [])
+  ];
   const envSummaryItems = envCount > 0
     ? [{ label: t("Environment variables"), value: String(envCount) }]
     : [];
@@ -1368,6 +1384,7 @@ export function profileSummaryItems(
       ...botSummaryItems,
       ...appPathSummaryItems,
       ...claudeSettingsSummaryItems,
+      ...launchSummaryItems,
       ...envSummaryItems
     ];
   }
@@ -1377,6 +1394,7 @@ export function profileSummaryItems(
       { label: t(profile.agent === "kimi" ? "Kimi model" : profile.agent === "pi" ? "Pi model" : "Model"), value: modelValue },
       ...allowedModelSummaryItems,
       ...routingSummaryItems,
+      ...launchSummaryItems,
       ...envSummaryItems
     ];
   }
@@ -1396,7 +1414,8 @@ export function profileSummaryItems(
     ...routingSummaryItems,
     ...appPathSummaryItems,
     ...botSummaryItems,
-    ...envSummaryItems
+    ...launchSummaryItems,
+      ...envSummaryItems
   ];
 }
 
@@ -1420,6 +1439,8 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
     return {
       agent: "claude-code",
       launchAlias: profile.launchAlias?.trim() || undefined,
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgs: profile.launchArgs ?? [],
       ...(surface !== "cli" && appPath ? { appPath } : {}),
       ...(botConfigId ? { botConfigId } : {}),
       ...(botGateway ? { botGateway } : {}),
@@ -1446,6 +1467,8 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
     return {
       agent,
       launchAlias: profile.launchAlias?.trim() || undefined,
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgs: profile.launchArgs ?? [],
       ...(availableModels ? { availableModels } : {}),
       enabled: profile.enabled,
       env: codexCompatibleProfileEnv(env),
@@ -1461,6 +1484,8 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
     return {
       agent,
       launchAlias: profile.launchAlias?.trim() || undefined,
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgs: profile.launchArgs ?? [],
       enabled: profile.enabled,
       env: {},
       id: profile.id || `profile-${index + 1}`,
@@ -1474,6 +1499,8 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
   return {
     agent: normalizeCodexCompatibleAgent(agent),
     launchAlias: profile.launchAlias?.trim() || undefined,
+      permissionMode: profile.permissionMode ?? "default",
+      launchArgs: profile.launchArgs ?? [],
     ...(surface !== "cli" && agent !== "zcode" && profile.appPath?.trim() ? { appPath: profile.appPath.trim() } : {}),
     ...(botConfigId ? { botConfigId } : {}),
     ...(botGateway ? { botGateway } : {}),
@@ -1578,6 +1605,8 @@ export function normalizeUnknownProfileItem(value: Record<string, unknown>, inde
   return normalizeProfileItem({
     agent,
     launchAlias: typeof value.launchAlias === "string" ? value.launchAlias.trim() : undefined,
+    permissionMode: value.permissionMode === "yolo" ? "yolo" : "default",
+    launchArgs: Array.isArray(value.launchArgs) ? value.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
     appPath: readUnknownProfileAppPath(value, agent),
     availableModels: Array.isArray(value.availableModels)
       ? value.availableModels.filter((model): model is string => typeof model === "string")
@@ -1766,7 +1795,7 @@ export function profileOpenSurfaces(profile: ProfileConfig): ProfileOpenSurface[
 
 export function profileOpenCommandFallback(profile: ProfileConfig, surface: ProfileOpenSurface = profile.agent === "workbuddy" || profile.agent === "zcode" || profile.agent === "claude-design" ? "app" : "cli"): string {
   const profileRef = profile.name.trim() || profile.id;
-  return ["agentrouter", shellCommandQuote(profileRef), ...(surface === "app" ? ["app"] : [])].join(" ");
+  return [...(profile.launchAlias ? [shellCommandQuote(profile.launchAlias)] : ["agentrouter", shellCommandQuote(profileRef)]), ...(surface === "app" ? ["app"] : [])].join(" ");
 }
 
 function shellCommandQuote(value: string): string {

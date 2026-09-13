@@ -463,7 +463,7 @@ test("ProfileView renders agent profiles as compact cards with inline actions", 
   assert.doesNotMatch(html, />Disabled<\/span>/);
   assert.doesNotMatch(html, /aria-label="Claude Code Main Launch actions"/);
   assert.doesNotMatch(html, /aria-label="Claude Code Main Management actions"/);
-  assert.match(html, /aria-label="Copy CLI command Claude Code Main"/);
+  assert.match(html, /aria-label="Open in terminal Claude Code Main"/);
   assert.match(html, /aria-label="Start App Claude Code Main"/);
   assert.match(html, /aria-label="Edit Claude Code Main"/);
   assert.match(html, /aria-label="Remove profile"/);
@@ -793,4 +793,15 @@ test("launch alias survives draft and persisted profile round trips", () => {
     assert.equal(normalizeUnknownProfileItem(profile, 0)?.launchAlias, "ccwork");
     assert.equal(isProfileDraftSubmittable({ ...draft, launchAlias: "../bad" }), false);
   }
+});
+
+
+test("profile launch permissions and arguments survive editing", () => {
+  const draft = { ...createProfileDraft("claude-code"), name: "Company", model: "Provider/model", permissionMode: "yolo" as const, launchArgsText: "--verbose\n--add-dir\n/tmp/my project" };
+  const saved = profileConfigFromDraft(draft, []);
+  assert.equal(saved.permissionMode, "yolo");
+  assert.deepEqual(saved.launchArgs, ["--verbose", "--add-dir", "/tmp/my project"]);
+  const reloaded = normalizeUnknownProfileItem(saved, 0)!;
+  assert.equal(createProfileDraftFromProfile(reloaded).permissionMode, "yolo");
+  assert.equal(createProfileDraftFromProfile(reloaded).launchArgsText, draft.launchArgsText);
 });

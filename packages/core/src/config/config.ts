@@ -3679,6 +3679,8 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
+          launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           ...(appPath ? { appPath } : {}),
           ...(botConfigId ? { botConfigId } : {}),
           ...(botGateway ? { botGateway } : {}),
@@ -3706,6 +3708,8 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
+          launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           ...(availableModels ? { availableModels } : {}),
           enabled,
           env: codexCompatibleProfileEnv(env),
@@ -3722,6 +3726,8 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
+          launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           enabled,
           env: {},
           id,
@@ -3744,6 +3750,8 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
       return {
         agent,
         launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
+          launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
         ...(appPath ? { appPath } : {}),
         ...(botConfigId ? { botConfigId } : {}),
         ...(botGateway ? { botGateway } : {}),

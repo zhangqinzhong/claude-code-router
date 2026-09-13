@@ -183,3 +183,12 @@ With a Bot bound, WorkBuddy can relay conversations through the selected IM chan
 Set **Launch alias** in the profile editor, for example `ccwork`. After saving, run `ccwork` in a terminal to start the profile. Additional arguments are passed through to the agent. The existing `agentrouter CodexCompany` command remains available.
 
 Aliases bind to profile IDs, so renaming a profile preserves its launch target. Disabling or deleting a profile, or changing or clearing its alias, removes the old alias command. Use up to 48 letters, digits, hyphens or underscores, starting with a letter. Existing commands, shell functions and aliases assigned to other profiles cannot be reused.
+
+
+## Terminal launch and permission mode
+
+The terminal button on a profile card opens the profile in the system terminal. **Copy launch command** is available in the adjacent menu.
+
+Claude Code and Codex profiles support Default and YOLO permission modes. YOLO skips permission prompts; for Codex it also disables sandbox restrictions. The setting applies to this profile's CLI launches, including launch aliases.
+
+Under **Advanced settings → Additional launch arguments**, enter one argument per line without shell quotes. For example, put `--add-dir` and `/path/my project` on separate lines; the path remains a single argument.

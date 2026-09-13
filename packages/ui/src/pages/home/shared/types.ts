@@ -171,6 +171,8 @@ export type AddApiKeyDraft = {
 
 export type AddProfileDraft = {
   launchAlias?: string;
+  permissionMode?: "default" | "yolo";
+  launchArgsText?: string;
   agent: ProfileConfig["agent"];
   appPath: string;
   availableModels: string[];

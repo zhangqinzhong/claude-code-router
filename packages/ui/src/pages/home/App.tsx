@@ -2831,6 +2831,43 @@ function App() {
     }
   }
 
+  async function openProfileCliFromList(index: number) {
+    const profile = draftConfig.profile.profiles[index];
+    if (!profile?.enabled || !profileOpenSurfaces(profile).includes("cli") || profileActionBusy) {
+      return;
+    }
+
+    setProfileActionError("");
+    setProfileActionBusy({ profileId: profile.id, surface: "cli" });
+    try {
+      let saveError = "";
+      const setSaveError = (message: string) => {
+        saveError = message;
+        setProfileActionError(message);
+      };
+      if (!(await persistConfig(draftConfig, setSaveError, undefined, "silent"))) {
+        if (!saveError) {
+          setProfileActionError(t("Failed to save profile before opening."));
+        }
+        return;
+      }
+
+      if (!window.agentrouter?.openProfile) {
+        setProfileActionError(t("Profile opening is only available in the Electron app."));
+        return;
+      }
+      const result = await window.agentrouter.openProfile({ profileId: profile.id, surface: "cli" });
+      await refreshProfileRuntimeStatus();
+      showToast(translateAppErrorMessage(copy, result.message));
+    } catch (error) {
+      setProfileActionError(formatError(error));
+    } finally {
+      setProfileActionBusy((current) =>
+        current?.profileId === profile.id && current.surface === "cli" ? undefined : current
+      );
+    }
+  }
+
   async function openProfileAppFromList(index: number) {
     const profile = draftConfig.profile.profiles[index];
     if (!profile?.enabled || !profileOpenSurfaces(profile).includes("app") || profileActionBusy) {
@@ -3319,6 +3356,7 @@ function App() {
                   agentOptions: availableProfileAgentOptions,
                   applyError: profileActionError,
                   copyProfileCliCommand: (index) => void copyProfileCliCommand(index),
+                  openProfileCli: (index) => void openProfileCliFromList(index),
                   config: draftConfig,
                   editProfile: openEditProfileDialog,
                   openProfileApp: (index) => void openProfileAppFromList(index),

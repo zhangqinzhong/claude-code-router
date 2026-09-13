@@ -1518,6 +1518,8 @@ export type CodexProfileConfig = {
 
 export type ProfileConfig = {
   launchAlias?: string;
+  permissionMode?: "default" | "yolo";
+  launchArgs?: string[];
   agent: ProfileClientKind;
   appPath?: string;
   availableModels?: string[];

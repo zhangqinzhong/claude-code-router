@@ -56,6 +56,7 @@ export function ProfileView({
   applyError,
   agentOptions = profileAgentOptions,
   copyProfileCliCommand,
+  openProfileCli,
   config,
   editProfile,
   openProfileApp,
@@ -69,6 +70,7 @@ export function ProfileView({
   agentOptions?: ProfileAgentOption[];
   applyError: string;
   copyProfileCliCommand: (index: number) => void;
+  openProfileCli?: (index: number) => void;
   config: AppConfig;
   editProfile: (index: number) => void;
   openProfileApp: (index: number) => void;
@@ -129,7 +131,7 @@ export function ProfileView({
               const appRunning = Boolean(runtimeEntry);
               const appActionLabel = appRunning ? "Stop" : "Start";
               const appActionTooltip = `${t(appActionLabel)} ${t("App")}`;
-              const cliActionTooltip = `${t("Copy")} ${t("CLI command")}`;
+              const cliActionTooltip = t("Open in terminal");
               const showProfileLaunchActions = profile.enabled;
               const profileActionDisabled = Boolean(profileActionBusy);
 
@@ -207,7 +209,7 @@ export function ProfileView({
                           <Button
                             aria-label={`${cliActionTooltip} ${profile.name || t("Profile")}`}
                             disabled={profileActionDisabled}
-                            onClick={() => copyProfileCliCommand(index)}
+                            onClick={() => openProfileCli?.(index)}
                             size="iconSm"
                             type="button"
                             variant="subtle"
@@ -223,6 +225,17 @@ export function ProfileView({
                             </AnimatedIconSwap>
                           </Button>
                         </ProfileActionTooltip>
+                      ) : null}
+                      {showProfileLaunchActions && openSurfaces.includes("cli") ? (
+                        <details className="relative">
+                          <summary aria-label={t("More actions")} className="cursor-pointer list-none rounded-md px-2 py-1 text-muted-foreground hover:bg-muted">···</summary>
+                          <div className="absolute bottom-full left-0 z-20 mb-2 min-w-40 rounded-md border border-border bg-popover p-1 shadow-md">
+                            <button type="button" disabled={profileActionDisabled} className="w-full rounded px-3 py-2 text-left text-xs hover:bg-muted" onClick={(event) => {
+                              event.currentTarget.closest("details")?.removeAttribute("open");
+                              copyProfileCliCommand(index);
+                            }}>{t("Copy CLI command")}</button>
+                          </div>
+                        </details>
                       ) : null}
                       {showProfileLaunchActions && openSurfaces.includes("app") ? (
                         <ProfileActionTooltip label={appActionTooltip}>
@@ -843,6 +856,11 @@ export function AddProfileForm({
           <Input value={draft.launchAlias ?? ""} placeholder="ccwork" onChange={(event) => onChange({ launchAlias: event.target.value })} />
           <ProfileFieldHint>{t(validation.launchAlias || "Optional. Start this profile by typing the alias in a terminal.")}</ProfileFieldHint>
         </Field>
+        {(draft.agent === "claude-code" || draft.agent === "codex") && draft.surface !== "app" ? (
+          <Field label={t("Permission mode")}>
+            <SelectControl value={draft.permissionMode ?? "default"} options={[{ label: t("Default"), value: "default" }, { label: t("YOLO (skip permission prompts)"), value: "yolo" }]} onChange={(value) => onChange({ permissionMode: value === "yolo" ? "yolo" : "default" })} />
+          </Field>
+        ) : null}
         <Field label={t("Effect scope")} requirement="required" requirementLabel={requiredFieldLabel}>
           <SelectControl
             onChange={(scope) => onChange({ scope: normalizeProfileScope(scope) })}
@@ -1069,6 +1087,12 @@ export function AddProfileForm({
                         error={validation.claudeSettings ? t(validation.claudeSettings) : ""}
                         onChange={onChange}
                       />
+                    ) : null}
+                    {draft.surface !== "app" ? (
+                      <Field className="sm:col-span-2" label={t("Additional launch arguments")}>
+                        <textarea className="min-h-20 w-full rounded-md border border-input bg-background px-3 py-2 font-mono text-xs" value={draft.launchArgsText ?? ""} onChange={(event) => onChange({ launchArgsText: event.target.value })} />
+                        <ProfileFieldHint>{t("One argument per line. No shell quoting is needed.")}</ProfileFieldHint>
+                      </Field>
                     ) : null}
                     <Field className="sm:col-span-2" label={t("Environment variables")} requirement="optional" requirementLabel={optionalFieldLabel}>
                       <KeyValueRowsControl
