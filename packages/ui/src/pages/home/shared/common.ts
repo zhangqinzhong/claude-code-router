@@ -1,5 +1,6 @@
 import {
   DEFAULT_OVERVIEW_WIDGETS,
+  LEGACY_DEFAULT_OVERVIEW_WIDGETS,
   DEFAULT_TRAY_COMPONENT_VARIANTS,
   DEFAULT_TRAY_WINDOW_MODULES,
   OVERVIEW_WIDGET_SIZE_VALUES,
@@ -330,6 +331,10 @@ export function normalizeOverviewWidgets(value: unknown): OverviewWidgetConfig[]
   const widgets = value
     .map(normalizeOverviewWidget)
     .filter((widget): widget is OverviewWidgetConfig => Boolean(widget));
+  // Only upgrade the untouched old default; preserve every customized layout.
+  if (JSON.stringify(widgets) === JSON.stringify(LEGACY_DEFAULT_OVERVIEW_WIDGETS.map(normalizeOverviewWidget))) {
+    return DEFAULT_OVERVIEW_WIDGETS.map((widget) => ({ ...widget }));
+  }
   return widgets;
 }
 

@@ -133,7 +133,9 @@ export function ModelSelector({
 
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
+        event.preventDefault();
         setOpen(false);
+        rootRef.current?.querySelector<HTMLElement>("[aria-haspopup]")?.focus({ preventScroll: true });
       }
     }
 

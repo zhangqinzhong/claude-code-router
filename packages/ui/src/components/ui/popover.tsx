@@ -1,6 +1,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { cn } from "@/lib/utils";
+import { DialogScopeContext } from "./dialog";
 
 export interface PopoverContentProps extends React.HTMLAttributes<HTMLDivElement> {}
 
@@ -22,11 +23,12 @@ export interface PopoverPortalProps {
 }
 
 function PopoverPortal({ children, open = true }: PopoverPortalProps) {
+  const dialogScope = React.useContext(DialogScopeContext);
   if (!open || typeof document === "undefined") {
     return null;
   }
 
-  return createPortal(children, document.body);
+  return createPortal(<div className="contents" data-ui-dialog-owner={dialogScope?.id}>{children}</div>, document.body);
 }
 
 export { PopoverContent, PopoverPortal };

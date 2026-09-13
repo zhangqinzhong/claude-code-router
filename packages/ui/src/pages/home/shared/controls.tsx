@@ -63,10 +63,10 @@ export function Field({
   return (
     <Label className={cn("block min-w-0 space-y-1", className)}>
       <span className="flex min-w-0 items-center gap-1.5">
-        <span className="truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+        <span className="truncate text-[12px] font-medium text-muted-foreground">{label}</span>
         {requirement ? (
           <span className={cn(
-            "shrink-0 rounded border px-1 py-0 text-[9px] font-semibold uppercase leading-3 tracking-wide",
+            "shrink-0 rounded border px-1 py-0 text-[11px] font-semibold leading-4 tracking-wide",
             requirement === "required"
               ? "border-amber-500/35 bg-amber-500/10 text-amber-700 dark:text-amber-300"
               : "border-border bg-muted/35 text-muted-foreground"
@@ -83,7 +83,7 @@ export function Field({
 export function FieldGroup({ children, className, label }: { children: React.ReactNode; className?: string; label: string }) {
   return (
     <div className={cn("block min-w-0 space-y-1", className)}>
-      <span className="block truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{label}</span>
+      <span className="block truncate text-[12px] font-medium text-muted-foreground">{label}</span>
       {children}
     </div>
   );
@@ -318,7 +318,7 @@ export function systemStatusPointTooltip(segment: SystemStatusPoint, t: (value: 
   return [
     segment.dateLabel,
     `${t("Requests")}: ${formatCompactNumber(segment.point.requestCount)}`,
-    `${t("Success rate")}: ${formatPercent(segment.point.successRate)}`,
+    `${t("Success rate")}: ${segment.point.requestCount > 0 ? formatPercent(segment.point.successRate) : "—"}`,
     `${t("Failed requests")}: ${formatCompactNumber(segment.point.errorCount)}`,
     `${t("Duration")}: ${formatDuration(segment.point.avgDurationMs)}`
   ].join("\n");

@@ -1587,3 +1587,14 @@
     }
   }
 }
+
+@media (max-height: 760px) {
+  .onboarding-step-heading {
+    flex-direction: row;
+    justify-content: center;
+    text-align: left;
+  }
+  .onboarding-step-heading .onboarding-mascot-sprite {
+    display: none;
+  }
+}

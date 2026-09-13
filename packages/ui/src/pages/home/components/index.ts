@@ -1,5 +1,5 @@
 export { OnboardingView } from "./onboarding";
-export { LightToast } from "./feedback";
+export { FeedbackStack, LightToast, PersistenceFeedback } from "./feedback";
 export { AppDialogStack } from "./dialog-stack";
 export { MainLayout, OnboardingLayout, UpdateEntryButton } from "./layout";
 export { AppSettingsDialog } from "./settings";

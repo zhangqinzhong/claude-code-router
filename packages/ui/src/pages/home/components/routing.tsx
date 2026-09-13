@@ -1,3 +1,4 @@
+import { useDraftClose } from "./unsaved-changes";
 import {
   AddRoutingRuleDraft, AnimatedListItem, AnimatePresence, AppConfig, ArrowDown,
   ArrowUp, Badge, buildRoutingRuleRows, Button, Card, CardContent,
@@ -384,6 +385,7 @@ export function AddRoutingRuleDialog({
   providers: GatewayProviderConfig[];
 }) {
   const t = useAppText();
+  const { close, confirmation } = useDraftClose(draft, onClose);
   const conditionSourceOptions = translateOptions(routerConditionSourceOptions, t);
   const rewriteOperationOptions = translateOptions(routerRewriteOperationOptions, t);
   const ruleTypeOptions = translateOptions(
@@ -485,13 +487,14 @@ export function AddRoutingRuleDialog({
   }
 
   return (
-    <Dialog onOpenChange={(open) => !open && onClose()}>
+    <>
+    <Dialog onOpenChange={(open) => !open && close()}>
       <DialogContent>
         <DialogHeader>
           <div className="min-w-0">
             <DialogTitle>{mode === "edit" ? t("Edit Routing Rule") : t("Add Routing Rule")}</DialogTitle>
           </div>
-          <Button aria-label={t("Close dialog")} onClick={onClose} size="iconSm" title={t("Close")} type="button" variant="ghost">
+          <Button aria-label={t("Close dialog")} onClick={close} size="iconSm" title={t("Close")} type="button" variant="ghost">
             <X className="h-4 w-4" />
           </Button>
         </DialogHeader>
@@ -688,7 +691,7 @@ export function AddRoutingRuleDialog({
         </DialogBody>
 
         <DialogFooter>
-          <Button onClick={onClose} type="button" variant="outline">
+          <Button onClick={close} type="button" variant="outline">
             {t("Cancel")}
           </Button>
           <Button
@@ -702,5 +705,7 @@ export function AddRoutingRuleDialog({
         </DialogFooter>
       </DialogContent>
     </Dialog>
+    {confirmation}
+    </>
   );
 }

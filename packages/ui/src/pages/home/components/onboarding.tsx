@@ -241,7 +241,7 @@ export function OnboardingView({
                 ) : null}
               </div>
 
-              <div className="flex min-w-0 shrink-0 flex-col items-center gap-2 text-center">
+              <div className="onboarding-step-heading flex min-w-0 shrink-0 flex-col items-center gap-2 text-center">
                 <OnboardingMascotSprite activeStep={activeStep} />
                 <div className="min-w-0">
                   <h2 className="text-[20px] font-semibold tracking-normal">{t(activeDetails.title)}</h2>

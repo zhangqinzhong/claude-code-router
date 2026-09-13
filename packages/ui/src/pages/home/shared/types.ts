@@ -184,6 +184,7 @@ export type AddProfileDraft = {
   botHandoffPhoneBluetoothTargets: string;
   botHandoffPhoneWifiTargets: string;
   botPlatform: string;
+  claudeSettingsText: string;
   configFile: string;
   envRows: KeyValueDraftRow[];
   fableModel: string;

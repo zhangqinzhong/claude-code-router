@@ -19,6 +19,7 @@ import trayLayeredIconUrl from "@/assets/tray-layered.png";
 const settingsPageContentWidthClassName = "mx-auto w-full max-w-[900px]";
 
 export function AppSettingsDialog({
+  saveFeedback,
   appInfo,
   botAddRequestKey,
   botConfigs,
@@ -53,6 +54,7 @@ export function AppSettingsDialog({
   trayWidgets,
   updateConfig
 }: {
+  saveFeedback?: ReactNode;
   appInfo: AppInfo;
   botAddRequestKey?: number;
   botConfigs: BotGatewaySavedConfig[];
@@ -89,6 +91,7 @@ export function AppSettingsDialog({
 }) {
   return (
     <SettingsLayout
+      saveFeedback={saveFeedback}
       copy={copy}
       initialPage={initialPage}
       onClose={onClose}
@@ -179,12 +182,14 @@ export function AppSettingsDialog({
 }
 
 function SettingsLayout({
+  saveFeedback,
   copy,
   initialPage,
   onClose,
   renderPage,
   traySupported
 }: {
+  saveFeedback?: ReactNode;
   copy: AppCopy;
   initialPage: SettingsPageId;
   onClose: () => void;
@@ -211,7 +216,22 @@ function SettingsLayout({
         </DialogHeader>
 
         <DialogBody className="flex overflow-hidden p-0 max-[640px]:flex-col">
-          <aside className="flex w-[220px] shrink-0 flex-col border-r border-border/70 bg-muted/20 p-2 max-[640px]:w-full max-[640px]:border-b max-[640px]:border-r-0">
+          <div className="hidden shrink-0 border-b border-border p-3 max-[640px]:block">
+            <Select
+              aria-label={copy.settings.title}
+              onChange={(event) => setActivePage(event.target.value as SettingsPageId)}
+              options={[
+                { label: copy.settings.appearance, value: "appearance" },
+                { label: copy.settings.general, value: "general" },
+                { label: copy.settings.observability, value: "observability" },
+                { label: copy.settings.toolHub, value: "toolhub" },
+                { label: copy.settings.bots, value: "bots" },
+                ...(traySupported ? [{ label: copy.settings.tray, value: "tray" }] : [])
+              ]}
+              value={visiblePage}
+            />
+          </div>
+          <aside className="flex w-[220px] shrink-0 flex-col border-r border-border/70 bg-muted/20 p-2 max-[640px]:hidden">
             <SettingsPageButton
               active={visiblePage === "appearance"}
               icon={Palette}
@@ -261,6 +281,7 @@ function SettingsLayout({
             {renderPage(visiblePage)}
           </section>
         </DialogBody>
+        {saveFeedback}
       </DialogContent>
     </Dialog>
   );
@@ -288,6 +309,7 @@ function SettingsPageButton({
           : "text-muted-foreground hover:bg-muted hover:text-foreground",
         className
       )}
+      aria-current={active ? "page" : undefined}
       onClick={onClick}
       type="button"
       unstyled
@@ -1466,6 +1488,7 @@ function BotConfigDialog({
   const platformOptions = botGatewayPlatformOptions.map((option) => ({ ...option, label: t(option.label) }));
   const authOptions = authSpecs.map((option) => ({ label: t(option.label), value: option.value }));
   const qrLoginSupported = platform === "weixin-ilink" && authType === "qr_login";
+  const streamRepliesSupported = platform !== "weixin-ilink";
   const busy = saving || qrLogin.loading;
   const shouldCompleteQrLoginOnSave = qrLoginSupported && !canReuseExistingQrConfig();
 
@@ -1480,7 +1503,8 @@ function BotConfigDialog({
     update({
       botAuthFields: botGatewayPickAuthFields(draft.botAuthFields, nextPlatform, nextAuthType),
       botAuthType: nextAuthType,
-      botPlatform: nextPlatform
+      botPlatform: nextPlatform,
+      ...(nextPlatform === "weixin-ilink" ? { botStreamReplies: false } : {})
     });
   }
 
@@ -1793,10 +1817,12 @@ function BotConfigDialog({
             <Field label={t("Maximum attachment size (MB)")}>
               <Input min="1" max="100" type="number" value={draft.botMaxAttachmentMb} onChange={(event) => update({ botMaxAttachmentMb: event.target.value })} />
             </Field>
-            <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
-              <span className="text-[12px] font-medium">{t("Stream replies and progress")}</span>
-              <Switch disabled={draft.botPlatform === "weixin-ilink"} checked={draft.botPlatform === "weixin-ilink" ? false : draft.botStreamReplies} onCheckedChange={(checked) => update({ botStreamReplies: checked })} />
-            </div>
+            {streamRepliesSupported ? (
+              <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
+                <span className="text-[12px] font-medium">{t("Stream replies and progress")}</span>
+                <Switch checked={draft.botStreamReplies} onCheckedChange={(checked) => update({ botStreamReplies: checked })} />
+              </div>
+            ) : null}
             <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
               <span className="text-[12px] font-medium">{t("Send and receive attachments")}</span>
               <Switch checked={draft.botMediaEnabled} onCheckedChange={(checked) => update({ botMediaEnabled: checked })} />

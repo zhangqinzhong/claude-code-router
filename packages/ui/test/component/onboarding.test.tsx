@@ -52,7 +52,7 @@ test("Onboarding provider step renders only the active provider setup section", 
   assert.match(html, /Connect agent/);
   assert.match(html, /Let&#x27;s start/);
   assert.match(html, /aria-label="Step 1 \/ 6"/);
-  assert.match(html, /1 \/ 4/);
+  assert.doesNotMatch(html, /1 \/ 4/);
   assert.doesNotMatch(html, /Setup readiness/);
   assert.doesNotMatch(html, /Choose a provider preset or endpoint, enter an API key, and add at least one model/);
   assert.doesNotMatch(html, /Choose how this provider authenticates model requests/);
@@ -104,5 +104,5 @@ test("Onboarding profile step does not prompt to save before continuing", () => 
   assert.doesNotMatch(html, /Save this agent profile to continue/);
   assert.doesNotMatch(html, /Choose an agent, model, and required profile settings/);
   assert.doesNotMatch(html, /provider identity/);
-  assert.match(html, /Models, paths, routing, bot, compact, and env/);
+  assert.match(html, /Models, paths, routing, bot, compact, Claude settings, and env/);
 });

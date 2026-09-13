@@ -535,7 +535,7 @@ test("AddProviderDialog progressively reveals provider setup steps", () => {
   assert.match(html, /sm:w-\[min\(1040px,calc\(100vw-3rem\)\)\]/);
   assert.doesNotMatch(html, /max-w-\[760px\]/);
   assert.doesNotMatch(html, /max-w-\[1040px\]/);
-  assert.match(html, />1 \/ 4</);
+  assert.doesNotMatch(html, />1 \/ 4</);
   assert.match(html, />Next</);
   assert.doesNotMatch(html, />Cancel<\/button>/);
   assert.doesNotMatch(html, /Add credentials/);

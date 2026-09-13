@@ -220,7 +220,7 @@ export function MainLayout({
             <nav className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-2 py-3 max-[720px]:flex-none max-[720px]:flex-row max-[720px]:gap-1 max-[720px]:overflow-x-auto max-[720px]:overflow-y-hidden max-[720px]:py-2" aria-label={copy.sidebar.primaryNavigation}>
               {navigationGroups.map((group) => (
                 <div className="grid min-w-0 gap-1 max-[720px]:contents" key={group.id}>
-                  <div className="px-2 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/65 max-[720px]:hidden">
+                  <div className="px-2 text-[13px] font-medium text-muted-foreground max-[720px]:hidden">
                     {copy.text[group.label] ?? group.label}
                   </div>
                   <div className="grid min-w-0 gap-1 max-[720px]:contents">
@@ -241,7 +241,7 @@ export function MainLayout({
 
             <div className="grid shrink-0 gap-1 border-t border-border/60 p-2 max-[720px]:border-t max-[720px]:pt-2">
               <Button
-                className="flex h-9 w-full min-w-0 items-center gap-2 rounded-md px-2 text-left text-[12px] font-medium text-muted-foreground transition-all duration-150 hover:bg-muted/80 hover:text-foreground"
+                className="flex h-9 w-full min-w-0 items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-muted-foreground transition-all duration-150 hover:bg-muted/80 hover:text-foreground"
                 onClick={onOpenSettings}
                 title={copy.settings.title}
                 type="button"
@@ -315,7 +315,7 @@ function SidebarNavigationButton({
   return (
     <Button
       className={cn(
-        "flex h-9 min-w-0 items-center gap-2 rounded-md px-2 text-left text-[12px] font-medium text-muted-foreground transition-all duration-150 max-[720px]:min-w-[118px]",
+        "flex h-9 min-w-0 items-center gap-2 rounded-md px-2 text-left text-[13px] font-medium text-muted-foreground transition-all duration-150 max-[720px]:min-w-[118px]",
         active
           ? "bg-card text-foreground shadow-[0_1px_3px_rgba(0,0,0,0.06)]"
           : "hover:bg-muted/80 hover:text-foreground"

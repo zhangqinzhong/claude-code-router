@@ -1,3 +1,4 @@
+import { useDraftClose } from "./unsaved-changes";
 import {
   AddProviderDraft, AnimatedDisclosure, AnimatedIconSwap, AnimatedListItem, AnimatedPopover, AnimatePresence, AppConfig, Badge,
   Box, Braces, Button, Card, CardContent, CardHeader, CardTitle,
@@ -114,7 +115,7 @@ export function ProvidersView({ accountSnapshots, addProvider, editProvider, not
             {t("Add")}
           </Button>
         </CardHeader>
-        <CardContent className="min-h-0 flex-1 overflow-auto p-0">
+        <CardContent className="@container min-h-0 flex-1 overflow-auto p-0">
           {providers.length === 0 ? (
             <div className="m-4 rounded-lg border border-dashed border-border bg-muted/30 px-3 py-10 text-center">
               <Layers3 className="mx-auto mb-2 h-7 w-7 text-muted-foreground/40" />
@@ -127,7 +128,7 @@ export function ProvidersView({ accountSnapshots, addProvider, editProvider, not
           ) : null}
           {visibleProviders.length > 0 ? (
             <>
-              <div className="grid gap-2 p-3 md:hidden">
+              <div className="grid gap-2 p-3 @[1080px]:hidden">
                 <AnimatePresence initial={false}>
                   {visibleProviders.map(({ provider, index }) => {
                     const itemKey = providerListItemKey(provider, index);
@@ -150,7 +151,7 @@ export function ProvidersView({ accountSnapshots, addProvider, editProvider, not
                   })}
                 </AnimatePresence>
               </div>
-              <div className="hidden min-w-0 md:block">
+              <div className="hidden min-w-0 @[1080px]:block">
                 <div className="min-w-[1080px]">
                   <div className="sticky top-0 z-10 grid h-10 grid-cols-[minmax(260px,1fr)_80px_minmax(150px,0.65fr)_minmax(260px,1fr)_132px] items-center gap-3 border-b border-border/60 bg-muted/95 px-4 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                     <div className="truncate">{t("Provider")}</div>
@@ -670,7 +671,7 @@ function ProviderAccountListCell({ provider, snapshots }: { provider: GatewayPro
   const fallbackText = snapshot ? snapshot.message ?? snapshot.errors?.[0]?.message : undefined;
 
   if (!provider.account?.enabled && snapshots.length === 0) {
-    return <div className="min-w-0 truncate text-[11px] text-muted-foreground">{t("Disabled")}</div>;
+    return <div className="min-w-0 text-[12px] text-muted-foreground">{t("Usage tracking not configured")}</div>;
   }
 
   if (!snapshot) {
@@ -804,7 +805,7 @@ export function ProviderDeepLinkDialog({
                     <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                     <span>{t("External provider link")}</span>
                   </div>
-                  <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                  <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                     {t("This provider link came from an external website. Review details before importing.")}
                   </div>
                 </div>
@@ -871,7 +872,7 @@ export function ProviderDeepLinkDialog({
                   <ShieldCheck className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                   <span>{t("Remote provider manifest")}</span>
                 </div>
-                <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                   {t("AgentRouter will fetch this HTTPS manifest with strict safety checks before showing provider details.")}
                 </div>
               </div>
@@ -1030,7 +1031,9 @@ function ProviderPresetCombobox({
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         setOpen(false);
+        rootRef.current?.querySelector<HTMLElement>("[aria-haspopup]")?.focus({ preventScroll: true });
       }
     };
 
@@ -1383,6 +1386,7 @@ function LocalAgentProviderImportPanel({
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [importingId, setImportingId] = useState("");
+  const [scanAttempt, setScanAttempt] = useState(0);
 
   useEffect(() => {
     if (mode !== "add" || !window.agentrouter?.getLocalAgentProviderCandidates) {
@@ -1413,7 +1417,7 @@ function LocalAgentProviderImportPanel({
     return () => {
       cancelled = true;
     };
-  }, [mode, providerPlugins, providers]);
+  }, [mode, providerPlugins, providers, scanAttempt]);
 
   if (mode !== "add" || (candidates.length === 0 && !error)) {
     return null;
@@ -1464,9 +1468,12 @@ function LocalAgentProviderImportPanel({
       <div className="mb-2 flex min-w-0 items-center justify-between gap-2">
         <div className="min-w-0">
           <div className="truncate text-[12px] font-semibold text-foreground">{t("Import local agent provider")}</div>
-          <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{t("AgentRouter scanned this computer for local Claude Code, Codex, Grok CLI, Kimi CLI, OpenCode CLI, and ZCode providers. Click Import to add one as a gateway provider.")}</div>
+          <div className="mt-0.5 text-[12px] leading-5 text-muted-foreground">{t("AgentRouter scanned this computer for local Claude Code, Codex, Grok CLI, Kimi CLI, OpenCode CLI, and ZCode providers. Click Import to add one as a gateway provider.")}</div>
         </div>
-        {loading ? <LoaderCircle className="h-4 w-4 shrink-0 animate-spin text-muted-foreground" /> : null}
+        <Button aria-label={t("Scan local providers again")} disabled={loading || Boolean(importingId)} onClick={() => setScanAttempt((value) => value + 1)} size="sm" variant="outline">
+          {loading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+          {t("Scan again")}
+        </Button>
       </div>
 
       {candidates.length > 0 ? (
@@ -1487,12 +1494,20 @@ function LocalAgentProviderImportPanel({
                     <div className="flex min-w-0 items-center gap-2">
                       <span className="min-w-0 truncate text-[12px] font-semibold">{candidate.name}</span>
                       <Badge variant={candidate.importable ? "success" : candidate.status === "locked" ? "warning" : "outline"}>
-                        {candidate.importable ? t("Ready") : candidate.status === "locked" ? t("Locked") : t("Not found")}
+                        {candidate.importable ? t("Ready") : t("Login unavailable")}
                       </Badge>
                     </div>
-                    <div className="mt-0.5 truncate text-[10px] text-muted-foreground" title={candidate.sourceFile || candidate.detail}>
-                      {candidate.detail ? t(candidate.detail) : candidate.sourceFile || t("No local login state was found for this agent.")}
-                    </div>
+                    {candidate.importable ? (
+                      <div className="mt-1 truncate text-[12px] text-muted-foreground" title={candidate.sourceFile || candidate.detail}>
+                        {candidate.detail ? t(candidate.detail) : candidate.sourceFile}
+                      </div>
+                    ) : (
+                      <div className="mt-1 space-y-2 text-[12px] leading-5 text-muted-foreground">
+                        <p>{t("Cannot read local login information. Sign in to the agent and scan again, or configure an API key manually.")}</p>
+                        <Button onClick={() => onChange({ presetId: customProviderPresetId }, true)} size="sm" variant="outline">{t("Configure API key manually")}</Button>
+                        {candidate.detail ? <details><summary className="cursor-pointer">{t("Technical details")}</summary><p className="mt-1 break-all">{candidate.detail}</p></details> : null}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <Button
@@ -1520,7 +1535,7 @@ function LocalAgentProviderImportPanel({
       {error ? (
         <div className="mt-2 flex items-start gap-2 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-[12px] text-destructive">
           <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          <span>{t(error)}</span>
+          <div><p>{t("Local provider import failed. Scan again or configure an API key manually.")}</p><details className="mt-2"><summary className="cursor-pointer">{t("Technical details")}</summary><p className="mt-1 break-all">{error}</p></details></div>
         </div>
       ) : null}
     </div>
@@ -1705,11 +1720,9 @@ function ProviderSetupProgress({
 
 function ProviderFormStepHeader({
   description,
-  index,
   title
 }: {
   description: string;
-  index: number;
   title: string;
 }) {
   return (
@@ -1718,9 +1731,7 @@ function ProviderFormStepHeader({
         <div className="truncate text-[14px] font-semibold text-foreground">{title}</div>
         <p className="max-w-[540px] text-[12px] leading-5 text-muted-foreground">{description}</p>
       </div>
-      <div className="shrink-0 rounded-full border border-border bg-muted/30 px-2 py-0.5 text-[11px] font-medium text-muted-foreground">
-        {index} / {providerSetupStepIds.length}
-      </div>
+
     </div>
   );
 }
@@ -1842,7 +1853,7 @@ function ProviderConnectionStatusRow({
       </span>
       <div className="min-w-0 flex-1">
         <div className="truncate text-[12px] font-semibold text-foreground">{title}</div>
-        <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{description}</div>
+        <div className="mt-0.5 text-[12px] leading-5 text-muted-foreground">{description}</div>
       </div>
       {action ? <div className="ml-auto shrink-0 self-center">{action}</div> : null}
     </div>
@@ -2248,7 +2259,6 @@ export function AddProviderForm({
           <>
             <ProviderFormStepHeader
               description={t("Pick a preset provider or use a custom compatible API endpoint.")}
-              index={1}
               title={t("Choose provider")}
             />
             {importProvider ? (
@@ -2278,7 +2288,7 @@ export function AddProviderForm({
               <Field className="sm:col-span-2" label={t("API endpoint")}>
                 <Input value={draft.baseUrl} onChange={(event) => onChange({ baseUrl: event.target.value, icon: "" }, true)} />
                 {customEndpoint ? (
-                  <div className="flex min-h-4 items-center gap-1.5 text-[11px] leading-4 text-muted-foreground">
+                  <div className="flex min-h-4 items-center gap-1.5 text-[12px] leading-5 text-muted-foreground">
                     {iconDetecting ? <LoaderCircle className="h-3 w-3 shrink-0 animate-spin" /> : null}
                     <span className="min-w-0">
                       {iconDetecting
@@ -2295,7 +2305,6 @@ export function AddProviderForm({
           <>
             <ProviderFormStepHeader
               description={t("Choose how this provider authenticates model requests.")}
-              index={2}
               title={t("Add credentials")}
             />
             <div className="sm:col-span-2 space-y-4">
@@ -2340,7 +2349,6 @@ export function AddProviderForm({
           <>
             <ProviderFormStepHeader
               description={t("Choose the models that should be available through this provider.")}
-              index={3}
               title={t("Pick models")}
             />
             <div className="sm:col-span-2">
@@ -2371,7 +2379,6 @@ export function AddProviderForm({
           <>
             <ProviderFormStepHeader
               description={t("Run a real model request before relying on this provider.")}
-              index={4}
               title={t("Verify connection")}
             />
             <ProviderConnectionStatusPanel
@@ -2461,7 +2468,7 @@ export function AddProviderForm({
                         placeholder={`{\n  "default": { "reasoning_effort": "high" }\n}`}
                         value={draft.extraBodyText}
                       />
-                      <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                      <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                         {t("Merged into every upstream request for this provider. Use \"default\" for all models, or a model name as the key to target one.")}
                       </div>
                     </Field>
@@ -2472,7 +2479,7 @@ export function AddProviderForm({
                         placeholder={`{\n  "x-tenant": "acme"\n}`}
                         value={draft.extraHeadersText}
                       />
-                      <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                      <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                         {t("Sent with every upstream request for this provider, alongside the API key header.")}
                       </div>
                     </Field>
@@ -2747,7 +2754,7 @@ function ProviderCredentialSettings({
       <div className="flex min-w-0 flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <Label className="text-[12px] font-semibold">{t("Pool keys")}</Label>
-          <div className="mt-0.5 text-[11px] leading-4 text-muted-foreground">{t("Use multiple API keys with optional priorities, weights, and limits.")}</div>
+          <div className="mt-0.5 text-[12px] leading-5 text-muted-foreground">{t("Use multiple API keys with optional priorities, weights, and limits.")}</div>
         </div>
         <div className="flex shrink-0 flex-wrap justify-end gap-2">
           <input
@@ -3075,7 +3082,7 @@ function ProviderUsageSettings({
           </Field>
 
           {draft.accountMode === "standard" ? (
-            <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[11px] leading-4 text-muted-foreground">
+            <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[12px] leading-5 text-muted-foreground">
               {t("Standard usage endpoint will try provider-hosted AgentRouter account endpoints.")}
               {customEndpoint ? <span> {t("Switch to HTTP JSON request to configure method, URL, headers, body, and response fields.")}</span> : null}
             </div>
@@ -3099,7 +3106,7 @@ function ProviderUsageSettings({
               </Field>
               {draft.accountMode === "browser" ? (
                 <>
-                  <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[11px] leading-4 text-muted-foreground">
+                  <div className="sm:col-span-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-[12px] leading-5 text-muted-foreground">
                     {t("Browser request uses AgentRouter Desktop's built-in browser login state. Sign in in the in-app browser before testing.")}
                   </div>
                   <Field className="sm:col-span-2" label={t("Browser login URL")}>
@@ -3125,7 +3132,7 @@ function ProviderUsageSettings({
                       value={draft.usageBrowserRequestOrigin}
                       onChange={(event) => onChange({ usageBrowserRequestOrigin: event.target.value })}
                     />
-                    <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                    <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                       {t("Origin used to read browser storage before fetching the usage URL.")}
                     </div>
                   </Field>
@@ -3135,7 +3142,7 @@ function ProviderUsageSettings({
                       options={translateOptions(providerBrowserCredentialsOptions, t)}
                       value={draft.usageBrowserCredentials}
                     />
-                    <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                    <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                       {t("Use omit for token headers when the API returns Access-Control-Allow-Origin: *.")}
                     </div>
                   </Field>
@@ -3154,7 +3161,7 @@ function ProviderUsageSettings({
                       rows={draft.usageBrowserHeaderTemplates}
                       onChange={(usageBrowserHeaderTemplates) => onChange({ usageBrowserHeaderTemplates })}
                     />
-                    <div className="mt-1 text-[11px] leading-4 text-muted-foreground">
+                    <div className="mt-1 text-[12px] leading-5 text-muted-foreground">
                       {t("Use ${localStorage.token} or ${sessionStorage.token} in values.")}
                     </div>
                   </Field>
@@ -3178,7 +3185,7 @@ function ProviderUsageSettings({
                           </>
                         ) : null}
                       </div>
-                      {chromeImportMessage ? <div className="mt-1 text-[11px] leading-4 text-muted-foreground">{chromeImportMessage}</div> : null}
+                      {chromeImportMessage ? <div className="mt-1 text-[12px] leading-5 text-muted-foreground">{chromeImportMessage}</div> : null}
                     </div>
                   ) : null}
                 </>
@@ -3496,6 +3503,7 @@ export function AddProviderDialog({
   title?: string;
 }) {
   const t = useAppText();
+  const { close, confirmation } = useDraftClose(draft, onClose);
   const [checkConfirmOpen, setCheckConfirmOpen] = useState(false);
   const [iconDetecting, setIconDetecting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -3585,7 +3593,7 @@ export function AddProviderDialog({
 
   return (
     <>
-      <Dialog onOpenChange={(open) => !open && !submitting && onClose()}>
+      <Dialog onOpenChange={(open) => !open && !submitting && close()}>
         <DialogContent
           className={cn(
             "origin-center border-border/70 bg-background shadow-[0_18px_70px_rgba(15,23,42,0.16)]",
@@ -3596,7 +3604,7 @@ export function AddProviderDialog({
         >
           <DialogHeader className={cn("h-11", wizardMode && "border-b-0")}>
             <DialogTitle>{title ?? (mode === "edit" ? t("Edit Provider") : t("Add Provider"))}</DialogTitle>
-            <Button aria-label={t("Close dialog")} disabled={submitting} onClick={onClose} size="iconSm" title={t("Close")} type="button" variant="ghost">
+            <Button aria-label={t("Close dialog")} disabled={submitting} onClick={close} size="iconSm" title={t("Close")} type="button" variant="ghost">
               <X className="h-4 w-4" />
             </Button>
           </DialogHeader>
@@ -3668,6 +3676,7 @@ export function AddProviderDialog({
           onClose={() => setCheckConfirmOpen(false)}
         />
       ) : null}
+      {confirmation}
     </>
   );
 }
@@ -3738,7 +3747,7 @@ export function ProviderConnectivityCheckDialog({
                 <CircleAlert className="mt-0.5 h-3.5 w-3.5 shrink-0" />
                 <span>{t("This check sends real model requests with your provider API key and may consume account balance.")}</span>
               </div>
-              <div className="mt-2 text-[11px] leading-4 text-muted-foreground">
+              <div className="mt-2 text-[12px] leading-5 text-muted-foreground">
                 {t("Generated output is limited to 1 token for connectivity checks.")}
               </div>
             </div>
@@ -4371,7 +4380,9 @@ function OpenRouterProviderBlacklistSelect({
     };
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
+        event.preventDefault();
         setOpen(false);
+        rootRef.current?.querySelector<HTMLElement>("[aria-haspopup]")?.focus({ preventScroll: true });
       }
     };
 
@@ -4871,7 +4882,7 @@ function ModelMetadataEditor({
       {header ? (
         <div className="flex min-w-0 items-center justify-between gap-2">
           <span className="block truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("Model settings")}</span>
-          <span className="shrink-0 text-[11px] leading-4 text-muted-foreground/75">{t("Context, pricing, reasoning, Fast Mode, web search, and image")}</span>
+          <span className="shrink-0 text-[12px] leading-5 text-muted-foreground/75">{t("Context, pricing, reasoning, Fast Mode, web search, and image")}</span>
         </div>
       ) : null}
       <div className="space-y-2">
@@ -4942,7 +4953,7 @@ function ModelMetadataEditor({
                 <div className="space-y-3 border-t border-border/60 p-3">
                   <div className="flex min-w-0 items-center justify-between gap-2">
                     <span className="block truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">{t("Model settings")}</span>
-                    <span className="shrink-0 text-[11px] leading-4 text-muted-foreground/75">{t("Context, pricing, reasoning, Fast Mode, web search, and image")}</span>
+                    <span className="shrink-0 text-[12px] leading-5 text-muted-foreground/75">{t("Context, pricing, reasoning, Fast Mode, web search, and image")}</span>
                   </div>
                   {openRouterDiscountRouting ? (
                     <div className="space-y-2">
