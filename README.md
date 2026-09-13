@@ -1,199 +1,95 @@
 # AgentRouter
 
-[中文](README_zh.md) · [Download Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest)
+[中文](README_zh.md) · [Download](https://github.com/zhangqinzhong/claude-code-router/releases/latest) · [Documentation](docs/README.md#english-guides)
 
-Manage agents, model providers, routing, tools, and request logs from one desktop application.
+**Your coding agents, providers, and launch profiles in one desktop app.**
 
-Current version: **1.1.0**, with installers for macOS Apple Silicon / Intel, Windows, and Linux. The app includes this repository's update feed. macOS packages are not Apple-notarized; automatic installation has not been verified.
+Keep personal and company configurations separate, launch the right agent in your preferred terminal, and inspect the requests passing through your local gateway.
 
-- [English documentation](docs/README.md#english-guides)
-- [Log retention and rates](docs/src/content/docs/en/configuration/observability.md)
-- [Release notes](docs/releases/1.1.0.md) · [Changelog](CHANGELOG.md)
+## Install
 
-## Why use AgentRouter?
+Download an installer from [Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest):
 
-AgentRouter is a local model gateway and control plane for coding agents. It gives Claude Code, Claude Design, Codex, Grok CLI, Kimi CLI, Kilo Code, OpenCode, Pi, ZCode, WorkBuddy, and compatible API clients **one stable local endpoint**, while you manage the providers, models, accounts, routing rules, and tools behind it from one place.
+| Platform | Package |
+| --- | --- |
+| macOS Apple Silicon | `mac-Apple-Silicon-arm64.dmg` |
+| macOS Intel | `mac-Intel-x64.dmg` |
+| Windows | `.exe` |
+| Linux | `.AppImage` |
 
-Use AgentRouter to:
+AgentRouter checks this repository for updates. macOS packages are ad-hoc signed and not notarized by Apple.
 
-- **Manage all agents and providers together** instead of maintaining a separate model configuration for every client.
-- **Switch providers or models without changing your workflow** or repeatedly editing agent configuration files.
-- **Keep requests running** with retries, credential pools, key rotation, and ordered fallback models.
-- **Add capabilities to existing models** with Fusion vision, web search, MCP tools, and ToolHub.
-- **See what actually happened** through request logs, resolved routes, latency, token usage, cost estimates, and account status.
+## Set up your first profile
 
-AgentRouter supports OpenAI Chat / Responses, Anthropic Messages, Gemini Generate Content / Interactions, OpenRouter, DeepSeek, SiliconFlow, Moonshot, Kimi Code, Mistral, Z.AI, Bailian, and custom compatible providers.
+1. Add a **Provider** with its endpoint, credentials, protocol, and models.
+2. Open **Agent Profiles**, choose an agent, and select a model.
+3. Choose the profile scope. Use an isolated AgentRouter profile for a separate company or personal setup; use global scope to manage the agent's normal configuration.
+4. For a CLI profile, set a launch alias and terminal. On macOS, choose Otty, iTerm2, or the system terminal; Otty is the default and must be installed separately.
+5. Save, then click the terminal button on the profile card. The adjacent copy button copies the launch command.
 
-<details open>
-<summary><strong>Supported Agents</strong></summary>
+The gateway listens on `http://127.0.0.1:3466` by default. Its running status appears in the sidebar.
 
-<div align="center">
+### Short commands, saved options
 
-<table width="100%">
-  <tr>
-    <td align="center" width="20%">
-      <a href="https://github.com/anthropics/claude-code">
-        <img src="/packages/ui/src/assets/agent-logos/claude-code.png" width="44" height="44" alt="Claude Code logo" />
-        <br />
-        <strong>Claude Code (CLI & APP)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://github.com/openai/codex">
-        <img src="/packages/ui/src/assets/agent-logos/codex.png" width="44" height="44" alt="Codex logo" />
-        <br />
-        <strong>Codex (CLI & APP)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://github.com/xai-org/grok-build">
-        <img src="/packages/ui/src/assets/agent-logos/grok.ico" width="44" height="44" alt="Grok CLI logo" />
-        <br />
-        <strong>Grok CLI (CLI)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://github.com/MoonshotAI/kimi-cli">
-        <img src="/docs/public/provider-icons/moonshot.ico" width="44" height="44" alt="Kimi CLI logo" />
-        <br />
-        <strong>Kimi CLI (CLI)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://kilo.ai/">
-        <img src="/packages/ui/src/assets/agent-logos/kilo.svg" width="44" height="44" alt="Kilo Code logo" />
-        <br />
-        <strong>Kilo Code (CLI)</strong>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="20%">
-      <a href="https://github.com/anomalyco/opencode">
-        <img src="/packages/ui/src/assets/agent-logos/opencode.ico" width="44" height="44" alt="OpenCode logo" />
-        <br />
-        <strong>OpenCode (CLI & APP)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://github.com/earendil-works/pi">
-        <img src="/packages/ui/src/assets/agent-logos/pi.svg" width="44" height="44" alt="Pi logo" />
-        <br />
-        <strong>Pi (CLI)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://zcode.z.ai/en">
-        <img src="/packages/ui/src/assets/agent-logos/zcode.png" width="44" height="44" alt="ZCode logo" />
-        <br />
-        <strong>ZCode (APP)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://www.anthropic.com/news/claude-design-anthropic-labs">
-        <img src="/packages/ui/src/assets/agent-logos/claude-code.png" width="44" height="44" alt="Claude Design logo" />
-        <br />
-        <strong>Claude Design (APP)</strong>
-      </a>
-    </td>
-    <td align="center" width="20%">
-      <a href="https://www.workbuddy.ai/">
-        <img src="/packages/ui/src/assets/agent-logos/workbuddy.png" width="44" height="44" alt="WorkBuddy logo" />
-        <br />
-        <strong>WorkBuddy (APP)</strong>
-      </a>
-    </td>
-  </tr>
-</table>
-
-</div>
-
-</details>
-
-## Quick Start
-
-### Desktop app (recommended)
-
-1. Download the installer for your platform from [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest), then install and open AgentRouter.
-
-2. Open **Providers → Add Provider**. Choose a built-in preset or a custom endpoint, enter the API key, select the protocol and models, then save.
-3. Open **Server** and click **Start**. The local model gateway listens on `http://127.0.0.1:3466` by default.
-4. Open **Agent Config**, choose Claude Code, Claude Design, Codex, Grok CLI, Kimi CLI, Kilo Code, OpenCode, Pi, ZCode, or WorkBuddy, select a model, and apply the profile.
-5. Start using your agent. Open **Logs** to confirm the resolved provider, model, status, tokens, latency, and errors.
-
-Your agent is now connected to AgentRouter. To add conditions, retries, request rewrites, or fallback models, open **Routing**.
-
-### CLI
-
-The npm CLI requires Node.js 22 or newer. It starts the same gateway and a browser-based management UI without Electron:
-
-The CLI package is not yet published to npm. Run from a source checkout with Node.js 22+; see the [CLI guide](packages/cli/README.md) for global installation:
+For a profile named `CodexCompany`, set the alias to `ccwork`:
 
 ```sh
+ccwork
+# The original command also works:
+agentrouter CodexCompany
+```
+
+Aliases stay attached to the same profile when its display name changes. Disabling or deleting a profile removes its alias command.
+
+Claude Code and Codex profiles offer **Default** and **YOLO** permission modes. YOLO skips permission prompts; for Codex it also disables sandbox restrictions. These options apply to the profile's CLI launches, including aliases.
+
+Add other CLI options under **Advanced settings → Additional launch arguments**, one argument per line. Paths containing spaces remain a single argument without shell quotes.
+
+## What you can manage
+
+| Area | Features |
+| --- | --- |
+| Agent profiles | Separate configurations, model selection, environment variables, launch aliases, CLI options, and terminal selection |
+| Providers | Compatible API endpoints, model discovery, connectivity checks, and multiple credentials |
+| Global routing | Conditional model selection, request rewrites, retries, and fallback models |
+| Logs and observability | Requests and responses, routing decisions, first-token latency, output rate, average throughput, and tool traces |
+| Usage overview | Request counts, tokens, cache usage, trends, and estimated costs |
+| Tools | Fusion, MCP, ToolHub, and gateway extensions |
+
+Profiles support Claude Code, Codex, OpenCode, Grok CLI, Kimi CLI, Kilo Code, Pi, ZCode, WorkBuddy, and Claude Design. Available CLI and app launch options depend on the agent. Agent software and provider access are configured separately.
+
+If a profile should always use one model, select it in the profile. Configure global routing when requests need conditional handling or fallbacks.
+
+## Local data
+
+Configuration and runtime data live under `~/.agentrouter` on macOS and Linux, or `%APPDATA%\agentrouter` on Windows.
+
+**Settings → Logs & Observability → Log retention days** controls request history retention. The default is one day, measured as a rolling 24-hour period. Logs and observability share request data; expired records, related traces, and unreferenced body files are cleaned together. Overview usage statistics are separate and have their own reset action.
+
+On macOS, **⌘W** closes the window while the gateway continues running. Quit AgentRouter to exit the application.
+
+## Run from source
+
+Requires Node.js 22 or newer.
+
+```sh
+git clone https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
 npm ci
 npm run build:assets
 node packages/cli/dist/main/cli.js ui
 ```
 
-Open `http://127.0.0.1:3458`, then follow the same **Providers → Server → Agent Profiles** flow above. The model gateway remains at `http://127.0.0.1:3466`. See the CLI reference for service modes, authentication, and profile commands.
+The browser management UI opens at `http://127.0.0.1:3458`. The CLI package is not currently published to npm; see the [CLI guide](packages/cli/README.md) for installation from source.
 
-### Docker
+## Guides
 
-```sh
-docker compose up -d --build
-```
+- [Agent profiles and launch options](docs/src/content/docs/en/configuration/profiles.md)
+- [Providers](docs/src/content/docs/en/guides/provider.md)
+- [Logs, retention, and rate calculations](docs/src/content/docs/en/configuration/observability.md)
+- [Docker deployment](docs/src/content/docs/en/guides/docker.md)
+- [Release notes](https://github.com/zhangqinzhong/claude-code-router/releases) · [Changelog](CHANGELOG.md)
 
-Docker exposes the management UI and gateway routes through `http://127.0.0.1:3458` by default. Read the Docker deployment guide before exposing AgentRouter remotely.
+## License and acknowledgments
 
-## Build desktop apps
-
-Install Node.js 22+, then run `npm ci`.
-
-| Target | Command | Output |
-| --- | --- | --- |
-| macOS local DMG/ZIP | `npm run build:app:mac` | `release-local/` |
-| Windows local NSIS installer | `npm run build:app:win` | `release-local/` |
-
-Windows app packaging must run on Windows x64 because `better-sqlite3` ships a native Electron module. The release workflow builds macOS on macOS runners and Windows on `windows-latest` when a `v*` tag is pushed.
-
-## How it works
-
-```text
-Claude Code · Claude Design · Codex · Grok CLI · Kimi CLI · Kilo Code · OpenCode · Pi · ZCode · WorkBuddy · Compatible API clients
-                              │
-                              ▼
-                 AgentRouter :3466
-          Profiles · Routing · Credentials · Tools · Logs
-                              │
-                              ▼
-             Selected provider, model, and account
-```
-
-## Core capabilities
-
-| Area | Highlights |
-| --- | --- |
-| **Agents** | Profiles for Claude Code, Claude Design, Codex, Grok CLI, Kimi CLI, Kilo Code, OpenCode, Pi, ZCode, and WorkBuddy; model overrides; scopes; environment settings; CLI and app launch entries; multi-instance workflows |
-| **Providers** | Presets and custom endpoints; protocol probing; model discovery; connectivity checks; local login import where supported; single keys and credential pools |
-| **Models & routing** | Searchable catalog; model descriptions for task selection; conditions on headers and bodies; prefixes; rewrites; retries; ordered fallbacks |
-| **Tools & extensions** | Fusion models; ToolHub; built-in browser automation; Chrome login-state import; wrapper and core gateway plugins; local routes and virtual models |
-| **Access & quotas** | Separate AgentRouter client keys with expiration and local request, token, and image limits |
-| **Observability** | Request and response details; resolved provider, model, and credential; status; latency; tokens; estimated cost; tool calls; agent traces |
-| **AgentClaw** | Agent relay through Weixin iLink, WeCom, Slack, Discord, Telegram, LINE, Feishu, and DingTalk |
-
-## Go deeper when you are ready
-
-The complete documentation lives in the `docs/` directory in this repository.
-
-- Install and launch AgentRouter
-- Configure providers
-- Explore routing and configuration
-- Use the CLI
-- Deploy with Docker
-- Troubleshoot common issues
-
-## License
-
-This project is licensed under the [MIT License](LICENSE).
-
-AgentRouter is based on [Claude Code Router](https://github.com/musistudio/claude-code-router) and retains the upstream license and copyright notices.
+[MIT](LICENSE). AgentRouter is based on [Claude Code Router](https://github.com/musistudio/claude-code-router). The upstream copyright and license notices are retained.
