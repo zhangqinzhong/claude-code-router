@@ -9,27 +9,41 @@ lead: Choose among the desktop app, npm CLI, and Docker distributions, complete 
 
 | Distribution | Best for | Entry | Default management address | Default gateway address |
 | --- | --- | --- | --- | --- |
-| Desktop app | Daily local use, tray, multi-instance Agent Apps, desktop integrations | App UI, `agentrouter` | In-app window | `http://127.0.0.1:3456` |
-| npm CLI | Terminal, SSH, no Electron, external process supervisors | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| Desktop app | Daily local use, tray, multi-instance Agent Apps, desktop integrations | App UI, `agentrouter` | In-app window | `http://127.0.0.1:3466` |
+| npm CLI | Terminal, SSH, no Electron, external process supervisors | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3466` |
 | Docker | Persistent servers and container operations | Nginx | Shared public endpoint | `http://127.0.0.1:3458` with the default mapping |
 
-In desktop/CLI deployments, management and the model gateway use different ports. CLI management uses `3458` by default, while the model gateway uses `3456`. Docker intentionally combines both through one Nginx endpoint.
+In desktop/CLI deployments, management and the model gateway use different ports. CLI management uses `3458` by default, while the model gateway uses `3466`. Docker intentionally combines both through one Nginx endpoint.
 
 ## Install the desktop app
 
-1. Build a local installer with `npm run build:app:mac:local` or `npm run build:app:win:local`.
-2. Download `.dmg`/`.zip` for macOS, `.exe` for Windows, or `.AppImage` for Linux.
+1. Open [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest).
+2. Choose the Apple Silicon (arm64) or Intel (x64) DMG/ZIP for macOS, EXE for Windows, or AppImage for Linux.
 3. Install and open **AgentRouter**.
 4. Add a provider/model, create a client key under **API Keys**, then click **Start** under **Server**.
 
-When Server shows Running, the model gateway defaults to `http://127.0.0.1:3456`. Enable automatic startup under Server if the gateway should start whenever the app opens.
+When Server shows Running, the model gateway defaults to `http://127.0.0.1:3466`. Enable automatic startup under Server if the gateway should start whenever the app opens.
+
+## Desktop updates
+
+The app includes this repository's Releases update feed. Use the in-app update check; no environment variable is required. Version 1.0.1 provides macOS, Windows, and Linux installers.
+
+macOS packages use ad-hoc signing and are not Apple-notarized. Automatic installation on macOS has not been verified; manual replacement from Releases is available. Switching from the old 3.0.22 development builds to AgentRouter 1.x requires a manual installation.
 
 ## Install the npm CLI
 
 Node.js 22 or newer is required:
 
+The CLI package is not currently published to npm. Install from source:
+
 ```sh
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
+agentrouter --help
 agentrouter ui
 ```
 
@@ -43,7 +57,7 @@ From a source checkout:
 docker compose up -d --build
 ```
 
-Open <http://127.0.0.1:3458>. Docker publishes one Nginx endpoint shared by management and the gateway. Add a provider/model, create a AgentRouter client key, and start the gateway under Server. See [Docker deployment](../docker/) for ports, authentication, persistence, backups, and remote access.
+Open <http://127.0.0.1:3458>. Docker publishes one Nginx endpoint shared by management and the gateway. Add a provider/model, create an AgentRouter client key, and start the gateway under Server. See [Docker deployment](../docker/) for ports, authentication, persistence, backups, and remote access.
 
 ## Verify the installation
 
@@ -60,8 +74,8 @@ A reachable management UI does not prove that the model gateway is usable. Docke
 
 | Distribution | Configuration location |
 | --- | --- |
-| Desktop / CLI on macOS or Linux | `~/.claude-code-router` |
-| Desktop / CLI on Windows | `%APPDATA%\claude-code-router` |
-| Docker | `/data/.claude-code-router`; persist `/data` |
+| Desktop / CLI on macOS or Linux | `~/.agentrouter` |
+| Desktop / CLI on Windows | `%APPDATA%\agentrouter` |
+| Docker | `/data/.agentrouter`; persist `/data` |
 
 Current configuration is stored in `config.sqlite`. Legacy `config.json` is only a migration source when SQLite does not exist, or an initial Docker bootstrap. Do not edit live SQLite files.

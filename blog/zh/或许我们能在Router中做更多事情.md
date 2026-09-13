@@ -1,3 +1,5 @@
+> 上游历史文章，描述早期 Claude Code Router 的设计与用法。当前 AgentRouter 使用说明见[中文文档](../../docs/src/content/docs/zh/index.md)。
+
 # 或许我们能在 Router 中做更多事情
 
 自从`claude-code-router`发布以来，我收到了很多用户的反馈，至今还有不少的 issues 未处理。其中大多都是关于不同的供应商的支持和`deepseek`模型调用工具不积极的问题。

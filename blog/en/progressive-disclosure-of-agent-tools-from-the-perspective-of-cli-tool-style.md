@@ -1,3 +1,5 @@
+> Historical upstream article about early Claude Code Router designs and usage. For current AgentRouter instructions, see the [documentation](../../docs/src/content/docs/en/index.md).
+
 # Progressive Disclosure of Agent Tools from the Perspective of CLI Tool Style
 
 It has been nearly two months since Anthropic released [Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills). In this release, Anthropic mentioned a term: Progressive Disclosure. What exactly is this? What problem does it solve?

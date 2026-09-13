@@ -139,11 +139,9 @@ Proxy all paths to Nginx and preserve streaming. The external proxy should allow
 The entrypoint sets `HOME=/data`, so AgentRouter stores files under:
 
 ```text
-/data/.claude-code-router/
+/data/.agentrouter/
 ├── config.sqlite
-├── gateway.config.json
 ├── app-data/
-│   ├── api-keys.sqlite
 │   ├── request-logs.sqlite
 │   ├── usage.sqlite
 │   └── certs/
@@ -153,7 +151,7 @@ The entrypoint sets `HOME=/data`, so AgentRouter stores files under:
 
 Use a named volume unless a bind mount is operationally required. Bind mounts must be writable by the container and should not be shared by two running AgentRouter containers.
 
-The first-run bootstrap writes a minimal legacy `config.json` only when neither `config.json` nor `config.sqlite` exists. When the UI saves current settings, SQLite becomes authoritative. By default, every container start also synchronizes the stored gateway listener and `routerEndpoint` to the Docker public endpoint.
+The first-run bootstrap writes a minimal legacy `config.json` only when neither `config.json` nor `config.sqlite` exists. When the UI saves current settings, SQLite becomes authoritative. The entrypoint synchronizes the legacy bootstrap location. Use the UI to check the active gateway listener and public endpoint after migration.
 
 ## Backup And Restore
 
@@ -308,7 +306,7 @@ environment:
 
 ### 数据、备份与升级
 
-数据实际位于 `/data/.claude-code-router/`，其中包括 `config.sqlite`、`app-data/`、Agent 配置和生成文件。优先使用命名卷，不要让两个运行中的 AgentRouter 容器共享同一个数据目录。
+数据实际位于 `/data/.agentrouter/`，其中包括 `config.sqlite`、`app-data/`、Agent 配置和生成文件。优先使用命名卷，不要让两个运行中的 AgentRouter 容器共享同一个数据目录。
 
 完整文件备份前先停止写入：
 
@@ -337,3 +335,10 @@ docker compose logs --tail=200 agentrouter
 - 容器健康但模型请求失败：继续检查服务状态、供应商连通性、AgentRouter 客户端 Key、路由和请求日志；容器健康只表示 Nginx / UI 可访问。
 
 完整的环境变量、端口拓扑、远程部署、构建参数和烟雾测试说明见本页英文主体，对应变量名和命令在中英文环境中完全相同。
+
+
+## 数据目录兼容 / Data directory compatibility
+
+主程序使用 `/data/.agentrouter`。入口脚本仍在 `/data/.claude-code-router` 写入兼容引导配置；持久化和备份应覆盖整个 `/data`。容器内部网关端口由入口脚本配置，默认 `3456`；它与桌面/CLI 的默认 `3466` 不同，对外统一使用 Nginx 映射的 `3458`。
+
+The application uses `/data/.agentrouter`, while the entrypoint retains `/data/.claude-code-router` for compatibility bootstrap. Persist and back up all of `/data`. The container gateway uses the entrypoint's default `3456`, independently of the desktop/CLI default `3466`; clients use the public Nginx mapping on `3458`.

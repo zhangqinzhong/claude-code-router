@@ -41,7 +41,7 @@ Recommended setup:
 2. Open **Models** and fill Description for the models you want Subagents to choose automatically. Describe task fit, speed, cost, and limits.
 3. Enable a Claude Code config under **Agent Config**, and choose the default model. Claude Code uses it when the client has not selected a recognized model.
 4. Confirm that the built-in **Claude Code** route is enabled on the **Routing** page.
-5. Use Agent, Task, or Workflow in Claude Code. When Claude Code spawns an agent, it can choose a AgentRouter model from the descriptions and write the tag.
+5. Use Agent, Task, or Workflow in Claude Code. When Claude Code spawns an agent, it can choose an AgentRouter model from the descriptions and write the tag.
 
 Write descriptions around the tasks the model handles. For example:
 

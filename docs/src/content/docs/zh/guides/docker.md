@@ -83,14 +83,14 @@ services:
 不使用 Compose 时：
 
 ```sh
-docker build -t claude-code-router:local .
+docker build -t agentrouter:local .
 docker run -d \
-  --name claude-code-router \
+  --name agentrouter \
   --restart unless-stopped \
   -p 127.0.0.1:3458:8080 \
   -e AR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
   -v ar-data:/data \
-  claude-code-router:local
+  agentrouter:local
 ```
 
 仓库也提供 `npm run docker:build` 和 `npm run docker:run`。后者使用 `3458` 和 `ar-data`，但容器带 `--rm`，没有固定名称和自动重启策略，更适合临时验证。
@@ -157,11 +157,9 @@ services:
 EntryPoint 会设置 `HOME=/data`，实际数据位于：
 
 ```text
-/data/.claude-code-router/
+/data/.agentrouter/
 ├── config.sqlite
-├── gateway.config.json
 ├── app-data/
-│   ├── api-keys.sqlite
 │   ├── request-logs.sqlite
 │   ├── usage.sqlite
 │   └── certs/
@@ -232,7 +230,7 @@ docker compose logs --tail=200 agentrouter
 docker build \
   --build-arg NODE_IMAGE=node:22-bookworm \
   --build-arg RUNTIME_NODE_IMAGE=node:22-bookworm-slim \
-  -t claude-code-router:local .
+  -t agentrouter:local .
 ```
 
 运行 Docker 烟雾测试：
@@ -294,3 +292,8 @@ docker compose logs --tail=200 agentrouter
 - [CLI 安装与命令参考](../cli/)
 - [服务配置](../../configuration/server/)
 - [API 密钥](../../configuration/api-keys/)
+
+
+## 数据目录兼容
+
+主程序使用 `/data/.agentrouter`。入口脚本仍在 `/data/.claude-code-router` 写入兼容引导配置；持久化和备份应覆盖整个 `/data`。容器内部网关端口由入口脚本配置，默认 `3456`；它与桌面/CLI 的默认 `3466` 不同，对外统一使用 Nginx 映射的 `3458`。

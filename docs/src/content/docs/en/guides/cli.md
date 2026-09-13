@@ -18,18 +18,21 @@ Both distributions read the same local configuration directory and accept the sa
 
 ## Install, upgrade, and uninstall
 
-The CLI requires Node.js 22 or newer:
+The CLI requires Node.js 22 or newer. The package is not currently published to npm; build it from source:
 
 ```sh
-node --version
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
 agentrouter --help
 ```
 
 Upgrade and uninstall:
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter@latest
 npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
@@ -54,12 +57,12 @@ agentrouter ui --no-open
 Then complete the configuration in this order:
 
 1. Add a provider and at least one model.
-2. Create a AgentRouter client key on the **API Keys** page for gateway access.
+2. Create an AgentRouter client key on the **API Keys** page for gateway access.
 3. Set the default model, routing rules, and fallbacks as needed.
 4. Confirm the gateway is running on the **Server** page.
 5. Point the client Base URL at the gateway address shown in the UI.
 
-The management UI defaults to `http://127.0.0.1:3458`; the model gateway defaults to `http://127.0.0.1:3456`. The management token and AgentRouter client keys are two independent credentials: the former protects UI / RPC, the latter authenticates model requests.
+The management UI defaults to `http://127.0.0.1:3458`; the model gateway defaults to `http://127.0.0.1:3466`. The management token and AgentRouter client keys are two independent credentials: the former protects UI / RPC, the latter authenticates model requests.
 
 ## Service command summary
 
@@ -156,8 +159,8 @@ Most profiles require the AgentRouter gateway to be running. Grok CLI, Kimi CLI,
 
 | Platform | Configuration directory |
 | --- | --- |
-| macOS / Linux | `~/.claude-code-router` |
-| Windows | `%APPDATA%\claude-code-router` |
+| macOS / Linux | `~/.agentrouter` |
+| Windows | `%APPDATA%\agentrouter` |
 
 Common files and directories:
 
@@ -194,7 +197,7 @@ In production, use `agentrouter serve --no-open` and let an external manager han
 
 ### The UI opens, but `/health` or model requests fail
 
-The management service can run without a usable model gateway. Add a provider and model, create a AgentRouter client key, then start or restart the gateway from the **Server** page. Use `agentrouter serve` to see startup errors.
+The management service can run without a usable model gateway. Add a provider and model, create an AgentRouter client key, then start or restart the gateway from the **Server** page. Use `agentrouter serve` to see startup errors.
 
 ### The management port shifted
 

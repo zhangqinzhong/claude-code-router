@@ -1,8 +1,4 @@
-/**
- * Real data fixtures exported from a running local AgentRouter instance via the
- * management RPC. NOT mocked — these are actual request logs and agent
- * analysis snapshots captured from the app.
- */
+/** Fictional order-status examples for the interactive documentation. */
 import type { AgentAnalysisSnapshot, RequestLogPage } from "@agentrouter/core/contracts/app";
 
 import requestLogsFixture from "./fixtures-request-logs.json";

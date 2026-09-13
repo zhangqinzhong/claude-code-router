@@ -2,7 +2,7 @@
 title: 飞书 AgentClaw 配置
 pageTitle: 飞书 AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入飞书群或应用会话，电脑锁屏后可接力。本页覆盖创建企业自建应用、开启机器人能力和接入验证。
+lead: 把 Agent 消息接入飞书群或应用会话，电脑锁屏后可接力。
 ---
 
 ## 这个方式适合谁

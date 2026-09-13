@@ -51,7 +51,7 @@ Open <http://127.0.0.1:3458>. On a fresh volume the management UI is available i
 Complete the first-time configuration in this order:
 
 1. Add a provider and at least one model.
-2. Create a AgentRouter client key on the **API Keys** page.
+2. Create an AgentRouter client key on the **API Keys** page.
 3. Start the gateway on the **Server** page.
 4. Request `/health` and confirm it returns `200` with a running status.
 5. Point the client Base URL at `http://127.0.0.1:3458` and use the AgentRouter client key you just created.
@@ -83,14 +83,14 @@ The left side of the port mapping is the host address and port; the right side i
 Without Compose:
 
 ```sh
-docker build -t claude-code-router:local .
+docker build -t agentrouter:local .
 docker run -d \
-  --name claude-code-router \
+  --name agentrouter \
   --restart unless-stopped \
   -p 127.0.0.1:3458:8080 \
   -e AR_PUBLIC_BASE_URL=http://127.0.0.1:3458 \
   -v ar-data:/data \
-  claude-code-router:local
+  agentrouter:local
 ```
 
 The repository also provides `npm run docker:build` and `npm run docker:run`. The latter uses `3458` and `ar-data`, but the container runs with `--rm` and has no fixed name or restart policy, so it is better suited to temporary verification.
@@ -157,11 +157,9 @@ The reverse proxy should forward all paths to the AgentRouter Nginx and must:
 The entrypoint sets `HOME=/data`; the actual data lives at:
 
 ```text
-/data/.claude-code-router/
+/data/.agentrouter/
 ├── config.sqlite
-├── gateway.config.json
 ├── app-data/
-│   ├── api-keys.sqlite
 │   ├── request-logs.sqlite
 │   ├── usage.sqlite
 │   └── certs/
@@ -171,7 +169,7 @@ The entrypoint sets `HOME=/data`; the actual data lives at:
 
 Prefer a named volume. A bind-mount directory must be writable by the container, and two running AgentRouter containers must not share the same data.
 
-On a brand-new data directory with neither `config.json` nor `config.sqlite`, the entrypoint writes a minimal legacy-format `config.json` as the first boot. Once the UI saves configuration, SQLite becomes authoritative. On every start, the gateway listener fields and `routerEndpoint` in the JSON / SQLite are also synchronized to the current Docker public address by default.
+On a brand-new data directory with neither `config.json` nor `config.sqlite`, the entrypoint writes a minimal legacy-format `config.json` as the first boot. Once the UI saves configuration, SQLite becomes authoritative. The entrypoint synchronizes the legacy bootstrap location. After migration, check the active listener and public endpoint in the UI.
 
 ## Backup and restore
 
@@ -232,7 +230,7 @@ By default, native dependencies are built on `node:22-bookworm`, then production
 docker build \
   --build-arg NODE_IMAGE=node:22-bookworm \
   --build-arg RUNTIME_NODE_IMAGE=node:22-bookworm-slim \
-  -t claude-code-router:local .
+  -t agentrouter:local .
 ```
 
 Run the Docker smoke test:
@@ -294,3 +292,8 @@ docker compose logs --tail=200 agentrouter
 - [CLI installation and command reference](../cli/)
 - [Server](../../configuration/server/)
 - [API Keys](../../configuration/api-keys/)
+
+
+## Data directory compatibility
+
+The application uses `/data/.agentrouter`, while the entrypoint retains `/data/.claude-code-router` for compatibility bootstrap. Persist and back up all of `/data`. The container gateway uses the entrypoint's default `3456`, independently of the desktop/CLI default `3466`; clients use the public Nginx mapping on `3458`.

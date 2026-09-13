@@ -2,7 +2,7 @@
 title: 钉钉 AgentClaw 配置
 pageTitle: 钉钉 AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入钉钉的企业协作环境，电脑锁屏后可接力。本页覆盖创建钉钉应用、开启机器人能力和接入验证。
+lead: 把 Agent 消息接入钉钉的企业协作环境，电脑锁屏后可接力。
 ---
 
 ## 这个方式适合谁

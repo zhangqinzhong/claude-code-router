@@ -1,3 +1,5 @@
+> Historical upstream article about early Claude Code Router designs and usage. For current AgentRouter instructions, see the [documentation](../../docs/src/content/docs/en/index.md).
+
 # Project Motivation and Principles
 
 As early as the day after Claude Code was released (2025-02-25), I began and completed a reverse engineering attempt of the project. At that time, using Claude Code required registering for an Anthropic account, applying for a waitlist, and waiting for approval. However, due to well-known reasons, Anthropic blocks users from mainland China, making it impossible for me to use the service through normal means. Based on known information, I discovered the following:

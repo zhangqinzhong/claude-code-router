@@ -2,7 +2,7 @@
 title: Agent 配置
 pageTitle: Agent 配置
 eyebrow: 详细配置
-lead: 为 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 和 WorkBuddy 创建可复用的启动配置（Agent 配置），并用不同配置打开相互独立的 Agent 实例。需要多开 Agent 或为不同用途固定不同模型时使用本页。
+lead: 为 Claude Code、Codex、OpenCode、Grok CLI、Kimi CLI、ZCode 和 WorkBuddy 创建可复用的启动配置（Agent 配置），并用不同配置打开相互独立的 Agent 实例。
 ---
 
 > 若需要某个 Agent 的逐字段详细接入指南，可在侧边栏 **Agent 配置** 下打开对应页面，例如 [Claude Code](/configuration/agents/claude-code/)、[Codex](/configuration/agents/codex/) 或 [Grok CLI](/configuration/agents/grok/)。

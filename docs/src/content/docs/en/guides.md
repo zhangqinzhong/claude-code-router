@@ -11,8 +11,8 @@ AgentRouter is available as a desktop app, a Node.js 22+ npm CLI, and a single-e
 
 | Distribution | Start entry | Default management | Default model gateway |
 | --- | --- | --- | --- |
-| Desktop | App UI / `agentrouter` | In-app window | `http://127.0.0.1:3456` |
-| npm CLI | `agentrouter ui` / `agentrouter serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| Desktop | App UI / `agentrouter` | In-app window | `http://127.0.0.1:3466` |
+| npm CLI | `agentrouter ui` / `agentrouter serve` | `http://127.0.0.1:3458` | `http://127.0.0.1:3466` |
 | Docker | `docker compose up -d --build` | Shared `http://127.0.0.1:3458` | Shared Nginx endpoint |
 
 Use the [installation page](install/) to choose a distribution. See the [CLI reference](cli/) for terminal commands and [Docker deployment](docker/) for container ports, authentication, persistence, and upgrades.

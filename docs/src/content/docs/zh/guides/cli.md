@@ -2,7 +2,7 @@
 title: CLI 安装与命令参考
 pageTitle: CLI 安装与命令参考
 eyebrow: 快速开始
-lead: 面向不使用桌面应用的部署：通过 npm 安装 AgentRouter CLI，管理后台服务、网关端口与凭据，并按 Agent 配置启动本机 Agent。
+lead: 面向不使用桌面应用的部署：从源码构建并安装 AgentRouter CLI，管理后台服务、网关端口与凭据，并按 Agent 配置启动本机 Agent。
 ---
 
 ## 命令名
@@ -18,18 +18,21 @@ AgentRouter 只暴露一个命令名 `agentrouter`，由两个发行版提供：
 
 ## 安装、升级与卸载
 
-CLI 要求 Node.js 22 或更高版本：
+CLI 要求 Node.js 22 或更高版本。CLI 包尚未发布到 npm，请从源码构建：
 
 ```sh
-node --version
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
 agentrouter --help
 ```
 
-升级和卸载：
+升级时构建目标版本标签，并安装生成的 `.tgz` 包。卸载：
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter@latest
 npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
@@ -59,7 +62,7 @@ agentrouter ui --no-open
 4. 在 **服务** 页面确认网关已经运行。
 5. 把客户端 Base URL 指向界面显示的网关地址。
 
-管理界面默认使用 `http://127.0.0.1:3458`，模型网关默认使用 `http://127.0.0.1:3456`。管理 Token 与 AgentRouter 客户端 Key 是两种独立凭据：前者保护 UI / RPC，后者验证模型请求。
+管理界面默认使用 `http://127.0.0.1:3458`，模型网关默认使用 `http://127.0.0.1:3466`。管理 Token 与 AgentRouter 客户端 Key 是两种独立凭据：前者保护 UI / RPC，后者验证模型请求。
 
 ## 服务命令总览
 
@@ -156,8 +159,8 @@ agentrouter profile-id -- --help
 
 | 平台 | 配置目录 |
 | --- | --- |
-| macOS / Linux | `~/.claude-code-router` |
-| Windows | `%APPDATA%\claude-code-router` |
+| macOS / Linux | `~/.agentrouter` |
+| Windows | `%APPDATA%\agentrouter` |
 
 常见文件和目录：
 

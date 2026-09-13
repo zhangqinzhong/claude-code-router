@@ -228,3 +228,9 @@ Field paths use AgentRouter's lightweight JSONPath syntax:
 | `local-estimate` | Shows estimated quota from local time-window config without a remote request. |
 
 `Insert example` fills an example connector array containing `standard`, `http-json`, `webcontent-json`, `plugin`, and `local-estimate` connectors.
+
+## Saving and renaming
+
+Failed saves keep the current draft available for correction and retry. A completed save does not overwrite edits made while it was in progress. Closing an unsaved editor offers a choice to keep editing or discard changes.
+
+Renaming a provider also updates model references in agent profiles, routing, fallbacks, Fusion, and known tool settings. Credentials, API URLs, prompts, and arbitrary script text are not rewritten as provider references.

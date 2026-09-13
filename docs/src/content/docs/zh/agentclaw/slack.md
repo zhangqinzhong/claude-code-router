@@ -2,7 +2,7 @@
 title: Slack AgentClaw 配置
 pageTitle: Slack AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入 Slack 频道或私聊，电脑锁屏后可接力到 Slack。本页覆盖创建 Slack 应用、AgentRouter 所需的两个 Token 和接入验证。
+lead: 把 Agent 消息接入 Slack 频道或私聊，电脑锁屏后可接力到 Slack。
 ---
 
 ## 这个方式适合谁

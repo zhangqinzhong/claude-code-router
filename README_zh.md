@@ -1,63 +1,18 @@
-<div align="center">
-
-<table width="100%">
-  <tr>
-    <td align="center">
-      <a href="https://www.kimi.com/code">
-        <img src="https://gcdn.moonshot.cn/growth-cdn/sponsor/kimi-zh.png" width="960" alt="Kimi K2.7 Code 赞助横幅" />
-      </a>
-      <br />
-      <sub>
-        <a href="https://www.kimi.com/code"><strong>Kimi Code 订阅</strong></a>
-        &nbsp;·&nbsp;
-        <a href="https://platform.kimi.com"><strong>API 中文站</strong></a>
-        &nbsp;·&nbsp;
-        <a href="https://platform.kimi.ai">API Global</a>
-      </sub>
-    </td>
-  </tr>
-  <tr>
-    <td align="left">
-      <p>
-        <strong>感谢 Kimi 赞助本项目！</strong>Kimi K3 是 Moonshot AI 迄今能力最强的模型，也是全球首个开源 3T 级模型。K3 拥有 2.8T 参数、原生视觉能力与 100 万 Token 上下文，在长周期编码、知识工作和推理任务中展现前沿性能。在 AgentRouter 中，Kimi 已作为内置供应商预设开箱即用：无论按量付费 API 还是 Kimi Code 订阅，一键导入即可将编程 Agent 的请求路由到 Kimi；订阅端点原生直通、无需协议转换，API 端点自动适配，账户余额与订阅用量也能直接在 AgentRouter 面板中查看。
-      </p>
-      <p align="center">
-        AgentRouter 已内置 Kimi 供应商预设。前往 Kimi 开放平台（<a href="https://platform.kimi.com">中文站</a>｜<a href="https://platform.kimi.ai">Global</a>）体验 API，或了解 <a href="https://www.kimi.com/code">Kimi Code 订阅</a>。
-      </p>
-    </td>
-  </tr>
-</table>
-
-</div>
-
-<div align="center">
-
 # AgentRouter
 
-### 在一个地方，管理你所有的 Agent 与 Provider
+[English](README.md) · [下载 Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest)
 
-让 Claude Code、Claude Design、Codex、Grok CLI、Kimi CLI、Kilo Code、OpenCode、Pi、ZCode、WorkBuddy 和兼容 API 客户端连接你选择的供应商，并在一个应用里完成每次请求的路由、降级、增强与观测。
+在一个桌面应用中管理 Agent、模型供应商、请求路由、工具和日志。
 
-<p>
-  <a href="#桌面端推荐"><img alt="下载桌面端" src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%B8%8B%E8%BD%BD-%E6%A1%8C%E9%9D%A2%E5%AE%A2%E6%88%B7%E7%AB%AF-2563EB?style=for-the-badge&logo=github&logoColor=white" /></a>
-  <a href="#快速开始"><img alt="快速开始" src="https://img.shields.io/badge/%E7%AB%8B%E5%8D%B3%E4%BD%BF%E7%94%A8-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B-16A34A?style=for-the-badge&logo=rocket&logoColor=white" /></a>
-</p>
+当前版本 **1.0.1**，提供 macOS Apple Silicon / Intel、Windows 和 Linux 安装包。App 已内置本仓库更新源。macOS 暂未 Apple 公证，自动安装升级尚未验证。
 
-<p>
-  <a href="README.md"><img alt="English README" src="https://img.shields.io/badge/%F0%9F%87%AC%F0%9F%87%A7-English-000aff?style=flat" /></a>
-  <a href="https://discord.gg/rdftVMaUcS"><img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white" /></a>
-  <a href="LICENSE">MIT License</a>
-</p>
-
-<br />
-
-<img src="blog/images/claude-code-router.png" width="820" alt="AgentRouter 桌面端控制台" />
-
-</div>
+- [中文文档](docs/README.md#中文指南)
+- [日志保存与速率](docs/src/content/docs/zh/configuration/observability.md)
+- [版本说明](docs/releases/1.0.1.md) · [更新记录](CHANGELOG.md)
 
 ## 为什么使用 AgentRouter？
 
-AgentRouter（AgentRouter）是面向编程 Agent 的本地模型网关与控制平面。它为 Claude Code、Claude Design、Codex、Grok CLI、Kimi CLI、Kilo Code、OpenCode、Pi、ZCode、WorkBuddy 和兼容 API 客户端提供**一个稳定的本地入口**，让你在一个地方管理入口背后的供应商、模型、账号、路由规则与工具。
+AgentRouter 是面向编程 Agent 的本地模型网关与控制平面。它为 Claude Code、Claude Design、Codex、Grok CLI、Kimi CLI、Kilo Code、OpenCode、Pi、ZCode、WorkBuddy 和兼容 API 客户端提供**一个稳定的本地入口**，让你在一个地方管理入口背后的供应商、模型、账号、路由规则与工具。
 
 你可以使用 AgentRouter：
 
@@ -162,7 +117,7 @@ AgentRouter 支持 OpenAI Chat / Responses、Anthropic Messages、Gemini Generat
 1. 从 [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest) 下载对应平台的安装包，安装并启动 AgentRouter。
 
 2. 打开 **供应商 → 添加供应商**。选择内置预设或自定义端点，填写 API Key，选择协议与模型，然后保存。
-3. 打开 **服务** 并点击 **启动**。本地模型网关默认监听 `http://127.0.0.1:3456`。
+3. 打开 **服务** 并点击 **启动**。本地模型网关默认监听 `http://127.0.0.1:3466`。
 4. 打开 **Agent配置**，选择 Claude Code、Claude Design、Codex、Grok CLI、Kimi CLI、Kilo Code、OpenCode、Pi、ZCode 或 WorkBuddy，指定模型并应用配置档案。
 5. 开始使用 Agent。在 **日志** 中确认最终供应商、模型、状态、Token、耗时与错误。
 
@@ -172,12 +127,15 @@ AgentRouter 支持 OpenAI Chat / Responses、Anthropic Messages、Gemini Generat
 
 npm CLI 要求 Node.js 22 或更高版本。无需 Electron，也能启动相同的模型网关与浏览器管理界面：
 
+CLI 包尚未发布到 npm。在当前源码目录中运行（需要 Node.js 22+）；全局安装见 [CLI 文档](packages/cli/README_zh.md)：
+
 ```sh
-npm install -g @zhangqinzhong/agentrouter
-agentrouter ui
+npm ci
+npm run build:assets
+node packages/cli/dist/main/cli.js ui
 ```
 
-打开 `http://127.0.0.1:3458`，然后按照上面的 **供应商 → 服务 → Agent 配置档案** 流程操作。模型网关仍位于 `http://127.0.0.1:3456`。服务模式、鉴权和 Profile 命令见 CLI 命令参考。
+打开 `http://127.0.0.1:3458`，然后按照上面的 **供应商 → 服务 → Agent 配置档案** 流程操作。模型网关仍位于 `http://127.0.0.1:3466`。服务模式、鉴权和 Profile 命令见 CLI 命令参考。
 
 ### Docker
 
@@ -204,7 +162,7 @@ Windows App 打包必须在 Windows x64 上运行，因为 `better-sqlite3` 包�
 Claude Code · Claude Design · Codex · Grok CLI · Kimi CLI · Kilo Code · OpenCode · Pi · ZCode · WorkBuddy · 兼容 API 客户端
                               │
                               ▼
-                 AgentRouter :3456
+                 AgentRouter :3466
               配置档案 · 路由 · 凭据 · 工具 · 日志
                               │
                               ▼
@@ -234,285 +192,8 @@ Claude Code · Claude Design · Codex · Grok CLI · Kimi CLI · Kilo Code · Op
 - 通过 Docker 部署
 - 排查常见问题
 
-## 支持与赞助
-
-<div align="center">
-
-<p>如果你觉得这个项目有帮助，欢迎赞助项目开发。非常感谢你的支持。</p>
-
-<table>
-  <tr>
-    <td align="center" width="220">
-      <a href="https://ko-fi.com/F1F31GN2GM">
-        <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="通过 Ko-fi 赞助" />
-      </a>
-      <br />
-      <sub>通过 Ko-fi 单次赞助</sub>
-    </td>
-  </tr>
-</table>
-
-<table>
-  <tr>
-    <td align="center" width="220">
-      <strong>支付宝</strong>
-      <br />
-      <img src="/blog/images/alipay.jpg" width="160" alt="支付宝收款码" />
-    </td>
-    <td align="center" width="220">
-      <strong>微信支付</strong>
-      <br />
-      <img src="/blog/images/wechat.jpg" width="160" alt="微信支付收款码" />
-    </td>
-  </tr>
-</table>
-
-</div>
-
-### 我们的赞助商
-
-<div align="center">
-
-<p>非常感谢所有赞助商的慷慨支持。</p>
-
-<table width="100%">
-  <tr>
-    <td align="center" width="330">
-      <a href="https://www.bigmodel.cn/claude-code?ic=FPF9IVAGFJ">
-        <img src="/docs/public/provider-icons/zhipu-cn-general.png" width="42" height="42" alt="智谱图标" />
-        <br />
-        <strong>Z智谱</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://aihubmix.com/">
-        <img src="https://www.google.com/s2/favicons?domain=aihubmix.com&amp;sz=128" width="42" height="42" alt="AIHubmix 图标" />
-        <br />
-        <strong>AIHubmix</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://ai.burncloud.com">
-        <img src="https://www.burncloud.com/favicon.png" width="42" height="42" alt="BurnCloud 图标" />
-        <br />
-        <strong>BurnCloud</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://share.302.ai/ZGVF9w">
-        <img src="https://www.google.com/s2/favicons?domain=302.ai&amp;sz=128" width="42" height="42" alt="302.AI 图标" />
-        <br />
-        <strong>302.AI</strong>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="330">
-      <a href="https://runapi.co/register">
-        <img src="/docs/public/provider-icons/runapi.jpg" width="42" height="42" alt="RunAPI 图标" />
-        <br />
-        <strong>RunAPI</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://teamorouter.com/">
-        <img src="/docs/public/provider-icons/teamorouter.png" width="42" height="42" alt="TeamoRouter 图标" />
-        <br />
-        <strong>TeamoRouter</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://code0.ai/agent/register/9n9jOsSnYQoemIVL?utm_source=claudecoderouter&amp;utm_medium=partner&amp;utm_campaign=claudecoderouter_2026&amp;utm_content=default">
-        <img src="/docs/public/provider-icons/code0.png" width="42" height="42" alt="code0.ai 图标" />
-        <br />
-        <strong>code0.ai</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://console.claudeapi.com/agent/register/LbmB7Y9kPloyzhwF?utm_source=claudecoderouter&amp;utm_medium=partner&amp;utm_campaign=claudecoderouter_2026&amp;utm_content=default">
-        <img src="/docs/public/provider-icons/claudeapi.png" width="42" height="42" alt="claudeapi 图标" />
-        <br />
-        <strong>claudeapi</strong>
-      </a>
-    </td>
-  </tr>
-  <tr>
-    <td align="center" width="330">
-      <a href="https://s.qiniu.com/AVjMVf">
-        <img src="/docs/public/provider-icons/qiniu-ai.png" width="42" height="42" alt="七牛云 AI 图标" />
-        <br />
-        <strong>七牛云 AI</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://api.fenno.ai/register?redirect=/purchase?tab=subscription%26group=16">
-        <img src="/docs/public/provider-icons/fenno.jpg" width="42" height="42" alt="Fenno.ai 图标" />
-        <br />
-        <strong>Fenno.ai</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://unity2.ai/register?source=claudecoderouter">
-        <img src="/docs/public/provider-icons/unity2.jpg" width="42" height="42" alt="Unity2.Ai 图标" />
-        <br />
-        <strong>Unity2.Ai</strong>
-      </a>
-    </td>
-    <td align="center" width="330">
-      <a href="https://www.infistar.cc/register">
-        <img src="/docs/public/provider-icons/infistar-ai.jpg" width="42" height="42" alt="无限星河图标" />
-        <br />
-        <strong>无限星河</strong>
-      </a>
-    </td>
-  </tr>
-</table>
-
-<h4>社区赞助者</h4>
-
-<table width="100%">
-  <tr>
-    <td align="center" width="220">@Simon Leischnig</td>
-    <td align="center" width="220"><a href="https://github.com/duanshuaimin">@duanshuaimin</a></td>
-    <td align="center" width="220"><a href="https://github.com/vrgitadmin">@vrgitadmin</a></td>
-    <td align="center" width="220">@*o</td>
-    <td align="center" width="220"><a href="https://github.com/ceilwoo">@ceilwoo</a></td>
-    <td align="center" width="220">@*说</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*更</td>
-    <td align="center" width="220">@K*g</td>
-    <td align="center" width="220">@R*R</td>
-    <td align="center" width="220"><a href="https://github.com/bobleer">@bobleer</a></td>
-    <td align="center" width="220">@*苗</td>
-    <td align="center" width="220">@*划</td>
-  </tr>
-  <tr>
-    <td align="center" width="220"><a href="https://github.com/Clarence-pan">@Clarence-pan</a></td>
-    <td align="center" width="220"><a href="https://github.com/carter003">@carter003</a></td>
-    <td align="center" width="220">@S*r</td>
-    <td align="center" width="220">@*晖</td>
-    <td align="center" width="220">@*敏</td>
-    <td align="center" width="220">@Z*z</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*然</td>
-    <td align="center" width="220"><a href="https://github.com/cluic">@cluic</a></td>
-    <td align="center" width="220">@*苗</td>
-    <td align="center" width="220"><a href="https://github.com/PromptExpert">@PromptExpert</a></td>
-    <td align="center" width="220">@*应</td>
-    <td align="center" width="220"><a href="https://github.com/yusnake">@yusnake</a></td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*飞</td>
-    <td align="center" width="220">@董*</td>
-    <td align="center" width="220">@*汀</td>
-    <td align="center" width="220">@*涯</td>
-    <td align="center" width="220">@*:-）</td>
-    <td align="center" width="220">@**磊</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*琢</td>
-    <td align="center" width="220">@*成</td>
-    <td align="center" width="220">@Z*o</td>
-    <td align="center" width="220">@*琨</td>
-    <td align="center" width="220"><a href="https://github.com/congzhangzh">@congzhangzh</a></td>
-    <td align="center" width="220">@*_</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@Z*m</td>
-    <td align="center" width="220">@*鑫</td>
-    <td align="center" width="220">@c*y</td>
-    <td align="center" width="220">@*昕</td>
-    <td align="center" width="220"><a href="https://github.com/witsice">@witsice</a></td>
-    <td align="center" width="220">@b*g</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*亿</td>
-    <td align="center" width="220">@*辉</td>
-    <td align="center" width="220">@JACK</td>
-    <td align="center" width="220">@*光</td>
-    <td align="center" width="220">@W*l</td>
-    <td align="center" width="220"><a href="https://github.com/kesku">@kesku</a></td>
-  </tr>
-  <tr>
-    <td align="center" width="220"><a href="https://github.com/biguncle">@biguncle</a></td>
-    <td align="center" width="220">@二吉吉</td>
-    <td align="center" width="220">@a*g</td>
-    <td align="center" width="220">@*林</td>
-    <td align="center" width="220">@*咸</td>
-    <td align="center" width="220">@*明</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@S*y</td>
-    <td align="center" width="220">@f*o</td>
-    <td align="center" width="220">@*智</td>
-    <td align="center" width="220">@F*t</td>
-    <td align="center" width="220">@r*c</td>
-    <td align="center" width="220"><a href="https://github.com/qierkang">@qierkang</a></td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*军</td>
-    <td align="center" width="220"><a href="https://github.com/snrise-z">@snrise-z</a></td>
-    <td align="center" width="220">@*王</td>
-    <td align="center" width="220"><a href="https://github.com/greatheart1000">@greatheart1000</a></td>
-    <td align="center" width="220">@*王</td>
-    <td align="center" width="220">@zcutlip</td>
-  </tr>
-  <tr>
-    <td align="center" width="220"><a href="https://github.com/Peng-YM">@Peng-YM</a></td>
-    <td align="center" width="220">@*更</td>
-    <td align="center" width="220">@*.</td>
-    <td align="center" width="220">@F*t</td>
-    <td align="center" width="220">@*政</td>
-    <td align="center" width="220">@*铭</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@*叶</td>
-    <td align="center" width="220">@七*o</td>
-    <td align="center" width="220">@*青</td>
-    <td align="center" width="220">@**晨</td>
-    <td align="center" width="220">@*远</td>
-    <td align="center" width="220">@*霄</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@**吉</td>
-    <td align="center" width="220">@**飞</td>
-    <td align="center" width="220">@**驰</td>
-    <td align="center" width="220">@x*g</td>
-    <td align="center" width="220">@**东</td>
-    <td align="center" width="220">@*落</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">@哆*k</td>
-    <td align="center" width="220">@*涛</td>
-    <td align="center" width="220"><a href="https://github.com/WitMiao">@苗大</a></td>
-    <td align="center" width="220">@*呢</td>
-    <td align="center" width="220">@d*u</td>
-    <td align="center" width="220">@crizcraig</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">s*s</td>
-    <td align="center" width="220">*火</td>
-    <td align="center" width="220">*勤</td>
-    <td align="center" width="220">**锟</td>
-    <td align="center" width="220">*涛</td>
-    <td align="center" width="220">**明</td>
-  </tr>
-  <tr>
-    <td align="center" width="220">*知</td>
-    <td align="center" width="220">*语</td>
-    <td align="center" width="220">*瓜</td>
-    <td align="center" width="220">**新</td>
-    <td align="center" width="220"></td>
-    <td align="center" width="220"></td>
-  </tr>
-</table>
-
-<sub>如果你的名字被打码，请通过我的主页邮箱联系我更新为 GitHub 用户名。</sub>
-
-</div>
-
 ## 许可证
 
 本项目基于 [MIT License](LICENSE) 发布。
+
+AgentRouter 基于 [Claude Code Router](https://github.com/musistudio/claude-code-router) 开发，保留原项目许可证与版权声明。

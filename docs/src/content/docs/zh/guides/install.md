@@ -9,27 +9,41 @@ lead: 按运行场景在桌面应用、npm CLI 和 Docker 三种发行方式中�
 
 | 方式 | 适合场景 | 入口 | 默认管理地址 | 默认网关地址 |
 | --- | --- | --- | --- | --- |
-| 桌面应用 | 日常本机使用、托盘、多开 Agent App、桌面集成 | 应用界面、`agentrouter` | 应用内窗口 | `http://127.0.0.1:3456` |
-| npm CLI | 终端、SSH、无 Electron 环境、进程管理器 | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3456` |
+| 桌面应用 | 日常本机使用、托盘、多开 Agent App、桌面集成 | 应用界面、`agentrouter` | 应用内窗口 | `http://127.0.0.1:3466` |
+| npm CLI | 终端、SSH、无 Electron 环境、进程管理器 | `agentrouter` | `http://127.0.0.1:3458` | `http://127.0.0.1:3466` |
 | Docker | 常驻服务器、容器运维、统一浏览器入口 | Nginx | 与网关共用公开地址 | `http://127.0.0.1:3458`（默认端口映射） |
 
-桌面版 / CLI 中，管理 UI 与模型网关使用不同端口。CLI 的 `3458` 是管理端口，默认模型网关端口是 `3456`；Docker 通过 Nginx 把管理 UI 和模型网关合并到同一公开入口。
+桌面版 / CLI 中，管理 UI 与模型网关使用不同端口。CLI 的 `3458` 是管理端口，默认模型网关端口是 `3466`；Docker 通过 Nginx 把管理 UI 和模型网关合并到同一公开入口。
 
 ## 安装桌面应用
 
-1. 使用 `npm run build:app:mac:local` 或 `npm run build:app:win:local` 构建本地安装包。
-2. 按系统下载：macOS 使用 `.dmg` 或 `.zip`，Windows 使用 `.exe`，Linux 使用 `.AppImage`。
+1. 打开 [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest)。
+2. macOS 按芯片选择 Apple Silicon（arm64）或 Intel（x64）的 DMG/ZIP；Windows 选择 EXE，Linux 选择 AppImage。
 3. 安装并打开 **AgentRouter**。
 4. 添加供应商和模型，在 **API 密钥** 中创建客户端 Key，然后从 **服务** 页面点击 **启动**。
 
-页面显示运行中后，模型网关默认监听 `http://127.0.0.1:3456`。需要打开应用时自动启动网关，可在 **服务** 页面开启自动启动。
+页面显示运行中后，模型网关默认监听 `http://127.0.0.1:3466`。需要打开应用时自动启动网关，可在 **服务** 页面开启自动启动。
+
+## 桌面版更新
+
+App 已内置本仓库的 Releases 更新源，通过应用内“检查更新”获取新版本，无需设置环境变量。1.0.1 提供 macOS、Windows 和 Linux 安装包。
+
+macOS 包使用本地签名，尚未 Apple 公证，自动安装升级尚未验证；可从 Releases 手动下载替换。旧的 3.0.22 开发版首次切换到 AgentRouter 1.x 时需手动安装。
 
 ## 安装 npm CLI
 
 要求 Node.js 22 或更高版本：
 
+CLI 包尚未发布到 npm；使用以下源码安装步骤：
+
 ```sh
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
+agentrouter --help
 agentrouter ui
 ```
 
@@ -60,8 +74,8 @@ docker compose up -d --build
 
 | 方式 | 配置位置 |
 | --- | --- |
-| 桌面 / CLI（macOS、Linux） | `~/.claude-code-router` |
-| 桌面 / CLI（Windows） | `%APPDATA%\claude-code-router` |
-| Docker | `/data/.claude-code-router`，应持久化挂载 `/data` |
+| 桌面 / CLI（macOS、Linux） | `~/.agentrouter` |
+| 桌面 / CLI（Windows） | `%APPDATA%\agentrouter` |
+| Docker | `/data/.agentrouter`，应持久化挂载 `/data` |
 
 AgentRouter 当前配置存储在 `config.sqlite` 中；`config.json` 只在没有 SQLite 配置时作为旧版迁移或 Docker 首次引导来源。不要在 AgentRouter 运行时直接编辑 SQLite。

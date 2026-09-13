@@ -86,7 +86,7 @@ Supports both OpenCode CLI and the desktop app.
 
 1. **Add Profile** → choose **OpenCode**, enter a **Profile name**, and pick a **Scope** and **Entry mode**.
 2. Confirm the **Provider ID**, **Provider Name**, and **OpenCode model**.
-3. **Save**, then open the CLI with the terminal button, or open the OpenCode desktop app via AgentRouter Desktop with the play button.
+3. **Save**, then open the CLI with the terminal button, or open the OpenCode desktop app vian AgentRouter Desktop with the play button.
 4. Send a message to confirm it replies, and check **Request logs** to verify the request went through the gateway.
 
 For OpenCode-specific fields, see [OpenCode setup and configuration](../../configuration/agents/opencode/).

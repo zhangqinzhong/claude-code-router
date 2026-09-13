@@ -2,7 +2,7 @@
 title: Discord AgentClaw 配置
 pageTitle: Discord AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入 Discord 服务器频道或私聊，电脑锁屏后可接力。本页覆盖创建 Discord 应用与 Bot、所需权限和接入验证。
+lead: 把 Agent 消息接入 Discord 服务器频道或私聊，电脑锁屏后可接力。
 ---
 
 ## 这个方式适合谁

@@ -121,7 +121,7 @@ hello-extension/
     {
       "id": "hello-status",
       "name": "Hello Status",
-      "url": "http://127.0.0.1:3456/plugins/hello"
+      "url": "http://127.0.0.1:3466/plugins/hello"
     }
   ]
 }
@@ -251,19 +251,19 @@ npm run dev
 After the gateway starts, request the status route:
 
 ```bash
-curl http://127.0.0.1:3456/plugins/hello
+curl http://127.0.0.1:3466/plugins/hello
 ```
 
 If the route uses the default `auth: "gateway"` and AgentRouter has API keys configured:
 
 ```bash
-curl -H "Authorization: Bearer <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "Authorization: Bearer <AR_API_KEY>" http://127.0.0.1:3466/plugins/hello
 ```
 
 You can also use:
 
 ```bash
-curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3456/plugins/hello
+curl -H "x-api-key: <AR_API_KEY>" http://127.0.0.1:3466/plugins/hello
 ```
 
 ### 4. Verify the HTTP backend and proxy route

@@ -58,7 +58,7 @@ API 后端支持生图、图片编辑、文生视频、图生视频和参考图�
 需要绕过 Fusion 直接接入 MCP 客户端时，可以连接：
 
 ```text
-http://127.0.0.1:3456/__ccr/media/mcp
+http://127.0.0.1:3466/__ccr/media/mcp
 Authorization: Bearer <AgentRouter API Key>
 ```
 

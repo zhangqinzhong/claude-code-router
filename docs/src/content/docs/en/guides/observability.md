@@ -24,6 +24,6 @@ Request logs record model request details passing through AgentRouter, including
 
 The Logs page supports filtering by status, provider, model, credential, request ID, model name, request body, or response body. A single record shows the main request and response fields, including `request model`, `resolved provider`, `resolved model`, status code, response body, errors, duration, tokens, and cost estimate.
 
-Regular request logs are kept locally for the current day. When the local date changes, the next request-log read or write cleans up the previous day's regular logs; they are useful for same-day troubleshooting, not long-term audit archiving.
+Logs and Observability share the same request data. Set **Settings → Logs & Observability → Log retention days** to 1, 3, 7, 14, 30, 90, or 365 days; the default is 1 day. Retention uses elapsed 24-hour periods rather than a midnight reset. While the log writer is running, expiration is checked every minute and expired requests, related traces, and unreferenced payload files are removed.
 
 See the [logs and observability configuration reference](../../configuration/observability/) for the full set of switches and page capabilities.

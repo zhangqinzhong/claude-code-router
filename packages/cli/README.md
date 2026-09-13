@@ -12,17 +12,21 @@ Use the CLI on developer machines and headless hosts. If you want the tray, desk
 - A supported upstream model provider, or a locally logged-in agent account that AgentRouter can import
 - A locally installed agent executable when using profile launch commands
 
-Install globally:
+The CLI package is not currently published to npm. Build and install it from the 1.0.1 source tag:
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
 agentrouter --help
 ```
 
-Upgrade or remove it with npm:
+To upgrade, build the desired release tag and install its generated `.tgz` package. To uninstall:
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter@latest
 npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
@@ -39,10 +43,10 @@ agentrouter ui
 Then:
 
 1. Add an upstream provider and at least one model.
-2. Create a AgentRouter client key under **API Keys**.
+2. Create an AgentRouter client key under **API Keys**.
 3. Configure routing if the default provider/model is not sufficient.
 4. Confirm that the gateway is running under **Server**.
-5. Point your client at the gateway URL shown in the UI. The default gateway is `http://127.0.0.1:3456`; the management UI defaults to `http://127.0.0.1:3458`.
+5. Point your client at the gateway URL shown in the UI. The default gateway is `http://127.0.0.1:3466`; the management UI defaults to `http://127.0.0.1:3458`.
 
 The management token and AgentRouter client API keys are different credentials. The management token protects the browser UI and RPC API. AgentRouter client keys authenticate model requests sent to the gateway.
 

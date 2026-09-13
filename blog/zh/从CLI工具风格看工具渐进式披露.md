@@ -1,3 +1,5 @@
+> 上游历史文章，描述早期 Claude Code Router 的设计与用法。当前 AgentRouter 使用说明见[中文文档](../../docs/src/content/docs/zh/index.md)。
+
 # 从CLI工具风格看Agent工具渐进式披露
 
 距离Anthropic发布[Skills](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)也过去将近两个月的时间了，其中Anthropic提到了一个术语渐进式披露(Progressive Disclosure)，这到底是什么东西？解决了什么问题？

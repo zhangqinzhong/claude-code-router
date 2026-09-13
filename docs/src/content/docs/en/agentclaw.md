@@ -2,7 +2,7 @@
 title: AgentClaw
 pageTitle: AgentClaw
 eyebrow: AgentClaw
-lead: "AgentClaw connects an agent running locally under AgentRouter to your IM apps: the agent keeps working with your projects, tools, and sessions on your own computer, while an IM bot handles remote viewing, handoff, and replies. This page covers how it works, the three message modes, and when to use it."
+lead: "AgentClaw connects an agent running locally under AgentRouter to your IM apps: the agent keeps working with your projects, tools, and sessions on your own computer, while an IM bot handles remote viewing, handoff, and replies."
 ---
 
 AgentClaw is AgentRouter's agent relay capability. A local agent managed by AgentRouter keeps its workspace, login state, config files, model routing, and tool permissions; AgentClaw exposes a remote entry point for it through an IM bot. From Slack, Discord, Telegram, LINE, Weixin, WeCom, Feishu, or DingTalk, you can watch agent output, continue the conversation, answer permission requests, or take over after your computer locks.
@@ -23,7 +23,7 @@ Handoff means that after your screen locks and the idle threshold passes, furthe
 | Concept | Meaning |
 | --- | --- |
 | AgentClaw | The IM access layer AgentRouter provides for local agents, with an interface styled after [OpenClaw](https://openclaw.ai) (an open-source personal AI assistant that runs on your own machine and interacts through IM platforms) |
-| Local agent | A Claude Code, Codex, OpenCode, ZCode, or similar agent opened through a AgentRouter Agent Config |
+| Local agent | A Claude Code, Codex, OpenCode, ZCode, or similar agent opened through an AgentRouter Agent Config |
 | Bot | The IM message entry; the AgentRouter UI still calls this **Bot Management** |
 | Project | An agent-native project or working directory |
 | Session | An agent-native conversation inside a Project |

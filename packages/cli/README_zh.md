@@ -12,17 +12,21 @@ CLI 适合开发机和无桌面的服务器。如果你需要系统托盘、桌�
 - 一个可用的上游模型供应商，或 AgentRouter 支持导入的本机 Agent 登录态
 - 使用配置启动命令时，本机需要已经安装对应 Agent
 
-全局安装：
+CLI 包尚未发布到 npm。请从 1.0.1 源码标签构建并安装：
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter
+git clone --branch v1.0.1 --depth 1 https://github.com/zhangqinzhong/claude-code-router.git
+cd claude-code-router
+npm ci
+npm run build:assets
+npm pack --workspace @zhangqinzhong/agentrouter --ignore-scripts
+npm install -g ./zhangqinzhong-agentrouter-1.0.1.tgz
 agentrouter --help
 ```
 
-升级或卸载：
+升级时构建目标版本标签，并安装生成的 `.tgz` 包。卸载：
 
 ```sh
-npm install -g @zhangqinzhong/agentrouter@latest
 npm uninstall -g @zhangqinzhong/agentrouter
 ```
 
@@ -42,7 +46,7 @@ agentrouter ui
 2. 在 **API 密钥** 页面创建 AgentRouter 客户端密钥。
 3. 如果默认供应商 / 模型不够用，再配置路由规则。
 4. 在 **服务** 页面确认网关已经运行。
-5. 把客户端指向界面显示的网关地址。网关默认是 `http://127.0.0.1:3456`，管理界面默认是 `http://127.0.0.1:3458`。
+5. 把客户端指向界面显示的网关地址。网关默认是 `http://127.0.0.1:3466`，管理界面默认是 `http://127.0.0.1:3458`。
 
 管理 Token 和 AgentRouter 客户端 API Key 是两种不同凭据。管理 Token 保护浏览器 UI 和 RPC 接口，AgentRouter 客户端 Key 用于验证发送到模型网关的请求。
 

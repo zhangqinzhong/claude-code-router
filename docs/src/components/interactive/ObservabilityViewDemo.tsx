@@ -1,10 +1,4 @@
-/**
- * Docs wrapper rendering the REAL, UNMODIFIED AgentAnalysisView (observability)
- * with real fixture data from the local AgentRouter. selectedSession is wired to local
- * state so clicking "Details" opens the detail panel; the session detail data
- * (trace runs etc.) is injected into the snapshot only when a session is
- * selected, and stripped otherwise so the dialog starts closed and can close.
- */
+/** Fictional order-status examples for the interactive documentation. */
 import { useState } from "react";
 import { AgentAnalysisView } from "@/pages/home/components/dashboard";
 import { BaseUiProvider } from "@/lib/baseui-provider";

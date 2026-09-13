@@ -1,3 +1,5 @@
+> Historical upstream article about early Claude Code Router designs and usage. For current AgentRouter instructions, see the [documentation](../../docs/src/content/docs/en/index.md).
+
 # Maybe We Can Do More with the Router
 
 Since the release of `claude-code-router`, I’ve received a lot of user feedback, and quite a few issues are still open. Most of them are related to support for different providers and the lack of tool usage from the deepseek model.

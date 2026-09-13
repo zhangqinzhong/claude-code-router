@@ -28,8 +28,8 @@ export function sleep(ms: number): Promise<void> {
 /* ------------------------------------------------------------------ */
 
 const NOTICE_TEXT: Record<Locale, string> = {
-  zh: "该组件仅供教程演示。",
-  en: "This component is for tutorial demonstration only.",
+  zh: "交互演示 · 示例数据",
+  en: "Interactive demo · Sample data",
 };
 
 function PlayIcon() {

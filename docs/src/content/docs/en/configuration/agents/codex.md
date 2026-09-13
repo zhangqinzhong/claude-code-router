@@ -86,3 +86,7 @@ With a Bot bound and ChatGPT opened from AgentRouter, ChatGPT can relay conversa
 - **ChatGPT keeps asking to sign in:** sign in to ChatGPT normally, then reopen it from AgentRouter.
 - **Provider ID rejected:** use only letters, numbers, dots, underscores, or hyphens, and keep it stable across saves.
 - **Wrong model in the app:** confirm the **Codex model** field; if left empty, AgentRouter falls back to the first available default model.
+
+## Custom model catalog
+
+AgentRouter's catalog includes context limits, output limits, capabilities, and base instructions. Catalog models and the middleware fallback use the same base instructions for tool-call preambles, progress updates, and completion summaries, while respecting explicit user preferences about updates.

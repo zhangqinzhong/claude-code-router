@@ -2,7 +2,7 @@
 title: 供应商配置
 pageTitle: 供应商配置
 eyebrow: 详细配置
-lead: 接入并管理 AgentRouter 的上游模型服务：导入本机 Agent 登录态，配置协议、API 地址、模型列表和凭据池，以及账号用量读取。需要添加或调整供应商时使用本页。
+lead: 接入并管理 AgentRouter 的上游模型服务：导入本机 Agent 登录态，配置协议、API 地址、模型列表和凭据池，以及账号用量读取。
 ---
 
 ## 导入本机 Agent 登录态
@@ -228,3 +228,9 @@ Kimi CLI 导入会读取本机 Kimi 配置（默认 `~/.kimi-code/config.toml`�
 | `local-estimate` | 不请求远程接口，基于本地窗口配置展示估算额度。 |
 
 点击 `插入示例` 会填入一个包含 `standard`、`http-json`、`webcontent-json`、`plugin` 和 `local-estimate` 的示例 connector 数组。
+
+## 保存与改名
+
+保存失败时，编辑内容保留在窗口中，可以修改后重试。连续编辑期间，已完成的保存不会覆盖后续修改。关闭尚未保存的编辑窗口时，可选择继续编辑或放弃修改。
+
+修改供应商名称会同步更新 Agent 配置、路由、回退、Fusion 和已知工具配置中的模型引用。API 密钥、接口地址、提示词与脚本内容不会被当作名称引用替换。

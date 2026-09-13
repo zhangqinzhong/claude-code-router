@@ -2,7 +2,7 @@
 title: 企业微信 AgentClaw 配置
 pageTitle: 企业微信 AgentClaw
 eyebrow: AgentClaw
-lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接收和回复，电脑锁屏后可接力。本页覆盖创建自建应用、所需凭据和接入验证。
+lead: 把 Agent 消息接入企业微信，让团队成员在企业微信里接收和回复，电脑锁屏后可接力。
 ---
 
 ## 这个方式适合谁

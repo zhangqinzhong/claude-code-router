@@ -96,3 +96,9 @@ If you bind a Bot and open Claude App from AgentRouter, Claude App can relay con
 - **`/model` shows no AgentRouter models:** confirm a provider + model is configured.
 - **Claude App did not pick up the config:** Claude App is already running — reopen it from AgentRouter, or restart it when prompted.
 - **Model aliases have no effect:** aliases only change which provider model a Claude Code tier uses; the value must be a valid `Provider/model` or Fusion model that AgentRouter can serve.
+
+## Advanced Claude settings
+
+Open **Claude settings** in the profile editor. Search settings or filter by All items and Configured. Edit typed values or a JSON object; environment variables have their own searchable editor.
+
+Saving applies the selected settings to that profile's Claude settings file. Clearing a previously managed field removes its override while preserving unrelated user settings. Invalid JSON and values of the wrong type cannot be saved. Administrator-only managed settings cannot be written as ordinary profile settings.

@@ -11,8 +11,8 @@ The Host/Port fields under **Server** configure the model gateway. The browser m
 
 | Distribution | Management entry | Model gateway |
 | --- | --- | --- |
-| Desktop | App window | `http://127.0.0.1:3456` by default |
-| npm CLI | `http://127.0.0.1:3458` by default | `http://127.0.0.1:3456` by default |
+| Desktop | App window | `http://127.0.0.1:3466` by default |
+| npm CLI | `http://127.0.0.1:3458` by default | `http://127.0.0.1:3466` by default |
 | Docker | Public `http://127.0.0.1:3458` by default | Combined into the same public Nginx endpoint |
 
 CLI `--host`/`--port` options configure management; this page configures the gateway. Docker internal listeners should not be published separately. See [Docker Deployment](../../guides/docker/).
