@@ -611,7 +611,7 @@ export function LogsView({
                 {visibleLogColumns.map((column, index) => (
                   <NetworkHeaderCell
                     key={column.id}
-                    help={column.id === "rate" ? <OutputRateHelp /> : undefined}
+                    help={column.id === "rate" ? <OutputRateHelp /> : column.id === "throughput" ? <OutputRateHelp average /> : undefined}
                     label={logTableColumnLabel(column.id, t)}
                     onResizeStart={index < visibleLogColumns.length - 1 ? (event) => startLogColumnResize(index, event) : undefined}
                     resizeLabel={t("Resize column width")}
@@ -2666,7 +2666,7 @@ function JsonPrimitiveValue({ value }: { value: unknown }) {
   return <span>{String(value)}</span>;
 }
 
-function OutputRateHelp() {
+function OutputRateHelp({ average = false }: { average?: boolean }) {
   const t = useAppText();
   const id = useId();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -2694,7 +2694,7 @@ function OutputRateHelp() {
     <button
       ref={trigger}
       type="button"
-      aria-label={t("输出速率说明")}
+      aria-label={t(average ? "平均吞吐率说明" : "输出速率说明")}
       aria-expanded={Boolean(position)}
       aria-controls={position ? id : undefined}
       className="ml-1.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[11px] font-bold leading-none text-slate-700 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2705,10 +2705,17 @@ function OutputRateHelp() {
       }}
     >?</button>
     <TooltipPortal ref={content} open={Boolean(position)} id={id} role="note" className="pointer-events-auto w-[320px] max-w-[calc(100vw-24px)] p-3 text-[12px] leading-5" style={position}>
+      {average ? <>
+        <p className="font-semibold">{t("平均吞吐率")}</p>
+        <p className="mt-1">{t("公式：输出 Token 数 ÷ 请求总耗时（秒）。")}</p>
+        <p className="mt-2">{t("包含等待首 Token 的时间，适用于流式和非流式请求。输出 Token 按供应商返回的用量统计，可能包含思考 Token。")}</p>
+        <p className="mt-2">{t("例如：输出 100 Token，总耗时 5 秒，平均吞吐率为 20 token/s。")}</p>
+      </> : <>
       <p className="font-semibold">{t("输出速率（TPOT 估算）")}</p>
       <p className="mt-1">{t("公式：(输出 Token 数 − 1) ÷ (总耗时 − 首 Token 延迟)，时间单位为秒。")}</p>
       <p className="mt-2">{t("仅适用于流式请求，且输出 Token 数大于 1、时间间隔有效。Token 数按供应商返回的输出用量计，可能包含思考 Token。")}</p>
       <p className="mt-2">{t("这是网关观测到的估算值，受网络缓冲、批量返回和短回复影响，不代表模型内部的真实生成速度。平均吞吐率则包含请求的全部耗时。")}</p>
+      </>}
     </TooltipPortal>
   </>;
 }
