@@ -1,6 +1,6 @@
 {
   "name": "@agentrouter/ui",
-  "version": "3.0.22",
+  "version": "1.0.0",
   "private": true,
   "description": "AgentRouter web management UI.",
   "scripts": {

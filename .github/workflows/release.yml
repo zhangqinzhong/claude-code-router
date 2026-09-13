@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   model-catalog:
-    name: Update model catalog
+    name: Validate release
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -26,8 +26,17 @@ jobs:
         with:
           node-version: 22
 
-      - name: Update models.json
-        run: npm run models:update
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify release version
+        run: node build/verify-release-version.mjs
+
+      - name: Validate source
+        run: |
+          npm run typecheck
+          npm run test:core
+          npm run test:ui
 
       - name: Upload model catalog
         uses: actions/upload-artifact@v4
@@ -134,8 +143,14 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1 || \
-            gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --generate-notes
+          if ! gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            notes="docs/releases/${GITHUB_REF_NAME#v}.md"
+            if [ -f "$notes" ]; then
+              gh release create "$GITHUB_REF_NAME" --title "AgentRouter $GITHUB_REF_NAME" --notes-file "$notes"
+            else
+              gh release create "$GITHUB_REF_NAME" --title "AgentRouter $GITHUB_REF_NAME" --generate-notes
+            fi
+          fi
 
       - name: Upload macOS release assets
         shell: bash

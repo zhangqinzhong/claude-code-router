@@ -10,7 +10,7 @@ type UpdateCheckOptions = {
 };
 
 const startupCheckDelayMs = 12_000;
-const defaultUpdateSource = "";
+const defaultUpdateSource = "https://github.com/zhangqinzhong/claude-code-router/releases/latest/download/";
 
 class AppUpdateService {
   private activeSilentCheckFailureRestoreStatus?: AppUpdateStatus;
@@ -177,7 +177,7 @@ class AppUpdateService {
   }
 
   private configureUpdater(): void {
-    const feedUrl = readEnvString("AR_UPDATE_FEED_URL");
+    const feedUrl = readEnvString("AR_UPDATE_FEED_URL") || defaultUpdateSource;
     if (feedUrl) {
       this.configuredUpdateSource = feedUrl;
       autoUpdater.setFeedURL({
@@ -187,6 +187,7 @@ class AppUpdateService {
       autoUpdater.forceDevUpdateConfig = true;
     }
 
+    autoUpdater.allowDowngrade = false;
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.allowPrerelease = readEnvBoolean("AR_UPDATE_ALLOW_PRERELEASE");
@@ -325,7 +326,7 @@ class AppUpdateService {
   }
 
   private isUpdaterSupported(): boolean {
-    return Boolean(readEnvString("AR_UPDATE_FEED_URL"));
+    return Boolean(readEnvString("AR_UPDATE_FEED_URL") || defaultUpdateSource);
   }
 }
 

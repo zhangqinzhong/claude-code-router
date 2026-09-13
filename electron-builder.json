@@ -14,7 +14,14 @@
     "zh_TW"
   ],
   "npmRebuild": true,
-  "publish": null,
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "zhangqinzhong",
+      "repo": "claude-code-router",
+      "releaseType": "release"
+    }
+  ],
   "directories": {
     "app": "packages/electron",
     "output": "release/${version}"

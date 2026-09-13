@@ -74,3 +74,10 @@ open -a /Applications/AgentRouter.app --env AR_UPDATE_FEED_URL=https://github.co
 ```
 
 该启动参数仅本次生效。正式发行应在 update-service.ts 配置自己的默认源，并允许环境变量覆盖，避免每次手动设置。本次没有启用源、上传文件、创建 Release 或改变版本号。
+
+
+## 1.0.0 实施结果
+
+已按功能移植凭据并发保护、初始化失败重试、跨协议限额估算、失败响应取消、Responses 原生字段保留及 iLink 流式限制，保留原有 AgentRouter 修改。模型目录和大规模配置 UI 重构未纳入本批。新增或移植相应回归测试；旧 profile 测试显式写入凭据数据库，符合新的凭据权威存储规则。
+
+发行版本改为 1.0.0。更新源内置本仓库 Releases 资产目录，环境变量可覆盖；发布配置归属 zhangqinzhong/claude-code-router。macOS 当前只有本地签名，公证及真实自动安装升级仍需另行验证。

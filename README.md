@@ -158,7 +158,7 @@ AgentRouter supports OpenAI Chat / Responses, Anthropic Messages, Gemini Generat
 
 ### Desktop app (recommended)
 
-1. Build a local installer with `npm run build:app:mac:local` (macOS) or `npm run build:app:win:local` (Windows), then install and open AgentRouter.
+1. Download the installer for your platform from [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest), then install and open AgentRouter.
 
 2. Open **Providers → Add Provider**. Choose a built-in preset or a custom endpoint, enter the API key, select the protocol and models, then save.
 3. Open **Server** and click **Start**. The local model gateway listens on `http://127.0.0.1:3456` by default.

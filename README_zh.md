@@ -159,7 +159,7 @@ AgentRouter 支持 OpenAI Chat / Responses、Anthropic Messages、Gemini Generat
 
 ### 桌面端（推荐）
 
-1. 使用 `npm run build:app:mac:local`（macOS）或 `npm run build:app:win:local`（Windows）构建本地安装包，然后安装并启动 AgentRouter。
+1. 从 [AgentRouter Releases](https://github.com/zhangqinzhong/claude-code-router/releases/latest) 下载对应平台的安装包，安装并启动 AgentRouter。
 
 2. 打开 **供应商 → 添加供应商**。选择内置预设或自定义端点，填写 API Key，选择协议与模型，然后保存。
 3. 打开 **服务** 并点击 **启动**。本地模型网关默认监听 `http://127.0.0.1:3456`。
