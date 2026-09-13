@@ -91,5 +91,12 @@
     "createStartMenuShortcut": true,
     "runAfterFinish": true,
     "shortcutName": "AgentRouter"
-  }
+  },
+  "copyright": "Copyright © 2026 zhangqinzhong",
+  "extraResources": [
+    {
+      "from": "LICENSE",
+      "to": "licenses/AgentRouter-LICENSE"
+    }
+  ]
 }

@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1 - 2026-09-14
+
+- Corrected desktop publisher, copyright display, and repository metadata.
+- Included the original MIT license in desktop distributions.
+- Fixed documentation deployment for this repository’s GitHub Pages URL.
+- Corrected the Docker workflow’s image namespace and release defaults.
+
 ## 1.1.0 - 2026-09-13
 
 - Added profile launch aliases, per-profile YOLO mode and saved CLI arguments.
