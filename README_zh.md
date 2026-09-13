@@ -4,11 +4,11 @@
 
 在一个桌面应用中管理 Agent、模型供应商、请求路由、工具和日志。
 
-当前版本 **1.0.1**，提供 macOS Apple Silicon / Intel、Windows 和 Linux 安装包。App 已内置本仓库更新源。macOS 暂未 Apple 公证，自动安装升级尚未验证。
+当前版本 **1.1.0**，提供 macOS Apple Silicon / Intel、Windows 和 Linux 安装包。App 已内置本仓库更新源。macOS 暂未 Apple 公证，自动安装升级尚未验证。
 
 - [中文文档](docs/README.md#中文指南)
 - [日志保存与速率](docs/src/content/docs/zh/configuration/observability.md)
-- [版本说明](docs/releases/1.0.1.md) · [更新记录](CHANGELOG.md)
+- [版本说明](docs/releases/1.1.0.md) · [更新记录](CHANGELOG.md)
 
 ## 为什么使用 AgentRouter？
 

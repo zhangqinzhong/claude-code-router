@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 - 2026-09-13
+
+- Added profile launch aliases, per-profile YOLO mode and saved CLI arguments.
+- Added direct terminal launch with Otty, iTerm2 and system terminal selection on macOS.
+- Bring Otty to the foreground and keep launch/copy actions directly accessible.
+- Support Command-W to close macOS windows while the gateway stays running.
+- Restore Claude authentication when disabling a profile without overwriting user hooks and preferences.
+- Ported upstream plugin error handling and Claude Design streaming/redirect fixes (by @musistudio).
+- Added average-throughput help and refreshed product documentation and demo data.
+
 ## 1.0.1 - 2026-09-13
 
 - Ported remaining upstream settings save/reconciliation and provider reference updates (by @musistudio).

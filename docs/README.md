@@ -1,6 +1,6 @@
 # AgentRouter Documentation
 
-Bilingual documentation for AgentRouter 1.0.1, built with Astro. GitHub Pages is not currently enabled for this repository; Markdown sources are available on GitHub.
+Bilingual documentation for AgentRouter 1.1.0, built with Astro. GitHub Pages is not currently enabled for this repository; Markdown sources are available on GitHub.
 
 ## Local development
 

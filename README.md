@@ -4,11 +4,11 @@
 
 Manage agents, model providers, routing, tools, and request logs from one desktop application.
 
-Current version: **1.0.1**, with installers for macOS Apple Silicon / Intel, Windows, and Linux. The app includes this repository's update feed. macOS packages are not Apple-notarized; automatic installation has not been verified.
+Current version: **1.1.0**, with installers for macOS Apple Silicon / Intel, Windows, and Linux. The app includes this repository's update feed. macOS packages are not Apple-notarized; automatic installation has not been verified.
 
 - [English documentation](docs/README.md#english-guides)
 - [Log retention and rates](docs/src/content/docs/en/configuration/observability.md)
-- [Release notes](docs/releases/1.0.1.md) · [Changelog](CHANGELOG.md)
+- [Release notes](docs/releases/1.1.0.md) · [Changelog](CHANGELOG.md)
 
 ## Why use AgentRouter?
 
