@@ -10,7 +10,7 @@ This directory is installable through AgentRouter Desktop's local extension pick
 
 Claude Design and Claude Ship are separate plugins. Install `plugins/claude-ship` when you also need the Ship app.
 
-By default the Claude Design window loads `https://claude-design.ccrdesk.top/design` from the frontend embedded in the plugin code. Static files under `/design/*` are served by the Claude Design frontend host, while AgentRouter still intercepts Design API paths such as `/v1/design`, `/design/v1/design`, Omelette RPC, bootstrap, and privacy consent probes.
+No third-party frontend host is configured by default. A custom frontend URL or assets origin can be set explicitly in the plugin configuration or AR_CLAUDE_DESIGN_FRONTEND_URL / AR_CLAUDE_DESIGN_ASSETS_ORIGIN.
 
 Browser-saved Claude Design HTML and Claude app `ion-dist` assets are no longer auto-detected. The plugin uses the Cloudflare Pages frontend by default; for local development fixtures, set `frontendUrl`/`frontendAssetsOrigin` and `assetDir` explicitly. `assetDir` can point at any of these extracted roots:
 

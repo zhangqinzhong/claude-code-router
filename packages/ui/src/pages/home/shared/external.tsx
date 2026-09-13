@@ -104,7 +104,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import appLogoUrl from "@/assets/logo.png";
+import appLogoUrl from "@/lib/app-icon";
 import claudeCodeLogoUrl from "@/assets/agent-logos/claude-code.png";
 import codexLogoUrl from "@/assets/agent-logos/codex.png";
 import onboardingMascotSpriteUrl from "@/assets/onboarding/mascot-transition.svg";
@@ -121,9 +121,6 @@ import zaiGlobalCodingProviderIconUrl from "@/assets/provider-icons/zai-global-c
 import zaiGlobalGeneralProviderIconUrl from "@/assets/provider-icons/zai-global-general.svg";
 import zhipuCnCodingProviderIconUrl from "@/assets/provider-icons/zhipu-cn-coding.png";
 import zhipuCnGeneralProviderIconUrl from "@/assets/provider-icons/zhipu-cn-general.png";
-import trayCyanIconUrl from "@/assets/tray-cyan.png";
-import trayOrangeIconUrl from "@/assets/tray-orange.png";
-import trayVioletIconUrl from "@/assets/tray-violet.png";
 import {
   BUILTIN_FUSION_TOOL_SERVER_NAME,
   BUILTIN_FUSION_VISION_TOOL_NAME,
@@ -364,7 +361,6 @@ import {
   routerRewriteOperationOptions,
   routerRuleOperatorOptions,
   routerRuleTypeOptions,
-  trayMascotIconUrls,
   usageRangeOptions,
   virtualModelBaseModeOptions,
   virtualModelClientToolsPolicyOptions,
@@ -480,7 +476,6 @@ export {
   routerRewriteOperationOptions,
   routerRuleOperatorOptions,
   routerRuleTypeOptions,
-  trayMascotIconUrls,
   usageRangeOptions,
   virtualModelBaseModeOptions,
   virtualModelClientToolsPolicyOptions,
@@ -559,7 +554,7 @@ export {
   DialogTitle, Input, Label, PopoverContent, Select, Switch, Tabs, TabsContent, TabsList, TabsTrigger, Textarea,
   cn, appLogoUrl, claudeCodeLogoUrl, codexLogoUrl, onboardingMascotSpriteUrl, anthropicProviderIconUrl, bailianProviderIconUrl, deepseekProviderIconUrl,
   geminiProviderIconUrl, mistralProviderIconUrl, moonshotProviderIconUrl, openaiProviderIconUrl, openrouterProviderIconUrl, siliconflowProviderIconUrl, zaiGlobalCodingProviderIconUrl,
-  zaiGlobalGeneralProviderIconUrl, zhipuCnCodingProviderIconUrl, zhipuCnGeneralProviderIconUrl, trayCyanIconUrl, trayOrangeIconUrl, trayVioletIconUrl, BUILTIN_FUSION_TOOL_SERVER_NAME,
+  zaiGlobalGeneralProviderIconUrl, zhipuCnCodingProviderIconUrl, zhipuCnGeneralProviderIconUrl, BUILTIN_FUSION_TOOL_SERVER_NAME,
   BUILTIN_FUSION_VISION_TOOL_NAME, BUILTIN_FUSION_WEB_SEARCH_TOOL_NAME, DEFAULT_OVERVIEW_WIDGETS, DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, enforceSingleEnabledGlobalProfilePerAgent, OVERVIEW_WIDGET_SIZE_VALUES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS,
   customProviderPresetId, defaultProviderAccountConfig, findProviderPreset, findProviderPresetByBaseUrl, findProviderPresetByIdentity, primaryProviderPresetEndpoint, providerApiKeySafetyIssue, providerEndpointCanReceiveProviderApiKey,
   providerIdentitySafetyIssue, getProviderPresets, setProviderPresets, standardProviderAccountConfig, normalizeProviderBaseUrl, providerUrlWithDefaultScheme

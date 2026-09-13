@@ -3498,7 +3498,7 @@ function originalSnapshotCandidate(
   isManagedContent: (content: string) => boolean
 ): { content: string; file: string } | undefined {
   // Prefer the most recent non-AgentRouter snapshot captured immediately before the
-  // latest takeover. The permanent .ccr-original file can be stale when the
+  // latest takeover. The permanent .ar-original file can be stale when the
   // user changes the agent config between separate AgentRouter sessions.
   for (const candidate of [...backupFiles(file).reverse(), originalBackupFilePath(file)]) {
     if (!existsSync(candidate)) {

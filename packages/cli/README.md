@@ -1,6 +1,6 @@
 # AgentRouter CLI
 
-[中文](README_zh.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
+[中文](README_zh.md)
 
 `@zhangqinzhong/agentrouter` is the Node.js distribution of AgentRouter. It provides the `agentrouter` command, the browser-based management UI, the local model gateway, and profile launch commands without requiring Electron.
 
@@ -116,8 +116,8 @@ The desktop application installs a related command named `agentrouter`. Commands
 
 | Platform | Config directory |
 | --- | --- |
-| macOS / Linux | `~/.claude-code-router` |
-| Windows | `%APPDATA%\claude-code-router` |
+| macOS / Linux | `~/.agentrouter` |
+| Windows | `%APPDATA%\agentrouter` |
 
 Important files include:
 
@@ -177,7 +177,7 @@ agentrouter start --host 127.0.0.1 --port 3458
 
 ## Docker
 
-The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `agentrouter` command into the runtime image. See the [Docker deployment guide](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md).
+The repository also includes a Docker image for gateway and browser-UI deployments. It does not install the npm `agentrouter` command into the runtime image. See the [Docker deployment guide](../../docker/README.md).
 
 ## License
 

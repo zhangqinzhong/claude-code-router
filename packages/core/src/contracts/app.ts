@@ -856,7 +856,7 @@ export const DEFAULT_CLAUDE_DESIGN_APP: GatewayPluginAppConfig = {
   icon: "palette",
   id: "claude-design",
   name: "Claude Design",
-  url: "https://claude-design.ccrdesk.top/design"
+  url: "https://claude.ai/design"
 };
 export const DEFAULT_CLAUDE_SHIP_APP: GatewayPluginAppConfig = {
   description: "Open Claude Ship in a dedicated AgentRouter Electron window.",
@@ -1277,6 +1277,7 @@ export type ProxyRuntimeConfig = {
 };
 
 export type ObservabilityConfig = {
+  retentionDays?: number;
   agentAnalysis: boolean;
   requestLogBodyCapture?: "all" | "errors" | "none";
   requestLogMaxBodyBytes?: number;

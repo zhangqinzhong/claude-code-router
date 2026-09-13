@@ -49,7 +49,7 @@ test("legacy combined Claude Design plugin config migrates to split Design and S
     assert.deepEqual(result.plugins.map((plugin) => plugin.id), ["claude-design", "claude-ship"]);
     assert.equal(result.plugins[0].module, bundledPluginModule("claude-design"));
     assert.deepEqual(result.plugins[0].apps?.map((app) => app.id), ["claude-design"]);
-    assert.equal(result.plugins[0].apps?.[0]?.url, "https://claude-design.ccrdesk.top/design");
+    assert.equal(result.plugins[0].apps?.[0]?.url, "https://claude.ai/design");
     assert.deepEqual(result.plugins[0].config, {
       adminAuth: "gateway",
       host: "claude.ai"

@@ -1713,6 +1713,8 @@ test("a standalone raw trace records itself instead of waiting for an admission"
       // applyRawTraceRequestLogPolicy always sets this; without it the pending
       // gate is never reached and the test would not exercise the regression.
       deferOutcomeUntilRecord: true,
+      timeToFirstTokenMs: 240,
+      streamOutputDurationMs: 1500,
       model: "standalone-model",
       provider: "standalone-provider",
       requestId: "standalone-request",
@@ -1730,6 +1732,8 @@ test("a standalone raw trace records itself instead of waiting for an admission"
     assert.equal(page.items[0].model, "standalone-model");
     assert.equal(page.items[0].provider, "standalone-provider");
     assert.equal(page.items[0].statusCode, 200);
+    assert.equal(page.items[0].timeToFirstTokenMs, 240);
+    assert.equal(page.items[0].streamOutputDurationMs, 1500);
   } finally {
     await runtime.close({ timeoutMs: 5_000 });
     rmSync(dir, { force: true, recursive: true });

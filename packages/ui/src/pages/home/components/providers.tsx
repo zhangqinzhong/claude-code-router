@@ -2110,14 +2110,14 @@ export function AddProviderForm({
     setIconDetecting(false);
 
     const baseUrl = draft.baseUrl.trim();
-    const ccr = window.agentrouter;
-    if (!customEndpoint || !baseUrl || draft.icon || !ccr?.detectProviderIcon) {
+    const gatewayApi = window.agentrouter;
+    if (!customEndpoint || !baseUrl || draft.icon || !gatewayApi?.detectProviderIcon) {
       return;
     }
 
     const timer = window.setTimeout(() => {
       setIconDetecting(true);
-      void ccr.detectProviderIcon({ baseUrl })
+      void gatewayApi.detectProviderIcon({ baseUrl })
         .then((result) => {
           if (iconDetectionRequestRef.current === requestId && result.icon) {
             onChangeRef.current({ icon: result.icon });

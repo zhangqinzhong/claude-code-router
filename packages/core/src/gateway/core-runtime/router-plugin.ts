@@ -1,3 +1,4 @@
+import { createGatewayStreamMetrics, recordGatewayResponseStatus } from "@agentrouter/core/observability/gateway-stream-metrics";
 import { timingSafeEqual } from "node:crypto";
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { Readable } from "node:stream";
@@ -201,6 +202,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
     scriptRuntime,
     scriptValidationErrors
   });
+  const streamMetrics = createGatewayStreamMetrics();
   const openRouterDiscountContext = openRouterDiscountTransformContext(config);
 
   return {
@@ -274,8 +276,8 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
           "GET /models",
           "GET /v1/models"
         ],
-        name: "claude-code-router",
-        plugin: "claude-code-router",
+        name: "agentrouter",
+        plugin: "agentrouter",
         wrapperPlugins: config.plugins.filter((plugin) => plugin.enabled !== false).map((plugin) => plugin.id)
       })
     }, {
@@ -348,6 +350,7 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
     requestHooks: [{
       key: "ar-public-auth-context",
       beforeAuth: async (requestInput: GatewayRequestHookInput) => {
+        streamMetrics.start(requestInput.request?.headers);
         if (publicGatewayMode) {
           stripUntrustedArRouteHeaders(requestInput.request?.headers);
           const authorization = await resolvePublicGatewayAuth(config, requestInput.request?.headers, {
@@ -437,6 +440,12 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
         applyCodexBridgeRequestTransform(config, requestInput)
     }],
     responseHooks: [{
+      key: "ar-response-log-status",
+      transformResponse: (responseInput: GatewayResponseHookInput) => {
+        recordGatewayResponseStatus(responseInput.request?.id, responseInput.statusCode);
+        return undefined;
+      }
+    }, {
       key: arCodexBridgeResponseHookKey,
       transformResponse: (responseInput: GatewayResponseHookInput) =>
         applyCodexBridgeResponseTransform(responseInput)
@@ -448,6 +457,10 @@ export async function createGatewayPlugin(input: GatewayPluginFactoryInput = {})
       }
     }],
     streamHooks: [{
+      key: "ar-stream-metrics",
+      transformResponse: (streamInput: GatewayStreamHookInput) =>
+        streamMetrics.wrap(streamInput.upstreamResponse, streamInput.request?.headers)
+    }, {
       key: arCodexBridgeStreamHookKey,
       transformResponse: (streamInput: GatewayStreamHookInput) =>
         applyCodexBridgeStreamTransform(streamInput)

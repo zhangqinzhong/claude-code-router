@@ -1,11 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { createRoot } from "react-dom/client";
 import { LoaderCircle, Power, RefreshCw } from "lucide-react";
-import appLogoUrl from "@/assets/logo.png";
+import appLogoUrl from "@/lib/app-icon";
 import codexLogoUrl from "@/assets/agent-logos/codex.png";
-import trayCyanIconUrl from "@/assets/tray-cyan.png";
-import trayOrangeIconUrl from "@/assets/tray-orange.png";
-import trayVioletIconUrl from "@/assets/tray-violet.png";
 import { DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS } from "@agentrouter/core/contracts/app";
 import { formatLocalizedErrorMessage } from "@agentrouter/core/contracts/i18n";
 import { findProviderPreset, findProviderPresetByBaseUrl, providerPresets } from "@agentrouter/core/providers/presets";
@@ -30,7 +27,7 @@ import type {
 
 export  {
   createContext, useCallback, useContext, useEffect, useMemo, useState, createRoot,
-  LoaderCircle, Power, RefreshCw, appLogoUrl, trayCyanIconUrl, trayOrangeIconUrl, trayVioletIconUrl, DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS
+  LoaderCircle, Power, RefreshCw, appLogoUrl, DEFAULT_TRAY_COMPONENT_VARIANTS, DEFAULT_TRAY_WIDGETS, DEFAULT_TRAY_WINDOW_MODULES, TRAY_SINGLETON_WIDGET_TYPES, TRAY_TOP_WIDGET_TYPES, TRAY_WINDOW_MODULE_IDS
 };
 export type {
   ReactNode, AppConfig, ProviderAccountMeter, ProviderAccountSnapshot, TrayBalanceProgressConfig, TrayComponentVariants, TrayWidgetConfig, TrayWidgetType, TrayWidgetVariant, TrayWindowModuleId, UsageComparisonRow,
@@ -181,12 +178,6 @@ export function useTrayErrorText() {
 }
 
 export const ranges: UsageStatsRange[] = ["today", "24h", "7d", "30d"];
-
-export const trayMascotIconUrls: Record<"cyan" | "orange" | "violet", string> = {
-  cyan: trayCyanIconUrl,
-  orange: trayOrangeIconUrl,
-  violet: trayVioletIconUrl
-};
 
 export const emptyTotals: UsageTotals = {
   avgDurationMs: 0,

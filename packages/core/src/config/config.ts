@@ -909,7 +909,7 @@ function pickConfig(value: Partial<AppConfig>): LoadedAppConfig {
   if (trayBalanceProgress) {
     config.trayBalanceProgress = trayBalanceProgress;
   } else if (config.trayIcon === "progress") {
-    config.trayIcon = "random";
+    config.trayIcon = "layered";
   }
   const trayProgressTargetTokens = readNumber((value as Record<string, unknown>).trayProgressTargetTokens);
   if (trayProgressTargetTokens && trayProgressTargetTokens > 0) {
@@ -1008,6 +1008,9 @@ function parseObservability(value: unknown): Partial<ObservabilityConfig> | unde
   }
 
   const observability: Partial<ObservabilityConfig> = {};
+  if (typeof value.retentionDays === "number" && Number.isFinite(value.retentionDays)) {
+    observability.retentionDays = Math.max(1, Math.min(365, Math.floor(value.retentionDays)));
+  }
   if (typeof value.requestLogs === "boolean") {
     observability.requestLogs = value.requestLogs;
   }
@@ -1276,10 +1279,8 @@ function isShareOverviewWidgetType(type: OverviewWidgetType): boolean {
 }
 
 function parseTrayIconPreference(value: unknown): TrayIconPreference | undefined {
-  if (value === "layered" || value === "random" || value === "violet" || value === "orange" || value === "cyan" || value === "progress") {
-    return value;
-  }
-  return undefined;
+  // Migrate retired styles to the single supported icon.
+  return typeof value === "string" ? "layered" : undefined;
 }
 
 function parseTrayBalanceProgress(value: unknown): TrayBalanceProgressConfig | undefined {
@@ -3071,9 +3072,10 @@ function isLegacyClaudeDesignAppUrl(value: string): boolean {
     const host = url.hostname.toLowerCase();
     const pathname = url.pathname.replace(/\/$/, "");
     if (host === "claude.ai") {
-      return pathname === "/design" || pathname === "/discover/design";
+      return pathname === "/discover/design";
     }
-    return false;
+    // Retire the former bundled frontend; never use it as a default service.
+    return host === "claude-design.ccrdesk.top";
   } catch {
     return false;
   }

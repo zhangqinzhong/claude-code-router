@@ -240,8 +240,8 @@ export class GatewayHttpRequestHandler {
         sendJson(response, 200, {
           core: "next-ai-gateway",
           endpoints: ["POST /v1/oauth/token", "GET /api/claude_cli/bootstrap", "POST /mcp", "POST /v1/messages", "POST /v1/messages/count_tokens", "GET /models", "GET /v1/models"],
-          name: "claude-code-router",
-          plugin: "claude-code-router",
+          name: "agentrouter",
+          plugin: "agentrouter",
           wrapperPlugins: this.config.plugins.filter((plugin) => plugin.enabled !== false).map((plugin) => plugin.id)
         });
         return;

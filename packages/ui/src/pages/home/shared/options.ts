@@ -67,9 +67,6 @@ import zaiGlobalCodingProviderIconUrl from "@/assets/provider-icons/zai-global-c
 import zaiGlobalGeneralProviderIconUrl from "@/assets/provider-icons/zai-global-general.svg";
 import zhipuCnCodingProviderIconUrl from "@/assets/provider-icons/zhipu-cn-coding.png";
 import zhipuCnGeneralProviderIconUrl from "@/assets/provider-icons/zhipu-cn-general.png";
-import trayCyanIconUrl from "@/assets/tray-cyan.png";
-import trayOrangeIconUrl from "@/assets/tray-orange.png";
-import trayVioletIconUrl from "@/assets/tray-violet.png";
 
 type ViewId = "onboarding" | "overview" | "observability" | "api-keys" | "server" | "profile" | "networking" | "logs" | "providers" | "models" | "routing" | "virtual-models" | "extensions";
 type NavigationId = ViewId;
@@ -398,12 +395,6 @@ export const providerPresetIconUrls: Record<string, string> = {
   "zai-global-general": zaiGlobalGeneralProviderIconUrl,
   "zhipu-cn-coding": zhipuCnCodingProviderIconUrl,
   "zhipu-cn-general": zhipuCnGeneralProviderIconUrl
-};
-
-export const trayMascotIconUrls: Record<"cyan" | "orange" | "violet", string> = {
-  cyan: trayCyanIconUrl,
-  orange: trayOrangeIconUrl,
-  violet: trayVioletIconUrl
 };
 
 export const mcpServerStartupTimeoutMs = 600000;

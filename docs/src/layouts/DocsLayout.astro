@@ -4,8 +4,6 @@ import {
   ArrowLeft,
   ArrowRight,
   ChevronDown,
-  Download,
-  Github,
   List,
   Moon,
   PenLine,
@@ -261,14 +259,6 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
               <kbd>⌘K</kbd>
               <div class="search-results" id="docs-search-results" role="listbox" hidden data-search-results></div>
             </div>
-            <a
-              class="icon-button github-button hide-small"
-              href="https://github.com/zhangqinzhong/claude-code-router"
-              aria-label={ui.githubLabel}
-            >
-              <Github size={18} aria-hidden="true" />
-              <strong id="github-stars" aria-label="GitHub stars">Stars</strong>
-            </a>
             <button class="icon-button theme-toggle" type="button" aria-label={ui.themeLabel} data-theme-toggle>
               <span class="theme-icon theme-icon-sun" aria-hidden="true">
                 <Sun size={19} />
@@ -277,14 +267,6 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
                 <Moon size={19} />
               </span>
             </button>
-            <a
-              class="cta-button"
-              href="https://github.com/zhangqinzhong/claude-code-router/releases"
-              aria-label={ui.downloadLabel}
-            >
-              <Download size={16} aria-hidden="true" />
-              <span>{ui.downloadLabel}</span>
-            </a>
           </div>
         </div>
       </header>
@@ -472,36 +454,6 @@ const featuredNavLabel = locale === "zh" ? "主要入口" : "Primary navigation"
       </div>
     </div>
 
-    <script define:vars={{ starsFallback: ui.starsFallback }}>
-      const starBadge = document.querySelector("#github-stars");
-
-      const formatStars = (count) => {
-        if (!Number.isFinite(count)) return starsFallback;
-        if (count >= 1000) {
-          const rounded = Math.round(count / 100) / 10;
-          return `${rounded.toFixed(rounded % 1 === 0 ? 0 : 1)}k`;
-        }
-        return count.toLocaleString();
-      };
-
-      fetch("https://api.github.com/repos/zhangqinzhong/claude-code-router", {
-        headers: { Accept: "application/vnd.github+json" },
-      })
-        .then((response) => {
-          if (!response.ok) throw new Error("GitHub request failed");
-          return response.json();
-        })
-        .then((repo) => {
-          if (starBadge) {
-            starBadge.textContent = formatStars(repo.stargazers_count);
-          }
-        })
-        .catch(() => {
-          if (starBadge) {
-            starBadge.textContent = starsFallback;
-          }
-        });
-    </script>
     <script define:vars={{ searchNoResults, searchIndexUrl, searchLoadingLabel: ui.searchLoading }}>
       const themeToggle = document.querySelector("[data-theme-toggle]");
       const themeStorageKey = "ar-docs-theme";

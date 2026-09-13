@@ -356,15 +356,15 @@ function App() {
     const unsubscribeOpenSettings = window.agentrouter.onOpenSettingsRequest(openSettingsDialog);
     const unsubscribeOpenUpdate = window.agentrouter.onOpenUpdateRequest(openUpdateDialog);
     const refreshRuntimeStatus = async () => {
-      const ccr = window.agentrouter;
-      if (!ccr) {
+      const gatewayApi = window.agentrouter;
+      if (!gatewayApi) {
         return;
       }
       await Promise.allSettled([
-        ccr.getGatewayStatus().then((next) => {
+        gatewayApi.getGatewayStatus().then((next) => {
           setGatewayStatus((current) => preserveEqualPollingSnapshot(current, next));
         }),
-        ccr.getProxyStatus().then((next) => {
+        gatewayApi.getProxyStatus().then((next) => {
           setProxyStatus((current) => preserveEqualPollingSnapshot(current, next));
         }),
         refreshProfileRuntimeStatus()
@@ -953,7 +953,7 @@ function App() {
       setUpdateDialogStatus({
         ...fallbackUpdateStatus,
         currentVersion: appInfo.version,
-        lastError: t("Updates are only available in packaged builds."),
+        lastError: t("No update source is configured."),
         state: "error"
       });
       return;

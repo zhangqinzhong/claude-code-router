@@ -1,3 +1,4 @@
+import { readGatewayStreamMetrics, responseStatusMessageType } from "./gateway-stream-metrics";
 /**
  * Extracted from gateway/service.ts. Keep this module focused on its named gateway boundary.
  */
@@ -135,6 +136,7 @@ const rawTraceDeadLetterMaintenanceIntervalMs = 60_000;
 
 export class RawTraceSynchronizer {
   readonly token = randomUUID();
+  private readonly responseStatuses = new Map<string, { status: number; at: number }>();
   private deadLetterPruneDirty = false;
   private deadLetterPrunePromise?: Promise<void>;
   private inboxIndex?: RawTraceInboxIndex;
@@ -153,6 +155,20 @@ export class RawTraceSynchronizer {
   private storageMutation = Promise.resolve();
 
   constructor(private readonly dependencies: RawTraceSynchronizerDependencies) {}
+
+  acceptResponseStatus(message: unknown): boolean {
+    if (!isRecord(message) || message.type !== responseStatusMessageType ||
+      typeof message.requestId !== "string" || !message.requestId || message.requestId.length > 1024 ||
+      typeof message.status !== "number" || !Number.isInteger(message.status) || message.status < 100 || message.status > 599) return false;
+    const now = Date.now();
+    for (const [id, entry] of this.responseStatuses) {
+      if (now - entry.at < 10 * 60_000 && this.responseStatuses.size < 10_000) break;
+      this.responseStatuses.delete(id);
+    }
+    this.responseStatuses.delete(message.requestId);
+    this.responseStatuses.set(message.requestId, { status: message.status, at: now });
+    return true;
+  }
 
   async start(): Promise<void> {
     const spoolDirectory = this.spoolDirectory();
@@ -180,6 +196,7 @@ export class RawTraceSynchronizer {
     await this.replayPromise?.catch(() => undefined);
     await Promise.allSettled(this.processingTasks);
     await this.waitForDeadLetterPrune();
+    this.responseStatuses.clear();
   }
 
   async handle(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -389,6 +406,10 @@ export class RawTraceSynchronizer {
         await this.deadLetterStoredBundle(stored, "invalid_manifest");
         this.retryStates.delete(stored.bundleId);
         return true;
+      }
+      if (!bundle.update.statusCode) {
+        const outcome = this.responseStatuses.get(bundle.update.bundleId ?? "") ?? this.responseStatuses.get(bundle.update.requestId);
+        if (outcome && Date.now() - outcome.at < 10 * 60_000) bundle.update.statusCode = outcome.status;
       }
       await recordUsageCaptureFromRawTrace(config, bundle.update, bundle.files);
       if (!shouldRecordRequestLogs(config)) {
@@ -1645,6 +1666,7 @@ export async function readRawTraceRequestLogBundle(
       responseBody: upstreamResponseBody
     },
     update: {
+      ...readGatewayStreamMetrics(clientRequestHeaders),
       ...(attempt === undefined ? {} : { attempt }),
       ...(stringValue(manifest.uploadedAt) ? { bundleCapturedAt: stringValue(manifest.uploadedAt) } : {}),
       ...(bundleId ? { bundleId } : {}),

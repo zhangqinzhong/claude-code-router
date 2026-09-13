@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { closeSync, copyFileSync, existsSync, fstatSync, mkdirSync, openSync, readFileSync, readSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { closeSync, copyFileSync, existsSync, fstatSync, mkdirSync, openSync, readFileSync, readdirSync, readSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { REQUEST_LOG_BODIES_DIR, REQUEST_LOGS_DB_FILE } from "@agentrouter/core/config/constants";
@@ -408,16 +408,30 @@ export class RequestLogStore {
   private initPromise?: Promise<SqlDatabase>;
   private insertRequestStatement?: BetterSqliteStatement;
   private insertRouteTraceStatement?: BetterSqliteStatement;
-  private lastRetentionCleanupDay?: string;
+  private lastRetentionCleanupKey?: string;
+  private retentionDays = 1;
+  private lastOrphanSweepAt = 0;
   private revision = 0;
+  private readonly bodyCleanupCandidates = new Set<string>();
   private analysisCache?: AgentAnalysisCacheEntry;
 
   constructor(
     private readonly dbFile: string,
     private readonly bodyDir = dbFile === REQUEST_LOGS_DB_FILE
       ? REQUEST_LOG_BODIES_DIR
-      : join(dirname(dbFile), "request-log-bodies")
+      : join(dirname(dbFile), "request-log-bodies"),
+    private readonly automaticRetention = true
   ) {}
+
+  async maintainRetention(days: number): Promise<void> {
+    const normalized = Number.isFinite(days) ? Math.max(1, Math.min(365, Math.floor(days))) : 1;
+    if (this.retentionDays !== normalized) {
+      this.retentionDays = normalized;
+      this.lastRetentionCleanupKey = undefined;
+    }
+    const database = await this.getDatabase();
+    this.pruneOldRequestLogs(database);
+  }
 
   async initialize(): Promise<void> {
     await this.getDatabase();
@@ -457,7 +471,7 @@ export class RequestLogStore {
             const pending = this.takePendingRawTraceUpdate(database, requestId);
             if (pending) {
               if (command.input.captureBody === false) {
-                deleteRequestLogBodyRefs(this.bodyDir, bodyRefsFromRawTraceInput(pending));
+                this.queueBodyCleanup(bodyRefsFromRawTraceInput(pending));
               }
               const pendingInput = command.input.captureBody === false
                 ? suppressRequestLogRawTraceBodies(pending)
@@ -481,7 +495,11 @@ export class RequestLogStore {
           }
           continue;
         }
+        const pending = queryRows(database, "SELECT update_json FROM request_log_pending_updates WHERE request_id = ?", [command.input.requestId.trim()])[0];
+        const pendingInput = pending ? parseJson(String(pending.update_json ?? "")) : undefined;
+        if (bundleId && isRecord(pendingInput) && pendingInput.bundleId === bundleId) continue;
         const rawTraceInput = this.prepareRawTraceInput(command.input, command.rawTraceFiles);
+        this.queueBodyCleanup(bodyRefsFromRawTraceInput(rawTraceInput));
         const applied = await this.updateFromRawTrace(rawTraceInput);
         if (bundleId && applied) {
           rememberProcessedRawTraceBundle(database, bundleId, rawTraceInput.requestId);
@@ -490,9 +508,11 @@ export class RequestLogStore {
         }
       }
       database.exec("COMMIT");
+      this.flushBodyCleanup(database);
       return { pricingRefreshNeeded };
     } catch (error) {
       if (database.inTransaction) database.exec("ROLLBACK");
+      this.flushBodyCleanup(database);
       throw error;
     }
   }
@@ -652,6 +672,7 @@ export class RequestLogStore {
       sizeBytes: Math.max(capturedRequestBody.sizeBytes, normalizeCount(input.requestBodySizeBytes)),
       truncated: capturedRequestBody.truncated || Boolean(input.requestBodyTruncated)
     };
+    this.queueBodyCleanup(capturedRequestBody.bodyRef ? [capturedRequestBody.bodyRef] : []);
     const responseBody = bodyFromText(
       responseBodyText,
       headerValue(responseHeaders, "content-type"),
@@ -660,6 +681,7 @@ export class RequestLogStore {
       undefined,
       { bodyDir: this.bodyDir, side: "response" }
     );
+    this.queueBodyCleanup(responseBody.bodyRef ? [responseBody.bodyRef] : []);
     const isStream = inferRequestLogIsStream({
       path: input.path,
       requestBodyText: requestBody.encoding === "utf8" ? requestBody.text : undefined,
@@ -809,6 +831,7 @@ export class RequestLogStore {
     if (database.inTransaction) insert();
     else database.transaction(insert)();
     if (inserted) this.revision += 1;
+    this.flushBodyCleanup(database);
   }
 
   async updateFromRawTrace(rawInput: RequestLogRawTraceUpdateInput): Promise<boolean> {
@@ -819,245 +842,253 @@ export class RequestLogStore {
 
     const database = await this.getDatabase();
     this.pruneOldRequestLogs(database);
-    if (!hasRequestLogWithRequestId(database, requestId)) {
-      return false;
-    }
-    const existingOutcome = readRequestLogStoredOutcome(database, requestId);
-    const expectedAttempt = readRequestLogFinalAttempt(database, requestId);
-    const rawAttempt = rawInput.attempt === undefined ? undefined : normalizeCount(rawInput.attempt);
-    if ((rawAttempt !== undefined && rawAttempt !== expectedAttempt) ||
-      (rawAttempt === undefined && expectedAttempt > 1)) {
-      // Each Core fallback request has its own bundle. Only the bundle for the
-      // final attempt may refine the outer gateway record.
-      return true;
-    }
-    // Determine the raw outcome before applying the body-capture policy. In
-    // errors-only mode the policy may intentionally replace body text with an
-    // empty value, but HTTP/SSE error detection must inspect the original data.
-    const rawStatusCode = rawInput.statusCode === undefined
-      ? undefined
-      : normalizeCount(rawInput.statusCode);
-    const rawResponseHeaders = rawInput.responseHeaders === undefined
-      ? undefined
-      : sanitizeHeaders(rawInput.responseHeaders);
-    const rawResponseBodyContentType = rawInput.responseBodyContentType ??
-      headerValue(rawResponseHeaders ?? {}, "content-type");
-    const rawSseError = rawInput.responseBodyText === undefined
-      ? undefined
-      : detectSseError(rawInput.responseBodyText, rawResponseBodyContentType);
-    const gatewayFailure = Boolean(existingOutcome.gatewayError) ||
-      (!existingOutcome.gatewayOk && existingOutcome.gatewayStatusCode > 0);
-    const existingFailure = gatewayFailure || Boolean(existingOutcome.error) ||
-      (!existingOutcome.ok && existingOutcome.statusCode > 0);
-    const rawHttpFailure = rawStatusCode !== undefined && rawStatusCode > 0 &&
-      (rawStatusCode < 200 || rawStatusCode >= 400);
-    const finalSuccessful = !existingFailure && !rawHttpFailure && !rawSseError;
-    const captureResolution = applyRawTraceBodyCapturePolicy(
-      rawInput,
-      finalSuccessful
-    );
-    if (captureResolution.bodiesSuppressed) {
-      deleteRequestLogBodyRefs(this.bodyDir, bodyRefsFromRawTraceInput(rawInput));
-    }
-    const input = captureResolution.input;
-    const existingUsageContext = readRequestLogUsageContext(database, requestId);
-
-    const sets: string[] = [];
-    const params: SqlValue[] = [];
-    const pushValue = (column: string, value: SqlValue | undefined) => {
-      if (value === undefined) {
-        return;
+    this.queueBodyCleanup(bodyRefsFromRawTraceInput(rawInput));
+    this.queueBodyCleanup(queryRows(database, "SELECT request_body_ref, response_body_ref FROM request_logs WHERE request_id = ?", [requestId]).flatMap((row) => [String(row.request_body_ref ?? ""), String(row.response_body_ref ?? "")]));
+    try {
+      if (!hasRequestLogWithRequestId(database, requestId)) {
+        return false;
       }
-      sets.push(`${column} = ?`);
-      params.push(value);
-    };
-
-    const url = normalizeFilterValue(input.url);
-    const path = normalizeFilterValue(input.path) ?? pathFromUrl(url);
-    const usagePath = path ?? existingUsageContext.path;
-    const rawModelFromTrace = normalizeFilterValue(input.model);
-    const modelFromTrace = requestLogStorageModel(rawModelFromTrace);
-    const resolvedModelFromTrace = requestLogStorageModelSelector(rawModelFromTrace);
-    const responseModelFromTrace = rawInput.responseBodyText === undefined
-      ? undefined
-      : requestLogResponseModel(rawInput.responseBodyText);
-    const providerFromTrace = normalizeFilterValue(input.provider);
-    const statusCode = rawStatusCode;
-    const requestCredentialHeaders = input.requestHeaders ?? {};
-    const responseCredentialHeaders = input.responseHeaders ?? {};
-    const requestHeaders = input.requestHeaders === undefined ? undefined : sanitizeHeaders(input.requestHeaders);
-    const responseHeaders = rawResponseHeaders;
-    const responseBodyContentType = rawResponseBodyContentType;
-    const sseError = rawSseError;
-    const mergedRequestHeaders = requestHeaders
-      ? mergeRequestHeadersForRawTrace(readRequestHeadersForRequestId(database, requestId), requestHeaders)
-      : undefined;
-
-    pushValue("method", normalizeFilterValue(input.method));
-    pushValue("path", path);
-    pushValue("url", url);
-    pushValue("provider", providerFromTrace);
-    pushValue("model", modelFromTrace);
-    pushValue("resolved_model", resolvedModelFromTrace);
-    pushValue("response_model", responseModelFromTrace);
-    pushValue("time_to_first_token_ms", rawInput.timeToFirstTokenMs === undefined ? undefined : optionalCount(rawInput.timeToFirstTokenMs));
-    pushValue("stream_output_duration_ms", rawInput.streamOutputDurationMs === undefined ? undefined : optionalCount(rawInput.streamOutputDurationMs));
-    // The gateway's terminal failure is authoritative, even when it has only
-    // an HTTP error status and no error string. A final-attempt raw failure may
-    // still refine a gateway success (for example an SSE error inside HTTP 200).
-    const preserveGatewayOutcome = gatewayFailure;
-    if (statusCode !== undefined && statusCode > 0 && !preserveGatewayOutcome) {
-      pushValue("status_code", statusCode);
-      pushValue("ok", isSuccessStatus(statusCode, sseError) ? 1 : 0);
-    }
-    if (sseError) {
-      if (!existingOutcome.error) pushValue("error", sseError);
-      if (statusCode === undefined && !preserveGatewayOutcome) {
-        pushValue("ok", 0);
+      const existingOutcome = readRequestLogStoredOutcome(database, requestId);
+      const expectedAttempt = readRequestLogFinalAttempt(database, requestId);
+      const rawAttempt = rawInput.attempt === undefined ? undefined : normalizeCount(rawInput.attempt);
+      if ((rawAttempt !== undefined && rawAttempt !== expectedAttempt) ||
+        (rawAttempt === undefined && expectedAttempt > 1)) {
+        // Each Core fallback request has its own bundle. Only the bundle for the
+        // final attempt may refine the outer gateway record.
+        return true;
       }
-    }
-    if (mergedRequestHeaders) {
-      pushValue("request_headers", JSON.stringify(mergedRequestHeaders));
-    }
-    if (responseHeaders) {
-      pushValue("response_headers", JSON.stringify(responseHeaders));
-    }
-    if (input.responseBodyText !== undefined || responseHeaders) {
-      const bodyUsage = input.responseBodyText === undefined
+      // Determine the raw outcome before applying the body-capture policy. In
+      // errors-only mode the policy may intentionally replace body text with an
+      // empty value, but HTTP/SSE error detection must inspect the original data.
+      const rawStatusCode = rawInput.statusCode === undefined
         ? undefined
-        : extractUsageFromBody(input.responseBodyText);
-      // As in record(), each source is normalized under its own convention.
-      // Raw-trace updates carry no provider protocol — it is not part of the
-      // gateway's raw-trace sync contract — so the billing headers fall back to
-      // the request path, which is only a proxy for the upstream's convention.
-      const usage: UsageSnapshot = mergeUsageSnapshots(
-        normalizeUsageInputTokens(extractUsageFromBillingHeaders(responseHeaders), {
-          path: usagePath,
-          source: "providerBilling"
-        }),
-        normalizeUsageInputTokens<UsageSnapshot>(bodyUsage, {
-          path: usagePath,
-          source: "responseBody"
-        })
-      ) ?? {};
-      if (hasUsageNumbers(usage)) {
-        const inputTokens = normalizeCount(usage.inputTokens);
-        const outputTokens = normalizeCount(usage.outputTokens);
-        const reasoningTokens = normalizeCount(usage.reasoningTokens);
-        const cacheReadTokens = normalizeCount(usage.cacheReadTokens);
-        const cacheWrite1hTokens = normalizeCount(usage.cacheWrite1hTokens);
-        const cacheWrite5mTokens = normalizeCount(usage.cacheWrite5mTokens);
-        const cacheWriteTokens = normalizeCount(usage.cacheWriteTokens);
-        const totalTokens =
-          normalizeCount(usage.totalTokens) ||
-          inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
-        const model = normalizeLabel(requestLogStorageModel(usage.model) ?? modelFromTrace ?? existingUsageContext.model, "unknown");
-        const provider = normalizeLabel(providerFromTrace ?? existingUsageContext.provider, "unknown");
-        const costInput = {
-          cacheReadTokens,
-          cacheWrite1hTokens,
-          cacheWrite5mTokens,
-          cacheWriteTokens,
-          inputTokens,
-          model,
-          outputTokens,
-          pricing: existingUsageContext.pricing,
-          provider
-        };
-        const cost = database.inTransaction
-          ? estimateUsageCostUsdFromLoadedCatalog(costInput)
-          : await estimateUsageCostUsd(costInput);
+        : normalizeCount(rawInput.statusCode);
+      const rawResponseHeaders = rawInput.responseHeaders === undefined
+        ? undefined
+        : sanitizeHeaders(rawInput.responseHeaders);
+      const rawResponseBodyContentType = rawInput.responseBodyContentType ??
+        headerValue(rawResponseHeaders ?? {}, "content-type");
+      const rawSseError = rawInput.responseBodyText === undefined
+        ? undefined
+        : detectSseError(rawInput.responseBodyText, rawResponseBodyContentType);
+      const gatewayFailure = Boolean(existingOutcome.gatewayError) ||
+        (!existingOutcome.gatewayOk && existingOutcome.gatewayStatusCode > 0);
+      const existingFailure = gatewayFailure || Boolean(existingOutcome.error) ||
+        (!existingOutcome.ok && existingOutcome.statusCode > 0);
+      const rawHttpFailure = rawStatusCode !== undefined && rawStatusCode > 0 &&
+        (rawStatusCode < 200 || rawStatusCode >= 400);
+      const finalSuccessful = !existingFailure && !rawHttpFailure && !rawSseError;
+      const captureResolution = applyRawTraceBodyCapturePolicy(
+        rawInput,
+        finalSuccessful
+      );
+      if (captureResolution.bodiesSuppressed) {
+        this.queueBodyCleanup(bodyRefsFromRawTraceInput(rawInput));
+      }
+      const input = captureResolution.input;
+      const existingUsageContext = readRequestLogUsageContext(database, requestId);
 
-        pushValue("input_tokens", inputTokens);
-        pushValue("output_tokens", outputTokens);
-        pushValue("reasoning_tokens", reasoningTokens);
-        pushValue("cache_read_tokens", cacheReadTokens);
-        pushValue("cache_write_tokens", cacheWriteTokens);
-        pushValue("total_tokens", totalTokens);
-        pushValue("cost_usd", cost?.amountUsd);
-        if (usage.model && !modelFromTrace) {
-          pushValue("model", model);
+      const sets: string[] = [];
+      const params: SqlValue[] = [];
+      const pushValue = (column: string, value: SqlValue | undefined) => {
+        if (value === undefined) {
+          return;
+        }
+        sets.push(`${column} = ?`);
+        params.push(value);
+      };
+
+      const url = normalizeFilterValue(input.url);
+      const path = normalizeFilterValue(input.path) ?? pathFromUrl(url);
+      const usagePath = path ?? existingUsageContext.path;
+      const rawModelFromTrace = normalizeFilterValue(input.model);
+      const modelFromTrace = requestLogStorageModel(rawModelFromTrace);
+      const resolvedModelFromTrace = requestLogStorageModelSelector(rawModelFromTrace);
+      const responseModelFromTrace = rawInput.responseBodyText === undefined
+        ? undefined
+        : requestLogResponseModel(rawInput.responseBodyText);
+      const providerFromTrace = normalizeFilterValue(input.provider);
+      const statusCode = rawStatusCode;
+      const requestCredentialHeaders = input.requestHeaders ?? {};
+      const responseCredentialHeaders = input.responseHeaders ?? {};
+      const requestHeaders = input.requestHeaders === undefined ? undefined : sanitizeHeaders(input.requestHeaders);
+      const responseHeaders = rawResponseHeaders;
+      const responseBodyContentType = rawResponseBodyContentType;
+      const sseError = rawSseError;
+      const mergedRequestHeaders = requestHeaders
+        ? mergeRequestHeadersForRawTrace(readRequestHeadersForRequestId(database, requestId), requestHeaders)
+        : undefined;
+
+      pushValue("method", normalizeFilterValue(input.method));
+      pushValue("path", path);
+      pushValue("url", url);
+      pushValue("provider", providerFromTrace);
+      pushValue("model", modelFromTrace);
+      pushValue("resolved_model", resolvedModelFromTrace);
+      pushValue("response_model", responseModelFromTrace);
+      pushValue("time_to_first_token_ms", rawInput.timeToFirstTokenMs === undefined ? undefined : optionalCount(rawInput.timeToFirstTokenMs));
+      pushValue("stream_output_duration_ms", rawInput.streamOutputDurationMs === undefined ? undefined : optionalCount(rawInput.streamOutputDurationMs));
+      // The gateway's terminal failure is authoritative, even when it has only
+      // an HTTP error status and no error string. A final-attempt raw failure may
+      // still refine a gateway success (for example an SSE error inside HTTP 200).
+      const preserveGatewayOutcome = gatewayFailure;
+      if (statusCode !== undefined && statusCode > 0 && !preserveGatewayOutcome) {
+        pushValue("status_code", statusCode);
+        pushValue("ok", isSuccessStatus(statusCode, sseError) ? 1 : 0);
+      }
+      if (sseError) {
+        if (!existingOutcome.error) pushValue("error", sseError);
+        if (statusCode === undefined && !preserveGatewayOutcome) {
+          pushValue("ok", 0);
         }
       }
-    }
-    if (hasCredentialLogHeaders(responseCredentialHeaders) || hasCredentialLogHeaders(requestCredentialHeaders)) {
-      const credentialInfo = readCredentialLogInfo(responseCredentialHeaders, requestCredentialHeaders);
-      pushValue("credential_id", credentialInfo.id);
-      pushValue("credential_chain", credentialInfo.chain.join(","));
-      pushValue("credential_saturated", credentialInfo.saturated ? 1 : 0);
-    }
-    const hasStreamSignal =
-      input.isStream !== undefined ||
-      input.path !== undefined ||
-      input.url !== undefined ||
-      input.requestBodyText !== undefined ||
-      input.requestHeaders !== undefined ||
-      input.responseBodyContentType !== undefined ||
-      input.responseHeaders !== undefined;
-    if (hasStreamSignal) {
-      pushValue("is_stream", inferRequestLogIsStream({
-        path,
-        requestBodyText: input.requestBodyText,
-        requestHeaders: mergedRequestHeaders,
-        responseBodyContentType: input.responseBodyContentType,
-        responseHeaders,
-        responseWasStream: input.isStream,
-        url
-      }) ? 1 : 0);
-    }
-    const shouldApplyRequestBody = input.requestBodyText !== undefined ||
-      Boolean(input.requestBodyRef && (!input.requestBodyTruncated || !existingOutcome.hasRequestBody));
-    if (shouldApplyRequestBody && (
-      captureResolution.bodiesSuppressed || Boolean(input.requestBodyRef) || (input.requestBodyText?.length ?? 0) > 0 || !existingOutcome.hasRequestBody
-    )) {
-      const requestBody = bodyFromText(
-        input.requestBodyText ?? "",
-        input.requestBodyContentType ?? headerValue(mergedRequestHeaders ?? {}, "content-type"),
-        Boolean(input.requestBodyTruncated),
-        input.requestBodySizeBytes,
-        rawTraceHardMaxBodyBytes,
-        { bodyDir: this.bodyDir, bodyRef: input.requestBodyRef, side: "request" }
-      );
-      pushBodyValues(sets, params, "request", requestBody);
-    }
-    const preserveExistingResponseBody = shouldPreserveExistingResponseBodyForRawTrace(
-      existingOutcome,
-      input,
-      responseHeaders,
-      responseBodyContentType,
-      sseError
-    );
-    const shouldApplyResponseBody = !preserveExistingResponseBody && (
-      input.responseBodyText !== undefined ||
-      Boolean(input.responseBodyRef && (!input.responseBodyTruncated || !existingOutcome.hasResponseBody))
-    );
-    if (shouldApplyResponseBody && (
-      captureResolution.bodiesSuppressed || Boolean(input.responseBodyRef) || (input.responseBodyText?.length ?? 0) > 0 || !existingOutcome.hasResponseBody
-    )) {
-      const responseBody = bodyFromText(
-        input.responseBodyText ?? "",
-        responseBodyContentType,
-        Boolean(input.responseBodyTruncated),
-        input.responseBodySizeBytes,
-        rawTraceHardMaxBodyBytes,
-        { bodyDir: this.bodyDir, bodyRef: input.responseBodyRef, side: "response" }
-      );
-      pushBodyValues(sets, params, "response", responseBody);
-    } else if (preserveExistingResponseBody && input.responseBodyRef) {
-      deleteRequestLogBodyRefs(this.bodyDir, [input.responseBodyRef]);
-    }
-
-    const update = () => {
-      if (sets.length > 0) {
-        database.prepare(`UPDATE request_logs SET ${sets.join(", ")} WHERE request_id = ?`).run(...params, requestId);
+      if (mergedRequestHeaders) {
+        pushValue("request_headers", JSON.stringify(mergedRequestHeaders));
       }
-    };
-    if (database.inTransaction) update();
-    else database.transaction(update)();
-    if (sets.length > 0) {
-      this.revision += 1;
+      if (responseHeaders) {
+        pushValue("response_headers", JSON.stringify(responseHeaders));
+      }
+      if (input.responseBodyText !== undefined || responseHeaders) {
+        const bodyUsage = input.responseBodyText === undefined
+          ? undefined
+          : extractUsageFromBody(input.responseBodyText);
+        // As in record(), each source is normalized under its own convention.
+        // Raw-trace updates carry no provider protocol — it is not part of the
+        // gateway's raw-trace sync contract — so the billing headers fall back to
+        // the request path, which is only a proxy for the upstream's convention.
+        const usage: UsageSnapshot = mergeUsageSnapshots(
+          normalizeUsageInputTokens(extractUsageFromBillingHeaders(responseHeaders), {
+            path: usagePath,
+            source: "providerBilling"
+          }),
+          normalizeUsageInputTokens<UsageSnapshot>(bodyUsage, {
+            path: usagePath,
+            source: "responseBody"
+          })
+        ) ?? {};
+        if (hasUsageNumbers(usage)) {
+          const inputTokens = normalizeCount(usage.inputTokens);
+          const outputTokens = normalizeCount(usage.outputTokens);
+          const reasoningTokens = normalizeCount(usage.reasoningTokens);
+          const cacheReadTokens = normalizeCount(usage.cacheReadTokens);
+          const cacheWrite1hTokens = normalizeCount(usage.cacheWrite1hTokens);
+          const cacheWrite5mTokens = normalizeCount(usage.cacheWrite5mTokens);
+          const cacheWriteTokens = normalizeCount(usage.cacheWriteTokens);
+          const totalTokens =
+            normalizeCount(usage.totalTokens) ||
+            inputTokens + outputTokens + cacheReadTokens + cacheWriteTokens;
+          const model = normalizeLabel(requestLogStorageModel(usage.model) ?? modelFromTrace ?? existingUsageContext.model, "unknown");
+          const provider = normalizeLabel(providerFromTrace ?? existingUsageContext.provider, "unknown");
+          const costInput = {
+            cacheReadTokens,
+            cacheWrite1hTokens,
+            cacheWrite5mTokens,
+            cacheWriteTokens,
+            inputTokens,
+            model,
+            outputTokens,
+            pricing: existingUsageContext.pricing,
+            provider
+          };
+          const cost = database.inTransaction
+            ? estimateUsageCostUsdFromLoadedCatalog(costInput)
+            : await estimateUsageCostUsd(costInput);
+
+          pushValue("input_tokens", inputTokens);
+          pushValue("output_tokens", outputTokens);
+          pushValue("reasoning_tokens", reasoningTokens);
+          pushValue("cache_read_tokens", cacheReadTokens);
+          pushValue("cache_write_tokens", cacheWriteTokens);
+          pushValue("total_tokens", totalTokens);
+          pushValue("cost_usd", cost?.amountUsd);
+          if (usage.model && !modelFromTrace) {
+            pushValue("model", model);
+          }
+        }
+      }
+      if (hasCredentialLogHeaders(responseCredentialHeaders) || hasCredentialLogHeaders(requestCredentialHeaders)) {
+        const credentialInfo = readCredentialLogInfo(responseCredentialHeaders, requestCredentialHeaders);
+        pushValue("credential_id", credentialInfo.id);
+        pushValue("credential_chain", credentialInfo.chain.join(","));
+        pushValue("credential_saturated", credentialInfo.saturated ? 1 : 0);
+      }
+      const hasStreamSignal =
+        input.isStream !== undefined ||
+        input.path !== undefined ||
+        input.url !== undefined ||
+        input.requestBodyText !== undefined ||
+        input.requestHeaders !== undefined ||
+        input.responseBodyContentType !== undefined ||
+        input.responseHeaders !== undefined;
+      if (hasStreamSignal) {
+        pushValue("is_stream", inferRequestLogIsStream({
+          path,
+          requestBodyText: input.requestBodyText,
+          requestHeaders: mergedRequestHeaders,
+          responseBodyContentType: input.responseBodyContentType,
+          responseHeaders,
+          responseWasStream: input.isStream,
+          url
+        }) ? 1 : 0);
+      }
+      const shouldApplyRequestBody = input.requestBodyText !== undefined ||
+        Boolean(input.requestBodyRef && (!input.requestBodyTruncated || !existingOutcome.hasRequestBody));
+      if (shouldApplyRequestBody && (
+        captureResolution.bodiesSuppressed || Boolean(input.requestBodyRef) || (input.requestBodyText?.length ?? 0) > 0 || !existingOutcome.hasRequestBody
+      )) {
+        const requestBody = bodyFromText(
+          input.requestBodyText ?? "",
+          input.requestBodyContentType ?? headerValue(mergedRequestHeaders ?? {}, "content-type"),
+          Boolean(input.requestBodyTruncated),
+          input.requestBodySizeBytes,
+          rawTraceHardMaxBodyBytes,
+          { bodyDir: this.bodyDir, bodyRef: input.requestBodyRef, side: "request" }
+        );
+        if (requestBody.bodyRef) this.queueBodyCleanup([requestBody.bodyRef]);
+        pushBodyValues(sets, params, "request", requestBody);
+      }
+      const preserveExistingResponseBody = shouldPreserveExistingResponseBodyForRawTrace(
+        existingOutcome,
+        input,
+        responseHeaders,
+        responseBodyContentType,
+        sseError
+      );
+      const shouldApplyResponseBody = !preserveExistingResponseBody && (
+        input.responseBodyText !== undefined ||
+        Boolean(input.responseBodyRef && (!input.responseBodyTruncated || !existingOutcome.hasResponseBody))
+      );
+      if (shouldApplyResponseBody && (
+        captureResolution.bodiesSuppressed || Boolean(input.responseBodyRef) || (input.responseBodyText?.length ?? 0) > 0 || !existingOutcome.hasResponseBody
+      )) {
+        const responseBody = bodyFromText(
+          input.responseBodyText ?? "",
+          responseBodyContentType,
+          Boolean(input.responseBodyTruncated),
+          input.responseBodySizeBytes,
+          rawTraceHardMaxBodyBytes,
+          { bodyDir: this.bodyDir, bodyRef: input.responseBodyRef, side: "response" }
+        );
+        if (responseBody.bodyRef) this.queueBodyCleanup([responseBody.bodyRef]);
+        pushBodyValues(sets, params, "response", responseBody);
+      } else if (preserveExistingResponseBody && input.responseBodyRef) {
+        this.queueBodyCleanup([input.responseBodyRef]);
+      }
+
+      const update = () => {
+        if (sets.length > 0) {
+          database.prepare(`UPDATE request_logs SET ${sets.join(", ")} WHERE request_id = ?`).run(...params, requestId);
+        }
+      };
+      if (database.inTransaction) update();
+      else database.transaction(update)();
+      if (sets.length > 0) {
+        this.revision += 1;
+      }
+      return true;
+    } finally {
+      this.flushBodyCleanup(database);
     }
-    return true;
   }
 
   async list(filter: RequestLogListFilter = {}): Promise<RequestLogPage> {
@@ -1518,25 +1549,27 @@ export class RequestLogStore {
   }
 
   private pruneOldRequestLogs(database: SqlDatabase): void {
+    if (!this.automaticRetention) return;
     const now = new Date();
-    const dayKey = formatLocalDayKey(now);
-    if (this.lastRetentionCleanupDay === dayKey) {
+    const dayKey = `${Math.floor(now.getTime() / 60_000)}:${this.retentionDays}`;
+    if (this.lastRetentionCleanupKey === dayKey) {
       return;
     }
     pruneRawTraceEvents(database, now.getTime());
 
-    const cutoff = floorDay(now).toISOString();
+    const cutoff = new Date(now.getTime() - this.retentionDays * 86_400_000).toISOString();
     const staleCount = firstNumber(
       queryRows(
         database,
-        "SELECT COUNT(*) AS total FROM request_logs WHERE source_usage_id IS NULL AND created_at < ?",
+        "SELECT COUNT(*) AS total FROM request_logs WHERE created_at < ?",
         [cutoff]
       ),
       "total"
     );
 
     if (staleCount === 0) {
-      this.lastRetentionCleanupDay = dayKey;
+      this.sweepOrphanBodies(database);
+      this.lastRetentionCleanupKey = dayKey;
       return;
     }
 
@@ -1545,7 +1578,7 @@ export class RequestLogStore {
       `
         SELECT request_body_ref, response_body_ref
         FROM request_logs
-        WHERE source_usage_id IS NULL AND created_at < ?
+        WHERE created_at < ?
       `,
       [cutoff]
     ).flatMap((row) => [
@@ -1554,16 +1587,63 @@ export class RequestLogStore {
     ]).filter((value): value is string => Boolean(value));
 
     database.prepare(
-      "DELETE FROM request_logs WHERE source_usage_id IS NULL AND created_at < ?",
+      "DELETE FROM request_logs WHERE created_at < ?",
     ).run(cutoff);
-    deleteRequestLogBodyRefs(this.bodyDir, refs);
-    this.lastRetentionCleanupDay = dayKey;
+    this.revision += 1;
+    this.invalidateAnalysisCache();
+    this.queueBodyCleanup(refs);
+    this.sweepOrphanBodies(database);
+    this.lastRetentionCleanupKey = dayKey;
+  }
+
+  private queueBodyCleanup(refs: string[]): void {
+    for (const ref of refs) if (normalizeBodyRef(ref)) this.bodyCleanupCandidates.add(ref);
+  }
+
+  private flushBodyCleanup(database: SqlDatabase): void {
+    // File deletion cannot roll back. Wait for the database transaction, then
+    // check both durable owners so shared and pending bodies remain readable.
+    if (database.inTransaction || this.bodyCleanupCandidates.size === 0) return;
+    const live = new Set(queryRows(database, "SELECT request_body_ref, response_body_ref FROM request_logs")
+      .flatMap((row) => [String(row.request_body_ref ?? ""), String(row.response_body_ref ?? "")]));
+    for (const ref of bodyRefsFromPendingRawTraceRows(queryRows(database, "SELECT update_json FROM request_log_pending_updates"))) live.add(ref);
+    for (const ref of this.bodyCleanupCandidates) {
+      if (!live.has(ref)) {
+        try { deleteRequestLogBodyRefs(this.bodyDir, [ref]); }
+        catch { continue; } // Retry on the next write; never invalidate a committed record.
+      }
+      this.bodyCleanupCandidates.delete(ref);
+    }
+  }
+
+  private sweepOrphanBodies(database: SqlDatabase): void {
+    if (Date.now() - this.lastOrphanSweepAt < 60 * 60 * 1_000) {
+      this.flushBodyCleanup(database);
+      return;
+    }
+    this.lastOrphanSweepAt = Date.now();
+    if (existsSync(this.bodyDir)) {
+      const cutoff = Date.now() - 60 * 60 * 1_000;
+      for (const shard of readdirSync(this.bodyDir, { withFileTypes: true })) {
+        if (!shard.isDirectory()) continue;
+        const directory = join(this.bodyDir, shard.name);
+        for (const file of readdirSync(directory, { withFileTypes: true })) {
+          if (!file.isFile() || shard.name !== file.name.slice(0, 2)) continue;
+          try {
+            if (statSync(join(directory, file.name)).mtimeMs < cutoff) this.queueBodyCleanup([file.name]);
+          } catch { /* A concurrently removed file needs no cleanup. */ }
+        }
+      }
+    }
+    this.flushBodyCleanup(database);
   }
 
   private storePendingRawTraceUpdate(database: SqlDatabase, input: RequestLogRawTraceUpdateInput): void {
     const requestId = input.requestId.trim();
     if (!requestId) return;
     const now = Date.now();
+    const previous = queryRows(database, "SELECT update_json FROM request_log_pending_updates WHERE request_id = ?", [requestId]);
+    this.queueBodyCleanup(bodyRefsFromPendingRawTraceRows(previous));
     const serialized = serializePendingRawTraceUpdate(input);
     if (serialized) {
       database.prepare(`
@@ -1575,7 +1655,8 @@ export class RequestLogStore {
           update_json = excluded.update_json
       `).run(requestId, now, serialized.bytes, serialized.json);
     }
-    prunePendingRawTraceUpdates(database, now, this.bodyDir);
+    prunePendingRawTraceUpdates(database, now, (refs) => this.queueBodyCleanup(refs));
+    this.flushBodyCleanup(database);
   }
 
   private takePendingRawTraceUpdate(database: SqlDatabase, requestId: string): RequestLogRawTraceUpdateInput | undefined {
@@ -1671,6 +1752,8 @@ function standaloneRecordInputFromRawTrace(
     ...(client ? { client } : {}),
     completedAt,
     durationMs,
+    timeToFirstTokenMs: input.timeToFirstTokenMs,
+    streamOutputDurationMs: input.streamOutputDurationMs,
     ...(input.bundleId ? { eventId: `raw-trace:${input.bundleId}` } : {}),
     fallbackModel: input.model,
     maxBodyBytes,
@@ -4176,13 +4259,6 @@ function floorDay(date: Date): Date {
   return result;
 }
 
-function formatLocalDayKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
 function isoFromMs(value: number): string {
   return new Date(value).toISOString();
 }
@@ -5756,13 +5832,13 @@ function rawTraceHasBodyText(input: RequestLogRawTraceUpdateInput): boolean {
   return input.requestBodyText !== undefined || input.responseBodyText !== undefined;
 }
 
-function prunePendingRawTraceUpdates(database: SqlDatabase, now: number, bodyDir?: string): void {
+function prunePendingRawTraceUpdates(database: SqlDatabase, now: number, retireRefs?: (refs: string[]) => void): void {
   const expiredRows = queryRows(
     database,
     "SELECT update_json FROM request_log_pending_updates WHERE received_at < ?",
     [now - pendingRawTraceTtlMs]
   );
-  if (bodyDir) deleteRequestLogBodyRefs(bodyDir, bodyRefsFromPendingRawTraceRows(expiredRows));
+  retireRefs?.(bodyRefsFromPendingRawTraceRows(expiredRows));
   database.prepare("DELETE FROM request_log_pending_updates WHERE received_at < ?")
     .run(now - pendingRawTraceTtlMs);
   const rows = queryRows(
@@ -5780,7 +5856,7 @@ function prunePendingRawTraceUpdates(database: SqlDatabase, now: number, bodyDir
     const bytes = normalizeCount(row.update_bytes);
     if (retainedEntries >= maxPendingRawTraceEntries ||
       retainedBytes + bytes > maxPendingRawTraceTotalBytes) {
-      if (bodyDir) deleteRequestLogBodyRefs(bodyDir, bodyRefsFromPendingRawTraceRows([row]));
+      retireRefs?.(bodyRefsFromPendingRawTraceRows([row]));
       remove.run(String(row.request_id ?? ""));
       continue;
     }

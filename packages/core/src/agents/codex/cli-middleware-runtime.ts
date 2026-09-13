@@ -77,11 +77,13 @@ function resolveConfigDir() {
   }
   if (process.platform === "win32") {
     const appData = process.env.APPDATA || process.env.LOCALAPPDATA || path.join(os.homedir(), "AppData", "Roaming");
-    const current = path.join(appData, "claude-code-router");
-    const legacy = path.join(appData, "Claude Code Router");
-    return fs.existsSync(current) || !fs.existsSync(legacy) ? current : legacy;
+    const current = path.join(appData, "agentrouter");
+    const legacy = [path.join(appData, "claude-code-router"), path.join(appData, "Claude Code Router")];
+    return fs.existsSync(current) ? current : legacy.find((dir) => fs.existsSync(dir)) || current;
   }
-  return path.join(os.homedir(), ".claude-code-router");
+  const current = path.join(os.homedir(), ".agentrouter");
+  const legacy = path.join(os.homedir(), ".claude-code-router");
+  return fs.existsSync(current) || !fs.existsSync(legacy) ? current : legacy;
 }
 
 function botBridge() {
@@ -6620,9 +6622,12 @@ function claudeConfigSourceDirs(template, order) {
 
 function inferBaseClaudeConfigDirFromSession(value) {
   const text = String(value || "");
-  const marker = path.sep + ".claude-code-router" + path.sep;
-  const index = text.indexOf(marker);
-  return index > 0 ? text.slice(0, index) : "";
+  for (const dirname of [".agentrouter", ".claude-code-router"]) {
+    const marker = path.sep + dirname + path.sep;
+    const index = text.indexOf(marker);
+    if (index > 0) return text.slice(0, index);
+  }
+  return "";
 }
 
 function uniqueExistingDirs(values) {

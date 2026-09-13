@@ -10,7 +10,7 @@ import {
   PanelLeftOpen, Power, ProviderAccountMeter, ProviderAccountSnapshot, ReactNode, ResolvedLanguage, ResolvedTheme, Select, SelectControl,
   PointerSensor, rectSortingStrategy, Settings, SettingsPageId, SortableContext, sortableKeyboardCoordinates, themeDisplayName,
   translateOptions, TrayBalanceProgressConfig, TrayComponentVariants, TrayWidgetConfig, TrayWidgetType, TrayWidgetVariant,
-  appLogoUrl, trayMascotIconUrls, arrayMove, defaultTrayWidgetVariant, isTraySingletonWidgetType, normalizeTrayWidget, normalizeTrayWidgets, Switch, Textarea, Trash2, trayWidgetVariantOptions, useAppText, useEffect, useMemo, useRef, useSensor, useSensors, useSortable, useState, validateMcpServerDraft,
+  arrayMove, defaultTrayWidgetVariant, isTraySingletonWidgetType, normalizeTrayWidget, normalizeTrayWidgets, Switch, Textarea, Trash2, trayWidgetVariantOptions, useAppText, useEffect, useMemo, useRef, useSensor, useSensors, useSortable, useState, validateMcpServerDraft,
   providerAccountSnapshotKey, providerAccountSnapshotLabel, uniqueStrings, X
 } from "../shared/index";
 import { ModelSelector } from "./model-selector";
@@ -539,6 +539,7 @@ function ObservabilitySettingsPage({
   observability: AppConfig["observability"];
   onChange: (patch: Partial<AppConfig["observability"]>) => void;
 }) {
+  const t = useAppText();
   return (
     <div className={cn(settingsPageContentWidthClassName, "grid grid-cols-1 gap-5")}>
       <h3 className="text-[15px] font-semibold text-foreground">{copy.settings.observability}</h3>
@@ -557,6 +558,13 @@ function ObservabilitySettingsPage({
           label={copy.settings.agentAnalysis}
           onChange={(agentAnalysis) => onChange({ agentAnalysis })}
         />
+        <Field label={t("日志保存天数")}>
+          <SelectControl
+            value={String(observability.retentionDays ?? 1)}
+            options={[...new Set([1, 3, 7, 14, 30, 90, 365, observability.retentionDays ?? 1])].sort((a, b) => a - b).map((days) => ({ value: String(days), label: `${days} ${t("天")}` }))}
+            onChange={(value) => onChange({ retentionDays: Number(value) })}
+          />
+        </Field>
       </div>
     </div>
   );
@@ -1923,12 +1931,7 @@ export function TraySettingsPage({
   const effectiveTrayIconPreference: AppConfig["trayIcon"] = progressSelectionActive ? "progress" : trayIconPreference;
   const progressEditorOpen = effectiveTrayIconPreference === "progress";
   const trayIconOptions: Array<{ label: string; value: AppConfig["trayIcon"] }> = [
-    { label: copy.settings.trayIconLayered, value: "layered" },
-    { label: copy.settings.trayIconRandom, value: "random" },
-    { label: copy.settings.trayIconViolet, value: "violet" },
-    { label: copy.settings.trayIconOrange, value: "orange" },
-    { label: copy.settings.trayIconCyan, value: "cyan" },
-    { label: copy.settings.trayIconProgress, value: "progress" }
+    { label: copy.settings.trayIconLayered, value: "layered" }
   ];
   const paletteItems = trayWidgetPalette(copy);
   const trayT = (value: string) => copy.text[value] ?? value;
@@ -2564,7 +2567,6 @@ function TrayIconPreview({
   preference: AppConfig["trayIcon"];
   progress?: number;
 }) {
-  const randomIcons: Array<"violet" | "orange" | "cyan"> = ["violet", "orange", "cyan"];
 
   return (
     <span
@@ -2585,24 +2587,6 @@ function TrayIconPreview({
             maskSize: "contain"
           }}
         />
-      ) : null}
-      {preference === "random" ? (
-        randomIcons.map((iconId, index) => (
-          <img
-            alt=""
-            className={cn(
-              "absolute h-[66%] w-[66%] object-contain drop-shadow-sm",
-              index === 0 && "left-[9%] top-[22%]",
-              index === 1 && "left-[22%] top-[11%]",
-              index === 2 && "left-[34%] top-[27%]"
-            )}
-            key={iconId}
-            src={trayMascotIconUrls[iconId]}
-          />
-        ))
-      ) : null}
-      {isTrayMascotIconPreference(preference) ? (
-        <img alt="" className="h-[88%] w-[88%] object-contain drop-shadow-sm" src={trayMascotIconUrls[preference]} />
       ) : null}
       {preference === "progress" ? <TrayProgressPreview progress={progress} /> : null}
     </span>
@@ -2724,7 +2708,7 @@ function TrayWindowHeaderIcon() {
       aria-hidden="true"
       className="flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-md border border-white/15 bg-white/10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.12)]"
     >
-      <img alt="" className="h-[72%] w-[72%] object-contain" src={appLogoUrl} />
+      <span className="h-full w-full bg-foreground" style={{ maskImage: `url(${trayLayeredIconUrl})`, maskPosition: "center", maskRepeat: "no-repeat", maskSize: "contain" }} />
     </span>
   );
 }
@@ -3440,10 +3424,6 @@ function trayBalanceMeterProgress(meter: ProviderAccountMeter): number {
 
 function trayBalanceProgressMeterLabel(meter: ProviderAccountMeter, t: (value: string) => string): string {
   return `${t(meter.label)} - ${formatProviderAccountMeterValue(meter)}`;
-}
-
-function isTrayMascotIconPreference(value: AppConfig["trayIcon"]): value is "cyan" | "orange" | "violet" {
-  return value === "cyan" || value === "orange" || value === "violet";
 }
 
 function trayPreviewText(copy: AppCopy, key: string, fallback: string, alternateKey?: string): string {

@@ -69,7 +69,7 @@ export function normalizeConfig(config: AppConfig): AppConfig {
     theme: normalizeThemePreference(config.theme),
     trayBalanceProgress,
     trayComponentVariants: normalizeTrayComponentVariants(config.trayComponentVariants),
-    trayIcon: trayIcon === "progress" && !trayBalanceProgress ? "random" : trayIcon,
+    trayIcon: trayIcon,
     trayShowTokenUsage: config.trayShowTokenUsage === true,
     trayProgressTargetTokens: normalizeTrayProgressTargetTokens(config.trayProgressTargetTokens),
     trayWidgets: normalizeTrayWidgets(config.trayWidgets, config.trayWindowModules, config.trayComponentVariants),

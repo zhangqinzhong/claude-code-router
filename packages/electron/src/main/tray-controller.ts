@@ -22,16 +22,7 @@ const trayWindowDarkBackgroundColor = "#1c1c1e";
 const trayWindowLightBackgroundColor = "#f2f2f7";
 const trayTokenFallbackTitle = "0 tokens";
 const trayIconFallbackPath = path.join(__dirname, "../assets/tray.png");
-const trayMascotIconIds = ["violet", "orange", "cyan"] as const;
-
-type TrayMascotIconId = (typeof trayMascotIconIds)[number];
-type TrayStaticIconId = TrayMascotIconId | "layered";
-
-const trayMascotIconPaths: Record<TrayMascotIconId, string> = {
-  cyan: path.join(__dirname, "../assets/tray-cyan.png"),
-  orange: path.join(__dirname, "../assets/tray-orange.png"),
-  violet: path.join(__dirname, "../assets/tray-violet.png")
-};
+type TrayStaticIconId = "layered";
 
 class TrayController {
   private detailCloseTimer?: NodeJS.Timeout;
@@ -39,8 +30,6 @@ class TrayController {
   private detailPopover?: BrowserWindow;
   private ignorePopoverBlurUntil = 0;
   private popover?: BrowserWindow;
-  private randomTrayIconDateKey?: string;
-  private resolvedRandomTrayIcon?: TrayMascotIconId;
   private refreshTimer?: NodeJS.Timeout;
   private suppressMainWindowActivationUntil = 0;
   private tray?: Tray;
@@ -124,7 +113,6 @@ class TrayController {
   }
 
   refreshUsageTitle(): void {
-    this.refreshRandomTrayIconForCurrentDay();
     void this.refreshTrayTitle();
   }
 
@@ -143,10 +131,6 @@ class TrayController {
 
     const nextConfig = config ?? await loadAppConfig();
     const nextPreference = normalizeTrayIconPreference(nextConfig.trayIcon);
-    if (nextPreference === "random" && this.trayIconPreference !== "random") {
-      this.randomTrayIconDateKey = undefined;
-      this.resolvedRandomTrayIcon = undefined;
-    }
     this.trayIconPreference = nextPreference;
     this.trayShowTokenUsage = nextConfig.trayShowTokenUsage === true;
     this.trayBalanceProgress = normalizeTrayBalanceProgressConfig(nextConfig.trayBalanceProgress);
@@ -385,35 +369,10 @@ class TrayController {
     }
   }
 
-  private refreshRandomTrayIconForCurrentDay(): void {
-    if (this.trayIconPreference !== "random") {
-      return;
-    }
-    const previousDateKey = this.randomTrayIconDateKey;
-    const previousIconId = this.resolvedRandomTrayIcon;
-    const iconId = this.resolveTrayIconId("random");
-    if (previousDateKey !== this.randomTrayIconDateKey || previousIconId !== iconId) {
-      this.applyTrayIcon(iconId);
-    }
+  private resolveTrayIconId(_preference: TrayIconPreference): TrayStaticIconId {
+    return "layered";
   }
 
-  private resolveTrayIconId(preference: TrayIconPreference): TrayStaticIconId {
-    if (preference === "layered") {
-      return preference;
-    }
-    if (preference === "violet" || preference === "orange" || preference === "cyan") {
-      return preference;
-    }
-
-    const dateKey = formatLocalDateKey(new Date());
-    if (this.resolvedRandomTrayIcon && this.randomTrayIconDateKey === dateKey) {
-      return this.resolvedRandomTrayIcon;
-    }
-
-    this.randomTrayIconDateKey = dateKey;
-    this.resolvedRandomTrayIcon = trayMascotIconIds[Math.floor(Math.random() * trayMascotIconIds.length)];
-    return this.resolvedRandomTrayIcon;
-  }
 }
 
 const trayController = new TrayController();
@@ -602,14 +561,11 @@ function alignDimensionToDevicePixel(value: number, scaleFactor: number): number
   return Math.max(1, Math.round(value * scaleFactor) / scaleFactor);
 }
 
-function createTrayIcon(iconId: TrayStaticIconId): Electron.NativeImage {
+function createTrayIcon(_iconId: TrayStaticIconId): Electron.NativeImage {
   const size = trayIconPixelSize();
-  const iconPath = iconId === "layered"
-    ? path.join(__dirname, "../assets", layeredTrayAssetName(
-      process.platform,
-      nativeTheme.shouldUseDarkColorsForSystemIntegratedUI
-    ))
-    : trayMascotIconPaths[iconId];
+  const iconPath = path.join(__dirname, "../assets", layeredTrayAssetName(
+    process.platform, nativeTheme.shouldUseDarkColorsForSystemIntegratedUI
+  ));
   const image = nativeImage.createFromPath(iconPath);
   if (image.isEmpty()) {
     const fallback = nativeImage.createFromPath(trayIconFallbackPath);
@@ -620,14 +576,8 @@ function createTrayIcon(iconId: TrayStaticIconId): Electron.NativeImage {
     fallbackIcon.setTemplateImage(process.platform === "darwin");
     return fallbackIcon;
   }
-  if (iconId === "layered") {
-    // Keep the bundled 1x/2x/3x representations instead of flattening Retina art.
-    image.setTemplateImage(process.platform === "darwin");
-    return image;
-  }
-  const resized = image.resize({ height: size, width: size });
-  resized.setTemplateImage(false);
-  return resized;
+  image.setTemplateImage(process.platform === "darwin");
+  return image;
 }
 
 function createTrayProgressIcon(progress: number): Electron.NativeImage {
@@ -646,10 +596,8 @@ function trayIconPixelSize(): number {
   return process.platform === "win32" ? 16 : trayMenuBarIconSize;
 }
 
-function normalizeTrayIconPreference(value: unknown): TrayIconPreference {
-  return value === "layered" || value === "violet" || value === "orange" || value === "cyan" || value === "progress" || value === "random"
-    ? value
-    : "layered";
+function normalizeTrayIconPreference(_value: unknown): TrayIconPreference {
+  return "layered";
 }
 
 function normalizeTrayBalanceProgressConfig(value: unknown): TrayBalanceProgressConfig | undefined {
@@ -814,14 +762,6 @@ function pngCrcTable(): Uint32Array {
   }
   cachedPngCrcTable = table;
   return table;
-}
-
-function formatLocalDateKey(date: Date): string {
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0")
-  ].join("-");
 }
 
 function clamp(value: number, min: number, max: number): number {

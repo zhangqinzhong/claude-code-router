@@ -1,7 +1,7 @@
 import { withClaudeDesignRuntimePluginConfig, withClaudeShipRuntimePluginConfig } from "@agentrouter/core/config/config";
 import { CLAUDE_DESIGN_PLUGIN_ID, CLAUDE_SHIP_PLUGIN_ID, knownGatewayPluginDefaultApps, type AppConfig, type GatewayPluginAppConfig, type GatewayPluginConfig } from "@agentrouter/core/contracts/app";
 
-const DEFAULT_CLAUDE_DESIGN_FRONTEND_URL = "https://claude-design.ccrdesk.top/design";
+const DEFAULT_CLAUDE_DESIGN_FRONTEND_URL = "https://claude.ai/design";
 const DESIGN_FRONTEND_URL_ENV_KEYS = ["AR_CLAUDE_DESIGN_FRONTEND_URL", "AR_CLAUDE_DESIGN_WEB_URL"];
 const DESIGN_FRONTEND_ASSETS_ORIGIN_ENV_KEYS = ["AR_CLAUDE_DESIGN_FRONTEND_ORIGIN", "AR_CLAUDE_DESIGN_ASSETS_ORIGIN"];
 const SHIP_FRONTEND_URL_ENV_KEYS = ["AR_CLAUDE_SHIP_FRONTEND_URL", "AR_CLAUDE_SHIP_WEB_URL"];
@@ -156,9 +156,10 @@ export function isLegacyClaudeDesignUrl(value: string): boolean {
     const host = url.hostname.toLowerCase();
     const pathname = url.pathname.replace(/\/$/, "");
     if (host === "claude.ai") {
-      return pathname === "/discover/design" || pathname === "/design";
+      return pathname === "/discover/design";
     }
-    return false;
+    // Retire the former bundled frontend; never use it as a default service.
+    return host === "claude-design.ccrdesk.top";
   } catch {
     return false;
   }

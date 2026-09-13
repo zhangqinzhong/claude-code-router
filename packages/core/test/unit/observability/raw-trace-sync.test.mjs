@@ -16,6 +16,36 @@ import {
   RawTraceSynchronizer
 } from "@agentrouter/core/observability/raw-trace-sync.ts";
 
+test("raw trace uses the managed runtime outcome when response metadata omits status", async () => {
+  const dir = mkdtempSync(path.join(tmpdir(), "ar-trace-response-status-"));
+  const spoolDirectory = path.join(dir, "spool");
+  const bundleDirectory = path.join(spoolDirectory, "bundle");
+  mkdirSync(bundleDirectory, { recursive: true });
+  const metadata = path.join(bundleDirectory, "response.json");
+  writeFileSync(metadata, "{}");
+  let update;
+  const synchronizer = new RawTraceSynchronizer({
+    allowStandaloneRequestLogs: () => true,
+    enqueueUpdate: (input) => { update = input; return { accepted: true, degraded: false }; },
+    getConfig: createConfig,
+    spoolDirectory
+  });
+  try {
+    assert.equal(synchronizer.acceptResponseStatus({ type: "ar:response-log-status", requestId: "core-request", status: 200 }), true);
+    assert.equal(synchronizer.acceptResponseStatus({ type: "ar:response-log-status", requestId: "core-request", status: 0 }), false);
+    await sendRawTrace(synchronizer, {
+      requestId: "core-request", turnKey: "logical-request",
+      parts: [{ partType: "upstream_response_metadata", filePath: metadata }]
+    });
+    await waitFor(() => update !== undefined);
+    assert.equal(update.statusCode, 200);
+    assert.equal(update.requestId, "logical-request");
+  } finally {
+    await synchronizer.stop();
+    rmSync(dir, { force: true, recursive: true });
+  }
+});
+
 test("raw trace applies metadata-only body privacy while retaining original sizes", () => {
   const config = createConfig();
   config.observability.requestLogBodyCapture = "none";
@@ -851,7 +881,7 @@ test("fallback raw bundles keep unique bundle ids while sharing the logical requ
       const clientMetadata = path.join(bundleDirectory, "client_request_metadata.json");
       const responseMetadata = path.join(bundleDirectory, "upstream_response_metadata.json");
       mkdirSync(bundleDirectory, { recursive: true });
-      writeFileSync(clientMetadata, JSON.stringify({ headers: { "x-ar-route-attempt": String(attempt) } }));
+      writeFileSync(clientMetadata, JSON.stringify({ headers: { "x-ar-route-attempt": String(attempt), "x-ar-stream-timing": "[240,1500]" } }));
       writeFileSync(responseMetadata, JSON.stringify({ statusCode: attempt === 1 ? 500 : 200 }));
       bundles.push(await readRawTraceRequestLogBundle({
         parts: [
@@ -863,6 +893,11 @@ test("fallback raw bundles keep unique bundle ids while sharing the logical requ
       }, spoolDirectory));
     }
 
+    assert.deepEqual(bundles.map((bundle) => bundle.update.statusCode), [500, 200]);
+    for (const bundle of bundles) {
+      assert.equal(bundle.update.timeToFirstTokenMs, 240);
+      assert.equal(bundle.update.streamOutputDurationMs, 1500);
+    }
     assert.deepEqual(bundles.map((bundle) => ({
       attempt: bundle.update.attempt,
       bundleId: bundle.update.bundleId,

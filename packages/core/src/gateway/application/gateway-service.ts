@@ -537,7 +537,9 @@ class GatewayService {
   }
 
   private handleCoreGatewayMessage(child: ChildProcess, message: unknown): void {
-    if (this.child !== child || !isRuntimeConfigReloadMessage(message)) {
+    if (this.child !== child) return;
+    if (this.rawTraceSynchronizer.acceptResponseStatus(message)) return;
+    if (!isRuntimeConfigReloadMessage(message)) {
       return;
     }
     this.schedulePersistedRuntimeConfigReload(message.configRevision, message.forceRestart === true);

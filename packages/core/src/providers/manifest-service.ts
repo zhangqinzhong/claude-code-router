@@ -21,7 +21,7 @@ type SafeAddress = {
 const maxManifestBytes = 128 * 1024;
 const maxRedirects = 3;
 const manifestTimeoutMs = 8000;
-const manifestUserAgent = "Claude-Code-Router/provider-manifest";
+const manifestUserAgent = "AgentRouter/provider-manifest";
 
 export async function fetchProviderManifest(request: ProviderManifestFetchRequest): Promise<ProviderManifestFetchResult> {
   const manifestUrl = normalizeManifestUrl(request.url);

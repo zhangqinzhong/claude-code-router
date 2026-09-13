@@ -5,6 +5,6 @@ import { CLAUDE_DESIGN_PLUGIN_ID, knownGatewayPluginDefaultApps } from "@agentro
 test("known gateway plugin defaults open Claude Design at the current shell", () => {
   assert.equal(
     knownGatewayPluginDefaultApps(CLAUDE_DESIGN_PLUGIN_ID)?.find((app) => app.id === "claude-design")?.url,
-    "https://claude-design.ccrdesk.top/design"
+    "https://claude.ai/design"
   );
 });

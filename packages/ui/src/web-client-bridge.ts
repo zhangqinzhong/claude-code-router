@@ -29,7 +29,7 @@ async function rpc(method: string, args: unknown[] = []): Promise<unknown> {
     const message = payload && !payload.ok
       ? payload.error.message
       : response.status === 404
-        ? "AgentRouter management service is unavailable. Make sure the AgentRouter app or ccr ui command is running, then retry."
+        ? "AgentRouter management service is unavailable. Make sure the AgentRouter app or agentrouter ui command is running, then retry."
         : `AgentRouter web API failed with HTTP ${response.status}`;
     throw new Error(message);
   }

@@ -109,7 +109,7 @@ export function UpdateDialog({
 
           {!status.supported ? (
             <div className="rounded-md border border-border bg-muted/30 px-3 py-2 text-[12px] text-muted-foreground">
-              {t("Updates are only available in packaged builds.")}
+              {t("No update source is configured.")}
             </div>
           ) : null}
 

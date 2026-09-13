@@ -14,6 +14,31 @@ test("generated Codex CLI middleware runtime is valid JavaScript", () => {
   execFileSync(process.execPath, ["--check", file], { stdio: "pipe" });
 });
 
+test("middleware config discovery prefers AgentRouter and preserves legacy-only installs", () => {
+  const source = extractRuntimeFunctionSource(codexCliMiddlewareRuntimeScript(), "resolveConfigDir");
+  for (const platform of ["darwin", "win32"]) {
+    const home = "/test-home";
+    const appData = "/test-appdata";
+    const current = platform === "win32" ? path.join(appData, "agentrouter") : path.join(home, ".agentrouter");
+    const legacy = platform === "win32" ? path.join(appData, "claude-code-router") : path.join(home, ".claude-code-router");
+    for (const existing of [[], [legacy], [legacy, current]]) {
+      const resolve = Function("path", "fs", "os", "process", "nonEmptyEnv", "expandHome", `${source}; return resolveConfigDir;`)(
+        path, { existsSync: (dir) => existing.includes(dir) }, { homedir: () => home },
+        { platform, env: { APPDATA: appData } }, () => "", (value) => value
+      );
+      assert.equal(resolve(), existing.length === 1 ? legacy : current);
+    }
+  }
+});
+
+test("middleware finds Claude base config from both current and legacy session paths", () => {
+  const infer = evaluateRuntimeFunction("inferBaseClaudeConfigDirFromSession");
+  for (const dirname of [".agentrouter", ".claude-code-router"]) {
+    assert.equal(infer(path.join("/test-home/.claude", dirname, "sessions", "test")), "/test-home/.claude");
+  }
+  assert.equal(infer("/unrelated/session"), "");
+});
+
 test("generated Codex CLI middleware converts Windows SDK paths before URL scheme detection", () => {
   const fn = evaluateRuntimeFunction("botGatewaySdkImportSpecifier");
   const windowsPath = "C:\\Users\\macao\\AppData\\Local\\Programs\\Claude Code Router\\resources\\app.asar\\dist\\main\\bot-gateway-sdk\\dist\\index.js";

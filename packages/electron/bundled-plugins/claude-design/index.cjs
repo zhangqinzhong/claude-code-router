@@ -23,7 +23,6 @@ const DEFAULT_UPSTREAM_ORIGIN = "https://claude.ai";
 const DEFAULT_DESIGN_ORIGIN = "https://claude.ai";
 const DEFAULT_DESIGN_REFERRER = "https://claude.ai/design";
 const DEFAULT_FALLBACK_ROUTE_HOSTS = ["claude.com", "www.anthropic.com", "anthropic.com"];
-const DEFAULT_FRONTEND_ASSETS_ORIGIN = "https://claude-design.ccrdesk.top";
 const DEFAULT_GATEWAY_MODEL_DISCOVERY_TTL_MS = 30 * 1000;
 const DEFAULT_GATEWAY_MODEL_DISCOVERY_TIMEOUT_MS = 1500;
 const GATEWAY_MODEL_DISCOVERY_PATHS = ["/models", "/v1/models"];
@@ -122,8 +121,8 @@ const CLAUDE_PLUGIN_PRODUCTS = {
     appId: "claude-design",
     defaultRoutePaths: DEFAULT_DESIGN_ROUTE_PATHS,
     fallbackRouteIdPrefix: "claude-design-fallback",
-    defaultFrontendAssetsOrigin: DEFAULT_FRONTEND_ASSETS_ORIGIN,
-    defaultFrontendUrl: `${DEFAULT_FRONTEND_ASSETS_ORIGIN}/design`,
+    defaultFrontendAssetsOrigin: "",
+    defaultFrontendUrl: "",
     frontendAssetsOriginEnvKeys: DESIGN_FRONTEND_ASSETS_ORIGIN_ENV_KEYS,
     frontendProxyId: "claude-design-frontend-assets-proxy",
     frontendUrlEnvKeys: DESIGN_FRONTEND_URL_ENV_KEYS,
@@ -145,8 +144,8 @@ const CLAUDE_PLUGIN_PRODUCTS = {
     appId: "claude-ship",
     defaultRoutePaths: DEFAULT_SHIP_ROUTE_PATHS,
     fallbackRouteIdPrefix: "claude-ship-fallback",
-    defaultFrontendAssetsOrigin: DEFAULT_FRONTEND_ASSETS_ORIGIN,
-    defaultFrontendUrl: `${DEFAULT_FRONTEND_ASSETS_ORIGIN}${CLAUDE_SHIP_APP_PATH}`,
+    defaultFrontendAssetsOrigin: "",
+    defaultFrontendUrl: "",
     frontendAssetsOriginEnvKeys: SHIP_FRONTEND_ASSETS_ORIGIN_ENV_KEYS,
     frontendProxyId: "claude-ship-frontend-assets-proxy",
     frontendUrlEnvKeys: SHIP_FRONTEND_URL_ENV_KEYS,

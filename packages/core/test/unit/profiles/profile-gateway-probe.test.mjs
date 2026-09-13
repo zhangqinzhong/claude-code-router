@@ -70,7 +70,8 @@ test("existing profile gateway uses health before the optional root probe", asyn
   }
 });
 
-test("existing profile gateway falls back to the root identity response", async () => {
+for (const gatewayName of ["agentrouter", "claude-code-router"]) {
+test(`existing profile gateway falls back to the ${gatewayName} root identity response`, async () => {
   const previousFetch = globalThis.fetch;
   const paths = [];
   globalThis.fetch = async (input) => {
@@ -80,7 +81,7 @@ test("existing profile gateway falls back to the root identity response", async 
       return Response.json({ status: "unknown" }, { status: 404 });
     }
     if (url.pathname === "/") {
-      return Response.json({ name: "claude-code-router" });
+      return Response.json({ name: gatewayName });
     }
     if (url.pathname === "/v1/models") {
       return Response.json({ data: [], object: "list" });
@@ -101,6 +102,8 @@ test("existing profile gateway falls back to the root identity response", async 
     globalThis.fetch = previousFetch;
   }
 });
+}
+
 
 test("existing profile gateway rejects WIF profiles when the root identity lacks the token endpoint", async () => {
   const previousFetch = globalThis.fetch;

@@ -25,13 +25,14 @@ function renderSettings(showTokenUsage = false, mac = true, language: "en" | "zh
   );
 }
 
-test("tray settings show the layered icon, legacy options, and an accessible off switch", () => {
+test("tray settings show only the AgentRouter icon, and an accessible off switch", () => {
   const html = renderSettings();
   assert.match(html, /data-tray-icon="layered"/);
   assert.match(html, /mask-image:url\(/);
   assert.match(html, /value="layered"[^>]*selected/);
-  for (const label of ["Layered knot", "Random", "Auralis", "Solara", "Vesper", "Balance progress"]) {
-    assert.ok(html.includes(label), label);
+  assert.ok(html.includes("AgentRouter"));
+  for (const label of ["Random", "Auralis", "Solara", "Vesper", "Balance progress"]) {
+    assert.ok(!html.includes(label), label);
   }
   assert.match(html, /aria-label="Show Token usage in the menu bar"/);
   assert.match(html, /aria-describedby="tray-token-usage-hint"/);
@@ -43,14 +44,14 @@ test("tray settings reflect the enabled preference and translated labels", () =>
   const html = renderSettings(true, true, "zh");
   assert.match(html, /aria-checked="true"/);
   assert.match(html, /托盘图标/);
-  assert.match(html, /双层结形/);
+  assert.match(html, /AgentRouter/);
   assert.match(html, /菜单栏显示 Token 用量/);
   assert.match(html, /悬停仍可查看今日用量/);
 });
 
 test("platforms without tray titles do not show a nonfunctional text toggle", () => {
   const html = renderSettings(false, false);
-  assert.match(html, /Layered knot/);
+  assert.match(html, /AgentRouter/);
   assert.doesNotMatch(html, /Show Token usage in the menu bar/);
   assert.doesNotMatch(html, /tray-token-usage-hint/);
 });

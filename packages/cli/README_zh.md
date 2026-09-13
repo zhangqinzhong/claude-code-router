@@ -1,6 +1,6 @@
 # AgentRouter CLI
 
-[English](README.md) · [GitHub](https://github.com/zhangqinzhong/claude-code-router)
+[English](README.md)
 
 `@zhangqinzhong/agentrouter` 是 AgentRouter 的 Node.js 发行版。它通过 `agentrouter` 命令提供浏览器管理界面、本地模型网关和 Agent 配置启动能力，不需要安装 Electron。
 
@@ -116,8 +116,8 @@ agentrouter <配置名称或 ID> [cli|app] [-- <Agent 参数>]
 
 | 平台 | 配置目录 |
 | --- | --- |
-| macOS / Linux | `~/.claude-code-router` |
-| Windows | `%APPDATA%\claude-code-router` |
+| macOS / Linux | `~/.agentrouter` |
+| Windows | `%APPDATA%\agentrouter` |
 
 重要文件包括：
 
@@ -177,7 +177,7 @@ agentrouter start --host 127.0.0.1 --port 3458
 
 ## Docker
 
-仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `agentrouter` 命令。请参阅 [Docker 部署文档](https://github.com/zhangqinzhong/claude-code-router/blob/main/docker/README.md)。
+仓库还提供面向模型网关和浏览器 UI 的 Docker 镜像。运行时镜像不会安装 npm 的 `agentrouter` 命令。请参阅 [Docker 部署文档](../../docker/README.md)。
 
 ## 许可证
 

@@ -3,14 +3,6 @@
   "version": "3.0.22",
   "license": "MIT",
   "description": "Local AgentRouter gateway with CLI and web management UI.",
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/zhangqinzhong/claude-code-router.git"
-  },
-  "bugs": {
-    "url": "https://github.com/zhangqinzhong/claude-code-router/issues"
-  },
-  "homepage": "https://github.com/zhangqinzhong/claude-code-router#readme",
   "keywords": [
     "claude-code",
     "codex",

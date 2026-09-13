@@ -10,7 +10,7 @@ type UpdateCheckOptions = {
 };
 
 const startupCheckDelayMs = 12_000;
-const defaultUpdateSource = "GitHub Releases";
+const defaultUpdateSource = "";
 
 class AppUpdateService {
   private activeSilentCheckFailureRestoreStatus?: AppUpdateStatus;
@@ -59,7 +59,7 @@ class AppUpdateService {
     this.start();
     if (!this.isUpdaterSupported()) {
       return this.publishStatus({
-        lastError: "Updates are only available in packaged builds.",
+        lastError: "No update source is configured.",
         state: "error"
       });
     }
@@ -325,7 +325,7 @@ class AppUpdateService {
   }
 
   private isUpdaterSupported(): boolean {
-    return app.isPackaged || Boolean(readEnvString("AR_UPDATE_FEED_URL"));
+    return Boolean(readEnvString("AR_UPDATE_FEED_URL"));
   }
 }
 

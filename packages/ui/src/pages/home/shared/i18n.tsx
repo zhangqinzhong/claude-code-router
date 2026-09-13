@@ -49,11 +49,7 @@ export type AppCopy = {
     trayIconLayered: string;
     trayShowTokenUsage: string;
     trayShowTokenUsageHint: string;
-    trayIconCyan: string;
-    trayIconOrange: string;
     trayIconProgress: string;
-    trayIconRandom: string;
-    trayIconViolet: string;
     trayComponentAccount: string;
     trayComponentArc: string;
     trayComponentArea: string;
@@ -163,14 +159,10 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       trayBalanceProgressNoData: "No account data is available. Enable account monitoring on a provider first.",
       trayBalanceProgressRequired: "Choose an account and data to enable balance progress.",
       trayIcon: "Tray icon",
-      trayIconLayered: "Layered knot",
+      trayIconLayered: "AgentRouter",
       trayShowTokenUsage: "Show Token usage in the menu bar",
       trayShowTokenUsageHint: "Turn off to show only the icon. Hover to see today's usage.",
-      trayIconCyan: "Auralis",
-      trayIconOrange: "Solara",
       trayIconProgress: "Balance progress",
-      trayIconRandom: "Random",
-      trayIconViolet: "Vesper",
       trayComponentAccount: "Account meter",
       trayComponentArc: "Arc",
       trayComponentArea: "Area",
@@ -239,6 +231,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "持续时间": "Duration",
       "首 Token": "First token",
       "输出速率": "Output rate",
+      "平均吞吐率": "Average throughput",
       "反馈": "Feedback",
       "Failed requests": "Failed requests",
       "输入": "Input",
@@ -249,6 +242,13 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "请求": "Request",
       "响应": "Response",
       "复制": "Copy",
+      "输出速率说明": "Output rate details",
+      "输出速率（TPOT 估算）": "Output rate (TPOT estimate)",
+      "公式：(输出 Token 数 − 1) ÷ (总耗时 − 首 Token 延迟)，时间单位为秒。": "Formula: (output tokens − 1) ÷ (total duration − time to first token), with time in seconds.",
+      "仅适用于流式请求，且输出 Token 数大于 1、时间间隔有效。Token 数按供应商返回的输出用量计，可能包含思考 Token。": "Available for streaming requests with more than one output token and a valid time interval. Output usage comes from the provider and may include reasoning tokens.",
+      "这是网关观测到的估算值，受网络缓冲、批量返回和短回复影响，不代表模型内部的真实生成速度。平均吞吐率则包含请求的全部耗时。": "This gateway-observed estimate is affected by buffering, batched delivery, and short responses. It does not measure internal model generation speed. Average throughput includes the full request duration.",
+      "日志保存天数": "Log retention days",
+      "天": "days",
       "筛选日志、模型、请求或响应": "Filter logs, models, requests, or responses",
       "全部供应商": "All providers",
       "全部模型": "All models",
@@ -325,7 +325,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "AgentRouter is checking which API protocols this endpoint supports.": "AgentRouter is checking which API protocols this endpoint supports.",
       "AgentRouter is checking this provider. Wait for the check to finish before continuing.": "AgentRouter is checking this provider. Wait for the check to finish before continuing.",
       "AgentRouter is sending a limited real model request.": "AgentRouter is sending a limited real model request.",
-      "AgentRouter management service is unavailable. Make sure the AgentRouter app or ccr ui command is running, then retry.": "AgentRouter management service is unavailable. Make sure the AgentRouter app or ccr ui command is running, then retry.",
+      "AgentRouter management service is unavailable. Make sure the AgentRouter app or agentrouter ui command is running, then retry.": "AgentRouter management service is unavailable. Make sure the AgentRouter app or agentrouter ui command is running, then retry.",
       "Connect a provider in four small steps.": "Connect a provider in four small steps.",
       "Create profiles that tell each agent which model and entry mode to use.": "Create profiles that tell each agent which model and entry mode to use.",
       "AgentRouter scanned this computer for Claude Code, Codex, Grok CLI, OpenCode CLI, and ZCode login states. Click Import to add one as a gateway provider.": "AgentRouter scanned this computer for Claude Code, Codex, Grok CLI, OpenCode CLI, and ZCode login states. Click Import to add one as a gateway provider.",
@@ -765,14 +765,10 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       trayBalanceProgressNoData: "暂无可用账户数据，请先为供应商启用账户监控。",
       trayBalanceProgressRequired: "请选择账户和数据后启用余额进度条。",
       trayIcon: "托盘图标",
-      trayIconLayered: "双层结形",
+      trayIconLayered: "AgentRouter",
       trayShowTokenUsage: "菜单栏显示 Token 用量",
       trayShowTokenUsageHint: "关闭后仅显示图标，悬停仍可查看今日用量。",
-      trayIconCyan: "晴岚",
-      trayIconOrange: "暖阳",
       trayIconProgress: "余额进度条",
-      trayIconRandom: "随机",
-      trayIconViolet: "星澜",
       trayComponentAccount: "账户指标",
       trayComponentArc: "弧形",
       trayComponentArea: "面积图",
@@ -1115,7 +1111,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "AgentRouter is checking this provider. Wait for the check to finish before continuing.": "AgentRouter 正在检查这个供应商，请等待检查结束后再继续。",
       "AgentRouter is checking which API protocols this endpoint supports.": "AgentRouter 正在检查这个端点支持哪些 API 协议。",
       "AgentRouter is sending a limited real model request.": "AgentRouter 正在发送一次受限的真实模型请求。",
-      "AgentRouter management service is unavailable. Make sure the AgentRouter app or ccr ui command is running, then retry.": "无法连接 AgentRouter 管理服务。请确认 AgentRouter App 或 ccr ui 命令正在运行，然后重试。",
+      "AgentRouter management service is unavailable. Make sure the AgentRouter app or agentrouter ui command is running, then retry.": "无法连接 AgentRouter 管理服务。请确认 AgentRouter App 或 agentrouter ui 命令正在运行，然后重试。",
       "Detected": "已检测",
       "Detecting protocols": "正在探测协议",
       "Enter API endpoint, API key, and at least one model to enable connectivity check.": "填写 API 地址、API Key 和至少一个模型后，才可检测连通性。",
@@ -2394,7 +2390,7 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "Update failed": "更新失败",
       "Update check complete": "检查完成",
       "Update ready to install": "更新已准备安装",
-      "Updates are only available in packaged builds.": "在线更新仅在打包后的应用中可用。",
+      "No update source is configured.": "尚未配置更新源。",
       "Downloaded update failed code-signature validation. Download the latest installer manually, or try again after the package is re-signed.": "下载的更新包未通过代码签名校验。请手动下载安装最新版本，或等待更新包重新签名后再试。",
       "After deletion, this bot data cannot be recovered.": "删除后数据不可恢复。",
       "This bot is being used by the following agents and cannot be deleted.": "当前 Bot 正在被以下 Agent 使用，不能删除。",

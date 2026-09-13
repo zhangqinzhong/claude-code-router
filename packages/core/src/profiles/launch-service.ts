@@ -437,7 +437,7 @@ async function ensureGatewayConfigRunning(
     if (existingGateway.state === "unavailable") {
       if (!startIfMissing) {
         const reason = existingGateway.reason ? `: ${existingGateway.reason}` : "";
-        throw new ProfileGatewayUnavailableError(`AgentRouter gateway is not running at ${profileGatewayEndpoint(config)}${reason}. Start AgentRouter Desktop or run ccr start before opening ${appName}.`);
+        throw new ProfileGatewayUnavailableError(`AgentRouter gateway is not running at ${profileGatewayEndpoint(config)}${reason}. Start AgentRouter Desktop or run agentrouter start before opening ${appName}.`);
       }
     } else {
       throw new Error(existingGatewayConflictMessage(existingGateway, appName));
@@ -445,7 +445,7 @@ async function ensureGatewayConfigRunning(
   }
 
   if (!startIfMissing) {
-    throw new ProfileGatewayUnavailableError(`AgentRouter gateway is not running at ${profileGatewayEndpoint(config)}. Start AgentRouter Desktop or run ccr start before opening ${appName}.`);
+    throw new ProfileGatewayUnavailableError(`AgentRouter gateway is not running at ${profileGatewayEndpoint(config)}. Start AgentRouter Desktop or run agentrouter start before opening ${appName}.`);
   }
 
   const startedStatus = await gatewayService.start(config);
@@ -515,7 +515,7 @@ async function probeExistingProfileGateway(
         if (!rootSupportsClaudeCodeWif(rootProbe.payload)) {
           return {
             endpoint,
-            message: "The running AgentRouter gateway does not advertise the Claude Code WIF token endpoint. Restart AgentRouter Desktop or run ccr start to use WIF authentication.",
+            message: "The running AgentRouter gateway does not advertise the Claude Code WIF token endpoint. Restart AgentRouter Desktop or run agentrouter start to use WIF authentication.",
             state: "incompatible"
           };
         }
@@ -583,7 +583,8 @@ function isArGatewayRoot(value: unknown): boolean {
   if (!isRecord(value)) {
     return false;
   }
-  return value.name === "claude-code-router" || value.plugin === "claude-code-router";
+  return value.name === "agentrouter" || value.plugin === "agentrouter" ||
+      value.name === "claude-code-router" || value.plugin === "claude-code-router";
 }
 
 function isArGatewayHealth(value: unknown): boolean {
@@ -747,10 +748,10 @@ function unquoteShellValue(value: string): string {
 function existingGatewayConflictMessage(probe: ExistingProfileGatewayProbe, appName: string): string {
   if (probe.state === "unauthorized") {
     const details = probe.message ? ` ${probe.message}` : "";
-    return `AgentRouter gateway is already running at ${probe.endpoint}, but it does not accept the API key for ${appName}.${details} Restart AgentRouter Desktop or run ccr start to refresh the gateway before opening this profile.`;
+    return `AgentRouter gateway is already running at ${probe.endpoint}, but it does not accept the API key for ${appName}.${details} Restart AgentRouter Desktop or run agentrouter start to refresh the gateway before opening this profile.`;
   }
   if (probe.state === "unusable") {
-    return `AgentRouter gateway is already running at ${probe.endpoint}, but it cannot serve ${appName} right now (HTTP ${probe.status}). Restart AgentRouter Desktop or run ccr start to refresh the gateway before opening this profile.`;
+    return `AgentRouter gateway is already running at ${probe.endpoint}, but it cannot serve ${appName} right now (HTTP ${probe.status}). Restart AgentRouter Desktop or run agentrouter start to refresh the gateway before opening this profile.`;
   }
   if (probe.state === "incompatible") {
     return `AgentRouter gateway is already running at ${probe.endpoint}, but it is not compatible with ${appName}. ${probe.message}`;
@@ -1930,7 +1931,7 @@ function persistArBinOnPath(binDir: string): void {
     }
     ensurePosixShellPath(binDir);
   } catch (error) {
-    console.warn(`[profile] Failed to persist ccr PATH: ${formatError(error)}`);
+    console.warn(`[profile] Failed to persist AgentRouter PATH: ${formatError(error)}`);
   }
 }
 

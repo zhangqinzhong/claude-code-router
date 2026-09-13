@@ -2,7 +2,8 @@ import { closeSync, fstatSync, openSync, readSync, realpathSync } from "node:fs"
 import { resolve as pathResolve, sep as pathSep } from "node:path";
 import { StringDecoder } from "node:string_decoder";
 import { parentPort, workerData } from "node:worker_threads";
-import { RAW_TRACE_SPOOL_DIR } from "@agentrouter/core/config/constants";
+import { loadPersistedAppConfig } from "@agentrouter/core/config/config-repository";
+import { RAW_TRACE_SPOOL_DIR, REQUEST_LOGS_DB_FILE } from "@agentrouter/core/config/constants";
 import {
   RequestLogStore,
   type RequestLogRawTraceFile,
@@ -36,14 +37,34 @@ type WorkerMessage = {
 };
 
 const configuration = workerData as WorkerConfiguration;
-const store = new RequestLogStore(configuration.dbFile);
+const store = new RequestLogStore(configuration.dbFile, undefined, configuration.mode === "writer");
 let chain = Promise.resolve();
 let pricingBackfillActive = false;
 let pricingRefreshPromise: Promise<void> | undefined;
 let queryRevision = -1;
 let shuttingDown = false;
 
-void store.initialize().then(() => {
+async function maintainRetention(): Promise<void> {
+  if (configuration.mode !== "writer") return;
+  // Isolated runtime/test databases must never depend on the user's configuration.
+  const config = configuration.dbFile === REQUEST_LOGS_DB_FILE
+    ? await loadPersistedAppConfig() as { observability?: { retentionDays?: number } } | undefined
+    : undefined;
+  await store.maintainRetention(config?.observability?.retentionDays ?? 1);
+}
+
+let retentionTimer: NodeJS.Timeout | undefined;
+void maintainRetention().then(() => store.initialize()).then(() => {
+  if (configuration.mode === "writer") {
+    retentionTimer = setInterval(() => {
+      chain = chain.then(async () => {
+        if (shuttingDown) return;
+        await maintainRetention();
+        parentPort?.postMessage({ type: "maintenance", updated: 1 });
+      }).catch((error) => console.warn(`[request-log] Retention cleanup failed: ${formatError(error)}`));
+    }, 60_000);
+    retentionTimer.unref();
+  }
   parentPort?.postMessage({ type: "ready" });
   parentPort?.on("message", (message: WorkerMessage) => {
     chain = chain.then(() => handleMessage(message)).catch((error) => {
@@ -97,6 +118,7 @@ async function handleMessage(message: WorkerMessage): Promise<void> {
       break;
     case "shutdown":
       shuttingDown = true;
+      if (retentionTimer) clearInterval(retentionTimer);
       await store.close();
       result = true;
       break;

@@ -1,4 +1,5 @@
-import { memo } from "react";
+import { outputRateFromTpot } from "@/lib/token-rate";
+import { memo, useId } from "react";
 import { Maximize2, Route, X } from "lucide-react";
 import type { RequestRouteTrace, RequestRouteTraceChange, RequestRouteTraceHop } from "@agentrouter/core/contracts/app";
 import {
@@ -25,7 +26,7 @@ const logJsonAutoExpandEntryLimit = 60;
 const logJsonContainerPreviewLimit = 80;
 const logJsonAutoExpandTextLimit = 160 * 1024;
 const logBodyWorkerFilterDebounceMs = 180;
-type LogTableColumnId = "time" | "status" | "stream" | "model" | "credential" | "tokens" | "duration";
+type LogTableColumnId = "time" | "status" | "stream" | "model" | "credential" | "tokens" | "firstToken" | "rate" | "throughput" | "duration";
 type LogTableColumn = {
   id: LogTableColumnId;
   minWidth: number;
@@ -42,6 +43,9 @@ const baseLogTableColumns: LogTableColumn[] = [
   { id: "stream", minWidth: 108 },
   { id: "model", minWidth: 180 },
   { id: "tokens", minWidth: 140 },
+  { id: "firstToken", minWidth: 92 },
+  { id: "rate", minWidth: 128 },
+  { id: "throughput", minWidth: 110 },
   { id: "duration", minWidth: 92 }
 ];
 const credentialLogTableColumn: LogTableColumn = { id: "credential", minWidth: 128 };
@@ -385,8 +389,8 @@ export function LogsView({
     page.items.some(logHasCredentialInfo);
   const visibleLogColumns = useMemo(() => getLogTableColumns(hasAnyCredentialInfo), [hasAnyCredentialInfo]);
   const logTableGridClass = hasAnyCredentialInfo
-    ? "grid-cols-[minmax(0,0.8fr)_minmax(92px,0.38fr)_minmax(98px,0.4fr)_minmax(0,0.78fr)_minmax(120px,0.42fr)_minmax(0,0.68fr)_82px]"
-    : "grid-cols-[minmax(0,0.8fr)_minmax(92px,0.38fr)_minmax(98px,0.4fr)_minmax(0,0.9fr)_minmax(0,0.74fr)_82px]";
+    ? "grid-cols-[minmax(0,0.8fr)_minmax(92px,0.38fr)_minmax(98px,0.4fr)_minmax(0,0.78fr)_minmax(120px,0.42fr)_minmax(0,0.68fr)_92px_128px_110px_82px]"
+    : "grid-cols-[minmax(0,0.8fr)_minmax(92px,0.38fr)_minmax(98px,0.4fr)_minmax(0,0.9fr)_minmax(0,0.74fr)_92px_128px_110px_82px]";
   const logTableGridStyle = useMemo(
     () => createLogTableGridStyle(visibleLogColumns, logColumnWidths),
     [logColumnWidths, visibleLogColumns]
@@ -607,6 +611,7 @@ export function LogsView({
                 {visibleLogColumns.map((column, index) => (
                   <NetworkHeaderCell
                     key={column.id}
+                    help={column.id === "rate" ? <OutputRateHelp /> : undefined}
                     label={logTableColumnLabel(column.id, t)}
                     onResizeStart={index < visibleLogColumns.length - 1 ? (event) => startLogColumnResize(index, event) : undefined}
                     resizeLabel={t("Resize column width")}
@@ -784,6 +789,12 @@ function logTableColumnLabel(columnId: LogTableColumnId, t: (value: string) => s
       return t("Credential");
     case "tokens":
       return t("Token");
+    case "firstToken":
+      return t("首 Token");
+    case "rate":
+      return t("输出速率");
+    case "throughput":
+      return t("平均吞吐率");
     case "duration":
       return t("持续时间");
   }
@@ -852,6 +863,9 @@ function LogMobileCard({
             <div className="mt-2 grid grid-cols-2 gap-2 text-[11px]">
               <LogCompactMetric label={t("Token")} value={tokenSummary} />
               <LogCompactMetric label={t("持续时间")} value={formatDuration(item.durationMs)} />
+              <LogCompactMetric label={t("首 Token")} value={formatLogFirstToken(item)} />
+              <LogCompactMetric label={t("输出速率")} value={formatLogOutputRate(item, numberLocale)} />
+              <LogCompactMetric label={t("平均吞吐率")} value={formatLogAverageThroughput(item, numberLocale)} />
               {hasCredentialInfo ? <LogCompactMetric label={t("Credential")} value={logCredentialCellLabel(item)} /> : null}
               <LogCompactMetric label={t("Provider")} value={item.provider || "-"} />
             </div>
@@ -932,12 +946,30 @@ const LogRow = memo(function LogRow({
         <LogModelRouteCell entry={item} />
         {hasCredentialInfo ? <LogCredentialCell entry={item} /> : null}
         <div className="network-row-secondary truncate px-2" title={tokenSummary}>{tokenSummary}</div>
+        <div className="network-row-secondary truncate px-2 tabular-nums">{formatLogFirstToken(item)}</div>
+        <div className="network-row-secondary truncate px-2 tabular-nums">{formatLogOutputRate(item, numberLocale)}</div>
+        <div className="network-row-secondary truncate px-2 tabular-nums">{formatLogAverageThroughput(item, numberLocale)}</div>
         <div className="network-row-secondary truncate px-2">{formatDuration(item.durationMs)}</div>
       </button>
       {expanded ? <LogExpandedDetails detailError={detailError} detailLoading={detailLoading} entry={item} /> : null}
     </div>
   );
 });
+
+function formatLogFirstToken(entry: RequestLogEntry): string {
+  return entry.timeToFirstTokenMs === undefined ? "-" : formatDuration(entry.timeToFirstTokenMs);
+}
+
+function formatLogOutputRate(entry: RequestLogEntry, numberLocale: Parameters<typeof formatTokenRate>[1]): string {
+  const rate = outputRateFromTpot(entry);
+  return rate === undefined ? "-" : `${formatTokenRate(rate, numberLocale)} token/s`;
+}
+
+function formatLogAverageThroughput(entry: RequestLogEntry, numberLocale: Parameters<typeof formatTokenRate>[1]): string {
+  return entry.outputTokens > 0 && Number.isFinite(entry.durationMs) && entry.durationMs > 0
+    ? `${formatTokenRate(entry.outputTokens / (entry.durationMs / 1_000), numberLocale)} token/s`
+    : "-";
+}
 
 export function LogExpandedDetails({
   detailError,
@@ -951,9 +983,6 @@ export function LogExpandedDetails({
   const t = useAppText();
   const numberLocale = useAppNumberLocale();
   const hasCredentialInfo = logHasCredentialInfo(entry);
-  const outputRate = entry.outputTokens > 0 && entry.streamOutputDurationMs && entry.streamOutputDurationMs > 0
-    ? `${formatTokenRate(entry.outputTokens / (entry.streamOutputDurationMs / 1_000), numberLocale)} token/s`
-    : "-";
 
   return (
     <div className="network-detail border-b">
@@ -968,10 +997,11 @@ export function LogExpandedDetails({
           {entry.method} {entry.path}
         </span>
       </div>
-      <div className={cn("network-body-meta grid grid-cols-2 gap-y-2 border-b px-3 py-2 text-[12px] sm:grid-cols-4", hasCredentialInfo ? "lg:grid-cols-12" : "lg:grid-cols-9")}>
+      <div className={cn("network-body-meta grid grid-cols-2 gap-y-2 border-b px-3 py-2 text-[12px] sm:grid-cols-4", hasCredentialInfo ? "lg:grid-cols-12" : "lg:grid-cols-10")}>
         <LogMetric label={t("持续时间")} value={formatDuration(entry.durationMs)} />
-        <LogMetric label={t("首 Token")} value={entry.timeToFirstTokenMs === undefined ? "-" : formatDuration(entry.timeToFirstTokenMs)} />
-        <LogMetric label={t("输出速率")} value={outputRate} />
+        <LogMetric label={t("首 Token")} value={formatLogFirstToken(entry)} />
+        <LogMetric label={t("输出速率")} value={formatLogOutputRate(entry, numberLocale)} />
+        <LogMetric label={t("平均吞吐率")} value={formatLogAverageThroughput(entry, numberLocale)} />
         <LogMetric label={t("Stream")} value={entry.isStream ? t("Streaming") : t("Non-streaming")} />
         <LogMetric label={t("Request ID")} value={entry.requestId || "-"} />
         <LogMetric label={t("Client")} value={entry.client || "-"} />
@@ -2636,7 +2666,55 @@ function JsonPrimitiveValue({ value }: { value: unknown }) {
   return <span>{String(value)}</span>;
 }
 
+function OutputRateHelp() {
+  const t = useAppText();
+  const id = useId();
+  const trigger = useRef<HTMLButtonElement>(null);
+  const content = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState<{ left: number; top: number }>();
+  useEffect(() => {
+    if (!position) return;
+    const closeOutside = (event: PointerEvent) => {
+      if (!trigger.current?.contains(event.target as Node) && !content.current?.contains(event.target as Node)) setPosition(undefined);
+    };
+    const closeOnEscape = (event: KeyboardEvent) => { if (event.key === "Escape") { setPosition(undefined); trigger.current?.focus(); } };
+    const close = () => setPosition(undefined);
+    document.addEventListener("pointerdown", closeOutside);
+    document.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("resize", close);
+    window.addEventListener("scroll", close, true);
+    return () => {
+      document.removeEventListener("pointerdown", closeOutside);
+      document.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("resize", close);
+      window.removeEventListener("scroll", close, true);
+    };
+  }, [position]);
+  return <>
+    <button
+      ref={trigger}
+      type="button"
+      aria-label={t("输出速率说明")}
+      aria-expanded={Boolean(position)}
+      aria-controls={position ? id : undefined}
+      className="ml-1.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-300 bg-white text-[11px] font-bold leading-none text-slate-700 shadow-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      onClick={() => {
+        if (position) { setPosition(undefined); return; }
+        const rect = trigger.current?.getBoundingClientRect();
+        if (rect) setPosition({ left: Math.max(12, Math.min(rect.left, window.innerWidth - 332)), top: rect.bottom + 8 });
+      }}
+    >?</button>
+    <TooltipPortal ref={content} open={Boolean(position)} id={id} role="note" className="pointer-events-auto w-[320px] max-w-[calc(100vw-24px)] p-3 text-[12px] leading-5" style={position}>
+      <p className="font-semibold">{t("输出速率（TPOT 估算）")}</p>
+      <p className="mt-1">{t("公式：(输出 Token 数 − 1) ÷ (总耗时 − 首 Token 延迟)，时间单位为秒。")}</p>
+      <p className="mt-2">{t("仅适用于流式请求，且输出 Token 数大于 1、时间间隔有效。Token 数按供应商返回的输出用量计，可能包含思考 Token。")}</p>
+      <p className="mt-2">{t("这是网关观测到的估算值，受网络缓冲、批量返回和短回复影响，不代表模型内部的真实生成速度。平均吞吐率则包含请求的全部耗时。")}</p>
+    </TooltipPortal>
+  </>;
+}
+
 function NetworkHeaderCell({
+  help,
   label,
   onResizeStart,
   resizeLabel
@@ -2644,10 +2722,12 @@ function NetworkHeaderCell({
   label: string;
   onResizeStart?: (event: ReactPointerEvent<HTMLButtonElement>) => void;
   resizeLabel?: string;
+  help?: React.ReactNode;
 }) {
   return (
     <div className={cn("network-header-cell relative flex h-full min-w-0 items-center border-l px-2 first:border-l-0", onResizeStart && "pr-3")}>
       <span className="min-w-0 truncate">{label}</span>
+      {help}
       {onResizeStart ? (
         <button
           aria-label={resizeLabel ?? label}

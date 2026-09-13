@@ -4,11 +4,11 @@ import {
   CardHeader, Check, CircleAlert, clampNumber, cn, createRouteModelOptions, createRoutingRewriteDraftRow,
   Dialog, DialogBody, DialogContent, DialogFooter, DialogHeader, DialogTitle,
   disclosureSpringTransition, Field, formatRouterRuleCondition, formatRouterRuleTarget, GatewayProviderConfig, Input,
-  AppI18nContext, appCopy, ExternalLink, FolderOpen, motion, normalizeRouteScriptSampleRequest, normalizeRouterFallbackConfig, Pencil, Plus, Route, RouterFallbackConfig,
+  FolderOpen, motion, normalizeRouteScriptSampleRequest, normalizeRouterFallbackConfig, Pencil, Plus, Route, RouterFallbackConfig,
   RouterFallbackMode, routerConditionSourceOptions, routerFallbackModeOptions, RouterRule, routerRewriteOperationOptions, routerRuleOperatorOptions,
   routerRuleTypeOptions,
   RouteTargetControl, routingRuleRowMatchesQuery, Search, SelectControl, Toggle, translateOptions,
-  Textarea, Trash2, uniqueStrings, useAppText, useContext, useMemo, useRef, useState, X
+  Textarea, Trash2, uniqueStrings, useAppText, useMemo, useRef, useState, X
 } from "../shared/index";
 import { Tooltip } from "@/components/ui/tooltip";
 import {
@@ -190,13 +190,6 @@ export function RoutingView({
   );
 }
 
-function openExternalUrl(url: string) {
-  if (window.agentrouter?.openExternal) {
-    void window.agentrouter.openExternal(url).catch(() => undefined);
-    return;
-  }
-  window.open(url, "_blank", "noopener,noreferrer");
-}
 
 export function RouterFallbackControl({
   className,
@@ -391,7 +384,6 @@ export function AddRoutingRuleDialog({
   providers: GatewayProviderConfig[];
 }) {
   const t = useAppText();
-  const copy = useContext(AppI18nContext);
   const conditionSourceOptions = translateOptions(routerConditionSourceOptions, t);
   const rewriteOperationOptions = translateOptions(routerRewriteOperationOptions, t);
   const ruleTypeOptions = translateOptions(
@@ -455,9 +447,9 @@ export function AddRoutingRuleDialog({
     setScriptBusy(action);
     setScriptMessage(undefined);
     try {
-      const ccr = window.agentrouter;
-      if (!ccr) throw new Error(t("Gateway API is unavailable"));
-      const result = await ccr.validateRouteScript({ script: scriptFromDraft() });
+      const gatewayApi = window.agentrouter;
+      if (!gatewayApi) throw new Error(t("Gateway API is unavailable"));
+      const result = await gatewayApi.validateRouteScript({ script: scriptFromDraft() });
       const message = result.ok
         ? t("Script validation passed")
         : result.diagnostics.map((diagnostic) => diagnostic.message).join("\n");
@@ -476,11 +468,11 @@ export function AddRoutingRuleDialog({
     setScriptBusy("test");
     setScriptMessage(undefined);
     try {
-      const ccr = window.agentrouter;
-      if (!ccr) throw new Error(t("Gateway API is unavailable"));
+      const gatewayApi = window.agentrouter;
+      if (!gatewayApi) throw new Error(t("Gateway API is unavailable"));
       const parsed = JSON.parse(scriptSample) as unknown;
       const request = normalizeRouteScriptSampleRequest(parsed);
-      const result = await ccr.testRouteScript({ request, script: scriptFromDraft() });
+      const result = await gatewayApi.testRouteScript({ request, script: scriptFromDraft() });
       const details = result.ok
         ? `${result.matched ? t("Matched") : t("Not matched")} · ${Math.round(result.durationMs ?? 0)}ms${result.output === undefined ? "" : `\n${JSON.stringify(result.output, null, 2)}`}`
         : result.diagnostics.map((diagnostic) => diagnostic.message).join("\n");
@@ -559,19 +551,6 @@ export function AddRoutingRuleDialog({
                     <span className="min-w-0 truncate text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
                       {t("Node.js route script file")}
                     </span>
-                    <a
-                      className="inline-flex shrink-0 items-center gap-1 text-[11px] font-medium text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
-                      href={routeScriptDocsUrl(copy === appCopy.zh ? "zh" : "en")}
-                      onClick={(event) => {
-                        event.preventDefault();
-                        openExternalUrl(routeScriptDocsUrl(copy === appCopy.zh ? "zh" : "en"));
-                      }}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      {t("Docs")}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
                   </div>
                   <div className="flex min-w-0 gap-2">
                     <Input
@@ -724,15 +703,4 @@ export function AddRoutingRuleDialog({
       </DialogContent>
     </Dialog>
   );
-}
-
-function routeScriptDocsUrl(language: "en" | "zh"): string {
-  // The docs live in this repository; there is no standalone documentation site.
-  const path = language === "zh"
-    ? "docs/src/content/docs/zh/configuration/routing.md"
-    : "docs/src/content/docs/en/configuration/routing.md";
-  const section = language === "zh"
-    ? "#nodejs-%E8%84%9A%E6%9C%AC%E8%A7%84%E5%88%99"
-    : "#nodejs-script-rules";
-  return `https://github.com/zhangqinzhong/claude-code-router/blob/main/${path}${section}`;
 }

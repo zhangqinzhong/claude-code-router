@@ -218,7 +218,8 @@ function isArGatewayHealth(value: unknown): boolean {
 
 function isArGatewayRoot(value: unknown): boolean {
   return isRecord(value) &&
-    (value.name === "claude-code-router" ||
+    (value.name === "agentrouter" || value.plugin === "agentrouter" ||
+      value.name === "claude-code-router" ||
       value.plugin === "claude-code-router" ||
       (value.core === "next-ai-gateway" && Array.isArray(value.endpoints)));
 }

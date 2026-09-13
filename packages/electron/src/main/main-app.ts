@@ -55,7 +55,7 @@ function startPrimaryInstance(): void {
     try {
       arLauncherPreparation = prepareArCliLauncherRuntime();
     } catch (error) {
-      console.error(`Failed to prepare ccr CLI runtime: ${formatError(error)}`);
+      console.error(`Failed to prepare AgentRouter CLI runtime: ${formatError(error)}`);
     }
     setupApplicationMenu();
     const mainWindow = windowsManager.createMainWindow();
@@ -65,7 +65,7 @@ function startPrimaryInstance(): void {
           try {
             persistPreparedArCliPath(arLauncherPreparation);
           } catch (error) {
-            console.error(`Failed to persist ccr CLI PATH: ${formatError(error)}`);
+            console.error(`Failed to persist AgentRouter CLI PATH: ${formatError(error)}`);
           }
         }, 0);
       });
@@ -222,7 +222,7 @@ function startConfiguredServices(reason: string): Promise<void> {
         try {
           ensureArCliLauncher(config, { persistPath: false });
         } catch (error) {
-          console.error(`Failed to install ccr CLI launcher during ${reason}: ${formatError(error)}`);
+          console.error(`Failed to install AgentRouter CLI launcher during ${reason}: ${formatError(error)}`);
         }
         try {
           syncLaunchAtLogin(config);

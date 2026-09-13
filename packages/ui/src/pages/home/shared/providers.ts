@@ -561,8 +561,8 @@ export type ProviderDeepLinkCatalogModelsResolution = {
 };
 
 export async function resolveProviderDeepLinkCatalogModels(payload: ProviderDeepLinkPayload): Promise<ProviderDeepLinkCatalogModelsResolution> {
-  const ccr = window.agentrouter;
-  if (!ccr?.getProviderCatalogModels) {
+  const gatewayApi = window.agentrouter;
+  if (!gatewayApi?.getProviderCatalogModels) {
     return {
       models: []
     };
@@ -570,7 +570,7 @@ export async function resolveProviderDeepLinkCatalogModels(payload: ProviderDeep
 
   const preset = resolveProviderDeepLinkPreset(payload);
   try {
-    const result = await ccr.getProviderCatalogModels({
+    const result = await gatewayApi.getProviderCatalogModels({
       baseUrl: payload.baseUrl,
       name: payload.name,
       providerPresetId: preset?.id
@@ -606,13 +606,13 @@ export async function resolveProviderDeepLinkIcon(payload: ProviderDeepLinkPaylo
     };
   }
 
-  const ccr = window.agentrouter;
-  if (!ccr?.detectProviderIcon) {
+  const gatewayApi = window.agentrouter;
+  if (!gatewayApi?.detectProviderIcon) {
     return {};
   }
 
   try {
-    const result = await ccr.detectProviderIcon({ baseUrl: payload.baseUrl });
+    const result = await gatewayApi.detectProviderIcon({ baseUrl: payload.baseUrl });
     const detectedIcon = result.icon?.trim();
     return {
       displayIcon: detectedIcon || undefined,

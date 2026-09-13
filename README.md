@@ -39,14 +39,13 @@
 Connect Claude Code, Claude Design, Codex, Grok CLI, Kimi CLI, Kilo Code, OpenCode, Pi, ZCode, WorkBuddy, and compatible API clients to the providers you choose—then route, fail over, extend, and observe every request from one app.
 
 <p>
-  <a href="https://github.com/zhangqinzhong/claude-code-router/releases"><img alt="Download Desktop" src="https://img.shields.io/badge/Download-Desktop_App-2563EB?style=for-the-badge&logo=github&logoColor=white" /></a>
   <a href="#quick-start"><img alt="Quick Start" src="https://img.shields.io/badge/Get_Started-Quick_Start-16A34A?style=for-the-badge&logo=rocket&logoColor=white" /></a>
 </p>
 
 <p>
   <a href="README_zh.md"><img alt="Chinese README" src="https://img.shields.io/badge/%F0%9F%87%A8%F0%9F%87%B3-%E4%B8%AD%E6%96%87%E7%89%88-ff0000?style=flat" /></a>
   <a href="https://discord.gg/rdftVMaUcS"><img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white" /></a>
-  <a href="https://github.com/zhangqinzhong/claude-code-router/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/zhangqinzhong/claude-code-router" /></a>
+  <a href="LICENSE">MIT License</a>
 </p>
 
 <br />
@@ -159,47 +158,7 @@ AgentRouter supports OpenAI Chat / Responses, Anthropic Messages, Gemini Generat
 
 ### Desktop app (recommended)
 
-1. <details open>
-   <summary><strong>Download AgentRouter for macOS, Windows, or Linux, then launch the app.</strong></summary>
-
-   <div align="center">
-
-   <table width="100%">
-     <tr>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22.exe">
-           <img src="/docs/public/platform-icons/windows.png" width="44" height="44" alt="Windows logo" />
-           <br />
-           <strong>Windows</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22.AppImage">
-           <img src="/docs/public/platform-icons/linux.png" width="44" height="44" alt="Linux logo" />
-           <br />
-           <strong>Linux</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22-mac-Apple-Silicon-arm64.dmg">
-           <img src="/docs/public/platform-icons/macos.png" width="44" height="44" alt="macOS logo" />
-           <br />
-           <strong>macOS (Apple Silicon)</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22-mac-Intel-x64.dmg">
-           <img src="/docs/public/platform-icons/macos.png" width="44" height="44" alt="macOS logo" />
-           <br />
-           <strong>macOS (Intel)</strong>
-         </a>
-       </td>
-     </tr>
-   </table>
-
-   </div>
-
-   </details>
+1. Build a local installer with `npm run build:app:mac:local` (macOS) or `npm run build:app:win:local` (Windows), then install and open AgentRouter.
 
 2. Open **Providers → Add Provider**. Choose a built-in preset or a custom endpoint, enter the API key, select the protocol and models, then save.
 3. Open **Server** and click **Start**. The local model gateway listens on `http://127.0.0.1:3456` by default.

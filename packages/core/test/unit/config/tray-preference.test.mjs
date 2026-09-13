@@ -38,13 +38,13 @@ test("layered icon and usage visibility survive save and reload", async () => {
   }
 });
 
-test("legacy icon selections remain unchanged and missing visibility defaults off", async () => {
+test("legacy icon selections migrate to AgentRouter and missing visibility defaults off", async () => {
   const current = await loadAppConfig();
   const { trayShowTokenUsage: _removed, ...legacy } = current;
   for (const trayIcon of ["random", "violet", "orange", "cyan"]) {
     await replacePersistedAppConfig({ ...legacy, trayIcon });
     const loaded = await loadAppConfig();
-    assert.equal(loaded.trayIcon, trayIcon);
+    assert.equal(loaded.trayIcon, "layered");
     assert.equal(loaded.trayShowTokenUsage, false);
   }
 });
@@ -59,7 +59,7 @@ test("invalid tray preferences safely normalize without treating strings as bool
   }
 });
 
-test("balance progress selection coexists with the usage visibility preference", async () => {
+test("retired balance icon migrates without changing usage visibility", async () => {
   const current = await loadAppConfig();
   const binding = { provider: "test-provider", meterId: "balance" };
   const loaded = await saveAppConfig({
@@ -68,7 +68,7 @@ test("balance progress selection coexists with the usage visibility preference",
     trayIcon: "progress",
     trayShowTokenUsage: true
   });
-  assert.equal(loaded.trayIcon, "progress");
+  assert.equal(loaded.trayIcon, "layered");
   assert.equal(loaded.trayShowTokenUsage, true);
   assert.deepEqual(loaded.trayBalanceProgress, binding);
 });

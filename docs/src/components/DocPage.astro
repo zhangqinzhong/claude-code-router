@@ -4,7 +4,6 @@ import { docsContent, type DocPageKey, type Locale } from "../i18n/content";
 import {
   docModule,
   docSections,
-  getPage,
   getPrevNext,
   getSection,
   resolveSidebarGroups,
@@ -158,14 +157,11 @@ const tocItems = tocHeadings.map((heading) => ({
   depth: heading.depth,
 }));
 const currentPageKey = activeSidebarItemProp ?? pageKey;
-const currentPage = getPage(currentPageKey);
 const { prev: prevPageDef, next: nextPageDef } = getPrevNext(currentPageKey);
 const toPageNavLink = (page?: { label: Record<Locale, string>; path: Record<Locale, string> }) =>
   page ? { label: page.label[locale], href: page.path[locale] } : undefined;
 const prevPage = toPageNavLink(prevPageDef);
 const nextPage = toPageNavLink(nextPageDef);
-const editSource = (currentPage?.source ?? sectionIndexSource(section))[locale];
-const editUrl = `https://github.com/zhangqinzhong/claude-code-router/edit/main/docs/src/content/docs/${locale}/${editSource}`;
 const isHome = pageKey === "documentation" && isSectionDoc;
 const pageMarkdown = doc.rawContent();
 ---
@@ -188,7 +184,6 @@ const pageMarkdown = doc.rawContent();
   tocItems={tocItems}
   prevPage={prevPage}
   nextPage={nextPage}
-  editUrl={editUrl}
   ui={content.ui}
 >
   <article class="doc-article">

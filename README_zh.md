@@ -46,7 +46,7 @@
 <p>
   <a href="README.md"><img alt="English README" src="https://img.shields.io/badge/%F0%9F%87%AC%F0%9F%87%A7-English-000aff?style=flat" /></a>
   <a href="https://discord.gg/rdftVMaUcS"><img alt="Discord" src="https://img.shields.io/badge/Discord-%235865F2.svg?&logo=discord&logoColor=white" /></a>
-  <a href="https://github.com/zhangqinzhong/claude-code-router/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/zhangqinzhong/claude-code-router" /></a>
+  <a href="LICENSE">MIT License</a>
 </p>
 
 <br />
@@ -159,47 +159,7 @@ AgentRouter 支持 OpenAI Chat / Responses、Anthropic Messages、Gemini Generat
 
 ### 桌面端（推荐）
 
-1. <details open>
-   <summary><strong>下载 AgentRouter，选择 macOS、Windows 或 Linux 版本并启动应用。</strong></summary>
-
-   <div align="center">
-
-   <table width="100%">
-     <tr>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22.exe">
-           <img src="/docs/public/platform-icons/windows.png" width="44" height="44" alt="Windows 图标" />
-           <br />
-           <strong>Windows</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22.AppImage">
-           <img src="/docs/public/platform-icons/linux.png" width="44" height="44" alt="Linux 图标" />
-           <br />
-           <strong>Linux</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22-mac-Apple-Silicon-arm64.dmg">
-           <img src="/docs/public/platform-icons/macos.png" width="44" height="44" alt="macOS 图标" />
-           <br />
-           <strong>macOS (Apple Silicon)</strong>
-         </a>
-       </td>
-       <td align="center" width="330">
-         <a href="https://github.com/zhangqinzhong/claude-code-router/releases/download/v3.0.22/AgentRouter_3.0.22-mac-Intel-x64.dmg">
-           <img src="/docs/public/platform-icons/macos.png" width="44" height="44" alt="macOS 图标" />
-           <br />
-           <strong>macOS (Intel)</strong>
-         </a>
-       </td>
-     </tr>
-   </table>
-
-   </div>
-
-   </details>
+1. 使用 `npm run build:app:mac:local`（macOS）或 `npm run build:app:win:local`（Windows）构建本地安装包，然后安装并启动 AgentRouter。
 
 2. 打开 **供应商 → 添加供应商**。选择内置预设或自定义端点，填写 API Key，选择协议与模型，然后保存。
 3. 打开 **服务** 并点击 **启动**。本地模型网关默认监听 `http://127.0.0.1:3456`。

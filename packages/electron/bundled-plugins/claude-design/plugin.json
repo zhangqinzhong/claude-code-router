@@ -22,7 +22,7 @@
       "name": "Claude Design",
       "description": "Open Claude Design in a dedicated AgentRouter Electron window.",
       "icon": "palette",
-      "url": "https://claude-design.ccrdesk.top/design"
+      "url": "https://claude.ai/design"
     }
   ]
 }

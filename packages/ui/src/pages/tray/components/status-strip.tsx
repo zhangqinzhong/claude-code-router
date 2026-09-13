@@ -1,5 +1,6 @@
+import trayLayeredIconUrl from "@/assets/tray-layered.png";
 import {
-  appLogoUrl, formatCompactNumber, Power, useTrayText
+  formatCompactNumber, Power, useTrayText
 } from "../shared";
 
 export function TrayStatusStrip({ totalTokens }: { totalTokens: number }) {
@@ -39,7 +40,7 @@ function TrayWindowHeaderIcon() {
       aria-hidden="true"
       className="tray-header-icon flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-[8px] border"
     >
-      <img alt="" className="h-[72%] w-[72%] object-contain" src={appLogoUrl} />
+      <span className="h-full w-full bg-foreground" style={{ maskImage: `url(${trayLayeredIconUrl})`, maskPosition: "center", maskRepeat: "no-repeat", maskSize: "contain" }} />
     </span>
   );
 }
