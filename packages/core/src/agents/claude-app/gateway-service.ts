@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomBytes, randomUUID } from "node:crypto";
 import { resolveRuntimeAppPath } from "@agentrouter/core/runtime/app-paths";
 import { saveAppConfig } from "@agentrouter/core/config/config";
+import { updatePersistedApiKeys } from "@agentrouter/core/config/config-repository";
 import { CONFIGDIR } from "@agentrouter/core/config/constants";
 import {
   buildClaudeAppGatewayInferenceModels,
@@ -106,6 +107,13 @@ export async function syncClaudeAppGatewayConfig(config: AppConfig): Promise<Cla
       configChanged: false,
       result: applied.result
     };
+  }
+
+  if (applied.result.apiKeyGenerated) {
+    const generatedKey = applied.config.APIKEYS.find((key) => key.key === applied.config.APIKEY);
+    if (generatedKey) {
+      await updatePersistedApiKeys((current) => [...current, generatedKey]);
+    }
   }
 
   return {

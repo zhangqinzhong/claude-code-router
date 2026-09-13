@@ -93,7 +93,7 @@ test("Pi profile config writes catalog token limits for known models", () => {
     const unknown = models.find((model) => model.id === "DeepSeek/unknown-model");
 
     assert.equal(deepseek.contextWindow, 1_050_000);
-    assert.equal(deepseek.maxTokens, 393_216);
+    assert.equal(deepseek.maxTokens, 1_048_576);
     assert.deepEqual(unknown, {
       id: "DeepSeek/unknown-model",
       name: "DeepSeek/unknown-model"
@@ -103,7 +103,7 @@ test("Pi profile config writes catalog token limits for known models", () => {
   }
 });
 
-test("Pi profile config writes 1M catalog limits for GLM 5.3", () => {
+test("Pi profile config writes the updated catalog limits for GLM 5.3", () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "ar-pi-profile-glm-"));
   try {
     const config = createDefaultAppConfig();
@@ -134,8 +134,8 @@ test("Pi profile config writes 1M catalog limits for GLM 5.3", () => {
     const models = payload.providers["ar-pi"].models;
     const glm = models.find((model) => model.id === "Zhipu AI (China) - Coding Plan/glm-5.3");
 
-    assert.equal(glm?.contextWindow, 1_048_576);
-    assert.equal(glm?.maxTokens, 131_072);
+    assert.equal(glm?.contextWindow, 1_310_720);
+    assert.equal(glm?.maxTokens, 1_048_576);
   } finally {
     rmSync(root, { force: true, recursive: true });
   }

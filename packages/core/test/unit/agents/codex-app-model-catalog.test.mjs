@@ -83,10 +83,21 @@ test("ChatGPT model catalog write includes patch bridge capabilities", () => {
     const model = catalog.models.find((item) => item.slug === "DeepSeek/deepseek-v4-flash");
     assert.ok(model);
     assert.equal(model.apply_patch_tool_type, "freeform");
+    assert.match(model.base_instructions, /commentary/);
 
     const second = writeCodexCompatibleAppModelCatalog(configDir, profile, config);
     assert.equal(second.changed, false);
     assert.equal(second.file, result.file);
+
+    // Existing profiles contain the old one-line placeholder. Launching again
+    // must refresh the catalog consumed by Codex, as well as new profiles.
+    model.base_instructions = "You are Codex, a coding agent.";
+    writeFileSync(result.file, `${JSON.stringify(catalog, null, 2)}\n`);
+    const refreshed = writeCodexCompatibleAppModelCatalog(configDir, profile, config);
+    assert.equal(refreshed.changed, true);
+    const refreshedCatalog = JSON.parse(readFileSync(refreshed.file, "utf8"));
+    assert.match(refreshedCatalog.models[0].base_instructions, /before.*tool call/i);
+    assert.match(refreshedCatalog.models[0].base_instructions, /progress update/i);
   } finally {
     rmSync(configDir, { force: true, recursive: true });
   }

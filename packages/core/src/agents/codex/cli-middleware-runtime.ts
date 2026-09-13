@@ -1,3 +1,5 @@
+import { codexBaseInstructions } from "@agentrouter/core/agents/codex/base-instructions";
+
 export function codexCliMiddlewareRuntimeScript(): string {
   return String.raw`#!/usr/bin/env node
 "use strict";
@@ -4671,7 +4673,7 @@ function modelCatalogConfigItem(model, priority) {
     service_tiers: [],
     availability_nux: null,
     upgrade: null,
-    base_instructions: "You are Codex, a coding agent.",
+    base_instructions: ${JSON.stringify(codexBaseInstructions)},
     supports_reasoning_summaries: false,
     default_reasoning_summary: "none",
     support_verbosity: true,

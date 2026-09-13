@@ -11,6 +11,7 @@ import { localAgentProviderApiKey } from "@agentrouter/core/agents/local-provide
 import { normalizeProviderBaseUrl } from "@agentrouter/core/providers/url";
 import { resolveUsageModelAttribution } from "@agentrouter/core/usage/model-attribution";
 import { filterModelIdsByAllowedModels } from "@agentrouter/core/profiles/model-allowlist";
+import { codexBaseInstructions } from "@agentrouter/core/agents/codex/base-instructions";
 
 const fusionModelProviderName = "Fusion";
 const codexDefaultContextWindow = 128_000;
@@ -164,7 +165,7 @@ function codexModelCatalogItem(
     additional_speed_tiers: profile.additionalSpeedTiers,
     apply_patch_tool_type: profile.applyPatchToolType,
     availability_nux: null,
-    base_instructions: "You are Codex, a coding agent.",
+    base_instructions: codexBaseInstructions,
     context_window: contextWindow,
     defaultReasoningEffort: profile.defaultReasoningLevel,
     default_reasoning_level: profile.defaultReasoningLevel,

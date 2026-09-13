@@ -3,7 +3,7 @@ import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
-import { buildCodexModelCatalog, buildCodexModelCatalogIds } from "@agentrouter/core/agents/codex/model-catalog.ts";
+import { buildCodexModelCatalog, buildCodexModelCatalogIds, codexModelCatalogBase64, codexModelCatalogJson } from "@agentrouter/core/agents/codex/model-catalog.ts";
 
 function catalogModelFor(config, slug) {
   const catalog = buildCodexModelCatalog(config, slug);
@@ -11,6 +11,25 @@ function catalogModelFor(config, slug) {
   assert.ok(model, `expected catalog model ${slug}`);
   return model;
 }
+
+test("Codex catalogs retain tool preambles and progress guidance for provider-qualified models", () => {
+  const config = {
+    Providers: [{ name: "uuroute", type: "openai_responses", models: ["gpt-5.5"] }]
+  };
+  const catalogs = [
+    buildCodexModelCatalog(config, "uuroute/gpt-5.5"),
+    JSON.parse(codexModelCatalogJson(config, "uuroute/gpt-5.5")),
+    JSON.parse(Buffer.from(codexModelCatalogBase64(config, "uuroute/gpt-5.5"), "base64").toString("utf8"))
+  ];
+
+  for (const catalog of catalogs) {
+    const instructions = catalog.models[0].base_instructions;
+    assert.match(instructions, /before.*tool call/i);
+    assert.match(instructions, /commentary/);
+    assert.match(instructions, /progress update/i);
+    assert.match(instructions, /final answer/i);
+  }
+});
 
 test("codex catalog removes duplicate model IDs case-insensitively without reordering", () => {
   const ids = buildCodexModelCatalogIds({

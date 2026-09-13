@@ -126,6 +126,7 @@ test("profile service preserves user statusLine when the active global Claude ta
       smallFastModel: "",
       surface: "auto"
     };
+    mkdirSync(path.dirname(takeoverFile), { recursive: true });
     writeFileSync(takeoverFile, `${JSON.stringify({
       profiles: [{
         agent: "claude-code",
@@ -321,6 +322,7 @@ test("profile service does not rewrite user Claude settings for stale legacy pro
     writeFileSync(`${settingsFile}.ar-original`, originalSettings);
     writeFileSync(`${settingsFile}.ar-backup-2026-07-28T16-26-39-119Z`, backupSettings);
     writeFileSync(settingsFile, userSettings);
+    mkdirSync(path.dirname(takeoverFile), { recursive: true });
     writeFileSync(takeoverFile, `${JSON.stringify({
       profiles: [{
         agent: "claude-code",
@@ -416,6 +418,94 @@ test("profile service does not rewrite Claude settings when only user-managed fi
     const secondResult = await applyProfileFixture(config);
     assert.equal(secondResult.clients.some((client) => client.client === "claude-code" && client.ok), true);
     assert.equal(readFileSync(settingsFile, "utf8"), userEditedContent);
+  } finally {
+    restoreGlobalProfileConfigsOnExit([], { manageMarker: true });
+    rmSync(takeoverFile, { force: true });
+    rmSync(root, { force: true, recursive: true });
+  }
+});
+
+test("profile service applies and removes profile Claude settings", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
+  const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-profile-settings-"));
+  const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
+  const profileId = "custom-claude-settings";
+  try {
+    rmSync(takeoverFile, { force: true });
+    const settingsFile = path.join(root, ".claude", "settings.json");
+    mkdirSync(path.dirname(settingsFile), { recursive: true });
+    writeFileSync(settingsFile, `${JSON.stringify({
+      env: {
+        USER_VALUE: "kept"
+      },
+      permissions: {
+        allow: ["Bash(echo:*)"],
+        defaultMode: "ask"
+      },
+      theme: "dark"
+    }, null, 2)}\n`);
+
+    const profile = {
+      agent: "claude-code",
+      claudeSettings: {
+        includeCoAuthoredBy: false,
+        permissions: {
+          defaultMode: "acceptEdits"
+        }
+      },
+      enabled: true,
+      env: {
+        AR_CLAUDE_CODE_AUTH_MODE: "wif",
+        CLAUDE_CODE_MAX_RETRIES: "3"
+      },
+      id: profileId,
+      model: "Provider/model",
+      name: "Custom Claude Settings",
+      scope: "global",
+      settingsFile,
+      smallFastModel: "",
+      surface: "auto"
+    };
+    const config = createDefaultAppConfig();
+    config.APIKEY = "ar-profile-claude-settings-test";
+    config.APIKEYS = [{
+      createdAt: "2026-01-01T00:00:00.000Z",
+      id: `profile:${profile.id}`,
+      key: "ar-profile-claude-settings-test",
+      name: "Profile: Custom Claude Settings"
+    }];
+    config.Providers = [{
+      api_base_url: "https://example.test/v1",
+      api_key: "provider-key",
+      models: ["model"],
+      name: "Provider"
+    }];
+    config.profile.profiles = [profile];
+
+    const firstResult = await applyProfileFixture(config);
+    assert.equal(firstResult.clients.some((client) => client.client === "claude-code" && client.ok), true);
+    const firstSettings = JSON.parse(readFileSync(settingsFile, "utf8"));
+    assert.equal(firstSettings.includeCoAuthoredBy, false);
+    assert.equal(firstSettings.permissions.defaultMode, "acceptEdits");
+    assert.deepEqual(firstSettings.permissions.allow, ["Bash(echo:*)"]);
+    assert.equal(firstSettings.theme, "dark");
+    assert.equal(firstSettings.env.USER_VALUE, "kept");
+    assert.equal(firstSettings.env.CLAUDE_CODE_MAX_RETRIES, "3");
+
+    config.profile.profiles = [{
+      ...profile,
+      claudeSettings: {},
+      env: {
+        AR_CLAUDE_CODE_AUTH_MODE: "wif"
+      }
+    }];
+    const secondResult = await applyProfileFixture(config);
+    assert.equal(secondResult.clients.some((client) => client.client === "claude-code" && client.ok), true);
+    const secondSettings = JSON.parse(readFileSync(settingsFile, "utf8"));
+    assert.equal(secondSettings.includeCoAuthoredBy, undefined);
+    assert.equal(secondSettings.permissions.defaultMode, undefined);
+    assert.deepEqual(secondSettings.permissions.allow, ["Bash(echo:*)"]);
+    assert.equal(secondSettings.env.CLAUDE_CODE_MAX_RETRIES, undefined);
+    assert.equal(secondSettings.env.USER_VALUE, "kept");
   } finally {
     restoreGlobalProfileConfigsOnExit([], { manageMarker: true });
     rmSync(takeoverFile, { force: true });
@@ -610,6 +700,9 @@ test("profile service overwrites generated bin files without creating backups", 
   assert.equal(settings.env.ANTHROPIC_FEDERATION_RULE_ID, "ar-local");
   assert.equal(settings.env.ANTHROPIC_ORGANIZATION_ID, "ar-local");
   assert.equal(settings.env.ANTHROPIC_IDENTITY_TOKEN_FILE, wifTokenFile);
+  assert.equal(settings.env.NO_PROXY, "127.0.0.1,localhost,::1");
+  assert.equal(settings.env.no_proxy, "127.0.0.1,localhost,::1");
+  assert.equal(settings.env.CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT, "1");
   assert.equal(settings.env.ANTHROPIC_MODEL, "Provider/long[1m]");
   assert.equal(settings.env.AR_CLAUDE_CODE_MODEL, "Provider/long[1m]");
   assert.equal(settings.env.CODEXL_CLAUDE_CODE_MODEL, "Provider/long[1m]");
@@ -621,6 +714,8 @@ test("profile service overwrites generated bin files without creating backups", 
   assert.equal(settings.env.CLAUDE_CODE_USE_GATEWAY, undefined);
   assert.equal(settings.env.ANTHROPIC_AUTH_TOKEN, undefined);
   assert.equal(settings.env.ANTHROPIC_API_KEY, undefined);
+  assert.match(wrapperContent, /NO_PROXY.*127\.0\.0\.1,localhost,::1/);
+  assert.match(wrapperContent, /CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT.*1/);
   assert.equal(settings.modelOverrides, undefined);
   const claudeGlobalConfig = JSON.parse(readFileSync(path.join(claudeProfileDir, ".claude.json"), "utf8"));
   assert.equal(claudeGlobalConfig.firstStartTime, "2026-01-01T00:00:00.000Z");
@@ -641,6 +736,84 @@ test("profile service overwrites generated bin files without creating backups", 
   assert.deepEqual(backupEntries, []);
 });
 
+test("profile service refreshes AR-managed global Claude gateway env for generated profiles", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
+  const home = mkdtempSync(path.join(os.tmpdir(), "ar-generated-claude-global-env-"));
+  const previousHome = process.env.HOME;
+  const previousRuntimeHome = process.env.AR_INTERNAL_HOME_DIR;
+  const takeoverFile = path.join(CONFIGDIR, "global-profile-takeover.json");
+  try {
+    process.env.HOME = home;
+    process.env.AR_INTERNAL_HOME_DIR = home;
+    rmSync(takeoverFile, { force: true });
+    const settingsFile = path.join(home, ".claude", "settings.json");
+    mkdirSync(path.dirname(settingsFile), { recursive: true });
+    writeFileSync(settingsFile, `${JSON.stringify({
+      alwaysThinkingEnabled: true,
+      env: {
+        ANTHROPIC_API_BASE_URL: "http://127.0.0.1:3456",
+        ANTHROPIC_BASE_URL: "http://127.0.0.1:3456",
+        ANTHROPIC_FEDERATION_RULE_ID: "ar-local",
+        ANTHROPIC_ORGANIZATION_ID: "ar-local",
+        CLAUDE_AGENT_API_BASE_URL: "http://127.0.0.1:3456",
+        USER_VALUE: "kept"
+      }
+    }, null, 2)}\n`);
+
+    const config = createDefaultAppConfig();
+    config.gateway.port = 3456;
+    config.APIKEY = "ar-generated-global-env-test";
+    config.APIKEYS = [{
+      createdAt: "2026-01-01T00:00:00.000Z",
+      id: "profile:generated-global-env-test",
+      key: "ar-generated-global-env-test",
+      name: "Profile: Generated Global Env Test"
+    }];
+    config.Providers = [{
+      api_base_url: "https://example.test/v1",
+      api_key: "provider-key",
+      models: ["model"],
+      name: "Provider"
+    }];
+    config.profile.profiles = [{
+      agent: "claude-code",
+      enabled: true,
+      env: {
+        AR_CLAUDE_CODE_AUTH_MODE: "wif"
+      },
+      id: "generated-global-env-test",
+      model: "Provider/model",
+      name: "Generated Global Env Test",
+      scope: "agentrouter",
+      settingsFile: "~/.claude/settings.json",
+      smallFastModel: "",
+      surface: "auto"
+    }];
+
+    const result = await applyProfileFixture(config);
+    assert.equal(result.clients.some((client) => client.client === "claude-code" && client.ok), true);
+    const settings = JSON.parse(readFileSync(settingsFile, "utf8"));
+    assert.equal(settings.alwaysThinkingEnabled, true);
+    assert.equal(settings.env.USER_VALUE, "kept");
+    assert.equal(settings.env.ANTHROPIC_BASE_URL, "http://127.0.0.1:3456");
+    assert.equal(settings.env.ANTHROPIC_API_BASE_URL, "http://127.0.0.1:3456");
+    assert.equal(settings.env.CLAUDE_AGENT_API_BASE_URL, "http://127.0.0.1:3456");
+    assert.equal(settings.env.NO_PROXY, "127.0.0.1,localhost,::1");
+    assert.equal(settings.env.no_proxy, "127.0.0.1,localhost,::1");
+    assert.equal(settings.env.CLAUDE_CODE_DISABLE_UNKNOWN_MODEL_WINDOW_ENFORCEMENT, "1");
+  } finally {
+    restoreGlobalProfileConfigsOnExit([], { manageMarker: true });
+    rmSync(takeoverFile, { force: true });
+    rmSync(home, { force: true, recursive: true });
+    if (previousRuntimeHome === undefined) delete process.env.AR_INTERNAL_HOME_DIR;
+    else process.env.AR_INTERNAL_HOME_DIR = previousRuntimeHome;
+    if (previousHome === undefined) {
+      delete process.env.HOME;
+    } else {
+      process.env.HOME = previousHome;
+    }
+  }
+});
+
 test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const root = mkdtempSync(path.join(os.tmpdir(), "ar-claude-auth-mode-"));
   const profileId = "old-claude-code";
@@ -652,7 +825,7 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
     mkdirSync(binDir, { recursive: true });
     writeFileSync(fakeClaude, process.platform === "win32"
       ? "@echo off\r\necho 2.1.235\r\n"
-      : "#!/bin/sh\nprintf '%s\\n' '2.1.100'\n");
+      : "#!/bin/sh\nprintf '%s\\n' '2.1.235'\n");
     chmodSync(fakeClaude, 0o700);
 
     const config = createDefaultAppConfig();
@@ -1105,7 +1278,7 @@ test("profile service injects Context Archive MCP for managed Claude Code withou
 
 test("profile service writes a Grok CLI wrapper that points model discovery and inference to AgentRouter", { skip: !process.env.AR_INTERNAL_HOME_DIR }, async () => {
   const profileId = "grok-gateway-test";
-  const sourceGrokHome = path.join(process.env.HOME, ".grok");
+  const sourceGrokHome = path.join(process.env.AR_INTERNAL_HOME_DIR, ".grok");
   mkdirSync(path.join(sourceGrokHome, "sessions"), { recursive: true });
   mkdirSync(path.join(sourceGrokHome, "skills"), { recursive: true });
   writeFileSync(path.join(sourceGrokHome, "auth.json"), "oauth credentials must not be shared");
@@ -1141,7 +1314,7 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
       enabled: true,
       env: {
         AR_GROK_BIN: "/custom/bin/grok",
-        GROK_HOME: "~/.grok",
+        GROK_HOME: sourceGrokHome,
         GROK_MODELS_BASE_URL: "https://ignored.example/v1",
         USER_VALUE: "kept"
       },
@@ -1940,7 +2113,8 @@ test("profile service reports a failed model discovery cache invalidation withou
   }
 });
 
-// Credentials are authoritative in the database, not in the settings snapshot.
+// Profile application reads credentials from their authoritative store. Persist
+// each fixture explicitly; config snapshots are no longer credential updates.
 async function applyProfileFixture(config, options) {
   await replacePersistedApiKeys(config.APIKEYS ?? []);
   return applyProfileConfig(config, options);

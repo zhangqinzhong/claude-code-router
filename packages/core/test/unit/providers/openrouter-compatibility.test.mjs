@@ -8,22 +8,24 @@ import { createClaudeCliAutoCompactWindows } from "@agentrouter/core/gateway/fea
 const baseUrl = "https://openrouter.ai/api/v1";
 const provider = {
   name: "OpenRouter", api_base_url: baseUrl,
-  models: ["z-ai/glm-5.2:free", "z-ai/glm-5.2"],
+  models: ["deepseek/deepseek-v4-flash", "z-ai/glm-5.3"],
   capabilities: ["anthropic_messages", "openai_chat_completions", "openai_responses"].map((type) => ({ type, baseUrl }))
 };
 
+// The bundled September catalog retires GLM 5.2 Free from the live OpenRouter list.
+// Keep testing exact provider limits against entries with current source records.
 test("#1779 OpenRouter exact source limits override cross-provider merged maxima", () => {
   const metadata = getProviderCatalogModels({ providerPresetId: "openrouter" }).modelMetadata;
-  assert.equal(metadata["z-ai/glm-5.2:free"].contextWindow, 256000);
-  assert.equal(metadata["z-ai/glm-5.2"].contextWindow, 1048576);
+  assert.equal(metadata["deepseek/deepseek-v4-flash"].contextWindow, 1024000);
+  assert.equal(metadata["z-ai/glm-5.3"].contextWindow, 1048576);
   assert.equal(metadata["minimax/minimax-m3"].contextWindow, 524288);
 });
 
 test("#1779 Claude context cache uses provider limits and explicit discovery overrides", () => {
   const config = { ...createDefaultAppConfig(), Providers: [provider] };
   let windows = createClaudeCliAutoCompactWindows(config);
-  assert.equal(windows["OpenRouter/z-ai/glm-5.2:free"], 256000);
-  assert.equal(windows["OpenRouter/z-ai/glm-5.2"], 1000000);
+  assert.equal(windows["OpenRouter/deepseek/deepseek-v4-flash"], 1000000);
+  assert.equal(windows["OpenRouter/z-ai/glm-5.3"], 1000000);
   config.Providers = [{ ...provider, models: ["minimax/minimax-m3:free"], modelMetadata: {
     "minimax/minimax-m3:free": { contextWindow: 1000000 }
   } }];

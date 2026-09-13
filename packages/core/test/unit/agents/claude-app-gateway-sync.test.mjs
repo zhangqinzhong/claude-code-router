@@ -11,6 +11,9 @@ const testRoot = path.join(
 process.env.AR_INTERNAL_HOME_DIR = path.join(testRoot, "home");
 process.env.AR_INTERNAL_APP_DATA_DIR = path.join(testRoot, "app-data");
 process.env.AR_INTERNAL_USER_DATA_DIR = path.join(testRoot, "user-data");
+if (process.platform === "win32") {
+  process.env.LOCALAPPDATA = path.join(testRoot, "local-app-data");
+}
 
 async function loadModules() {
   const {
@@ -133,6 +136,25 @@ test("sync applies the gateway config regardless of profile scope", async () => 
   }
 });
 
+test("sync persists a generated Claude App credential through the credential store", async () => {
+  const { BACKUP_FILE, syncClaudeAppGatewayConfig } = await loadModules();
+  const { createDefaultAppConfig } = await import("@agentrouter/core/config/default-config.ts");
+  const { loadPersistedApiKeys } = await import("@agentrouter/core/config/config-repository.ts");
+  const config = createDefaultAppConfig();
+  config.Providers = [{ name: "test-provider", models: ["test-model"], api_base_url: "https://example.test/v1" }];
+  config.profile.profiles = [claudeCodeProfile({ surface: "app" })];
+  try {
+    const synced = await syncClaudeAppGatewayConfig(config);
+    assert.equal(synced.result.apiKeyGenerated, true);
+    const libraryConfig = JSON.parse(readFileSync(claudeAppPaths().configLibraryFile, "utf8"));
+    const keys = await loadPersistedApiKeys();
+    assert.ok(keys.some((key) => key.key === libraryConfig.inferenceGatewayApiKey));
+    assert.ok(synced.config.APIKEYS.some((key) => key.key === libraryConfig.inferenceGatewayApiKey));
+  } finally {
+    cleanup(BACKUP_FILE);
+  }
+});
+
 function claudeCodeProfile(overrides = {}) {
   return {
     agent: "claude-code",
@@ -145,12 +167,10 @@ function claudeCodeProfile(overrides = {}) {
 }
 
 function claudeAppPaths() {
-  // Mirror getClaudeApp3pDataDir(): the Claude app stores its data under a
-  // platform-specific root, so a hardcoded layout only passes on one platform.
   const dataDir = process.platform === "darwin"
     ? path.join(testRoot, "home", "Library", "Application Support", "Claude-3p")
     : process.platform === "win32"
-      ? path.join(process.env.LOCALAPPDATA || path.join(testRoot, "app-data", "..", "Local"), "Claude-3p")
+      ? path.join(testRoot, "local-app-data", "Claude-3p")
       : path.join(testRoot, "app-data", "Claude-3p");
   return {
     configLibraryFile: path.join(dataDir, "configLibrary", "8f69f2f1-3275-4ad8-9317-4aa7e972f311.json"),

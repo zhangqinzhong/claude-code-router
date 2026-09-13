@@ -6,6 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { pathToFileURL } from "node:url";
 import { codexCliMiddlewareRuntimeScript } from "@agentrouter/core/agents/codex/cli-middleware-runtime.ts";
+import { buildCodexModelCatalog } from "@agentrouter/core/agents/codex/model-catalog.ts";
 
 test("generated Codex CLI middleware runtime is valid JavaScript", () => {
   const dir = mkdtempSync(path.join(os.tmpdir(), "ar-runtime-check-"));
@@ -37,6 +38,17 @@ test("middleware finds Claude base config from both current and legacy session p
     assert.equal(infer(path.join("/test-home/.claude", dirname, "sessions", "test")), "/test-home/.claude");
   }
   assert.equal(infer("/unrelated/session"), "");
+});
+
+test("generated Codex middleware fallback retains the catalog's tool commentary instructions", () => {
+  const model = "uuroute/gpt-5.5";
+  const fallback = evaluateRuntimeFunction("modelCatalogConfigItem")(model, 0);
+  const catalog = buildCodexModelCatalog(undefined, model);
+
+  assert.match(fallback.base_instructions, /before.*tool call/i);
+  assert.match(fallback.base_instructions, /commentary/);
+  assert.match(fallback.base_instructions, /progress update/i);
+  assert.equal(fallback.base_instructions, catalog.models[0].base_instructions);
 });
 
 test("generated Codex CLI middleware converts Windows SDK paths before URL scheme detection", () => {
