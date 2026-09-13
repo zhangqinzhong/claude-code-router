@@ -1470,6 +1470,8 @@ export const appCopy: Record<ResolvedLanguage, AppCopy> = {
       "Profile name": "配置档案名称",
       "Launch alias": "启动别名",
       "Permission mode": "权限模式",
+      "Launch terminal": "启动终端",
+      "System terminal": "系统终端",
       "Open in terminal": "在终端启动",
       "More actions": "更多操作",
       "Copy CLI command": "复制启动命令",

@@ -797,9 +797,10 @@ test("launch alias survives draft and persisted profile round trips", () => {
 
 
 test("profile launch permissions and arguments survive editing", () => {
-  const draft = { ...createProfileDraft("claude-code"), name: "Company", model: "Provider/model", permissionMode: "yolo" as const, launchArgsText: "--verbose\n--add-dir\n/tmp/my project" };
+  const draft = { ...createProfileDraft("claude-code"), name: "Company", model: "Provider/model", permissionMode: "yolo" as const, terminalApp: "iterm" as const, launchArgsText: "--verbose\n--add-dir\n/tmp/my project" };
   const saved = profileConfigFromDraft(draft, []);
   assert.equal(saved.permissionMode, "yolo");
+  assert.equal(createProfileDraftFromProfile(saved).terminalApp, "iterm");
   assert.deepEqual(saved.launchArgs, ["--verbose", "--add-dir", "/tmp/my project"]);
   const reloaded = normalizeUnknownProfileItem(saved, 0)!;
   assert.equal(createProfileDraftFromProfile(reloaded).permissionMode, "yolo");

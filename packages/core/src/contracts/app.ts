@@ -1519,6 +1519,7 @@ export type CodexProfileConfig = {
 export type ProfileConfig = {
   launchAlias?: string;
   permissionMode?: "default" | "yolo";
+  terminalApp?: "otty" | "iterm" | "system";
   launchArgs?: string[];
   agent: ProfileClientKind;
   appPath?: string;

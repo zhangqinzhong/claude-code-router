@@ -856,6 +856,11 @@ export function AddProfileForm({
           <Input value={draft.launchAlias ?? ""} placeholder="ccwork" onChange={(event) => onChange({ launchAlias: event.target.value })} />
           <ProfileFieldHint>{t(validation.launchAlias || "Optional. Start this profile by typing the alias in a terminal.")}</ProfileFieldHint>
         </Field>
+        {draft.surface !== "app" ? (
+          <Field label={t("Launch terminal")}>
+            <SelectControl value={draft.terminalApp ?? "otty"} options={[{ label: "Otty", value: "otty" }, { label: "iTerm2", value: "iterm" }, { label: t("System terminal"), value: "system" }]} onChange={(value) => onChange({ terminalApp: value === "system" || value === "iterm" ? value : "otty" })} />
+          </Field>
+        ) : null}
         {(draft.agent === "claude-code" || draft.agent === "codex") && draft.surface !== "app" ? (
           <Field label={t("Permission mode")}>
             <SelectControl value={draft.permissionMode ?? "default"} options={[{ label: t("Default"), value: "default" }, { label: t("YOLO (skip permission prompts)"), value: "yolo" }]} onChange={(value) => onChange({ permissionMode: value === "yolo" ? "yolo" : "default" })} />

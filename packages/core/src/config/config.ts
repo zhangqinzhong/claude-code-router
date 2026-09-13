@@ -3679,6 +3679,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          terminalApp: item.terminalApp === "system" || item.terminalApp === "iterm" ? item.terminalApp : "otty",
           permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
           launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           ...(appPath ? { appPath } : {}),
@@ -3708,6 +3709,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          terminalApp: item.terminalApp === "system" || item.terminalApp === "iterm" ? item.terminalApp : "otty",
           permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
           launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           ...(availableModels ? { availableModels } : {}),
@@ -3726,6 +3728,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         return {
           agent,
           launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          terminalApp: item.terminalApp === "system" || item.terminalApp === "iterm" ? item.terminalApp : "otty",
           permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
           launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
           enabled,
@@ -3750,6 +3753,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
       return {
         agent,
         launchAlias: readString(item.launchAlias)?.trim() || undefined,
+          terminalApp: item.terminalApp === "system" || item.terminalApp === "iterm" ? item.terminalApp : "otty",
           permissionMode: item.permissionMode === "yolo" ? "yolo" : "default",
           launchArgs: Array.isArray(item.launchArgs) ? item.launchArgs.filter((arg): arg is string => typeof arg === "string") : [],
         ...(appPath ? { appPath } : {}),

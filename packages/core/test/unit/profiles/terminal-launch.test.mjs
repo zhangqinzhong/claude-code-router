@@ -12,7 +12,8 @@ test("macOS terminal launcher preserves profile IDs and paths as literal argumen
     const launcher = path.join(dir, "agentrouter");
     writeFileSync(launcher, '#!/bin/sh\nprintf "%s\\n" "$@"\n', { mode: 0o755 });
     const id = "profile ' $(touch never)";
-    const plan = profileTerminalLaunch(dir, launcher, id, "darwin");
+    const plan = profileTerminalLaunch(dir, launcher, id, "darwin", "system");
+    assert.equal(profileTerminalLaunch(dir, launcher, id, "darwin", "iterm").args[1], "iTerm");
     assert.deepEqual(plan.args, ["-a", "Terminal", plan.scriptFile]);
     const result = spawnSync("/bin/sh", ["-c", plan.scriptContent], { encoding: "utf8" });
     assert.equal(result.status, 0);

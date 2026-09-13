@@ -167,7 +167,7 @@ export async function openProfileFromAr(config: AppConfig, request: ProfileOpenR
   }
   if (surface === "cli") {
     const launcher = ensureArCliLauncher(config);
-    const terminal = profileTerminalLaunch(CONFIGDIR, launcher, profile.id);
+    const terminal = profileTerminalLaunch(CONFIGDIR, launcher, profile.id, process.platform, profile.terminalApp);
     if (terminal.scriptFile && terminal.scriptContent) {
       mkdirSync(path.dirname(terminal.scriptFile), { recursive: true });
       writeFileIfChanged(terminal.scriptFile, terminal.scriptContent);
@@ -175,7 +175,8 @@ export async function openProfileFromAr(config: AppConfig, request: ProfileOpenR
     }
     const child = spawn(terminal.command, terminal.args, { detached: true, stdio: "ignore", cwd: os.homedir() });
     const error = await new Promise<string | undefined>((resolve) => {
-      const timer = setTimeout(() => finish(undefined), 500);
+      const awaitExit = process.platform === "darwin";
+      const timer = setTimeout(() => finish(awaitExit ? "Terminal launch timed out." : undefined), awaitExit ? 10_000 : 500);
       const finish = (message: string | undefined) => {
         clearTimeout(timer);
         child.off("error", onError);
