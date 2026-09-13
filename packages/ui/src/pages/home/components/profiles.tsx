@@ -227,15 +227,11 @@ export function ProfileView({
                         </ProfileActionTooltip>
                       ) : null}
                       {showProfileLaunchActions && openSurfaces.includes("cli") ? (
-                        <details className="relative">
-                          <summary aria-label={t("More actions")} className="cursor-pointer list-none rounded-md px-2 py-1 text-muted-foreground hover:bg-muted">···</summary>
-                          <div className="absolute bottom-full left-0 z-20 mb-2 min-w-40 rounded-md border border-border bg-popover p-1 shadow-md">
-                            <button type="button" disabled={profileActionDisabled} className="w-full rounded px-3 py-2 text-left text-xs hover:bg-muted" onClick={(event) => {
-                              event.currentTarget.closest("details")?.removeAttribute("open");
-                              copyProfileCliCommand(index);
-                            }}>{t("Copy CLI command")}</button>
-                          </div>
-                        </details>
+                        <ProfileActionTooltip label={t("Copy CLI command")}>
+                          <Button aria-label={`${t("Copy CLI command")} ${profile.name || t("Profile")}`} disabled={profileActionDisabled} onClick={() => copyProfileCliCommand(index)} size="iconSm" type="button" variant="subtle">
+                            <Copy className="h-3.5 w-3.5" />
+                          </Button>
+                        </ProfileActionTooltip>
                       ) : null}
                       {showProfileLaunchActions && openSurfaces.includes("app") ? (
                         <ProfileActionTooltip label={appActionTooltip}>

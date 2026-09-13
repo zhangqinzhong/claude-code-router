@@ -190,6 +190,10 @@ export async function openProfileFromAr(config: AppConfig, request: ProfileOpenR
     });
     if (error) throw new Error(`Failed to open terminal: ${error}`);
     child.unref();
+    if (terminal.activation) {
+      const activated = spawnSync(terminal.activation.command, terminal.activation.args, { timeout: 5000, stdio: "ignore" });
+      if (activated.error || activated.status !== 0) throw new Error("The terminal started but could not be brought to the front.");
+    }
     return { message: `Opened ${profile.name || profile.id}.`, profileId: profile.id, profileName: profile.name, surface };
   }
   const plan = buildProfileLaunchPlan(CONFIGDIR, profile, surface);

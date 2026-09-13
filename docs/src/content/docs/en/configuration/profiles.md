@@ -187,7 +187,7 @@ Aliases bind to profile IDs, so renaming a profile preserves its launch target. 
 
 ## Terminal launch and permission mode
 
-The terminal button on a profile card opens the profile in the selected terminal. On macOS, choose Otty, iTerm2, or the system terminal. Otty is the default; an unavailable terminal produces an error. **Copy launch command** is available in the adjacent menu.
+The terminal button on a profile card opens the profile in the selected terminal. On macOS, choose Otty, iTerm2, or the system terminal. Otty is the default; an unavailable terminal produces an error. The adjacent copy button copies the launch command directly.
 
 Claude Code and Codex profiles support Default and YOLO permission modes. YOLO skips permission prompts; for Codex it also disables sandbox restrictions. The setting applies to this profile's CLI launches, including launch aliases.
 
