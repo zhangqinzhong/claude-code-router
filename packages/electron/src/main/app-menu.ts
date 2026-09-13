@@ -27,6 +27,10 @@ function createMenuTemplate(): MenuItemConstructorOptions[] {
         { role: "quit" }
       ]
     });
+    template.push({
+      label: "File",
+      submenu: [{ role: "close", accelerator: "Cmd+W" }]
+    });
   } else {
     template.push({
       label: "File",
