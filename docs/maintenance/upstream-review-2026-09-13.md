@@ -81,3 +81,10 @@ open -a /Applications/AgentRouter.app --env AR_UPDATE_FEED_URL=https://github.co
 已按功能移植凭据并发保护、初始化失败重试、跨协议限额估算、失败响应取消、Responses 原生字段保留及 iLink 流式限制，保留原有 AgentRouter 修改。模型目录和大规模配置 UI 重构未纳入本批。新增或移植相应回归测试；旧 profile 测试显式写入凭据数据库，符合新的凭据权威存储规则。
 
 发行版本改为 1.0.0。更新源内置本仓库 Releases 资产目录，环境变量可覆盖；发布配置归属 zhangqinzhong/claude-code-router。macOS 当前只有本地签名，公证及真实自动安装升级仍需另行验证。
+
+
+## 1.0.1 实施结果
+
+剩余设置保存队列/草稿合并、供应商引用同步、未保存编辑保护、Claude 高级设置编辑器、模型目录和 Codex base_instructions 均已移植。保留 AgentRouter 标识、3466 默认端口、旧路径兼容、日志清理及指标修改。模型目录测试改用新快照中仍有 OpenRouter 直接记录的型号，继续验证供应商特定限制优先于跨供应商合并上限。
+
+Claude/Codex 配置写入的上游依赖一并接入；测试中显式隔离 HOME，使用已配置网关端口匹配托管设置。Dockerfile 未改动。

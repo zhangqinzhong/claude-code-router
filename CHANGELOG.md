@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-09-13
+
+- Ported remaining upstream settings save/reconciliation and provider reference updates (by @musistudio).
+- Added unsaved draft protection and the Claude advanced settings editor (by @musistudio).
+- Updated the bundled model catalog and Codex base instructions (by @musistudio).
+- Preserved AgentRouter branding, log retention and timing metrics.
+
 ## 1.0.0 - 2026-09-13
 
 Initial independent AgentRouter release.
