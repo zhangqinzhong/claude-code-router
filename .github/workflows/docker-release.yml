@@ -6,11 +6,11 @@ on:
       ref:
         description: Git ref to build, usually a release tag.
         required: true
-        default: v3.0.21
+        default: v1.1.1
       version:
         description: Docker version tag without leading v.
         required: true
-        default: 3.0.21
+        default: 1.1.1
 
 permissions:
   contents: read
@@ -20,7 +20,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  IMAGE_NAME: musistudio/claude-code-router
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   docker:

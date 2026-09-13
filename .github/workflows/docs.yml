@@ -39,7 +39,8 @@ jobs:
       - name: Build and upload docs
         uses: withastro/action@v6
         env:
-          ASTRO_BASE: /
+          ASTRO_SITE: https://${{ github.repository_owner }}.github.io
+          ASTRO_BASE: /${{ github.event.repository.name }}/
         with:
           path: docs
           node-version: 24

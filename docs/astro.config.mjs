@@ -84,6 +84,24 @@ const isRedirectPage = (page) => {
   return redirectPaths.has(pathname);
 };
 
+// Markdown root-relative links must follow the project site's base path.
+function rehypeBaseUrls() {
+  return (tree) => {
+    const visit = (node) => {
+      if (node.type === "element" && node.properties && basePath !== "/") {
+        for (const key of ["href", "src"]) {
+          const value = node.properties[key];
+          if (typeof value === "string" && value.startsWith("/") && !value.startsWith("//") && !value.startsWith(basePath)) {
+            node.properties[key] = `${basePath}${value.slice(1)}`;
+          }
+        }
+      }
+      for (const child of node.children ?? []) visit(child);
+    };
+    visit(tree);
+  };
+}
+
 export default defineConfig({
   site,
   base,
@@ -102,6 +120,7 @@ export default defineConfig({
     },
   },
   markdown: {
+    rehypePlugins: [rehypeBaseUrls],
     shikiConfig: {
       themes: {
         light: "github-light",

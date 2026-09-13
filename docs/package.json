@@ -1,5 +1,5 @@
 {
-  "name": "claude-code-router-docs",
+  "name": "agentrouter-docs",
   "private": true,
   "version": "0.1.0",
   "license": "MIT",
@@ -11,6 +11,7 @@
     "astro": "astro"
   },
   "devDependencies": {
+    "@astrojs/markdown-remark": "^7.2.0",
     "@astrojs/sitemap": "^3.7.3",
     "@tailwindcss/vite": "^4.3.3",
     "astro": "7.0.0",

@@ -11,107 +11,107 @@ Choose a provider below to get started. AgentRouter shows what will be added bef
 
 <div class="provider-import-grid" aria-label="Preset provider import buttons">
   <a class="provider-import-button provider-openai" href="agentrouter://provider?name=OpenAI&amp;base_url=https%3A%2F%2Fapi.openai.com%2Fv1&amp;protocol=openai_responses&amp;models=gpt-5.5%2Cgpt-5.5-pro%2Cgpt-5.5-instant%2Cgpt-5.4-mini" aria-label="Import OpenAI provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/openai.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/openai.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">OpenAI</span><span class="provider-import-meta">Responses / Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-anthropic" href="agentrouter://provider?name=Anthropic&amp;base_url=https%3A%2F%2Fapi.anthropic.com&amp;protocol=anthropic_messages&amp;models=claude-fable-5%2Cclaude-opus-4-8%2Cclaude-sonnet-4-6%2Cclaude-haiku-4-5" aria-label="Import Anthropic provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/anthropic.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/anthropic.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Anthropic</span><span class="provider-import-meta">Anthropic Messages</span></span>
   </a>
   <a class="provider-import-button provider-gemini" href="agentrouter://provider?name=Google+Gemini&amp;base_url=https%3A%2F%2Fgenerativelanguage.googleapis.com&amp;protocol=gemini_generate_content&amp;models=gemini-3.5-flash%2Cgemini-3.1-pro-preview%2Cgemini-3-flash-preview" aria-label="Import Google Gemini provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/gemini.svg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/gemini.svg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Google Gemini</span><span class="provider-import-meta">Gemini Generate Content</span></span>
   </a>
   <a class="provider-import-button provider-openrouter" href="agentrouter://provider?name=OpenRouter&amp;base_url=https%3A%2F%2Fopenrouter.ai%2Fapi%2Fv1&amp;protocol=openai_chat_completions&amp;models=%7Eopenai%2Fgpt-latest%2C%7Eanthropic%2Fclaude-opus-latest%2C%7Eanthropic%2Fclaude-sonnet-latest%2Cgoogle%2Fgemini-3.5-flash%2Cz-ai%2Fglm-5.2" aria-label="Import OpenRouter provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/openrouter.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/openrouter.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">OpenRouter</span><span class="provider-import-meta">OpenAI compatible gateway</span></span>
   </a>
   <a class="provider-import-button provider-nvidia" href="agentrouter://provider?name=NVIDIA&amp;base_url=https%3A%2F%2Fintegrate.api.nvidia.com%2Fv1&amp;protocol=openai_chat_completions&amp;models=nvidia%2Fnemotron-3-super-120b-a12b%2Cnvidia%2Fnemotron-3-ultra-550b-a55b&amp;source=https%3A%2F%2Fbuild.nvidia.com%2Fmodels" aria-label="Import NVIDIA NIM provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/nvidia.svg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/nvidia.svg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">NVIDIA</span><span class="provider-import-meta">NIM Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-deepseek" href="agentrouter://provider?name=DeepSeek&amp;base_url=https%3A%2F%2Fapi.deepseek.com&amp;protocol=openai_chat_completions&amp;models=deepseek-v4-pro%2Cdeepseek-v4-flash%2Cdeepseek-v3.2%2Cdeepseek-reasoner%2Cdeepseek-chat" aria-label="Import DeepSeek provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/deepseek.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/deepseek.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">DeepSeek</span><span class="provider-import-meta">Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-zhipu-coding" href="agentrouter://provider?name=Zhipu+AI+%28China%29+-+Coding+Plan&amp;base_url=https%3A%2F%2Fopen.bigmodel.cn%2Fapi%2Fcoding%2Fpaas%2Fv4&amp;protocol=openai_chat_completions&amp;models=glm-5.2%2Cglm-5.1%2Cglm-5-turbo%2Cglm-5v-turbo%2Cglm-4.7" aria-label="Import Zhipu AI China Coding Plan provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/zhipu-cn-coding.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/zhipu-cn-coding.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Zhipu Coding</span><span class="provider-import-meta">China Coding Plan</span></span>
   </a>
   <a class="provider-import-button provider-zhipu-general" href="agentrouter://provider?name=Zhipu+AI+%28China%29+-+General+Endpoint&amp;base_url=https%3A%2F%2Fopen.bigmodel.cn%2Fapi%2Fpaas%2Fv4&amp;protocol=openai_chat_completions&amp;models=glm-5.2%2Cglm-5.1%2Cglm-5%2Cglm-5v-turbo%2Cglm-4.7" aria-label="Import Zhipu AI China General Endpoint provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/zhipu-cn-general.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/zhipu-cn-general.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Zhipu General</span><span class="provider-import-meta">China General Endpoint</span></span>
   </a>
   <a class="provider-import-button provider-zai-coding" href="agentrouter://provider?name=Z.ai+%28Global%29+-+Coding+Plan&amp;base_url=https%3A%2F%2Fapi.z.ai%2Fapi%2Fcoding%2Fpaas%2Fv4&amp;protocol=openai_chat_completions&amp;models=glm-5.2%2Cglm-5.1%2Cglm-5-turbo%2Cglm-5v-turbo%2Cglm-4.7" aria-label="Import Z.ai Global Coding Plan provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/zai-global-coding.svg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/zai-global-coding.svg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Z.ai Coding</span><span class="provider-import-meta">Global Coding Plan</span></span>
   </a>
   <a class="provider-import-button provider-zai-general" href="agentrouter://provider?name=Z.ai+%28Global%29+-+General+Endpoint&amp;base_url=https%3A%2F%2Fapi.z.ai%2Fapi%2Fpaas%2Fv4&amp;protocol=openai_chat_completions&amp;models=glm-5.2%2Cglm-5.1%2Cglm-5%2Cglm-5v-turbo%2Cglm-4.7" aria-label="Import Z.ai Global General Endpoint provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/zai-global-general.svg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/zai-global-general.svg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Z.ai General</span><span class="provider-import-meta">Global General Endpoint</span></span>
   </a>
   <a class="provider-import-button provider-mistral" href="agentrouter://provider?name=Mistral&amp;base_url=https%3A%2F%2Fapi.mistral.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=mistral-medium-3-5%2Cmistral-large-3%2Cministral-3-14b-instruct-2512%2Cdevstral-2512" aria-label="Import Mistral provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/mistral.webp" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/mistral.webp" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Mistral</span><span class="provider-import-meta">Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-moonshot" href="agentrouter://provider?name=Kimi+API+%28China%29&amp;base_url=https%3A%2F%2Fapi.moonshot.cn%2Fv1&amp;protocol=openai_chat_completions&amp;models=kimi-k2.7-code%2Ckimi-k2.6%2Ckimi-latest%2Ckimi-thinking-preview" aria-label="Import Kimi API China provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Kimi API (China)</span><span class="provider-import-meta">China platform</span></span>
   </a>
   <a class="provider-import-button provider-moonshot-global" href="agentrouter://provider?name=Kimi+API+%28Global%29&amp;base_url=https%3A%2F%2Fapi.moonshot.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=kimi-k2.7-code%2Ckimi-k2.6%2Ckimi-latest%2Ckimi-thinking-preview" aria-label="Import Kimi API Global provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Kimi API (Global)</span><span class="provider-import-meta">Global platform</span></span>
   </a>
   <a class="provider-import-button provider-kimi-coding" href="agentrouter://provider?name=Kimi+Code+-+Coding+Plan&amp;base_url=https%3A%2F%2Fapi.kimi.com%2Fcoding%2Fv1&amp;protocol=openai_chat_completions&amp;models=kimi-for-coding" aria-label="Import Kimi Code Coding Plan provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/moonshot.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Kimi Code</span><span class="provider-import-meta">Coding Plan</span></span>
   </a>
   <a class="provider-import-button provider-bailian" href="agentrouter://provider?name=Alibaba+Bailian&amp;base_url=https%3A%2F%2Fdashscope.aliyuncs.com%2Fcompatible-mode%2Fv1&amp;protocol=openai_chat_completions&amp;models=qwen3.7-max%2Cqwen3.7-plus%2Cqwen3.6-max-preview%2Cqwen3-coder-plus%2Cqwen3-max" aria-label="Import Alibaba Bailian provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/bailian.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/bailian.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Alibaba Bailian</span><span class="provider-import-meta">DashScope compatible</span></span>
   </a>
   <a class="provider-import-button provider-siliconflow" href="agentrouter://provider?name=SiliconFlow&amp;base_url=https%3A%2F%2Fapi.siliconflow.cn%2Fv1&amp;protocol=openai_chat_completions&amp;models=zai-org%2FGLM-5.2%2Cdeepseek-ai%2Fdeepseek-v4-pro%2Cdeepseek-ai%2Fdeepseek-v4-flash%2Czai-org%2FGLM-5.1%2Cdeepseek-ai%2FDeepSeek-V3.2" aria-label="Import SiliconFlow provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/siliconflow.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/siliconflow.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">SiliconFlow</span><span class="provider-import-meta">Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-runapi" href="agentrouter://provider?name=RunAPI&amp;base_url=https%3A%2F%2Frunapi.co%2Fv1&amp;protocol=openai_responses" aria-label="Import RunAPI provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/runapi.jpg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/runapi.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">RunAPI</span><span class="provider-import-meta">Responses / Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-teamorouter" href="agentrouter://provider?name=TeamoRouter&amp;base_url=https%3A%2F%2Fapi.teamorouter.com&amp;protocol=anthropic_messages&amp;source=https%3A%2F%2Fteamorouter.com%2F" aria-label="Import TeamoRouter provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/teamorouter.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/teamorouter.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">TeamoRouter</span><span class="provider-import-meta">Anthropic / Chat / Responses</span></span>
   </a>
   <a class="provider-import-button provider-unity2" href="agentrouter://provider?name=Unity2.Ai&amp;base_url=https%3A%2F%2Funity2.ai%2Fv1&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Funity2.ai%2Fregister%3Fsource%3Dclaudecoderouter" aria-label="Import Unity2.Ai provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/unity2.jpg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/unity2.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Unity2.Ai</span><span class="provider-import-meta">OpenAI compatible gateway</span></span>
   </a>
   <a class="provider-import-button provider-code0" href="agentrouter://provider?name=code0.ai&amp;base_url=https%3A%2F%2Fconsole.code0.ai&amp;protocol=anthropic_messages&amp;source=https%3A%2F%2Fcode0.ai%2Fagent%2Fregister%2F9n9jOsSnYQoemIVL%3Futm_source%3Dclaudecoderouter%26utm_medium%3Dpartner%26utm_campaign%3Dclaudecoderouter_2026%26utm_content%3Ddefault" aria-label="Import code0.ai provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/code0.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/code0.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">code0.ai</span><span class="provider-import-meta">Anthropic / Chat / Responses</span></span>
   </a>
   <a class="provider-import-button provider-claudeapi" href="agentrouter://provider?name=claudeapi&amp;base_url=https%3A%2F%2Fgw.claudeapi.com&amp;protocol=anthropic_messages&amp;source=https%3A%2F%2Fconsole.claudeapi.com%2Fagent%2Fregister%2FLbmB7Y9kPloyzhwF%3Futm_source%3Dclaudecoderouter%26utm_medium%3Dpartner%26utm_campaign%3Dclaudecoderouter_2026%26utm_content%3Ddefault" aria-label="Import claudeapi provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/claudeapi.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/claudeapi.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">claudeapi</span><span class="provider-import-meta">Anthropic Messages</span></span>
   </a>
   <a class="provider-import-button provider-qiniu-ai" href="agentrouter://provider?name=%E4%B8%83%E7%89%9B%E4%BA%91+AI&amp;base_url=https%3A%2F%2Fapi.qnaigc.com&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fs.qiniu.com%2FAVjMVf" aria-label="Import Qiniu Cloud AI provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/qiniu-ai.png" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/qiniu-ai.png" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Qiniu Cloud AI</span><span class="provider-import-meta">Chat / Responses / Anthropic / Gemini Generate</span></span>
   </a>
   <a class="provider-import-button provider-fenno" href="agentrouter://provider?name=Fenno.ai&amp;base_url=https%3A%2F%2Fapi.fenno.ai&amp;protocol=openai_chat_completions&amp;source=https%3A%2F%2Fapi.fenno.ai%2Fregister%3Fredirect%3D%2Fpurchase%3Ftab%3Dsubscription%2526group%3D16" aria-label="Import Fenno.ai provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/fenno.jpg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/fenno.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">Fenno.ai</span><span class="provider-import-meta">Chat / Responses / Anthropic</span></span>
   </a>
   <a class="provider-import-button provider-infistar-ai" href="agentrouter://provider?name=%E6%97%A0%E9%99%90%E6%98%9F%E6%B2%B3&amp;base_url=https%3A%2F%2Finfistar.ai%2Fv1&amp;protocol=openai_chat_completions&amp;models=gpt-4o&amp;source=https%3A%2F%2Finfistar.ai%2Fregister" aria-label="Import 无限星河 provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/infistar-ai.jpg" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/infistar-ai.jpg" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">无限星河</span><span class="provider-import-meta">OpenAI compatible gateway</span></span>
   </a>
   <a class="provider-import-button provider-minimax" href="agentrouter://provider?name=MiniMax+%28Global%29&amp;base_url=https%3A%2F%2Fapi.minimax.io%2Fv1&amp;protocol=openai_chat_completions&amp;models=MiniMax-M3&amp;source=https%3A%2F%2Fplatform.minimax.io%2Fdocs" aria-label="Import MiniMax global provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/minimax.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/minimax.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">MiniMax (Global)</span><span class="provider-import-meta">Chat Completions</span></span>
   </a>
   <a class="provider-import-button provider-minimax" href="agentrouter://provider?name=MiniMax+%28China%29&amp;base_url=https%3A%2F%2Fapi.minimaxi.com%2Fv1&amp;protocol=openai_chat_completions&amp;models=MiniMax-M3&amp;source=https%3A%2F%2Fplatform.minimaxi.com%2Fdocs" aria-label="Import MiniMax China provider">
-    <span class="provider-import-icon-shell"><img src="../../../provider-icons/minimax.ico" alt="" loading="lazy" /></span>
+    <span class="provider-import-icon-shell"><img src="../../provider-icons/minimax.ico" alt="" loading="lazy" /></span>
     <span class="provider-import-copy"><span class="provider-import-name">MiniMax (China)</span><span class="provider-import-meta">Chat Completions</span></span>
   </a>
 </div>

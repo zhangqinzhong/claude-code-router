@@ -1,6 +1,6 @@
 # AgentRouter Documentation
 
-Bilingual documentation for AgentRouter 1.1.0, built with Astro. GitHub Pages is not currently enabled for this repository; Markdown sources are available on GitHub.
+Bilingual documentation for AgentRouter, built with Astro. The documentation site is published from `main` at [zhangqinzhong.github.io/claude-code-router](https://zhangqinzhong.github.io/claude-code-router/).
 
 ## Local development
 
