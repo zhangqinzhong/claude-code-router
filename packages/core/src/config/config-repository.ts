@@ -111,6 +111,20 @@ export class ConfigRepository {
     return normalized;
   }
 
+  async updateApiKeys(update: (current: ApiKeyConfig[]) => ApiKeyConfig[]): Promise<ApiKeyConfig[]> {
+    const database = await this.getDatabase();
+    let result: ApiKeyConfig[] = [];
+    runTransaction(database, () => {
+      const current = listApiKeys(database);
+      result = uniqueApiKeyConfigs(update(current));
+      if (JSON.stringify(result) !== JSON.stringify(current)) {
+        replaceApiKeyRows(database, result);
+      }
+    });
+    secureDatabaseFilePermissions(this.dbFile);
+    return result;
+  }
+
   async replaceConfigSnapshot(value: unknown, apiKeys: ApiKeyConfig[]): Promise<ApiKeyConfig[]> {
     const normalized = uniqueApiKeyConfigs(apiKeys);
     const database = await this.getDatabase();
@@ -141,7 +155,10 @@ export class ConfigRepository {
     if (this.database) {
       return this.database;
     }
-    this.initPromise ??= this.open();
+    this.initPromise ??= this.open().catch((error) => {
+      this.initPromise = undefined;
+      throw error;
+    });
     return this.initPromise;
   }
 
@@ -150,10 +167,9 @@ export class ConfigRepository {
     mkdirSync(dbDir, { mode: privateDirMode, recursive: true });
     securePathPermissions(dbDir, privateDirMode);
     const database = createBetterSqliteDatabase(this.dbFile);
-    configureSqliteDatabase(database);
-    createSchema(database);
-
     try {
+      configureSqliteDatabase(database);
+      createSchema(database);
       migrateLegacySqliteStores(database, this.removeFile);
       migrateLegacyOnboardingMarker(database, this.removeFile);
       drainLegacyCleanup(database, this.removeFile, "legacy-json-config");
@@ -204,6 +220,10 @@ export async function loadPersistedApiKeys(): Promise<ApiKeyConfig[]> {
 
 export async function replacePersistedApiKeys(apiKeys: ApiKeyConfig[]): Promise<ApiKeyConfig[]> {
   return configRepository.replaceApiKeys(apiKeys);
+}
+
+export async function updatePersistedApiKeys(update: (current: ApiKeyConfig[]) => ApiKeyConfig[]): Promise<ApiKeyConfig[]> {
+  return configRepository.updateApiKeys(update);
 }
 
 export async function replacePersistedConfigSnapshot(value: unknown, apiKeys: ApiKeyConfig[]): Promise<ApiKeyConfig[]> {

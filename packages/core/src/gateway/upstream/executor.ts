@@ -502,7 +502,8 @@ export async function fetchUpstreamWithFallback(input: {
           statusCode: response.status
         });
         recordProviderCredentialOutcome(input.config, input.method, attempt, response.status, response.headers);
-        await drainResponseBody(response);
+        // Failed response bodies must not block the next provider attempt.
+        void cancelResponseBody(response);
         if (delayMs > 0) {
           await delay(delayMs, input.signal);
         }
@@ -808,6 +809,9 @@ function usageAwareOpenAiChatAttemptBody(input: {
       : undefined
   );
   if (providerProtocol !== "openai_chat_completions" && providerProtocol !== "openai_responses") {
+    return input.body;
+  }
+  if (providerProtocol === "openai_responses" && clientProtocol === "openai_responses") {
     return input.body;
   }
   const sanitizedBody = stripUnsupportedOpenAiRequestParameters(input.body);
@@ -1161,15 +1165,6 @@ function routeTraceChange(
 
 function isRouteTraceChange(value: RequestRouteTraceChange | undefined): value is RequestRouteTraceChange {
   return Boolean(value);
-}
-
-
-async function drainResponseBody(response: Response): Promise<void> {
-  try {
-    await response.arrayBuffer();
-  } catch {
-    // The failed attempt is already being skipped; body drain errors should not block the next attempt.
-  }
 }
 
 

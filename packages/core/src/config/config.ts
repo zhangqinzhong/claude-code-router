@@ -392,15 +392,14 @@ export async function saveAppThemePreference(theme: unknown): Promise<AppConfig[
 async function saveAppConfigNow(config: AppConfig): Promise<AppConfig> {
   const normalizedConfig = withSingleEnabledGlobalProfiles(config);
   assertProviderApiKeysAreSafe(normalizedConfig);
-  const apiKeys = ensureGatewayApiKeys(normalizeApiKeys(normalizedConfig.APIKEYS, normalizedConfig.APIKEY).filter((apiKey) => !isDefaultSeedApiKey(apiKey)));
   const pluginMigration = migrateKnownGatewayPluginConfigs(normalizedConfig.plugins);
-  await replacePersistedConfigSnapshot(sanitizeConfigForDisk({
+  // Credentials have their own save operation. A settings snapshot may predate
+  // a key revocation or rotation, so it must never replace the credential table.
+  await writeSanitizedConfig({
     ...normalizedConfig,
     theme: appThemePreferenceOverride ?? normalizedConfig.theme,
-    APIKEY: apiKeys[0]?.key ?? "",
-    APIKEYS: apiKeys,
     plugins: pluginMigration.plugins
-  }), apiKeys);
+  });
   return loadAppConfig();
 }
 
@@ -663,8 +662,10 @@ function providerCredentialApiKey(credential: ProviderCredentialConfig): string 
 
 export async function saveApiKeysConfig(apiKeys: ApiKeyConfig[]): Promise<AppConfig> {
   const normalized = ensureGatewayApiKeys(normalizeApiKeys(apiKeys, undefined).filter((apiKey) => !isDefaultSeedApiKey(apiKey)));
-  await replacePersistedApiKeys(normalized);
-  return loadAppConfig();
+  return enqueueAppConfigWrite(async () => {
+    await replacePersistedApiKeys(normalized);
+    return loadAppConfig();
+  });
 }
 
 async function loadRawAppConfig(): Promise<RawAppConfigLoadResult> {

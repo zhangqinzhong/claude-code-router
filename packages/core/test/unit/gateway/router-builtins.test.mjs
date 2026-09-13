@@ -1817,7 +1817,7 @@ test("model-chain fallback model selectors must not keep stale target provider h
   assert.equal(upstreamAttempt.body.model, "Qwen3-235B-A22B");
 });
 
-test("gateway strips unsupported OpenAI upstream request parameters", () => {
+test("gateway sanitizes OpenAI chat requests and preserves native Responses parameters", () => {
   const config = {
     CUSTOM_ROUTER_PATH: "",
     Providers: [
@@ -1861,8 +1861,9 @@ test("gateway strips unsupported OpenAI upstream request parameters", () => {
       routedModel: "gpt-compatible"
     });
 
-    assert.equal(upstreamAttempt.body.thinking, undefined);
-    assert.equal(upstreamAttempt.body.reasoning_split, undefined);
+    const nativeResponses = item.path === "/v1/responses";
+    assert.deepEqual(upstreamAttempt.body.thinking, nativeResponses ? item.body.thinking : undefined);
+    assert.equal(upstreamAttempt.body.reasoning_split, nativeResponses ? item.body.reasoning_split : undefined);
     assert.deepEqual(upstreamAttempt.body.reasoning, { effort: "medium" });
   }
 });

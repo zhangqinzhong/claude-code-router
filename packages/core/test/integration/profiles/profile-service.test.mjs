@@ -6,7 +6,7 @@ import path from "node:path";
 import test from "node:test";
 import { loadAppConfig } from "@agentrouter/core/config/config.ts";
 import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
-import { replacePersistedAppConfig } from "@agentrouter/core/config/config-repository.ts";
+import { replacePersistedApiKeys, replacePersistedAppConfig } from "@agentrouter/core/config/config-repository.ts";
 import { CONFIGDIR } from "@agentrouter/core/config/constants.ts";
 import { applyProfileConfig, cleanupGeneratedBinBackups, resolveGrokSourceHome, resolveKimiSourceHome, restoreInactiveGlobalProfileConfigs, restoreGlobalProfileConfigsOnExit } from "@agentrouter/core/profiles/service.ts";
 
@@ -152,7 +152,7 @@ test("profile service preserves user statusLine when the active global Claude ta
     }];
     config.profile.profiles = [profile];
 
-    const result = await applyProfileConfig(config);
+    const result = await applyProfileFixture(config);
     assert.equal(result.clients.some((client) => client.client === "claude-code" && client.ok), true);
     const current = JSON.parse(readFileSync(settingsFile, "utf8"));
     assert.deepEqual(current.statusLine, {
@@ -209,7 +209,7 @@ test("profile service does not overwrite invalid global Claude settings JSON", {
     }];
     config.profile.profiles = [profile];
 
-    const result = await applyProfileConfig(config);
+    const result = await applyProfileFixture(config);
     const status = result.clients.find((client) => client.client === "claude-code");
     assert.equal(status?.ok, false);
     assert.match(status?.message ?? "", /not valid JSON/);
@@ -264,7 +264,7 @@ test("profile service honors the top-level profile disabled flag", { skip: !proc
     config.profile.enabled = false;
     config.profile.profiles = [profile];
 
-    const result = await applyProfileConfig(config);
+    const result = await applyProfileFixture(config);
     const status = result.clients.find((client) => client.client === "claude-code");
     assert.equal(result.enabled, false);
     assert.equal(status?.enabled, false);
@@ -346,7 +346,7 @@ test("profile service does not rewrite user Claude settings for stale legacy pro
     assert.equal(loadedConfig.profile.codex.enabled, false);
     assert.deepEqual(loadedConfig.profile.profiles, []);
 
-    const result = await applyProfileConfig(loadedConfig);
+    const result = await applyProfileFixture(loadedConfig);
     assert.equal(result.enabled, false);
     assert.equal(readFileSync(settingsFile, "utf8"), userSettings);
     assert.deepEqual(
@@ -401,7 +401,7 @@ test("profile service does not rewrite Claude settings when only user-managed fi
     }];
     config.profile.profiles = [profile];
 
-    const initialResult = await applyProfileConfig(config);
+    const initialResult = await applyProfileFixture(config);
     assert.equal(initialResult.clients.some((client) => client.client === "claude-code" && client.ok), true);
     const settings = JSON.parse(readFileSync(settingsFile, "utf8"));
     settings.apiKeyHelper = "/usr/local/bin/custom-claude-helper";
@@ -413,7 +413,7 @@ test("profile service does not rewrite Claude settings when only user-managed fi
     const userEditedContent = JSON.stringify(settings);
     writeFileSync(settingsFile, userEditedContent);
 
-    const secondResult = await applyProfileConfig(config);
+    const secondResult = await applyProfileFixture(config);
     assert.equal(secondResult.clients.some((client) => client.client === "claude-code" && client.ok), true);
     assert.equal(readFileSync(settingsFile, "utf8"), userEditedContent);
   } finally {
@@ -456,7 +456,7 @@ test("profile service can exclude ZCode from automatic synchronization", async (
       }
     ];
 
-    const result = await applyProfileConfig(config, { excludeAgents: ["zcode"] });
+    const result = await applyProfileFixture(config, { excludeAgents: ["zcode"] });
 
     assert.equal(result.enabled, false);
     assert.deepEqual(result.clients, []);
@@ -571,7 +571,7 @@ test("profile service overwrites generated bin files without creating backups", 
   mkdirSync(claudeProfileDir, { recursive: true });
   writeFileSync(path.join(claudeProfileDir, ".claude.json"), `${JSON.stringify({ firstStartTime: "2026-01-01T00:00:00.000Z" }, null, 2)}\n`);
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, true);
   assert.equal(existsSync(legacyApiKeyHelperFile), false);
@@ -684,7 +684,7 @@ test("#1779 profile service defaults to apiKeyHelper even on Claude Code 2.1.235
       surface: "auto"
     }];
 
-    const result = await applyProfileConfig(config);
+    const result = await applyProfileFixture(config);
     assert.equal(result.clients.length, 1);
     assert.equal(result.clients[0].ok, true);
 
@@ -757,7 +757,7 @@ test("Codex profile launcher bypasses middleware for Browser and Computer Use he
       surface: "app"
     }];
 
-    const applied = await applyProfileConfig(config);
+    const applied = await applyProfileFixture(config);
     assert.equal(applied.clients[0].ok, true);
     const launcher = path.join(CONFIGDIR, "bin", `ar-codex-cli-stdio-${profileId}`);
     const content = readFileSync(launcher, "utf8");
@@ -855,7 +855,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, true);
 
@@ -909,7 +909,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
       ].join("\n"))
   );
 
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
 
   const preservedConfig = readFileSync(configFile, "utf8");
   assert.match(preservedConfig, /model = "User\/selected-in-codex"/);
@@ -927,7 +927,7 @@ test("profile service injects ToolHub MCP into Codex config", { skip: !process.e
 
   config.Providers[0].models.push("model-2");
   config.profile.profiles[0].model = "Provider/model-2";
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
 
   const explicitlyUpdatedConfig = readFileSync(configFile, "utf8");
   assert.match(explicitlyUpdatedConfig, /model = "Provider\/model-2"/);
@@ -979,7 +979,7 @@ test("profile service injects Context Archive MCP for managed Claude Code profil
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, true);
   const mcpConfigFile = path.join(CONFIGDIR, "profiles", profileId, "claude", "toolhub-mcp.json");
@@ -1037,7 +1037,7 @@ test("profile service injects Context Archive MCP for managed Codex profile", { 
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, true);
 
@@ -1093,7 +1093,7 @@ test("profile service injects Context Archive MCP for managed Claude Code withou
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, true);
   const mcpConfigFile = path.join(CONFIGDIR, "profiles", profileId, "claude", "toolhub-mcp.json");
@@ -1153,7 +1153,7 @@ test("profile service writes a Grok CLI wrapper that points model discovery and 
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].client, "grok");
   assert.equal(result.clients[0].ok, true);
@@ -1276,7 +1276,7 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].client, "kimi");
   assert.equal(result.clients[0].ok, true);
@@ -1312,7 +1312,7 @@ test("profile service writes a multi-model Kimi CLI home that points inference t
 
   delete config.profile.profiles[0].availableModels;
   config.profile.profiles[0].model = "";
-  const legacyResult = await applyProfileConfig(config);
+  const legacyResult = await applyProfileFixture(config);
   assert.equal(legacyResult.clients[0].ok, true);
   const legacyProfileConfigContent = readFileSync(path.join(profileKimiHome, "config.toml"), "utf8");
   assert.match(legacyProfileConfigContent, /default_model = "Provider\/model"/);
@@ -1369,7 +1369,7 @@ test("profile service writes a Pi config and wrapper that points inference to Ag
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].client, "pi");
   assert.equal(result.clients[0].ok, true);
@@ -1444,7 +1444,7 @@ test("profile service writes an OpenCode CLI wrapper and shared CLI/App config",
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].client, "opencode");
   assert.equal(result.clients[0].ok, true);
@@ -1509,21 +1509,21 @@ test("profile service removes disabled and deleted OpenCode wrappers and API key
   const commandExtension = process.platform === "win32" ? ".cmd" : "";
   const wrapperFile = path.join(CONFIGDIR, "bin", `ar-opencode-wrapper-${profileId}${commandExtension}`);
 
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(wrapperFile), true);
 
   profile.enabled = false;
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(wrapperFile), false);
   assert.deepEqual(config.APIKEYS.map((apiKey) => apiKey.id), ["general-key"]);
 
   profile.enabled = true;
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(wrapperFile), true);
   assert.ok(config.APIKEYS.some((apiKey) => apiKey.id === `profile:${profileId}`));
 
   config.profile.profiles = [];
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(wrapperFile), false);
   assert.deepEqual(config.APIKEYS.map((apiKey) => apiKey.id), ["general-key"]);
 });
@@ -1585,7 +1585,7 @@ test("profile service clears stale Claude Code ToolHub artifacts when no gateway
     }
   ];
 
-  const result = await applyProfileConfig(config);
+  const result = await applyProfileFixture(config);
   assert.equal(result.clients.length, 1);
   assert.equal(result.clients[0].ok, false);
   assert.equal(existsSync(toolHubMcpConfigFile), false);
@@ -1854,20 +1854,20 @@ test("profile service invalidates Claude gateway model discovery cache only when
   mkdirSync(path.dirname(gatewayCacheFile), { recursive: true });
   writeFileSync(gatewayCacheFile, `{"baseUrl":"http://127.0.0.1:${config.gateway.port}","fetchedAt":1,"models":[]}`);
 
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(gatewayCacheFile), false);
 
   writeFileSync(gatewayCacheFile, "{}");
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(gatewayCacheFile), true, "unchanged allowlist must not invalidate the cache");
 
   config.Providers[0].modelMetadata = { alpha: { contextWindow: 400000 } };
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(gatewayCacheFile), false, "model metadata change must invalidate the cache even with an unchanged allowlist");
 
   writeFileSync(gatewayCacheFile, "{}");
   config.profile.profiles[0].availableModels = ["Provider/alpha", "Provider/beta"];
-  await applyProfileConfig(config);
+  await applyProfileFixture(config);
   assert.equal(existsSync(gatewayCacheFile), false, "allowlist change must invalidate the cache");
 
   rmSync(fingerprintFile, { force: true });
@@ -1931,7 +1931,7 @@ test("profile service reports a failed model discovery cache invalidation withou
   ];
 
   try {
-    const result = await applyProfileConfig(config);
+    const result = await applyProfileFixture(config);
     const claudeStatus = result.clients.find((client) => client.client === "claude-code");
     assert.equal(claudeStatus?.ok, false, "a failed cache invalidation must be reported as a contained Claude Code error");
     assert.ok(result.clients.some((client) => client.client === "codex"), "profiles after the failing one must still be applied");
@@ -1939,3 +1939,9 @@ test("profile service reports a failed model discovery cache invalidation withou
     rmSync(fingerprintFile, { force: true, recursive: true });
   }
 });
+
+// Credentials are authoritative in the database, not in the settings snapshot.
+async function applyProfileFixture(config, options) {
+  await replacePersistedApiKeys(config.APIKEYS ?? []);
+  return applyProfileConfig(config, options);
+}

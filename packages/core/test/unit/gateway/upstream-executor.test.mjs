@@ -474,3 +474,102 @@ test("model-chain fallback rebuilds every protocol attempt from the canonical re
     globalThis.fetch = originalFetch;
   }
 });
+
+
+test("fallback cancels unfinished error bodies without waiting for cancellation", async () => {
+  const originalFetch = globalThis.fetch;
+  try {
+    for (const cancellation of ["complete", "reject", "pending"]) {
+      let fetchCount = 0;
+      let cancelled = false;
+      const body = new ReadableStream({
+        start(controller) {
+          controller.enqueue(new TextEncoder().encode('{"error":"rate limited"}'));
+        },
+        cancel() {
+          cancelled = true;
+          if (cancellation === "reject") return Promise.reject(new Error("cleanup failed"));
+          if (cancellation === "pending") return new Promise(() => {});
+        }
+      });
+      globalThis.fetch = async () => {
+        fetchCount += 1;
+        return fetchCount === 1
+          ? new Response(body, { headers: { "retry-after": "0.001" }, status: 429 })
+          : new Response("{}", { status: 200 });
+      };
+
+      const result = await fetchUpstreamWithFallback({
+        body: Buffer.from('{"model":"test-model"}'),
+        config: retryConfig,
+        coreAuthToken: "core-token",
+        fallback: retryFallback,
+        headers: {},
+        method: "POST",
+        path: "/v1/messages",
+        routedModel: "test-model",
+        signal: AbortSignal.timeout(1000),
+        upstreamUrl: "http://127.0.0.1:3456/v1/messages"
+      });
+      assert.equal(cancelled, true, cancellation);
+      assert.equal(fetchCount, 2, cancellation);
+      assert.equal(result.response.status, 200, cancellation);
+      assert.equal(result.failedAttempts.length, 1, cancellation);
+      assert.equal(result.failedAttempts[0].statusCode, 429, cancellation);
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+
+test("OpenAI Responses upstream preserves response-native request bodies", () => {
+  const input = [
+    {
+      content: [{ text: "Developer rules", type: "input_text" }],
+      role: "developer",
+      type: "message"
+    },
+    {
+      content: [{ text: "inspect the repo", type: "input_text" }],
+      role: "user",
+      type: "message"
+    },
+    {
+      content: "System guardrails",
+      role: "system",
+      type: "message"
+    }
+  ];
+  const attempt = prepareGatewayUpstreamAttemptForTest({
+    body: {
+      input,
+      instructions: "You are Codex.",
+      model: "Provider/gpt-5.5",
+      reasoning_split: true,
+      stream: true
+    },
+    config: {
+      Providers: [
+        {
+          capabilities: [{ baseUrl: "https://openai-compatible.example/v1", type: "openai_responses" }],
+          credentials: [{ apiKey: "provider-key", id: "provider-main" }],
+          models: ["gpt-5.5"],
+          name: "Provider"
+        }
+      ],
+      Router: { fallback: { mode: "off", models: [], retryCount: 0 }, rules: [] },
+      virtualModelProfiles: []
+    },
+    headers: {},
+    method: "POST",
+    path: "/v1/responses",
+    routedModel: "Provider/gpt-5.5"
+  });
+
+  assert.equal(attempt.body.model, "gpt-5.5");
+  assert.equal(attempt.body.instructions, "You are Codex.");
+  assert.deepEqual(attempt.body.input, input);
+  assert.equal(attempt.body.reasoning_split, true);
+  assert.equal(attempt.credentialProtocol, "openai_responses");
+});

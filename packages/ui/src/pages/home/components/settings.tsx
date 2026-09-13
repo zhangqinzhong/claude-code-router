@@ -1795,7 +1795,7 @@ function BotConfigDialog({
             </Field>
             <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
               <span className="text-[12px] font-medium">{t("Stream replies and progress")}</span>
-              <Switch checked={draft.botStreamReplies} onCheckedChange={(checked) => update({ botStreamReplies: checked })} />
+              <Switch disabled={draft.botPlatform === "weixin-ilink"} checked={draft.botPlatform === "weixin-ilink" ? false : draft.botStreamReplies} onCheckedChange={(checked) => update({ botStreamReplies: checked })} />
             </div>
             <div className="flex items-center justify-between gap-3 rounded-md border border-border px-3 py-2">
               <span className="text-[12px] font-medium">{t("Send and receive attachments")}</span>

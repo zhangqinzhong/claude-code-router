@@ -722,7 +722,7 @@ export function createBotGatewayConfigDraft(config?: BotGatewaySavedConfig): Bot
     botPlatform: botDraft.botPlatform === "none" ? "weixin-ilink" : botDraft.botPlatform,
     botSessionIdleMinutes: String(bot.sessionIdleMinutes),
     botShellEnabled: bot.shellEnabled,
-    botStreamReplies: bot.streamReplies,
+    botStreamReplies: botDraft.botPlatform === "none" || botDraft.botPlatform === "weixin-ilink" ? false : bot.streamReplies,
     name: config?.name ?? ""
   };
 }
@@ -803,7 +803,7 @@ function botGatewayConfigFromDraft(
     sourceDir: "",
     startupTimeoutMs: fallbackConfig.botGateway.startupTimeoutMs,
     stateDir: existingBotGateway?.stateDir?.trim() || createBotGatewayStateDir(configId),
-    streamReplies: draft.botStreamReplies,
+    streamReplies: platform === "weixin-ilink" ? false : draft.botStreamReplies,
     tenantId: existingBotGateway?.tenantId?.trim() || createBotGatewayTenantId(configName || configId)
   };
   return config;

@@ -55,9 +55,26 @@ export function estimateLimitUsage(method: string, requestBody: Buffer): ApiKeyL
   }
 
   const body = parseJsonObjectCached(requestBody);
-  const inputCharacters = countUnknownCharacters(body.messages) + countUnknownCharacters(body.system) + countUnknownCharacters(body.tools);
+  const inputCharacters = [
+    body.messages,
+    body.system,
+    body.tools,
+    body.input,
+    body.instructions,
+    body.contents,
+    body.systemInstruction,
+    body.system_instruction
+  ].reduce<number>((total, value) => total + countUnknownCharacters(value), 0);
   const inputTokens = Math.ceil(inputCharacters / 4);
-  const outputTokens = readPositiveNumber(body.max_tokens) ?? readPositiveNumber(body.max_output_tokens) ?? 1024;
+  const generationConfig = isRecord(body.generationConfig)
+    ? body.generationConfig
+    : isRecord(body.generation_config) ? body.generation_config : undefined;
+  const outputTokens = readPositiveNumber(body.max_completion_tokens) ??
+    readPositiveNumber(body.max_tokens) ??
+    readPositiveNumber(body.max_output_tokens) ??
+    readPositiveNumber(generationConfig?.maxOutputTokens) ??
+    readPositiveNumber(generationConfig?.max_output_tokens) ??
+    1024;
   return {
     imageCount: countImageInputs(body),
     totalTokens: Math.max(1, inputTokens + outputTokens)

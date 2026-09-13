@@ -102,7 +102,8 @@ test("botGatewayProfileEnv disables create integration for QR login platforms", 
       botConfigs: [],
       botGateway: botGateway({
         authType: "qr",
-        platform: "weixin"
+        platform: "weixin",
+        streamReplies: true
       })
     },
     { ...profile, botConfigId: undefined },
@@ -112,6 +113,7 @@ test("botGatewayProfileEnv disables create integration for QR login platforms", 
   assert.equal(env.AR_BOT_GATEWAY_PLATFORM, "weixin-ilink");
   assert.equal(env.AR_BOT_GATEWAY_AUTH_TYPE, "qr_login");
   assert.equal(env.AR_BOT_GATEWAY_CREATE_INTEGRATION, "false");
+  assert.equal(env.AR_BOT_GATEWAY_STREAM_REPLIES, "false");
   assert.equal(JSON.parse(env.AR_BOT_GATEWAY_CONFIG_JSON).transport, "websocket");
 });
 
@@ -158,4 +160,10 @@ test("materializeBotGatewayStdioRunnerPath copies bundled runner out of app.asar
   assert.equal(materialized, path.join(configDir, "bot-gateway", "runners", "bot-gateway-stdio.mjs"));
   assert.notEqual(path.dirname(materialized), path.dirname(source));
   assert.equal(readFileSync(materialized, "utf8"), "#!/usr/bin/env node\nconsole.log('ok');\n");
+});
+
+
+test("non-Weixin bots preserve explicitly enabled streaming replies", () => {
+  const env = botGatewayProfileEnv({botConfigs: [], botGateway: botGateway({streamReplies:true})}, {...profile,botConfigId:undefined}, "app");
+  assert.equal(env.AR_BOT_GATEWAY_STREAM_REPLIES, "true");
 });

@@ -4,7 +4,7 @@ import os from "node:os";
 import path from "node:path";
 import { CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY_ENV, NO_AVAILABLE_GATEWAY_MODELS_MESSAGE, availableGatewayModelIds, enforceSingleEnabledGlobalProfilePerAgent, hasAvailableGatewayModels, isGatewayProviderEnabled, type AppConfig, type ProfileApplyResult, type ProfileClientApplyStatus, type ProfileClientKind, type ProfileConfig } from "@agentrouter/core/contracts/app";
 import { CLAUDE_CODE_AUTH_MODE_ENV, resolveClaudeCodeGatewayAuthMode, type ClaudeCodeGatewayAuthMode } from "@agentrouter/core/agents/claude-code/auth-mode";
-import { replacePersistedApiKeys } from "@agentrouter/core/config/config-repository";
+import { updatePersistedApiKeys } from "@agentrouter/core/config/config-repository";
 import { botGatewayProfileEnv } from "@agentrouter/core/agents/bot-gateway/env";
 import {
   CLAUDE_CODE_MCP_CONFIG_ENV,
@@ -845,24 +845,20 @@ function profileEntries(config: AppConfig): ProfileConfig[] {
 }
 
 async function ensureProfileApiKeys(config: AppConfig, profiles: ProfileConfig[]): Promise<Map<string, string>> {
-  const result = syncProfileApiKeys(Array.isArray(config.APIKEYS) ? config.APIKEYS : [], profiles);
-  if (result.changed) {
-    config.APIKEYS = await replacePersistedApiKeys(result.apiKeys);
-    config.APIKEY = config.APIKEYS[0]?.key ?? "";
-  }
-
-  return result.tokens;
+  let tokens = new Map<string, string>();
+  config.APIKEYS = await updatePersistedApiKeys((current) => {
+    const result = syncProfileApiKeys(current, profiles);
+    tokens = result.tokens;
+    return result.apiKeys;
+  });
+  config.APIKEY = config.APIKEYS[0]?.key ?? "";
+  return tokens;
 }
 
 async function pruneInactiveProfileApiKeys(config: AppConfig, profiles: ProfileConfig[]): Promise<void> {
-  const result = pruneInactiveProfileApiKeysFromList(
-    Array.isArray(config.APIKEYS) ? config.APIKEYS : [],
-    profiles
+  config.APIKEYS = await updatePersistedApiKeys((current) =>
+    pruneInactiveProfileApiKeysFromList(current, profiles).apiKeys
   );
-  if (!result.changed) {
-    return;
-  }
-  config.APIKEYS = await replacePersistedApiKeys(result.apiKeys);
   config.APIKEY = config.APIKEYS[0]?.key ?? "";
 }
 
