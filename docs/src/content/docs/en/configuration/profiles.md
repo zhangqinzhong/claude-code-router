@@ -176,3 +176,10 @@ With a Bot bound, WorkBuddy can relay conversations through the selected IM chan
 2. While testing, prefer **Only opened from AgentRouter** to avoid changing the system default agent.
 3. To keep desktop windows side by side, use `App only` or `CLI & APP`, then open the App from AgentRouter.
 4. If the same config is already running, opening it again activates the existing window. Create another Agent Config when you need a second instance.
+
+
+## Launch aliases
+
+Set **Launch alias** in the profile editor, for example `ccwork`. After saving, run `ccwork` in a terminal to start the profile. Additional arguments are passed through to the agent. The existing `agentrouter CodexCompany` command remains available.
+
+Aliases bind to profile IDs, so renaming a profile preserves its launch target. Disabling or deleting a profile, or changing or clearing its alias, removes the old alias command. Use up to 48 letters, digits, hyphens or underscores, starting with a letter. Existing commands, shell functions and aliases assigned to other profiles cannot be reused.

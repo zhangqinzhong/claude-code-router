@@ -783,3 +783,14 @@ test("Workbuddy profiles support local App configuration", () => {
   assert.match(profileAgentLogoUrl("workbuddy"), /workbuddy/i);
   assert.notEqual(profileAgentLogoUrl("workbuddy"), profileAgentLogoUrl("codex"));
 });
+
+test("launch alias survives draft and persisted profile round trips", () => {
+  for (const agent of ["claude-code", "codex", "grok", "claude-design"] as const) {
+    const draft = { ...createProfileDraft(agent), name: "Company", model: "Provider/model", launchAlias: "ccwork" };
+    const profile = profileConfigFromDraft(draft, []);
+    assert.equal(profile.launchAlias, "ccwork");
+    assert.equal(createProfileDraftFromProfile(profile).launchAlias, "ccwork");
+    assert.equal(normalizeUnknownProfileItem(profile, 0)?.launchAlias, "ccwork");
+    assert.equal(isProfileDraftSubmittable({ ...draft, launchAlias: "../bad" }), false);
+  }
+});

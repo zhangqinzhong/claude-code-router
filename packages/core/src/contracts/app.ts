@@ -1517,6 +1517,7 @@ export type CodexProfileConfig = {
 };
 
 export type ProfileConfig = {
+  launchAlias?: string;
   agent: ProfileClientKind;
   appPath?: string;
   availableModels?: string[];

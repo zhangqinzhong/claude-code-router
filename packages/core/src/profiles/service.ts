@@ -1,3 +1,4 @@
+import { syncProfileAliases } from "@agentrouter/core/profiles/aliases";
 import { chmodSync, copyFileSync, existsSync, lstatSync, mkdirSync, readlinkSync, readdirSync, readFileSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import os from "node:os";
@@ -150,6 +151,7 @@ export async function applyProfileConfig(
   const appliedAt = new Date().toISOString();
   const excludedAgents = new Set(options.excludeAgents ?? []);
   const allProfiles = profileEntries(config);
+  syncProfileAliases(allProfiles, path.join(CONFIGDIR, "bin"));
   const profiles = allProfiles.filter((profile) => !excludedAgents.has(profile.agent));
   cleanupInactiveOpenCodeWrappers(allProfiles);
   cleanupInactiveKiloWrappers(allProfiles);

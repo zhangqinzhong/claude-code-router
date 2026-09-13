@@ -34,6 +34,7 @@ export function findProfileForOpen(config: Pick<AppConfig, "profile">, profileRe
 
   const normalizedNeedle = normalizeLookupValue(needle);
   const matches = profiles.filter((profile) =>
+    (Boolean(profile.launchAlias) && normalizeLookupValue(profile.launchAlias!) === normalizedNeedle) ||
     normalizeLookupValue(profile.name) === normalizedNeedle ||
     normalizeLookupValue(profile.id) === normalizedNeedle ||
     sanitizePathSegment(profile.name) === normalizedNeedle ||
@@ -96,7 +97,9 @@ export function profileOpenCommand(
   profileRef = profile.name?.trim() || profile.id
 ): string {
   const quote = process.platform === "win32" ? windowsCommandQuote : shellQuote;
-  const parts = [quote(command), quote(profileRef)];
+  const parts = profile.launchAlias && command === "agentrouter"
+    ? [quote(profile.launchAlias)]
+    : [quote(command), quote(profileRef)];
   if (surface === "app") {
     parts.push(surface);
   }

@@ -1,3 +1,4 @@
+import { isValidLaunchAlias } from "@agentrouter/core/profiles/alias-validation";
 import claudeCodeLogoUrl from "@/assets/agent-logos/claude-code.png";
 import codexLogoUrl from "@/assets/agent-logos/codex.png";
 import grokLogoUrl from "@/assets/agent-logos/grok.ico";
@@ -556,6 +557,7 @@ export function createProfileDraft(agent: ProfileConfig["agent"] = "claude-code"
     haikuModel: "",
     managedCompact: false,
     model: "",
+    launchAlias: "",
     name: name ?? profileAgentLabel(agent),
     opusModel: "",
     providerId: "claude-code-router",
@@ -598,6 +600,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
     return {
       ...createProfileDraft("claude-code", profile.name),
       ...createProfileRoutingDraft(profile.routing),
+      launchAlias: profile.launchAlias ?? "",
       ...botDraft,
       appPath: profile.appPath ?? "",
       botConfigId,
@@ -621,6 +624,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
     return {
       ...createProfileDraft(profile.agent, profile.name),
       ...createProfileRoutingDraft(profile.routing),
+      launchAlias: profile.launchAlias ?? "",
       availableModels: profileDraftAvailableModels(profile),
       envRows: keyValueRowsFromRecord(codexCompatibleProfileEnv(profile.env ?? {})),
       model: profile.model,
@@ -632,6 +636,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
     return {
       ...createProfileDraft("claude-design", profile.name),
       ...createProfileRoutingDraft(profile.routing),
+      launchAlias: profile.launchAlias ?? "",
       envRows: [],
       model: "",
       scope: "agentrouter",
@@ -642,6 +647,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
   return {
     ...createProfileDraft(profile.agent, profile.name),
     ...createProfileRoutingDraft(profile.routing),
+      launchAlias: profile.launchAlias ?? "",
     ...botDraft,
     appPath: profile.appPath ?? "",
     availableModels: profileDraftAvailableModels(profile),
@@ -660,6 +666,7 @@ export function createProfileDraftFromProfile(profile: ProfileConfig, botConfigs
 }
 
 export function isProfileDraftSubmittable(draft: AddProfileDraft): boolean {
+  if (draft.launchAlias?.trim() && !isValidLaunchAlias(draft.launchAlias.trim())) return false;
   if (!draft.name.trim()) {
     return false;
   }
@@ -749,6 +756,7 @@ export function profileConfigFromDraft(
     id,
     managedCompact: draft.managedCompact,
     model: draft.model,
+    launchAlias: draft.launchAlias?.trim() || undefined,
     name: draft.name,
     opusModel: draft.opusModel,
     providerId: draft.providerId.trim() || "claude-code-router",
@@ -1411,6 +1419,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
     const claudeSettings = normalizeClaudeSettingsConfig(profile.claudeSettings);
     return {
       agent: "claude-code",
+      launchAlias: profile.launchAlias?.trim() || undefined,
       ...(surface !== "cli" && appPath ? { appPath } : {}),
       ...(botConfigId ? { botConfigId } : {}),
       ...(botGateway ? { botGateway } : {}),
@@ -1436,6 +1445,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
   if (agent === "grok" || agent === "kimi" || agent === "pi") {
     return {
       agent,
+      launchAlias: profile.launchAlias?.trim() || undefined,
       ...(availableModels ? { availableModels } : {}),
       enabled: profile.enabled,
       env: codexCompatibleProfileEnv(env),
@@ -1450,6 +1460,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
   if (agent === "claude-design") {
     return {
       agent,
+      launchAlias: profile.launchAlias?.trim() || undefined,
       enabled: profile.enabled,
       env: {},
       id: profile.id || `profile-${index + 1}`,
@@ -1462,6 +1473,7 @@ export function normalizeProfileItem(profile: ProfileConfig, index: number): Pro
   }
   return {
     agent: normalizeCodexCompatibleAgent(agent),
+    launchAlias: profile.launchAlias?.trim() || undefined,
     ...(surface !== "cli" && agent !== "zcode" && profile.appPath?.trim() ? { appPath: profile.appPath.trim() } : {}),
     ...(botConfigId ? { botConfigId } : {}),
     ...(botGateway ? { botGateway } : {}),
@@ -1565,6 +1577,7 @@ export function normalizeUnknownProfileItem(value: Record<string, unknown>, inde
   }
   return normalizeProfileItem({
     agent,
+    launchAlias: typeof value.launchAlias === "string" ? value.launchAlias.trim() : undefined,
     appPath: readUnknownProfileAppPath(value, agent),
     availableModels: Array.isArray(value.availableModels)
       ? value.availableModels.filter((model): model is string => typeof model === "string")

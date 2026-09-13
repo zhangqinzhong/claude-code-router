@@ -1,3 +1,4 @@
+import { syncProfileAliases } from "@agentrouter/core/profiles/aliases";
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
 import { chmodSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
@@ -1750,6 +1751,7 @@ export function ensureArCliLauncher(config?: AppConfig, options: EnsureArCliLaun
     persistPreparedArCliPath(preparation);
   }
 
+  if (config) syncProfileAliases(config.profile.profiles, binDir);
   return launcherFile;
 }
 

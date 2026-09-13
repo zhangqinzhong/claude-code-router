@@ -170,6 +170,7 @@ export type AddApiKeyDraft = {
 };
 
 export type AddProfileDraft = {
+  launchAlias?: string;
   agent: ProfileConfig["agent"];
   appPath: string;
   availableModels: string[];

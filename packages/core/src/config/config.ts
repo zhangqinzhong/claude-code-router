@@ -1,3 +1,5 @@
+import { CONFIGDIR } from "@agentrouter/core/config/constants";
+import { validateProfileAliasFiles } from "@agentrouter/core/profiles/aliases";
 import { createHash, randomBytes } from "node:crypto";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
@@ -393,6 +395,7 @@ export async function saveAppThemePreference(theme: unknown): Promise<AppConfig[
 async function saveAppConfigNow(config: AppConfig): Promise<AppConfig> {
   const normalizedConfig = withSingleEnabledGlobalProfiles(config);
   assertProviderApiKeysAreSafe(normalizedConfig);
+  validateProfileAliasFiles(normalizedConfig.profile.profiles, path.join(CONFIGDIR, "bin"));
   const pluginMigration = migrateKnownGatewayPluginConfigs(normalizedConfig.plugins);
   // Credentials have their own save operation. A settings snapshot may predate
   // a key revocation or rotation, so it must never replace the credential table.
@@ -3675,6 +3678,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
         const claudeSettings = parseUnknownRecord(item.claudeSettings ?? item.claude_settings);
         return {
           agent,
+          launchAlias: readString(item.launchAlias)?.trim() || undefined,
           ...(appPath ? { appPath } : {}),
           ...(botConfigId ? { botConfigId } : {}),
           ...(botGateway ? { botGateway } : {}),
@@ -3701,6 +3705,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
       if (agent === "grok" || agent === "kimi" || agent === "pi") {
         return {
           agent,
+          launchAlias: readString(item.launchAlias)?.trim() || undefined,
           ...(availableModels ? { availableModels } : {}),
           enabled,
           env: codexCompatibleProfileEnv(env),
@@ -3716,6 +3721,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
       if (agent === CLAUDE_DESIGN_PLUGIN_ID) {
         return {
           agent,
+          launchAlias: readString(item.launchAlias)?.trim() || undefined,
           enabled,
           env: {},
           id,
@@ -3737,6 +3743,7 @@ function parseProfiles(value: unknown): ProfileConfig[] | undefined {
             : undefined;
       return {
         agent,
+        launchAlias: readString(item.launchAlias)?.trim() || undefined,
         ...(appPath ? { appPath } : {}),
         ...(botConfigId ? { botConfigId } : {}),
         ...(botGateway ? { botGateway } : {}),

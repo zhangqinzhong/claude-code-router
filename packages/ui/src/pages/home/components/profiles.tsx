@@ -1,3 +1,4 @@
+import { isValidLaunchAlias } from "@agentrouter/core/profiles/alias-validation";
 import { useDraftClose } from "./unsaved-changes";
 import {
   AddProfileDraft, AddRoutingRuleDraft, AgentLogo, AnimatedIconSwap, AnimatedPopover, AnimatePresence, AppConfig, Badge, BotGatewaySavedConfig, botGatewaySavedConfigLabel, BotHandoffScanTarget, Button,
@@ -837,6 +838,10 @@ export function AddProfileForm({
         <Field label={t("Profile name")} requirement="required" requirementLabel={requiredFieldLabel}>
           <Input value={draft.name} onChange={(event) => onChange({ name: event.target.value })} />
           {validation.name ? <ProfileFieldHint>{t(validation.name)}</ProfileFieldHint> : null}
+        </Field>
+        <Field label={t("Launch alias")}>
+          <Input value={draft.launchAlias ?? ""} placeholder="ccwork" onChange={(event) => onChange({ launchAlias: event.target.value })} />
+          <ProfileFieldHint>{t(validation.launchAlias || "Optional. Start this profile by typing the alias in a terminal.")}</ProfileFieldHint>
         </Field>
         <Field label={t("Effect scope")} requirement="required" requirementLabel={requiredFieldLabel}>
           <SelectControl
@@ -1833,8 +1838,11 @@ function profileDraftValidation(
   draft: AddProfileDraft,
   botConfigs: BotGatewaySavedConfig[],
   availableModelCount: number
-): Partial<Record<"allowedModels" | "bot" | "claudeSettings" | "defaultModel" | "env" | "handoff" | "kimiModel" | "models" | "name", string>> {
-  const issues: Partial<Record<"allowedModels" | "bot" | "claudeSettings" | "defaultModel" | "env" | "handoff" | "kimiModel" | "models" | "name", string>> = {};
+): Partial<Record<"allowedModels" | "bot" | "claudeSettings" | "defaultModel" | "env" | "handoff" | "kimiModel" | "models" | "name" | "launchAlias", string>> {
+  const issues: Partial<Record<"allowedModels" | "bot" | "claudeSettings" | "defaultModel" | "env" | "handoff" | "kimiModel" | "models" | "name" | "launchAlias", string>> = {};
+  if (draft.launchAlias?.trim() && !isValidLaunchAlias(draft.launchAlias.trim())) {
+    issues.launchAlias = "Use 1–48 letters, digits, hyphens or underscores, starting with a letter. Reserved commands are not allowed.";
+  }
   if (!draft.name.trim()) {
     issues.name = "Profile name is required.";
   }
