@@ -37,10 +37,13 @@ type ClaudeDesignWindowRedirectState = {
 
 type ClaudeDesignFetchInterceptorRegistration = {
   handler: (event: ElectronEvent, method: string, params: unknown) => void;
+  networkRequests: Map<string, string>;
+  requests: Map<string, { originalUrl: string; networkId?: string }>;
   state: ClaudeDesignWindowRedirectState;
 };
 
 type CdpFetchRequestPausedParams = {
+  networkId?: string;
   request?: {
     hasPostData?: boolean;
     headers?: Record<string, string>;
@@ -50,6 +53,10 @@ type CdpFetchRequestPausedParams = {
     url?: string;
   };
   requestId?: string;
+  responseErrorReason?: string;
+  responseHeaders?: Array<{ name: string; value: string }>;
+  responseStatusCode?: number;
+  responseStatusText?: string;
 };
 
 const claudePluginAdminPaths: Record<string, string> = {
@@ -216,6 +223,10 @@ async function installClaudeDesignFetchInterceptor(webContents: WebContents, sta
       webContents.debugger.attach("1.3");
     }
     ensureClaudeDesignFetchInterceptorHandler(webContents, state);
+    // Network.enable can wait for the first renderer navigation. Enable it in
+    // parallel so loading that page is not blocked; its completion events
+    // discard redirect metadata when a request is cancelled before headers.
+    void webContents.debugger.sendCommand("Network.enable").catch(() => undefined);
     await webContents.debugger.sendCommand("Fetch.enable", {
       patterns: claudeDesignCdpFetchPatterns(state.options)
     });
@@ -236,11 +247,21 @@ function ensureClaudeDesignFetchInterceptorHandler(webContents: WebContents, sta
 
   const registration: ClaudeDesignFetchInterceptorRegistration = {
     handler: (_event, method, params) => {
+      if (method === "Network.loadingFailed" || method === "Network.loadingFinished") {
+        const networkId = (params as { requestId?: string }).requestId;
+        const requestId = networkId && registration.networkRequests.get(networkId);
+        if (requestId) {
+          forgetClaudeDesignFetchRequest(registration, requestId);
+        }
+        return;
+      }
       if (method !== "Fetch.requestPaused") {
         return;
       }
-      void fulfillClaudeDesignFetchRequest(webContents, registration.state, params as CdpFetchRequestPausedParams);
+      void routeClaudeDesignFetchRequest(webContents, registration, params as CdpFetchRequestPausedParams);
     },
+    networkRequests: new Map(),
+    requests: new Map(),
     state
   };
   fetchInterceptorRegistrations.set(webContents, registration);
@@ -249,6 +270,8 @@ function ensureClaudeDesignFetchInterceptorHandler(webContents: WebContents, sta
   const cleanup = (reason?: string) => {
     registration.state.fetchInterceptedWebContentsIds.delete(webContents.id);
     fetchInterceptorRegistrations.delete(webContents);
+    registration.networkRequests.clear();
+    registration.requests.clear();
     try {
       webContents.debugger.off("message", registration.handler);
     } catch {
@@ -262,15 +285,46 @@ function ensureClaudeDesignFetchInterceptorHandler(webContents: WebContents, sta
   webContents.once("destroyed", () => cleanup());
 }
 
-async function fulfillClaudeDesignFetchRequest(
+async function routeClaudeDesignFetchRequest(
   webContents: WebContents,
-  state: ClaudeDesignWindowRedirectState,
+  registration: ClaudeDesignFetchInterceptorRegistration,
   params: CdpFetchRequestPausedParams
 ): Promise<void> {
+  const state = registration.state;
   const requestId = typeof params.requestId === "string" ? params.requestId : "";
   const request = params.request;
   const requestUrl = typeof request?.url === "string" ? request.url : "";
   if (!requestId || !requestUrl) {
+    return;
+  }
+
+  if (params.responseStatusCode !== undefined || params.responseErrorReason !== undefined) {
+    const originalUrl = registration.requests.get(requestId)?.originalUrl;
+    forgetClaudeDesignFetchRequest(registration, requestId);
+    try {
+      const headers = params.responseHeaders;
+      const responseHeaders = originalUrl && headers && params.responseStatusCode !== undefined &&
+          params.responseStatusCode >= 300 && params.responseStatusCode < 400 &&
+          headers.some((header) => header.name.toLowerCase() === "location")
+        ? headers.map((header) => header.name.toLowerCase() === "location"
+          ? { ...header, value: claudeDesignRedirectLocation(header.value, originalUrl, requestUrl) }
+          : header)
+        : undefined;
+      // Replacing a redirect is necessary: continueResponse changes headers,
+      // but Chromium has already resolved its redirect target against the
+      // backend URL. Other responses continue directly, including SSE.
+      await webContents.debugger.sendCommand(responseHeaders ? "Fetch.fulfillRequest" : "Fetch.continueResponse", {
+        requestId,
+        ...(responseHeaders ? {
+          body: "",
+          responseCode: params.responseStatusCode,
+          responsePhrase: params.responseStatusText,
+          responseHeaders
+        } : {})
+      });
+    } catch {
+      await failClaudeDesignFetchRequest(webContents, requestId);
+    }
     return;
   }
 
@@ -283,24 +337,108 @@ async function fulfillClaudeDesignFetchRequest(
   try {
     const method = request?.method || "GET";
     const backendRequest = claudeDesignBackendRequestForCdp(method, request);
-    const response = await fetch(backendUrl, {
-      body: fetchBodyInit(backendRequest.body),
-      cache: "no-store",
-      headers: backendRequest.headers,
-      method,
-      redirect: "manual"
-    });
-    const responseBody = method === "HEAD" ? Buffer.alloc(0) : Buffer.from(await response.arrayBuffer());
-    await webContents.debugger.sendCommand("Fetch.fulfillRequest", {
-      body: responseBody.toString("base64"),
+    if (!isClaudeDesignStreamingRequest(method, requestUrl, backendRequest.headers)) {
+      // Keep navigation and ordinary API responses on the original response
+      // origin, including Secure cookies. A transparent network URL rewrite
+      // preserves the page URL but Chromium associates cookies with its target.
+      const response = await fetch(backendUrl, {
+        body: fetchBodyInit(backendRequest.body),
+        cache: "no-store",
+        headers: backendRequest.headers,
+        method,
+        redirect: "manual"
+      });
+      const responseBody = method === "HEAD" ? Buffer.alloc(0) : Buffer.from(await response.arrayBuffer());
+      await webContents.debugger.sendCommand("Fetch.fulfillRequest", {
+        body: responseBody.toString("base64"),
+        requestId,
+        responseCode: response.status,
+        responseHeaders: responseHeadersForCdp(response.headers),
+        responsePhrase: response.statusText
+      });
+      return;
+    }
+    registration.requests.set(requestId, { originalUrl: requestUrl, networkId: params.networkId });
+    if (params.networkId) {
+      registration.networkRequests.set(params.networkId, requestId);
+    }
+    // CDP rewrites the network URL without changing the URL visible to the
+    // page. Let Chromium transport the response so SSE, binary bodies and
+    // cancellation keep working without buffering the entire response here.
+    await webContents.debugger.sendCommand("Fetch.continueRequest", {
       requestId,
-      responseCode: response.status,
-      responseHeaders: responseHeadersForCdp(response.headers),
-      responsePhrase: response.statusText
+      url: backendUrl,
+      interceptResponse: true,
+      method,
+      headers: Object.entries(backendRequest.headers).map(([name, value]) => ({ name, value })),
+      ...(backendRequest.body !== undefined
+        ? { postData: Buffer.from(backendRequest.body).toString("base64") }
+        : {})
     });
   } catch (error) {
-    state.logger.warn(`[claude-design] Failed to fulfill ${safeUrlForLog(requestUrl)} from local backend. ${formatError(error)}`);
-    await continueClaudeDesignFetchRequest(webContents, requestId);
+    forgetClaudeDesignFetchRequest(registration, requestId);
+    state.logger.warn(`[claude-design] Failed to route ${safeUrlForLog(requestUrl)} to local backend. ${formatError(error)}`);
+    await failClaudeDesignFetchRequest(webContents, requestId);
+  }
+}
+
+function isClaudeDesignStreamingRequest(method: string, requestUrl: string, headers: Record<string, string>): boolean {
+  if (method.toUpperCase() === "HEAD") {
+    return false;
+  }
+  if (headerValue(headers, "accept").toLowerCase().includes("text/event-stream")) {
+    return true;
+  }
+  const pathname = new URL(requestUrl).pathname;
+  const contentType = headerValue(headers, "content-type").split(";", 1)[0].trim().toLowerCase();
+  if (method.toUpperCase() === "POST" && (
+    contentType === "application/connect+proto" ||
+    contentType === "application/connect+json" ||
+    pathname === "/design/anthropic.omelette.api.v1alpha.OmeletteService/Chat"
+  )) {
+    return true;
+  }
+  if (method.toUpperCase() === "GET" && /^\/v1\/sessions\/sse\/[^/]+\/stream\/?$/.test(pathname)) {
+    return true;
+  }
+  // The bundled frontends also use fetch's default Accept: */* for these
+  // streaming routes, including their Design and tokenized preview aliases.
+  const designPath = pathname.replace(/^\/design(?=\/)/, "").replace(/^\/_t\/[^/]+(?=\/v1\/design\/)/, "");
+  return (method.toUpperCase() === "GET" && /^\/v1\/design\/projects\/[^/]+\/events\/?$/.test(designPath)) ||
+    (method.toUpperCase() === "POST" && designPath === "/v1/design/artifact-proxy/v1/messages");
+}
+
+function forgetClaudeDesignFetchRequest(registration: ClaudeDesignFetchInterceptorRegistration, requestId: string): void {
+  const networkId = registration.requests.get(requestId)?.networkId;
+  if (networkId && registration.networkRequests.get(networkId) === requestId) {
+    registration.networkRequests.delete(networkId);
+  }
+  registration.requests.delete(requestId);
+}
+
+function claudeDesignRedirectLocation(location: string, originalUrl: string, backendUrl: string): string {
+  // Chromium resolves relative redirects against the rewritten backend URL.
+  // Keep local redirects on the original frontend origin, just like the page.
+  const target = new URL(location, backendUrl);
+  if (target.origin !== new URL(backendUrl).origin) {
+    return location;
+  }
+  const original = new URL(originalUrl);
+  target.protocol = original.protocol;
+  target.hostname = original.hostname;
+  target.port = original.port;
+  target.username = original.username;
+  target.password = original.password;
+  return target.toString();
+}
+
+async function failClaudeDesignFetchRequest(webContents: WebContents, requestId: string): Promise<void> {
+  try {
+    // A failed local rewrite must not send local project data to the original
+    // remote endpoint instead.
+    await webContents.debugger.sendCommand("Fetch.failRequest", { requestId, errorReason: "Failed" });
+  } catch {
+    // The request may already have been cancelled by navigation.
   }
 }
 
@@ -444,6 +582,13 @@ function cdpPostDataBufferCandidates(postData: string): Buffer[] {
   });
 }
 
+function claudeDesignWebRequestUrlPatterns(options: Pick<ClaudeDesignWindowCdpOptions, "hosts">): string[] {
+  return normalizeHostList(options.hosts).flatMap((host) => [
+    `https://${host}/*`,
+    `http://${host}/*`
+  ]);
+}
+
 function responseHeadersForCdp(headers: Headers): Array<{ name: string; value: string }> {
   const blocked = new Set(["connection", "content-encoding", "content-length", "keep-alive", "transfer-encoding"]);
   const responseHeaders: Array<{ name: string; value: string }> = [];
@@ -453,13 +598,6 @@ function responseHeadersForCdp(headers: Headers): Array<{ name: string; value: s
     }
   });
   return responseHeaders;
-}
-
-function claudeDesignWebRequestUrlPatterns(options: Pick<ClaudeDesignWindowCdpOptions, "hosts">): string[] {
-  return normalizeHostList(options.hosts).flatMap((host) => [
-    `https://${host}/*`,
-    `http://${host}/*`
-  ]);
 }
 
 function logClaudeDesignRedirect(state: ClaudeDesignWindowRedirectState, requestUrl: string, redirectUrl: string): void {

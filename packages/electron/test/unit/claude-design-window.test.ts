@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
+import { EventEmitter } from "node:events";
 import test from "node:test";
 import { gzipSync } from "node:zlib";
+import type { WebContents } from "electron";
 import {
   claudeDesignBackendRequestForCdp,
   claudeDesignCdpFetchPatterns,
   claudeDesignCdpOptionsFromStatus,
   claudeDesignRedirectUrlForRequest,
   claudePluginAdminPath,
+  configureClaudeDesignWindowCdp,
   gatewayAuthHeadersForTest
 } from "@agentrouter/electron/main/claude-design-window.ts";
 
@@ -126,3 +129,192 @@ test("Claude Design window status auth falls back to persisted gateway API keys"
     { authorization: "Bearer config-key" }
   );
 });
+
+test("Claude browser SSE requests use Chromium transport without reading the response in the main process", async (t) => {
+  t.mock.method(globalThis, "fetch", () => {
+    throw new Error("Streaming requests must stay in Chromium's network stack.");
+  });
+  const fixture = await createCdpFixture();
+
+  await fixture.pause({
+    requestId: "ship-stream",
+    request: {
+      method: "GET",
+      url: "https://claude.ai/v1/sessions/sse/session-1/stream?cursor=2",
+      headers: { accept: "text/event-stream", host: "claude.ai" }
+    }
+  });
+
+  assert.deepEqual(fixture.commands, [{
+    method: "Fetch.continueRequest",
+    params: {
+      requestId: "ship-stream",
+      url: "http://127.0.0.1:45678/v1/sessions/sse/session-1/stream?cursor=2",
+      interceptResponse: true,
+      method: "GET",
+      headers: [{ name: "accept", value: "text/event-stream" }]
+    }
+  }]);
+});
+
+test("Claude browser Connect Chat streams preserve binary POST data without an SSE Accept header", async (t) => {
+  t.mock.method(globalThis, "fetch", () => {
+    throw new Error("Connect Chat responses must stream without a main-process fetch.");
+  });
+  const fixture = await createCdpFixture();
+  const body = Buffer.from([0, 255, 17, 128, 65]);
+  await fixture.pause({
+    requestId: "design-chat",
+    request: {
+      method: "POST",
+      url: "https://claude.ai/design/anthropic.omelette.api.v1alpha.OmeletteService/Chat",
+      headers: { accept: "*/*", "content-encoding": "gzip", "content-length": "100", "content-type": "application/connect+proto" },
+      postDataEntries: [{ bytes: gzipSync(body).toString("base64") }]
+    }
+  });
+
+  assert.deepEqual(fixture.commands, [{
+    method: "Fetch.continueRequest",
+    params: {
+      requestId: "design-chat",
+      url: "http://127.0.0.1:45678/design/anthropic.omelette.api.v1alpha.OmeletteService/Chat",
+      interceptResponse: true,
+      method: "POST",
+      headers: [{ name: "accept", value: "*/*" }, { name: "content-type", value: "application/connect+proto" }],
+      postData: body.toString("base64")
+    }
+  }]);
+});
+
+test("Claude browser requests outside local routes continue unchanged", async () => {
+  const fixture = await createCdpFixture();
+  await fixture.pause({ requestId: "remote", request: { method: "GET", url: "https://claude.ai/settings", headers: {} } });
+  assert.deepEqual(fixture.commands, [{ method: "Fetch.continueRequest", params: { requestId: "remote" } }]);
+});
+
+test("Claude browser bundled Design streams use native transport with fetch's default Accept header", async (t) => {
+  t.mock.method(globalThis, "fetch", () => {
+    throw new Error("Bundled streaming endpoints must not buffer their responses.");
+  });
+  const fixture = await createCdpFixture();
+  for (const [method, path] of [
+    ["GET", "/v1/design/projects/test/events"],
+    ["GET", "/design/v1/design/projects/test/events"],
+    ["GET", "/_t/preview/v1/design/projects/test/events"],
+    ["GET", "/design/_t/preview/v1/design/projects/test/events"],
+    ["POST", "/design/anthropic.omelette.api.v1alpha.OmeletteService/Chat"],
+    ["POST", "/v1/design/artifact-proxy/v1/messages"],
+    ["POST", "/design/v1/design/artifact-proxy/v1/messages"]
+  ]) {
+    await fixture.pause({ requestId: path, request: { method, url: `https://claude.ai${path}`, headers: { accept: "*/*" } } });
+    assert.equal(fixture.commands.at(-1)?.method, "Fetch.continueRequest");
+    assert.equal(fixture.commands.at(-1)?.params.url, `http://127.0.0.1:45678${path}`);
+  }
+});
+
+test("Claude browser nonstream responses retain original-origin cookie handling", async (t) => {
+  t.mock.method(globalThis, "fetch", async () => new Response("signed in", {
+    headers: { "content-type": "text/plain", "set-cookie": "session=local; Secure; Path=/" }
+  }));
+  const fixture = await createCdpFixture();
+  await fixture.pause({ requestId: "login", request: { method: "POST", url: "https://claude.ai/design/login", headers: {} } });
+  assert.equal(fixture.commands.length, 1);
+  assert.equal(fixture.commands[0].method, "Fetch.fulfillRequest");
+  assert.equal(fixture.commands[0].params.body, Buffer.from("signed in").toString("base64"));
+  assert.ok(fixture.commands[0].params.responseHeaders.some((header: { name: string; value: string }) =>
+    header.name === "set-cookie" && header.value === "session=local; Secure; Path=/"
+  ));
+});
+
+test("Claude browser SSE response headers resume without waiting for the stream to finish", async (t) => {
+  t.mock.method(globalThis, "fetch", () => {
+    throw new Error("The main process must not consume a streaming response.");
+  });
+  const fixture = await createCdpFixture();
+  await fixture.pause({ requestId: "stream", networkId: "network-stream", request: { method: "GET", url: "https://claude.ai/v1/sessions/sse/test/stream" } });
+  await fixture.pause({
+    requestId: "stream",
+    request: { method: "GET", url: "http://127.0.0.1:45678/v1/sessions/sse/test/stream" },
+    responseStatusCode: 200,
+    responseHeaders: [{ name: "content-type", value: "text/event-stream" }]
+  });
+  assert.deepEqual(fixture.commands[1], { method: "Fetch.continueResponse", params: { requestId: "stream" } });
+});
+
+test("Claude browser backend redirects keep the frontend origin and do not retain the backend port", async () => {
+  const fixture = await createCdpFixture();
+  for (const location of ["../landed?tab=1", "http://127.0.0.1:45678/design/landed?tab=1"]) {
+    await fixture.pause({ requestId: "redirect", request: { method: "GET", url: "https://claude.ai/design/login/start", headers: { accept: "text/event-stream" } } });
+    await fixture.pause({
+      requestId: "redirect",
+      request: { method: "GET", url: "http://127.0.0.1:45678/design/login/start" },
+      responseStatusCode: 302,
+      responseStatusText: "Found",
+      responseHeaders: [{ name: "Location", value: location }, { name: "set-cookie", value: "session=local" }]
+    });
+    assert.deepEqual(fixture.commands.at(-1), {
+      method: "Fetch.fulfillRequest",
+      params: {
+        requestId: "redirect",
+        body: "",
+        responseCode: 302,
+        responsePhrase: "Found",
+        responseHeaders: [{ name: "Location", value: "https://claude.ai/design/landed?tab=1" }, { name: "set-cookie", value: "session=local" }]
+      }
+    });
+  }
+});
+
+test("Claude browser explicit external redirects remain unchanged", async () => {
+  const fixture = await createCdpFixture();
+  await fixture.pause({ requestId: "redirect", request: { method: "GET", url: "https://claude.ai/design/login", headers: { accept: "text/event-stream" } } });
+  await fixture.pause({
+    requestId: "redirect",
+    request: { method: "GET", url: "http://127.0.0.1:45678/design/login" },
+    responseStatusCode: 302,
+    responseHeaders: [{ name: "Location", value: "https://auth.example.com/login" }]
+  });
+  assert.equal(fixture.commands.at(-1)?.params.responseHeaders[0].value, "https://auth.example.com/login");
+});
+
+test("Claude browser failed rewrites fail locally without retrying the original remote URL", async () => {
+  const fixture = await createCdpFixture(true);
+  await fixture.pause({
+    requestId: "failed",
+    request: { method: "POST", url: "https://claude.ai/v1/sessions/test/events", headers: { accept: "text/event-stream" }, postData: "private project data" }
+  });
+  assert.deepEqual(fixture.commands.map(({ method }) => method), ["Fetch.continueRequest", "Fetch.failRequest"]);
+  assert.deepEqual(fixture.commands[1].params, { requestId: "failed", errorReason: "Failed" });
+});
+
+async function createCdpFixture(rejectRewrite = false) {
+  const commands: Array<{ method: string; params: any }> = [];
+  const debuggerApi = Object.assign(new EventEmitter(), {
+    isAttached: () => true,
+    sendCommand: async (method: string, params: any) => {
+      commands.push({ method, params });
+      if (rejectRewrite && method === "Fetch.continueRequest" && params.url) {
+        throw new Error("Rewrite rejected");
+      }
+    }
+  });
+  const webContents = Object.assign(new EventEmitter(), {
+    debugger: debuggerApi,
+    id: 42,
+    session: { webRequest: { onBeforeRequest: () => undefined } }
+  }) as unknown as WebContents;
+  await configureClaudeDesignWindowCdp(webContents, {
+    backendUrl: "http://127.0.0.1:45678/",
+    hosts: ["claude.ai"],
+    paths: ["/v1/sessions", "/v1/design", "/design", "/_t"],
+    logger: { info: () => undefined, warn: () => undefined }
+  });
+  commands.length = 0;
+  return {
+    commands,
+    pause: async (params: unknown) => {
+      debuggerApi.emit("message", {}, "Fetch.requestPaused", params);
+      await new Promise<void>((resolve) => setImmediate(resolve));
+    }
+  };
+}

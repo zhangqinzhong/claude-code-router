@@ -8,7 +8,7 @@ import { loadAppConfig } from "@agentrouter/core/config/config.ts";
 import { createDefaultAppConfig } from "@agentrouter/core/config/default-config.ts";
 import { replacePersistedApiKeys, replacePersistedAppConfig } from "@agentrouter/core/config/config-repository.ts";
 import { CONFIGDIR } from "@agentrouter/core/config/constants.ts";
-import { applyProfileConfig, cleanupGeneratedBinBackups, resolveGrokSourceHome, resolveKimiSourceHome, restoreInactiveGlobalProfileConfigs, restoreGlobalProfileConfigsOnExit } from "@agentrouter/core/profiles/service.ts";
+import { applyProfileRuntimeConfig, applyProfileConfig, cleanupGeneratedBinBackups, resolveGrokSourceHome, resolveKimiSourceHome, restoreInactiveGlobalProfileConfigs, restoreGlobalProfileConfigsOnExit } from "@agentrouter/core/profiles/service.ts";
 
 test("Grok profile source home follows profile and process environment overrides", () => {
   const previous = {
@@ -2118,4 +2118,37 @@ test("profile service reports a failed model discovery cache invalidation withou
 async function applyProfileFixture(config, options) {
   await replacePersistedApiKeys(config.APIKEYS ?? []);
   return applyProfileConfig(config, options);
+}
+
+for (const legacy of [false, true]) {
+  test(`disabled Claude profile restores mixed settings from ${legacy ? "legacy" : "current"} original`, () => {
+    const root = mkdtempSync(path.join(os.tmpdir(), "ar-disabled-mixed-"));
+    try {
+      const file = path.join(root, "settings.json");
+      const profile = { agent: "claude-code", id: "disabled-mixed", enabled: false, scope: "global", settingsFile: file, env: {}, model: "", surface: "auto" };
+      const original = { env: { ANTHROPIC_BASE_URL: "https://provider.test/anthropic", ANTHROPIC_AUTH_TOKEN: "original-token", ANTHROPIC_MODEL: "original-model" }, statusLine: { command: "old" } };
+      const managed = { apiKeyHelper: `/tmp/${legacy ? "ccr" : "ar"}-claude-code-api-key-disabled-mixed${process.platform === "win32" ? ".cmd" : ""}`, env: { ANTHROPIC_BASE_URL: "http://127.0.0.1:3466", ANTHROPIC_API_BASE_URL: "http://127.0.0.1:3466", CLAUDE_AGENT_API_BASE_URL: "http://127.0.0.1:3466", ANTHROPIC_MODEL: "Provider/model", USER_SETTING: "kept" }, hooks: { custom: [] }, statusLine: { command: "new" } };
+      writeFileSync(file, JSON.stringify(managed));
+      writeFileSync(`${file}.ar-original`, JSON.stringify(legacy ? managed : original));
+      if (legacy) writeFileSync(`${file}.ccr-original`, JSON.stringify(original));
+      // A mixed managed backup must never be mistaken for the user's original.
+      writeFileSync(`${file}.ar-backup-2026-09-13`, JSON.stringify(managed));
+      const result = applyProfileRuntimeConfig(createDefaultAppConfig(), profile, "unused");
+      assert.equal(result.ok, true);
+      const restored = JSON.parse(readFileSync(file, "utf8"));
+      assert.equal(restored.apiKeyHelper, undefined);
+      assert.deepEqual(restored.env, { ...original.env, USER_SETTING: "kept" });
+      assert.deepEqual(restored.hooks, managed.hooks);
+      assert.deepEqual(restored.statusLine, managed.statusLine);
+      const content = readFileSync(file, "utf8");
+      applyProfileRuntimeConfig(createDefaultAppConfig(), profile, "unused");
+      assert.equal(readFileSync(file, "utf8"), content);
+      restored.apiKeyHelper = "/usr/local/bin/custom-helper";
+      writeFileSync(file, JSON.stringify(restored));
+      applyProfileRuntimeConfig(createDefaultAppConfig(), profile, "unused");
+      assert.equal(JSON.parse(readFileSync(file, "utf8")).apiKeyHelper, restored.apiKeyHelper);
+    } finally {
+      rmSync(root, { recursive: true, force: true });
+    }
+  });
 }

@@ -3165,7 +3165,7 @@ function withoutManagedClaudeCodeApiKeyHelper(settings: Record<string, unknown>)
 }
 
 function isManagedClaudeCodeApiKeyHelper(value: unknown): boolean {
-  return typeof value === "string" && value.includes("ar-claude-code-api-key-");
+  return typeof value === "string" && /\b(?:ar|ccr)-claude-code-api-key-/.test(value);
 }
 
 function claudeCodeManagedSettingsEnvKeys(
@@ -3403,8 +3403,50 @@ function restoreDisabledGlobalProfile(
     return disabledStatus(profile.agent, file, disabledMessage);
   }
 
-  const restoreResult = restoreGlobalConfigFile(file, { isManagedContent, mode: privateFileMode });
+  const restoreResult = (profile.agent === "claude-code" ? restoreClaudeCodeHelperSettings(profile, file) : undefined)
+    ?? restoreGlobalConfigFile(file, { isManagedContent, mode: privateFileMode });
   return disabledRestoreStatus(profile.agent, file, disabledMessage, restoreResult, profile.name || profile.id || profile.agent);
+}
+
+// A global settings file can contain both gateway settings and user hooks/plugins.
+// Restore only owned fields; replacing the entire file would discard user edits.
+function restoreClaudeCodeHelperSettings(profile: ProfileConfig, file: string): RestoreFileResult | undefined {
+  const current = existsSync(file) ? parseJsonContent(readFileSync(file, "utf8")) : undefined;
+  if (!current || typeof current.apiKeyHelper !== "string") {
+    return undefined;
+  }
+  const helperName = path.basename(current.apiKeyHelper.replace(/^"|"$/g, "").replaceAll("\\", "/"));
+  const expected = claudeCodeLegacyApiKeyHelperFilename(profile);
+  if (helperName !== expected && helperName !== expected.replace(/^ar-/, "ccr-")) {
+    return undefined;
+  }
+  let original: Record<string, unknown> | undefined;
+  // Legacy originals may coexist with a newer, already-managed snapshot.
+  for (const candidate of [...backupFiles(file).reverse(), originalBackupFilePath(file), `${file}.ccr-original`]) {
+    if (!existsSync(candidate)) continue;
+    const settings = parseJsonContent(readFileSync(candidate, "utf8"));
+    if (!settings || isManagedClaudeCodeApiKeyHelper(settings.apiKeyHelper)) continue;
+    const env = isRecord(settings.env) ? settings.env : {};
+    if (claudeCodeGatewayEnvKeys.every((key) => typeof env[key] === "string")) continue;
+    original = settings;
+    break;
+  }
+  const next = { ...current };
+  if (original && typeof original.apiKeyHelper === "string") next.apiKeyHelper = original.apiKeyHelper;
+  else delete next.apiKeyHelper;
+  const env = isRecord(current.env) ? { ...current.env } : {};
+  const originalEnv = original && isRecord(original.env) ? original.env : {};
+  for (const key of new Set([...Object.keys(env), ...Object.keys(originalEnv)])) {
+    if (!isManagedClaudeCodeSettingsEnvKey(key) && key !== "ANTHROPIC_AUTH_TOKEN" &&
+        key !== "ANTHROPIC_API_KEY" && key !== "CCR_CLAUDE_CODE_MODEL") continue;
+    if (hasOwn(originalEnv, key)) env[key] = originalEnv[key];
+    else delete env[key];
+  }
+  if (Object.keys(env).length) next.env = env;
+  else delete next.env;
+  const backupFile = backupCurrentConfigFile(file, privateFileMode);
+  writeFileSync(file, `${JSON.stringify(next, null, 2)}\n`, { encoding: "utf8", mode: privateFileMode });
+  return { backupFile, changed: true, file, missingBackup: !original, restored: Boolean(original) };
 }
 
 function disabledProfileStatus(profile: ProfileConfig): ProfileClientApplyStatus {
