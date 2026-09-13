@@ -2,9 +2,18 @@ import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
-import test from "node:test";
+import test, { before, after } from "node:test";
 import { claudeDesignRuntimePluginConfig, claudeShipRuntimePluginConfig, migrateKnownGatewayPluginConfigsForTest, withClaudeDesignRuntimePluginConfig } from "@agentrouter/core/config/config.ts";
 import { AR_DESKTOP_APP_ENV } from "@agentrouter/core/runtime/desktop-app.ts";
+
+const originalElectronVersion = Object.getOwnPropertyDescriptor(process.versions, "electron");
+// These tests simulate desktop mode even when CI executes them with plain Node.
+before(() => {
+  if (!originalElectronVersion) Object.defineProperty(process.versions, "electron", { value: "test", configurable: true });
+});
+after(() => {
+  if (!originalElectronVersion) delete process.versions.electron;
+});
 
 test("legacy combined Claude Design plugin config migrates to split Design and Ship plugins", () => {
   const extensionsRoot = mkdtempSync(path.join(os.tmpdir(), "ar-extensions-migration-"));
